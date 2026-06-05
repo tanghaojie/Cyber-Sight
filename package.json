@@ -1,0 +1,10 @@
+{
+  "name": "ai-web-scaffold",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "pnpm --parallel -r dev",
+    "build": "pnpm --parallel -r build",
+    "gen:client": "openapi-typescript packages/openapi-spec/openapi.yaml -o apps/frontend/src/api-types/schema.d.ts"
+  }
+}
