@@ -6,5 +6,8 @@
     "dev": "pnpm --parallel -r dev",
     "build": "pnpm --parallel -r build",
     "gen:client": "openapi-typescript packages/openapi-spec/openapi.yaml -o apps/frontend/src/api-types/schema.d.ts"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.3.0"
   }
 }
