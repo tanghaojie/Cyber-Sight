@@ -11,6 +11,8 @@ docs/
 │   ├── system-overview.md
 │   └── modules/
 ├── decisions/               # ADR：重要且长期有效的技术决策
+├── guides/                  # 面向人类维护者的操作型开发指南
+├── reference/               # 错误码等需要持续维护的参考表
 ├── plans/
 │   ├── active/              # 正在实施的计划
 │   └── archive/             # 已完成、取消或被替代的历史计划
@@ -27,6 +29,9 @@ docs/
 3. 相关的[架构决策](decisions/README.md)
 4. [进行中的实施计划](plans/README.md)
 5. 必要时查看历史计划和 [AI 协作记录](ai-logs/README.md)
+
+第一次参与项目开发的人类维护者应先阅读[人类维护者开发指南](guides/human-maintainer-development-guide.md)。
+业务错误码统一查询和登记在[错误码参考](reference/error-codes.md)。
 
 ## 文档分工
 

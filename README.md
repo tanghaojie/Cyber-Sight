@@ -42,3 +42,9 @@ pnpm test:db       # 检查 PostgreSQL 连接和关键表
 ## 切换后端到 Java
 
 前端通过 `@scaffold/openapi-spec` 使用共享契约类型。切换 Java 时应保持 `packages/openapi-spec/openapi.yaml` 的接口语义，并通过同一组契约回归测试验证新实现。
+
+## 开发文档
+
+- [人类维护者开发指南](docs/guides/human-maintainer-development-guide.md)：目录职责、OpenAPI、Drizzle、Vitest、新增接口和数据库维护流程。
+- [错误码参考](docs/reference/error-codes.md)：统一响应、错误码区间和登记流程。
+- [系统与模块设计](docs/design/README.md)：当前有效架构和模块边界。

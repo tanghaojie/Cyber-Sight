@@ -24,7 +24,13 @@ Swagger UI 仍使用 Fastify 路由 Schema 生成运行时文档，因此共享 
 - 后端实现必须通过契约测试证明请求和响应符合 OpenAPI。
 - Swagger UI 展示内容必须与共享契约一致，不能长期维护独立事实源。
 - Java 后端若引入，也必须消费或验证同一份契约。
+- 普通业务响应统一使用 `{ status: number, data?: T, err?: string }`；`status = 0` 表示成功，其他值必须来自错误码表。
+- 分页请求统一使用可选 `pageNum`、`pageSize`，默认值为 `1`、`10`。
+- 分页响应统一使用 `{ status: number, list: T[], total: number, err?: string }`。
+- HTTP 状态码仍表达传输语义，响应体 `status` 表达业务结果，两者不能互相替代。
 
 ## 已采用方案
 
 ADR-0002 决定采用“共享生成类型 + 运行时契约测试”的渐进方案。它先消除前后端编译期类型分叉，同时保留 Fastify 的运行时序列化和 Swagger 能力。后续如重复维护成本继续升高，再单独评估 Schema 自动生成。
+
+ADR-0003 定义统一响应、分页和错误码约定。OpenAPI 3.0 不支持真正的泛型，因此每个接口仍要在契约中定义具体 `data` 或 `list` 项类型；TypeScript 侧通过共享泛型减少重复。

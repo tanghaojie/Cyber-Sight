@@ -6,15 +6,28 @@ export function useHealth() {
   const timestamp = ref<string>('')
   const error = ref<string | null>(null)
 
-  const fetchHealth = async () => {
-    const { data, error: err } = await apiClient.GET('/health')
-    if (err) {
-      error.value = 'Failed to reach backend'
+  async function fetchHealth() {
+    error.value = null
+
+    const { data: response, error: responseError } =
+      await apiClient.GET('/health')
+
+    if (responseError) {
+      error.value = responseError.err ?? 'Failed to reach backend'
       status.value = 'error'
+      timestamp.value = ''
       return
     }
-    status.value = data.status
-    timestamp.value = data.timestamp
+
+    if (!response || response.status !== 0 || !response.data) {
+      error.value = response?.err ?? 'Backend returned an invalid response'
+      status.value = 'error'
+      timestamp.value = ''
+      return
+    }
+
+    status.value = response.data.status
+    timestamp.value = response.data.timestamp
   }
 
   onMounted(fetchHealth)

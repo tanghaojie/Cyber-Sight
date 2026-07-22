@@ -1,0 +1,13 @@
+export const ErrorCode = {
+  SUCCESS: 0,
+  INVALID_REQUEST: 1000,
+  UNAUTHORIZED: 1001,
+  FORBIDDEN: 1002,
+  RESOURCE_NOT_FOUND: 1003,
+  RESOURCE_CONFLICT: 1004,
+  RATE_LIMITED: 1005,
+  INTERNAL_ERROR: 9000,
+  EXTERNAL_DEPENDENCY_ERROR: 9001,
+} as const
+
+export type ErrorCodeValue = (typeof ErrorCode)[keyof typeof ErrorCode]

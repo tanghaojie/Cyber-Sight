@@ -22,10 +22,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HealthResponse'
+        default:
+          description: Request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   schemas:
-    HealthResponse:
+    HealthData:
       type: object
       required:
         - status
@@ -37,3 +43,57 @@ components:
         timestamp:
           type: string
           format: date-time
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - data
+      properties:
+        status:
+          type: integer
+          enum: [0]
+        data:
+          $ref: '#/components/schemas/HealthData'
+        err:
+          type: string
+    ErrorResponse:
+      type: object
+      required:
+        - status
+        - err
+      properties:
+        status:
+          type: integer
+          minimum: 1
+        err:
+          type: string
+    PaginationRequest:
+      type: object
+      properties:
+        pageNum:
+          type: integer
+          minimum: 1
+          example: 1
+          description: 1-based page number; defaults to 1 when omitted
+        pageSize:
+          type: integer
+          minimum: 1
+          example: 10
+          description: Number of items per page; defaults to 10 when omitted
+    PaginationResponse:
+      type: object
+      required:
+        - status
+        - list
+        - total
+      properties:
+        status:
+          type: integer
+        list:
+          type: array
+          items: {}
+        total:
+          type: integer
+          minimum: 0
+        err:
+          type: string

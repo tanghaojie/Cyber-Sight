@@ -44,6 +44,10 @@
 - 业务规则不得只存在于 Vue 组件或 Fastify 路由中，应放在可测试、与传输层解耦的模块内。
 - 数据库专属实现必须隔离在基础设施层；不得宣称只换 import 就能切换数据库。
 - 新模块必须同时说明职责、边界、公共接口、依赖、数据流、失败模式和测试策略。
+- 有名称的函数优先使用 `function name() {}` 或 `async function name() {}` 声明；只有短小回调、闭包或必须保持词法 `this` 时使用箭头函数。
+- 业务 API 成功响应统一为 `{ status: 0, data?: T }`，失败响应统一为 `{ status: 非零错误码, err: string }`。
+- 分页请求统一接受可选的 `pageNum`、`pageSize`，默认分别为 `1`、`10`；分页响应统一为 `{ status, list, total, err? }`。
+- 新增或修改错误码必须同步更新 `docs/reference/error-codes.md`，禁止直接在业务代码散落无说明的数字错误码。
 
 ## AI 协作记录规则
 

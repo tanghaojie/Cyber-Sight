@@ -21,6 +21,8 @@
 - 页面必须明确处理 loading、empty、error 和 success 状态。
 - 跨页面共享状态才进入 Pinia；局部状态保留在组件或 composable。
 - 新业务模块必须提供组件/逻辑测试，并为关键流程提供端到端测试。
+- API 调用必须先检查传输错误，再检查响应体业务 `status`；只有 `status === 0` 且存在预期数据时才进入成功状态。
+- 分页页面通过统一的 `pageNum`、`pageSize` 请求和 `list`、`total` 响应维护状态。
 
 前端测试使用 Vitest、Vue Test Utils 和 jsdom。页面测试应隔离网络，通过 mock composable 或 API Client 验证 loading、error 和 success 展示；真实前后端流程留给端到端测试。
 

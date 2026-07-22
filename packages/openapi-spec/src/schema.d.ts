@@ -25,11 +25,39 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        HealthResponse: {
+        HealthData: {
             /** @enum {string} */
             status: "ok";
             /** Format: date-time */
             timestamp: string;
+        };
+        HealthResponse: {
+            /** @enum {integer} */
+            status: 0;
+            data: components["schemas"]["HealthData"];
+            err?: string;
+        };
+        ErrorResponse: {
+            status: number;
+            err: string;
+        };
+        PaginationRequest: {
+            /**
+             * @description 1-based page number; defaults to 1 when omitted
+             * @example 1
+             */
+            pageNum?: number;
+            /**
+             * @description Number of items per page; defaults to 10 when omitted
+             * @example 10
+             */
+            pageSize?: number;
+        };
+        PaginationResponse: {
+            status: number;
+            list: unknown[];
+            total: number;
+            err?: string;
         };
     };
     responses: never;
@@ -56,6 +84,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+            /** @description Request failed */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };

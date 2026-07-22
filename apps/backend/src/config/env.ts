@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import { z } from 'zod'
+import { z, type ZodIssue } from 'zod'
 
 const envSchema = z.object({
   DATABASE_URL: z.string().url(),
@@ -9,10 +9,12 @@ const envSchema = z.object({
 
 const parsed = envSchema.safeParse(process.env)
 
+function formatIssue(issue: ZodIssue): string {
+  return `${issue.path.join('.')}: ${issue.message}`
+}
+
 if (!parsed.success) {
-  const details = parsed.error.issues
-    .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
-    .join('; ')
+  const details = parsed.error.issues.map(formatIssue).join('; ')
   throw new Error(`Invalid backend environment: ${details}`)
 }
 

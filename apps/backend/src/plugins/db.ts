@@ -8,10 +8,13 @@ declare module 'fastify' {
   }
 }
 
-export default fp(async (app: FastifyInstance) => {
-  app.decorate('db', db)
+async function closeDatabase(): Promise<void> {
+  await databaseClient.end()
+}
 
-  app.addHook('onClose', async () => {
-    await databaseClient.end()
-  })
-})
+async function registerDatabase(app: FastifyInstance): Promise<void> {
+  app.decorate('db', db)
+  app.addHook('onClose', closeDatabase)
+}
+
+export default fp(registerDatabase)
