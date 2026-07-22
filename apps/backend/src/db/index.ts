@@ -1,10 +1,9 @@
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
+import { env } from '../config/env.js'
 import * as schema from './schema.js'
 
-// 切换数据库：将 drizzle-orm/postgres-js 换成 drizzle-orm/mysql2
-const connectionString = process.env.DATABASE_URL ?? 'postgres://localhost:5432/scaffold'
-const client = postgres(connectionString)
+export const databaseClient = postgres(env.DATABASE_URL)
 
-export const db = drizzle(client, { schema })
+export const db = drizzle(databaseClient, { schema })
 export type Database = typeof db

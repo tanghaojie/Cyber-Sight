@@ -5,7 +5,14 @@
   "scripts": {
     "dev": "pnpm --parallel -r dev",
     "build": "pnpm --parallel -r build",
-    "gen:client": "openapi-typescript packages/openapi-spec/openapi.yaml -o apps/frontend/src/api-types/schema.d.ts"
+    "test": "pnpm -r test",
+    "test:watch": "pnpm --parallel -r test:watch",
+    "test:db": "pnpm --filter @scaffold/backend db:check",
+    "db:generate": "pnpm --filter @scaffold/backend db:generate",
+    "db:migrate": "pnpm --filter @scaffold/backend db:migrate",
+    "gen:api": "openapi-typescript packages/openapi-spec/openapi.yaml -o packages/openapi-spec/src/schema.d.ts",
+    "gen:client": "pnpm gen:api",
+    "preinstall": "npx only-allow pnpm"
   },
   "devDependencies": {
     "openapi-typescript": "^7.3.0"

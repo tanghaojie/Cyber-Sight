@@ -4,16 +4,23 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/app.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/app.js"
+    "start": "node dist/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:check": "tsx src/db/check.ts"
   },
   "dependencies": {
+    "@scaffold/openapi-spec": "workspace:*",
     "fastify": "^4.28.0",
     "@fastify/sensible": "^5.6.0",
     "@fastify/swagger": "^8.15.0",
     "@fastify/swagger-ui": "^4.0.0",
     "fastify-plugin": "^4.5.1",
+    "dotenv": "^16.4.5",
     "drizzle-orm": "^0.32.0",
     "postgres": "^3.4.0",
     "zod": "^3.23.0"
@@ -22,6 +29,8 @@
     "tsx": "^4.19.0",
     "typescript": "^5.5.0",
     "@types/node": "^22.0.0",
-    "drizzle-kit": "^0.23.0"
+    "drizzle-kit": "^0.23.0",
+    "vitest": "^2.1.0",
+    "yaml": "^2.5.0"
   }
 }

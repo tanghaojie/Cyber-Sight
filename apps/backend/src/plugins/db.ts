@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify'
 import fp from 'fastify-plugin'
-import { db } from '../db/index.js'
+import { databaseClient, db } from '../db/index.js'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -10,4 +10,8 @@ declare module 'fastify' {
 
 export default fp(async (app: FastifyInstance) => {
   app.decorate('db', db)
+
+  app.addHook('onClose', async () => {
+    await databaseClient.end()
+  })
 })
