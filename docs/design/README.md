@@ -7,6 +7,7 @@
 - [系统概览](system-overview.md)：目标、边界、核心原则和演进方向。
 - [文档治理](documentation-governance.md)：文档类型、生命周期和 AI 文档门禁。
 - [测试策略](testing-strategy.md)：测试分层、默认测试边界和契约校验。
+- [管理系统基础能力](management-system.md)：认证、软删除审计、基础资料模块和管理端框架。
 
 ## 模块设计
 

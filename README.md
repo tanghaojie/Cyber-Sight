@@ -1,6 +1,6 @@
 # AI Web Scaffold
 
-前后端分离的 pnpm monorepo 脚手架，以 OpenAPI 3.0 为契约层。
+前后端分离的 pnpm monorepo 管理系统脚手架，以 OpenAPI 3.0 为契约层，内置登录、管理后台框架和用户/角色/菜单/字典管理。
 
 ## 快速开始
 
@@ -17,6 +17,10 @@ pnpm dev
 - 前端：http://localhost:5173
 - 后端 API：http://localhost:3000
 - Swagger UI：http://localhost:3000/docs
+
+首次执行迁移会创建本地管理员 `admin / Admin@123456`。该凭据仅用于本地初始化，进入共享或生产环境前必须修改。
+
+所有业务表统一使用软删除，并包含 `is_deleted`、`created_at`、`created_by`、`updated_at`、`updated_by` 五个生命周期字段。
 
 ## 添加新接口的步骤（AI 的工作路径）
 

@@ -20,7 +20,7 @@ export function useHealth() {
     }
 
     if (!response || response.status !== 0 || !response.data) {
-      error.value = response?.err ?? 'Backend returned an invalid response'
+      error.value = 'Backend returned an invalid response'
       status.value = 'error'
       timestamp.value = ''
       return

@@ -12,6 +12,8 @@
 - `src/modules/`：按业务能力组织的路由模块。
 - `src/db/`：Drizzle Schema 与数据库客户端。
 - `drizzle.config.ts`：数据库迁移生成配置。
+- `src/modules/auth/`：密码散列、数据库会话、登录/退出和当前用户解析。
+- `src/modules/admin/`：用户、角色、菜单和字典管理 API 与 Drizzle 仓储。
 
 应用组装与网络监听必须分离，使测试可以通过 Fastify `inject` 验证路由而不占用端口。环境变量由集中配置模块加载和校验，数据库客户端在应用关闭时释放。
 
@@ -48,9 +50,10 @@ Java 替换不是简单代码生成，需要独立的设计、ADR、迁移计划
 - `.env.example` 只提供无敏感信息的示例。
 - Drizzle 迁移文件进入版本控制，数据库结构变化通过迁移执行。
 - 默认单元和路由测试不得依赖本机数据库；数据库集成验证使用独立命令显式运行。
+- 所有业务表包含 `is_deleted`、`created_at`、`created_by`、`updated_at`、`updated_by`；仓储查询显式过滤软删除数据。
 
 ## 仍待解决
 
 - 健康检查目前是存活检查，不验证数据库 readiness。
-- 缺少完整业务分层示例。
+- 管理模块已提供路由、认证服务和基础设施仓储分离示例；更复杂领域用例仍需继续拆分应用层与领域层。
 - PostgreSQL 绑定存在于 Schema、驱动和 Drizzle 配置多个位置。

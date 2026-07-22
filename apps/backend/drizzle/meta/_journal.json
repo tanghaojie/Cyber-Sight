@@ -8,6 +8,13 @@
       "when": 1784729728632,
       "tag": "0000_happy_shockwave",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1784736160888,
+      "tag": "0001_huge_gargoyle",
+      "breakpoints": true
     }
   ]
 }

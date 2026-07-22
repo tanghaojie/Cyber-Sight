@@ -110,6 +110,43 @@ describe('GET /health', () => {
     expect(runtimeErrorSchema.required).toEqual(contractErrorSchema.required)
   })
 
+  it('exposes every authentication and management operation from the contract', async () => {
+    const contractPath = new URL(
+      '../../../packages/openapi-spec/openapi.yaml',
+      import.meta.url
+    )
+    const contract = parse(await readFile(contractPath, 'utf8'))
+    const runtimeResponse = await app.inject({ method: 'GET', url: '/docs/json' })
+    const runtime = runtimeResponse.json()
+    const operations = [
+      ['/auth/login', 'post'],
+      ['/auth/logout', 'post'],
+      ['/auth/me', 'get'],
+      ['/admin/users', 'get'],
+      ['/admin/users', 'post'],
+      ['/admin/users/{id}', 'put'],
+      ['/admin/users/{id}', 'delete'],
+      ['/admin/roles', 'get'],
+      ['/admin/roles', 'post'],
+      ['/admin/roles/{id}', 'put'],
+      ['/admin/roles/{id}', 'delete'],
+      ['/admin/menus', 'get'],
+      ['/admin/menus', 'post'],
+      ['/admin/menus/{id}', 'put'],
+      ['/admin/menus/{id}', 'delete'],
+      ['/admin/dictionaries', 'get'],
+      ['/admin/dictionaries', 'post'],
+      ['/admin/dictionaries/{id}', 'put'],
+      ['/admin/dictionaries/{id}', 'delete'],
+    ] as const
+
+    for (const [path, method] of operations) {
+      expect(runtime.paths[path][method].operationId).toBe(
+        contract.paths[path][method].operationId
+      )
+    }
+  })
+
   it('returns a unified not-found response', async () => {
     const response = await app.inject({
       method: 'GET',
@@ -168,4 +205,24 @@ describe('GET /health', () => {
       err: 'Authentication required',
     })
   })
+
+  it.each([
+    ['GET', '/auth/me'],
+    ['POST', '/auth/logout'],
+    ['GET', '/admin/users'],
+    ['GET', '/admin/roles'],
+    ['GET', '/admin/menus'],
+    ['GET', '/admin/dictionaries'],
+  ] as const)(
+    'protects %s %s when no session cookie is present',
+    async (method, url) => {
+      const response = await app.inject({ method, url })
+
+      expect(response.statusCode).toBe(401)
+      expect(response.json()).toEqual({
+        status: ErrorCode.UNAUTHORIZED,
+        err: 'Authentication required',
+      })
+    }
+  )
 })

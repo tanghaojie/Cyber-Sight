@@ -8,5 +8,6 @@ ADR 记录会长期影响项目的技术选择及其理由。已接受的 ADR �
 - [ADR-0002：共享 OpenAPI 生成类型并以契约测试校验运行时接口](ADR-0002-shared-generated-api-types.md)
 - [ADR-0003：统一业务响应、分页和错误码](ADR-0003-unified-api-response-and-error-codes.md)
 - [ADR-0004：HTTP 状态与前端全局错误处理边界](ADR-0004-http-status-and-frontend-global-error-handling.md)
+- [ADR-0005：统一软删除与审计字段](ADR-0005-soft-delete-and-audit-fields.md)
 
 新增 ADR 时从 [ADR 模板](../templates/adr-template.md)复制，使用下一个连续编号。

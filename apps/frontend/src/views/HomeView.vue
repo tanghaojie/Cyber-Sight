@@ -1,15 +1,2 @@
-<template>
-  <main>
-    <h1>AI Web Scaffold</h1>
-    <p>Backend status: <strong>{{ status }}</strong></p>
-    <p v-if="timestamp">Last checked: {{ timestamp }}</p>
-    <p v-if="error" style="color: red">{{ error }}</p>
-    <button @click="fetchHealth">Refresh</button>
-  </main>
-</template>
-
-<script setup lang="ts">
-import { useHealth } from '../modules/health/composables/useHealth.js'
-
-const { status, timestamp, error, fetchHealth } = useHealth()
-</script>
+<template><div class="blank-home" aria-label="空白首页"></div></template>
+<style scoped>.blank-home { min-height: calc(100vh - 156px); border: 1px solid rgba(226,229,238,.75); border-radius: 18px; background: rgba(255,255,255,.38); }</style>
