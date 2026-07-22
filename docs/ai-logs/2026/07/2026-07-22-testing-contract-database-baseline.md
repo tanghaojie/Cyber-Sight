@@ -1,7 +1,7 @@
 ---
 title: 测试、接口契约与 PostgreSQL 基线
 date: 2026-07-22
-status: active
+status: completed
 ---
 
 # 测试、接口契约与 PostgreSQL 基线
@@ -29,8 +29,21 @@ status: active
 
 ## 执行与验证结果
 
-实施中，完成后补充。
+- 子智能体确认 `sensible.ts` 无引用且不会被自动加载，文件已删除。
+- 后端拆分为可测试的 `buildApp` 和独立 `server.ts`，数据库客户端在应用关闭时释放。
+- OpenAPI 类型生成到 `@scaffold/openapi-spec`，前端 API Client 和后端 health 路由共同消费。
+- 后端增加路由和 OpenAPI/Swagger 契约测试，2 个测试通过。
+- 前端增加 HomeView loading、success、error 和 refresh 测试，4 个测试通过。
+- 用户协助完成依赖安装；锁文件和 pnpm 构建脚本许可已更新。
+- 本地环境变量完成配置，敏感凭据仅存在于 Git 忽略文件。
+- PostgreSQL 18.4 连接成功，Drizzle 首次迁移已应用，`public.users` 和迁移记录表存在。
+- 前端 TypeScript 配置增加 `noEmit`，避免 `vue-tsc` 将 JavaScript 发射到源码目录。
+- `pnpm gen:api`、`pnpm test`、`pnpm build`、`pnpm test:db` 均通过。
 
 ## 未决问题
 
 运行时 Fastify Schema 是否完全由 OpenAPI 自动生成，留待接口复杂度增加后复审。
+
+## 后续工作约定
+
+用户要求后续每轮工作在验证通过后直接创建 Git 提交。该约定已同步到根 `AGENTS.md` 和文档治理设计。

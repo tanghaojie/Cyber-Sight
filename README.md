@@ -6,8 +6,10 @@
 
 ```bash
 pnpm install
-cp apps/backend/.env.example apps/backend/.env
+# Windows PowerShell
+Copy-Item apps/backend/.env.example apps/backend/.env
 # 编辑 apps/backend/.env 填写数据库连接
+pnpm db:migrate
 pnpm dev
 ```
 
@@ -19,24 +21,24 @@ pnpm dev
 ## 添加新接口的步骤（AI 的工作路径）
 
 1. 修改 `packages/openapi-spec/openapi.yaml`
-2. `pnpm run gen:client` — 更新前端类型
+2. `pnpm gen:api` — 更新前后端共享类型
 3. 在 `apps/backend/src/modules/<module>/` 实现路由
 4. 在 `apps/frontend/src/modules/<module>/composables/` 封装调用
+5. 补充路由、契约和前端状态测试，然后运行 `pnpm test && pnpm build`
 
-## 切换数据库
+## 常用命令
 
-修改 `apps/backend/src/db/index.ts` 的 import：
-
-```typescript
-// PostgreSQL（默认）
-import { drizzle } from 'drizzle-orm/postgres-js'
-import postgres from 'postgres'
-
-// MySQL
-import { drizzle } from 'drizzle-orm/mysql2'
-import mysql from 'mysql2/promise'
+```bash
+pnpm gen:api       # 生成共享 OpenAPI 类型
+pnpm test          # 后端路由/契约测试和前端组件测试
+pnpm build         # TypeScript 检查和生产构建
+pnpm db:generate   # 根据 Drizzle Schema 生成迁移
+pnpm db:migrate    # 应用迁移
+pnpm test:db       # 检查 PostgreSQL 连接和关键表
 ```
+
+当前数据库实现是 PostgreSQL。切换 MySQL 会同时影响驱动、Drizzle Schema、迁移和测试，必须作为独立架构变更处理，不能只替换 import。
 
 ## 切换后端到 Java
 
-前端无需改动，只需用同一份 `packages/openapi-spec/openapi.yaml` 生成 Spring Boot 项目骨架，并重新运行 `pnpm run gen:client`。
+前端通过 `@scaffold/openapi-spec` 使用共享契约类型。切换 Java 时应保持 `packages/openapi-spec/openapi.yaml` 的接口语义，并通过同一组契约回归测试验证新实现。

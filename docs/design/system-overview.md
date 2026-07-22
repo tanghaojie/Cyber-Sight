@@ -56,8 +56,8 @@ Fastify 是默认后端，不同时维护等价 Java 服务。只有明确需求
 
 ## 已知差距
 
-- OpenAPI 文件、Fastify JSON Schema 和 Zod Schema 当前存在重复定义；本轮将先统一编译期类型来源并增加契约测试，运行时 Schema 生成留待后续演进。
+- 前后端已统一消费 OpenAPI 生成类型，并用契约测试校验 Fastify Swagger；Fastify JSON Schema 和 OpenAPI 仍是两种运行时表达，自动生成留待后续演进。
 - PostgreSQL/MySQL 可切换能力仍是愿景，当前实现绑定 PostgreSQL。
-- 缺少 CI 和生产部署基线；测试、契约校验、迁移与配置校验将在本轮建立最小基线。
+- 已建立测试、契约校验、迁移与配置校验最小基线；仍缺少 CI 和生产部署基线。
 
 这些差距应通过后续 ADR 和实施计划逐步解决，不在没有需求和验证的情况下大规模预构建。
