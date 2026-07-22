@@ -21,3 +21,4 @@ ai-logs/YYYY/MM/YYYY-MM-DD-<topic>.md
 - [2026-07-22：项目背景确认与文档治理](2026/07/2026-07-22-project-context-and-documentation-governance.md)
 - [2026-07-22：测试、接口契约与 PostgreSQL 基线](2026/07/2026-07-22-testing-contract-database-baseline.md)
 - [2026-07-22：维护者指南与统一 API 响应](2026/07/2026-07-22-maintainer-guide-and-api-response-standard.md)
+- [2026-07-22：HTTP 状态与前端全局拦截器](2026/07/2026-07-22-http-status-and-global-interceptor.md)

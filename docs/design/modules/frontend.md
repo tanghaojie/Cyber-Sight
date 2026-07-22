@@ -8,7 +8,7 @@
 
 - `src/views/`：路由页面。
 - `src/modules/<module>/composables/`：模块 API 调用和页面状态封装。
-- `src/api/`：共享 API Client。
+- `src/api/`：共享 API Client 和 HTTP 401/404/500 全局响应拦截器。
 - `@scaffold/openapi-spec`：前后端共享的 OpenAPI 生成类型，禁止手改。
 - `src/router/`：路由配置。
 - Pinia 已初始化，但当前没有 store。
@@ -21,13 +21,14 @@
 - 页面必须明确处理 loading、empty、error 和 success 状态。
 - 跨页面共享状态才进入 Pinia；局部状态保留在组件或 composable。
 - 新业务模块必须提供组件/逻辑测试，并为关键流程提供端到端测试。
-- API 调用必须先检查传输错误，再检查响应体业务 `status`；只有 `status === 0` 且存在预期数据时才进入成功状态。
+- 共享响应拦截器统一处理 HTTP `401`、`404`、`500` 并发布 `api:global-http-error` 事件；应用壳层监听事件执行登录、404 页面或 500 提示等全局动作。
+- 业务模块处理 HTTP `200` 响应中的非零业务 `status`；只有 `status === 0` 且存在预期数据时才进入成功状态。
 - 分页页面通过统一的 `pageNum`、`pageSize` 请求和 `list`、`total` 响应维护状态。
 
 前端测试使用 Vitest、Vue Test Utils 和 jsdom。页面测试应隔离网络，通过 mock composable 或 API Client 验证 loading、error 和 success 展示；真实前后端流程留给端到端测试。
 
 ## 当前缺口
 
-- 只有健康检查示例，没有统一 UI、错误模型和请求状态规范。
+- 只有健康检查示例，尚未实现全局错误事件对应的登录页、404 页面和提示 UI。
 - `useHealth` 成功重试时不会清理旧错误状态。
 - 缺少样式体系、可访问性和生产环境 API 地址策略。

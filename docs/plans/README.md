@@ -10,6 +10,7 @@
 - [文档治理与 AI 强制规则](archive/2026-07-22-documentation-governance.md)：建立统一文档结构、模板和仓库级 AI 规则。
 - [测试、统一接口类型与 PostgreSQL 开发环境](archive/2026-07-22-testing-contract-database-baseline.md)：建立测试、共享类型、迁移和本地数据库基线。
 - [人类维护指南、函数风格与统一 API 响应](archive/2026-07-22-maintainer-guide-and-api-response-standard.md)：统一人类开发流程、代码风格、响应、分页和错误码。
+- [HTTP 状态策略与前端全局拦截器](archive/2026-07-22-http-status-and-global-interceptor.md)：限定全局 HTTP 错误并区分前端全局与业务模块处理边界。
 
 ## 使用规则
 

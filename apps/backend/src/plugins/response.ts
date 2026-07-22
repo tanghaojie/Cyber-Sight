@@ -37,11 +37,22 @@ function errorMessage(error: FastifyError, httpStatus: number): string {
     return 'Invalid request'
   }
 
-  if (httpStatus >= 500) {
+  if (errorCodeForHttpStatus(httpStatus) === ErrorCode.INTERNAL_ERROR) {
     return 'Internal server error'
   }
 
   return error.message
+}
+
+function responseHttpStatus(sourceHttpStatus: number): number {
+  switch (sourceHttpStatus) {
+    case 401:
+    case 404:
+    case 500:
+      return sourceHttpStatus
+    default:
+      return 200
+  }
 }
 
 async function handleNotFound(
@@ -58,20 +69,20 @@ async function handleError(
   request: FastifyRequest,
   reply: FastifyReply
 ): Promise<void> {
-  const httpStatus = error.validation
+  const sourceHttpStatus = error.validation
     ? 400
     : Math.max(400, error.statusCode ?? 500)
 
-  if (httpStatus >= 500) {
+  if (sourceHttpStatus >= 500) {
     request.log.error(error)
   }
 
   await reply
-    .code(httpStatus)
+    .code(responseHttpStatus(sourceHttpStatus))
     .send(
       failure(
-        errorCodeForHttpStatus(httpStatus),
-        errorMessage(error, httpStatus)
+        errorCodeForHttpStatus(sourceHttpStatus),
+        errorMessage(error, sourceHttpStatus)
       )
     )
 }

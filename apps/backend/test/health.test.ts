@@ -12,6 +12,36 @@ beforeAll(async () => {
   app.get('/test-error', async function throwTestError() {
     throw new Error('test-only failure')
   })
+  app.get('/test-unauthorized', async function throwUnauthorized() {
+    throw app.httpErrors.unauthorized('Authentication required')
+  })
+  app.get('/test-forbidden', async function throwForbidden() {
+    throw app.httpErrors.forbidden('Operation forbidden')
+  })
+  app.get('/test-conflict', async function throwConflict() {
+    throw app.httpErrors.conflict('Resource conflict')
+  })
+  app.get('/test-rate-limit', async function throwRateLimit() {
+    throw app.httpErrors.tooManyRequests('Too many requests')
+  })
+  app.get('/test-external-error', async function throwExternalError() {
+    throw app.httpErrors.badGateway('Dependency unavailable')
+  })
+  app.get(
+    '/test-validation',
+    {
+      schema: {
+        querystring: {
+          type: 'object',
+          required: ['value'],
+          properties: { value: { type: 'string' } },
+        },
+      },
+    },
+    async function validationRoute() {
+      return { status: ErrorCode.SUCCESS }
+    }
+  )
 })
 
 afterAll(async () => {
@@ -103,6 +133,39 @@ describe('GET /health', () => {
     expect(response.json()).toEqual({
       status: ErrorCode.INTERNAL_ERROR,
       err: 'Internal server error',
+    })
+  })
+
+  it.each([
+    ['/test-validation', ErrorCode.INVALID_REQUEST, 'Invalid request'],
+    ['/test-forbidden', ErrorCode.FORBIDDEN, 'Operation forbidden'],
+    ['/test-conflict', ErrorCode.RESOURCE_CONFLICT, 'Resource conflict'],
+    ['/test-rate-limit', ErrorCode.RATE_LIMITED, 'Too many requests'],
+    [
+      '/test-external-error',
+      ErrorCode.EXTERNAL_DEPENDENCY_ERROR,
+      'Dependency unavailable',
+    ],
+  ])(
+    'returns business error %s with HTTP 200',
+    async (url, status, err) => {
+      const response = await app.inject({ method: 'GET', url })
+
+      expect(response.statusCode).toBe(200)
+      expect(response.json()).toEqual({ status, err })
+    }
+  )
+
+  it('preserves HTTP 401 for global authentication handling', async () => {
+    const response = await app.inject({
+      method: 'GET',
+      url: '/test-unauthorized',
+    })
+
+    expect(response.statusCode).toBe(401)
+    expect(response.json()).toEqual({
+      status: ErrorCode.UNAUTHORIZED,
+      err: 'Authentication required',
     })
   })
 })

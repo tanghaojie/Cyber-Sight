@@ -183,7 +183,7 @@ pnpm build
 }
 ```
 
-`status` 是业务状态码，不替代 HTTP 状态码。例如资源不存在应同时返回 HTTP 404 和业务错误码 1003。前端不能只判断 HTTP 请求是否完成，还要判断业务 `status === 0`。
+`status` 是业务状态码。项目只把未认证、资源不存在和内部异常分别返回为 HTTP 401、404、500；参数错误、权限不足、冲突、限流和外部依赖错误都返回 HTTP 200，并通过非零 `status` 区分。前端因此不能把 HTTP 200 当成业务成功，仍要判断 `status === 0`。
 
 后端使用公共函数：
 
@@ -224,6 +224,12 @@ interface PaginationRequest {
 
 错误码的完整列表和登记流程见[错误码参考](../reference/error-codes.md)。前端只能根据数值错误码执行分支逻辑，`err` 是给人阅读的描述，不是稳定标识。
 
+### 6.4 前端全局响应拦截器
+
+`src/api/client.ts` 为唯一共享 Client，并注册 `globalHttpErrorMiddleware`。拦截器只处理 HTTP 401、404、500，发布 `api:global-http-error` 事件；应用入口可监听事件，统一完成重新登录、跳转 404 页面或显示服务异常提示。
+
+业务 composable 不重复实现这些全局动作。它们只处理 HTTP 200 返回体中的非零 `status`，例如在表单旁显示参数错误、提示权限不足或让用户解决资源冲突。
+
 ## 7. 新增一个接口的完整流程
 
 以新增“查询用户详情”为例：
@@ -235,7 +241,7 @@ interface PaginationRequest {
 5. 在后端用户模块中编写命名处理函数，使用 `success()` 或 `failure()`。
 6. 在 Fastify 路由中声明与 OpenAPI 一致的运行时 Schema。
 7. 在前端 composable 中通过 `apiClient.GET('/users/{id}', ...)` 调用。
-8. 前端先判断传输错误，再判断 `response.status` 和 `response.data`。
+8. 前端业务模块处理 HTTP 200 中的非零 `response.status`；401、404、500 的全局动作由共享拦截器处理。
 9. 添加后端路由测试、OpenAPI/Swagger 契约测试和前端状态测试。
 10. 运行生成、测试、构建和必要的数据库验证。
 11. 更新最终设计和日志，将计划归档。

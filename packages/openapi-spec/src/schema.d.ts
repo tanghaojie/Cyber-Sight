@@ -86,7 +86,7 @@ export interface operations {
                     "application/json": components["schemas"]["HealthResponse"];
                 };
             };
-            /** @description Request failed */
+            /** @description Global HTTP failure; business APIs only use HTTP 401, 404, or 500 */
             default: {
                 headers: {
                     [name: string]: unknown;

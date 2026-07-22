@@ -1,7 +1,8 @@
 ---
 title: 统一业务响应、分页和错误码
-status: accepted
+status: superseded
 date: 2026-07-22
+superseded_by: ADR-0004-http-status-and-frontend-global-error-handling.md
 ---
 
 # ADR-0003：统一业务响应、分页和错误码
@@ -26,6 +27,10 @@ AI 和人类会持续增加接口。如果每个模块自行定义成功、失�
 - 契约、运行时 Schema 和测试必须同步维护一层响应包装。
 - 错误响应不返回 `data`，成功响应不返回 `err`。
 - 基础设施接口如 Swagger 文档不属于业务 API，可保持其原始协议格式。
+
+## 后续决策
+
+HTTP 状态码的使用范围已由 ADR-0004 调整；其他响应、分页和错误码约定继续有效。
 
 ## 错误码区间
 
