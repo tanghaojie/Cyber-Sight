@@ -1,14 +1,12 @@
 import { and, eq, gt } from 'drizzle-orm'
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
-import type { components } from '@scaffold/openapi-spec'
+import type { CurrentUser } from '@scaffold/api-contract'
 import { authSessions, roles, userRoles, users } from '../../db/schema.js'
 import {
   createSessionToken,
   hashSessionToken,
   verifyPassword,
 } from './auth.security.js'
-
-export type CurrentUser = components['schemas']['CurrentUser']
 
 const SESSION_COOKIE = 'scaffold_session'
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000

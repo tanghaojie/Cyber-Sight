@@ -8,7 +8,15 @@ import { authRoutes } from './modules/auth/auth.route.js'
 import { adminRoutes } from './modules/admin/admin.route.js'
 
 export async function buildApp(options: FastifyServerOptions = {}) {
-  const app = Fastify({ logger: true, ...options })
+  const app = Fastify({
+    logger: true,
+    ajv: {
+      customOptions: {
+        removeAdditional: false,
+      },
+    },
+    ...options,
+  })
 
   app.register(sensible)
   await registerResponseHandling(app)

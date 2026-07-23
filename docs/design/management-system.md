@@ -2,14 +2,14 @@
 title: 管理系统基础能力设计
 status: active
 owner: maintainers
-updated: 2026-07-22
+updated: 2026-07-23
 ---
 
 # 管理系统基础能力设计
 
 ## 背景与目标
 
-在现有 Vue 3、Fastify、OpenAPI 和 PostgreSQL 脚手架上提供可直接扩展的管理后台基线，包括现代化应用框架、用户登录退出、用户/角色/菜单/字典管理，以及全表统一的审计与软删除能力。
+在现有 Vue 3、Fastify、共享运行时 Schema 和 PostgreSQL 脚手架上提供可直接扩展的管理后台基线，包括现代化应用框架、用户登录退出、用户/角色/菜单/字典管理，以及全表统一的审计与软删除能力。
 
 ## 范围与非目标
 
@@ -17,7 +17,7 @@ updated: 2026-07-22
 
 ## 职责与边界
 
-- `packages/openapi-spec` 定义认证和管理 API 的稳定契约。
+- `packages/api-contract` 定义认证和管理 API 的运行时 Schema 与推导类型。
 - `apps/backend/src/modules/auth` 负责凭据校验、会话创建/撤销与当前用户解析。
 - `apps/backend/src/modules/admin` 负责管理资源用例；路由只处理 HTTP 映射，仓储隔离 Drizzle 查询。
 - `apps/backend/src/db` 定义业务表、统一审计列和软删除过滤规则。
@@ -41,7 +41,7 @@ updated: 2026-07-22
 
 ## 依赖关系
 
-继续使用现有 Fastify、Zod、Drizzle、PostgreSQL、Vue Router、Pinia 与 `openapi-fetch`。密码散列、随机令牌和摘要使用 Node.js 内置 `crypto`，不新增认证运行时依赖。前端视觉体系使用仓库内 CSS 设计令牌和组件，不引入 UI 框架。
+继续使用现有 Fastify、TypeBox、Drizzle、PostgreSQL、Vue Router、Pinia 与共享 fetch Client。密码散列、随机令牌和摘要使用 Node.js 内置 `crypto`。前端视觉体系使用仓库内 CSS 设计令牌和组件，不引入 UI 框架。
 
 ## 失败模式与安全考虑
 
@@ -56,7 +56,7 @@ updated: 2026-07-22
 - 单元测试覆盖密码散列、会话令牌和软删除审计构造。
 - Fastify 注入测试使用内存仓储覆盖登录、鉴权、分页、CRUD 与软删除不可见性。
 - 前端组件测试覆盖登录成功/失败、路由保护和资源页面列表/空/错误状态。
-- 契约生成、类型检查、Vitest、生产构建和 Drizzle 迁移生成全部通过。
+- 共享契约构建、运行时输入校验、类型检查、Vitest、生产构建和 Drizzle 迁移生成全部通过。
 - 启动本地前端进行登录页与管理框架的桌面/窄屏视觉检查。
 
 ## 兼容性与迁移

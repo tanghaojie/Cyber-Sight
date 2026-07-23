@@ -2,7 +2,7 @@ import type {
   ApiResponse,
   PaginatedResponse,
   PaginationRequest,
-} from '@scaffold/openapi-spec'
+} from '@scaffold/api-contract'
 import { ErrorCode } from '../errors/error-codes.js'
 
 export function success<T>(data: T): { status: 0; data: T }

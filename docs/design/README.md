@@ -11,8 +11,8 @@
 
 ## 模块设计
 
-- [API 契约](modules/api-contract.md)：OpenAPI 的职责、生成链路和一致性要求。
-- [后端](modules/backend.md)：Fastify 默认实现及未来 Java 替换边界。
+- [API 契约](modules/api-contract.md)：共享运行时 Schema、类型推导和边界校验。
+- [后端](modules/backend.md)：Fastify 默认实现、运行时校验及未来 Java 引入边界。
 - [前端](modules/frontend.md)：Vue 应用结构、API 使用方式和业务边界。
 
 新增一级模块时，必须增加对应设计文档并更新本索引。

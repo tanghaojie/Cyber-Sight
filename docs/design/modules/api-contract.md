@@ -2,38 +2,64 @@
 
 ## 职责
 
-`packages/openapi-spec/openapi.yaml` 定义前后端以及未来不同后端语言共同遵守的 HTTP API，包括路径、请求、响应、错误和版本信息。
+`packages/api-contract` 是 TypeScript/Vue 前端与 TypeScript/Fastify 后端之间的内部 HTTP 契约包。它定义请求体、查询参数、路径参数、响应数据和公共包装的运行时 JSON Schema，并从同一份 Schema 推导 TypeScript 类型。
+
+## 为什么不能只共享 TypeScript 类型
+
+TypeScript 只能检查参与编译的源码，类型在运行时会被擦除。后端收到的是外部 JSON；调用方可以绕过前端、篡改请求、继续使用旧版本客户端，或者提交错误类型、缺失字段、非法枚举、越界值和额外字段。
+
+给 `FastifyRequest` 标注泛型只是在编译期告诉 TypeScript 相信该数据合法，并不会检查真实请求。如果没有边界校验，非法输入会继续进入业务逻辑、数据库、权限判断和外部依赖，最终形成难以定位的 500、脏数据或安全问题。
+
+因此 HTTP 输入必须遵循以下链路：
+
+```text
+不可信 HTTP JSON
+        |
+        v
+共享运行时 Schema 校验
+        |
+        v
+已验证的 TypeScript 数据
+        |
+        v
+应用与领域逻辑
+```
+
+校验集中在系统边界：HTTP 请求、环境变量、外部服务响应、消息和文件。内部已经由可信代码构造的数据不做无意义的层层重复解析。
 
 ## 当前链路
 
-1. 人或 AI 修改 `openapi.yaml`。
-2. 根脚本 `pnpm gen:api` 运行 `openapi-typescript`。
-3. 生成 `packages/openapi-spec/src/schema.d.ts`，由契约包统一导出。
-4. 前端和 Fastify 后端都从 `@scaffold/openapi-spec` 导入同一份生成类型。
-5. 前端通过 `openapi-fetch` 获得类型化调用能力；Fastify 路由用共享响应类型约束实现。
-6. 契约测试比较共享 OpenAPI 与 Fastify 暴露的 Swagger 文档，阻止接口漂移。
-
-## 当前风险
-
-Swagger UI 仍使用 Fastify 路由 Schema 生成运行时文档，因此共享 OpenAPI 与运行时 Schema 仍是两种表达。当前通过共享生成类型和契约测试约束一致性；未来可评估直接从 OpenAPI 生成 Fastify Schema。
+1. 人或 AI 在 `@scaffold/api-contract` 中定义或修改 TypeBox Schema。
+2. TypeScript 类型通过 `Static<typeof Schema>` 从 Schema 推导。
+3. Fastify 路由直接引用请求、查询、路径和响应 Schema，执行输入校验与响应序列化。
+4. 前后端从 `@scaffold/api-contract` 导入同一组请求和响应类型。
+5. 前端业务 API 通过共享 fetch Client 发起请求，并处理统一响应。
+6. Fastify Swagger 从路由 Schema 生成 `/docs` 和 `/docs/json`；该 OpenAPI 是调试与互操作产物，不是另一份手写源。
 
 ## 约束
 
-- 所有 API 变化必须从共享 OpenAPI 开始。
-- 生成文件不能手工编辑。
-- 后端实现必须通过契约测试证明请求和响应符合 OpenAPI。
-- Swagger UI 展示内容必须与共享契约一致，不能长期维护独立事实源。
-- Java 后端若引入，也必须消费或验证同一份契约。
-- 普通业务响应统一使用 `{ status: number, data?: T, err?: string }`；`status = 0` 表示成功，其他值必须来自错误码表。
-- 分页请求统一使用可选 `pageNum`、`pageSize`，默认值为 `1`、`10`。
-- 分页响应统一使用 `{ status: number, list: T[], total: number, err?: string }`。
-- 业务 API 仅以 HTTP `401`、`404`、`500` 表达需要全局处理的未认证、未找到和内部异常；其余错误返回 HTTP `200`。
-- HTTP `200` 响应也可能包含非零 `status`，调用方必须根据业务状态判断成功或失败。
+- HTTP 数据结构必须先在共享契约包中定义，禁止在前端和后端维护平行 interface。
+- 所有外部请求体、查询参数和路径参数必须由后端运行时 Schema 校验。
+- 请求对象默认拒绝未声明字段；Fastify AJV 的 `removeAdditional` 保持为 `false`，避免静默删除后继续处理。字符串长度、数值范围、格式和枚举应在 Schema 中明确表达。
+- 前端导入契约类型时优先使用 `import type`，不把运行时校验库打入无关业务代码。
+- Swagger/OpenAPI 由 Fastify 路由生成，禁止再提交手写 YAML 与运行时 Schema 双源。
+- 普通业务响应统一使用 `{ status: number, data?: T, err?: string }`；分页和 HTTP 状态策略沿用 ADR-0003、ADR-0004。
+- 未来 Java、外部 API 或 SDK 需求正式立项时，从 `/docs/json` 导出、审查并版本化 OpenAPI，再决定是否升级为发布契约。
 
-## 已采用方案
+## 失败模式
 
-ADR-0002 决定采用“共享生成类型 + 运行时契约测试”的渐进方案。它先消除前后端编译期类型分叉，同时保留 Fastify 的运行时序列化和 Swagger 能力。后续如重复维护成本继续升高，再单独评估 Schema 自动生成。
+- Schema 未挂到路由：类型看似正确，但请求不会在边界被拒绝。路由测试必须覆盖非法输入。
+- Schema 和处理函数使用了不同类型：必须从共享 Schema 推导类型，不能手写近似类型。
+- 响应 Schema 缺字段：Fastify 序列化可能过滤未声明字段。路由测试必须断言完整响应。
+- 前端错误地把 HTTP 200 当成功：业务模块仍必须检查非零 `status`。
 
-ADR-0003 定义统一响应、分页和错误码约定。OpenAPI 3.0 不支持真正的泛型，因此每个接口仍要在契约中定义具体 `data` 或 `list` 项类型；TypeScript 侧通过共享泛型减少重复。
+## 测试策略
 
-ADR-0004 定义 HTTP 状态与前端全局处理边界。存在业务失败的接口必须在 OpenAPI 的 `200` 响应中覆盖成功体和该接口可能返回的错误体，并单独声明可能出现的 `401`、`404`、`500`。
+- 契约包通过 TypeScript 构建证明 Schema 和推导类型有效。
+- 后端使用 `Fastify.inject` 测试合法与非法输入、默认值、额外字段和响应序列化。
+- Swagger 测试只验证运行时路由确实暴露预期操作和关键约束，不再比较第二份 OpenAPI。
+- 前端测试 mock 共享 Client，验证成功、业务失败和全局 HTTP 错误边界。
+
+## 决策依据
+
+ADR-0006 取代 ADR-0001 和 ADR-0002。当前只有 TypeScript 前后端，持续维护跨语言 OpenAPI-first 链路的成本高于收益。共享运行时 Schema 在不放弃安全边界的前提下消除结构重复，并保留按需生成 OpenAPI 的退出路径。

@@ -14,7 +14,7 @@
     "db:check": "tsx src/db/check.ts"
   },
   "dependencies": {
-    "@scaffold/openapi-spec": "workspace:*",
+    "@scaffold/api-contract": "workspace:*",
     "fastify": "^4.28.0",
     "@fastify/sensible": "^5.6.0",
     "@fastify/swagger": "^8.15.0",
@@ -30,7 +30,6 @@
     "typescript": "^5.5.0",
     "@types/node": "^22.0.0",
     "drizzle-kit": "^0.23.0",
-    "vitest": "^2.1.0",
-    "yaml": "^2.5.0"
+    "vitest": "^2.1.0"
   }
 }

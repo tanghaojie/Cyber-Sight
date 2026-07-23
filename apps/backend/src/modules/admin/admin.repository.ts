@@ -7,7 +7,13 @@ import {
   or,
 } from 'drizzle-orm'
 import type { FastifyInstance } from 'fastify'
-import type { components } from '@scaffold/openapi-spec'
+import type {
+  DictionaryRequest,
+  MenuRequest,
+  RoleRequest,
+  UserCreate,
+  UserUpdate,
+} from '@scaffold/api-contract'
 import {
   dictionaries,
   menus,
@@ -17,12 +23,6 @@ import {
   users,
 } from '../../db/schema.js'
 import { hashPassword } from '../auth/auth.security.js'
-
-type UserCreate = components['schemas']['UserCreateRequest']
-type UserUpdate = components['schemas']['UserUpdateRequest']
-type RoleRequest = components['schemas']['RoleRequest']
-type MenuRequest = components['schemas']['MenuRequest']
-type DictionaryRequest = components['schemas']['DictionaryRequest']
 
 export interface ListQuery {
   pageNum: number

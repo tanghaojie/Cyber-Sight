@@ -1,5 +1,12 @@
 import type { FastifyInstance } from 'fastify'
-import type { components } from '@scaffold/openapi-spec'
+import {
+  CurrentUserResponseSchema,
+  EmptySuccessResponseSchema,
+  ErrorResponseSchema,
+  LoginRequestSchema,
+  LoginResultSchema,
+  type LoginRequest,
+} from '@scaffold/api-contract'
 import { ErrorCode } from '../../shared/errors/error-codes.js'
 import { failure, success } from '../../shared/http/response.js'
 import {
@@ -7,18 +14,6 @@ import {
   requireCurrentUser,
   revokeCurrentSession,
 } from './auth.service.js'
-
-type LoginRequest = components['schemas']['LoginRequest']
-
-const loginBodySchema = {
-  type: 'object',
-  required: ['username', 'password'],
-  additionalProperties: false,
-  properties: {
-    username: { type: 'string', minLength: 2, maxLength: 50 },
-    password: { type: 'string', minLength: 8, maxLength: 128 },
-  },
-} as const
 
 export async function authRoutes(app: FastifyInstance): Promise<void> {
   app.post<{ Body: LoginRequest }>(
@@ -28,7 +23,11 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
         operationId: 'login',
         summary: 'Sign in with username and password',
         tags: ['Authentication'],
-        body: loginBodySchema,
+        body: LoginRequestSchema,
+        response: {
+          200: LoginResultSchema,
+          default: ErrorResponseSchema,
+        },
       },
     },
     async function login(request, reply) {
@@ -55,6 +54,10 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
         operationId: 'getCurrentUser',
         summary: 'Get the signed-in user',
         tags: ['Authentication'],
+        response: {
+          200: CurrentUserResponseSchema,
+          default: ErrorResponseSchema,
+        },
       },
     },
     async function getCurrentUser(request) {
@@ -69,6 +72,10 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
         operationId: 'logout',
         summary: 'Revoke the current session',
         tags: ['Authentication'],
+        response: {
+          200: EmptySuccessResponseSchema,
+          default: ErrorResponseSchema,
+        },
       },
     },
     async function logout(request, reply) {

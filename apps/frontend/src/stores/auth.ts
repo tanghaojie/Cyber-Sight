@@ -1,9 +1,12 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { components } from '@scaffold/openapi-spec'
+import type {
+  CurrentUser,
+  CurrentUserResponse,
+  EmptySuccessResponse,
+  LoginRequest,
+} from '@scaffold/api-contract'
 import { apiClient } from '../api/client.js'
-
-type CurrentUser = components['schemas']['CurrentUser']
 
 function responseError(data: unknown, fallback: string): string {
   if (typeof data === 'object' && data !== null && 'err' in data && typeof data.err === 'string') {
@@ -21,7 +24,10 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(username: string, password: string): Promise<string | null> {
     busy.value = true
     try {
-      const { data, error } = await apiClient.POST('/auth/login', {
+      const { data, error } = await apiClient.POST<
+        CurrentUserResponse,
+        LoginRequest
+      >('/auth/login', {
         body: { username, password },
       })
       const response = data ?? error
@@ -41,7 +47,7 @@ export const useAuthStore = defineStore('auth', () => {
   async function fetchCurrentUser(): Promise<void> {
     if (checked.value) return
     try {
-      const { data } = await apiClient.GET('/auth/me')
+      const { data } = await apiClient.GET<CurrentUserResponse>('/auth/me')
       if (data?.status === 0 && data.data) user.value = data.data
     } catch {
       user.value = null
@@ -52,7 +58,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function logout(): Promise<void> {
     try {
-      await apiClient.POST('/auth/logout')
+      await apiClient.POST<EmptySuccessResponse>('/auth/logout')
     } finally {
       user.value = null
       checked.value = true

@@ -1,5 +1,3 @@
-import type { Middleware } from 'openapi-fetch'
-
 export const GLOBAL_HTTP_ERROR_EVENT = 'api:global-http-error'
 
 export type GlobalHttpErrorStatus = 401 | 404 | 500
@@ -44,10 +42,4 @@ export async function dispatchGlobalHttpError(response: Response): Promise<void>
   window.dispatchEvent(
     new CustomEvent<GlobalHttpErrorDetail>(GLOBAL_HTTP_ERROR_EVENT, { detail })
   )
-}
-
-export const globalHttpErrorMiddleware: Middleware = {
-  onResponse({ response }) {
-    return dispatchGlobalHttpError(response)
-  },
 }

@@ -2,7 +2,7 @@
 
 ## 1. 这份指南适合谁
 
-本项目虽然以 AI 辅助开发为主，但所有实现必须能够由全栈工程师阅读、调试和修改。本指南面向熟悉 TypeScript、Vue、Node.js 和关系型数据库，但不熟悉 OpenAPI、Drizzle ORM 或 Vitest 工作模式的维护者。
+本项目虽然以 AI 辅助开发为主，但所有实现必须能够由全栈工程师阅读、调试和修改。本指南面向熟悉 TypeScript、Vue、Node.js 和关系型数据库，但不熟悉 TypeBox、Drizzle ORM 或 Vitest 工作模式的维护者。
 
 阅读完后，你应该能够：
 
@@ -18,19 +18,16 @@
 项目是 pnpm workspace，包含一个共享契约包和两个应用：
 
 ```text
-packages/openapi-spec/openapi.yaml
-        |                         API 的跨语言契约
-        v
-packages/openapi-spec/src/schema.d.ts
-        |                         自动生成的 TypeScript 类型
+packages/api-contract
+        |                         运行时 Schema + 推导类型
         +------------------+
         |                  |
         v                  v
 apps/frontend          apps/backend
-Vue 3 + openapi-fetch  Fastify + Drizzle
+Vue 3 + fetch Client   Fastify 校验 + Swagger
 ```
 
-最重要的原则是“契约优先”：接口变化先改 OpenAPI，再生成共享类型，最后修改后端实现和前端调用。不要先改后端，然后靠人脑把变化同步到前端。
+最重要的原则是“可执行契约优先”：接口数据变化先改共享 TypeBox Schema，后端直接用它校验真实请求，前后端类型从它推导。不要分别手写相似 interface，再靠人脑保持同步。
 
 ## 3. 开发环境与首次启动
 
@@ -71,16 +68,15 @@ pnpm dev
 | `AGENTS.md` | AI 必须遵守的仓库规则 | 调整开发、文档、验证或提交约定 |
 | `docs/` | 设计、ADR、计划、指南和 AI 记录 | 非简单任务必须同步维护 |
 
-### 4.2 `packages/openapi-spec`
+### 4.2 `packages/api-contract`
 
-这是 API 契约包，不包含业务实现。
+这是 API 数据契约包，不包含业务实现。
 
-- `openapi.yaml`：唯一跨语言 API 契约。
-- `src/schema.d.ts`：`pnpm gen:api` 自动生成，禁止手改。
-- `src/index.d.ts`：共享泛型类型入口，如 `ApiResponse<T>`、`PaginationRequest`。
-- `package.json`：让前端和后端可以通过 `@scaffold/openapi-spec` 引用类型。
+- `src/index.ts`：共享 TypeBox Schema、由 Schema 推导的请求/响应类型，以及统一响应泛型。
+- `package.json`：让前端和后端通过 `@scaffold/api-contract` 消费同一契约。
+- `dist/`：构建产物，不作为手工编辑源。
 
-修改接口时先改 `openapi.yaml`。如果生成文件与预期不符，应修正 YAML，不要修补 `schema.d.ts`。
+修改接口时先改共享 Schema。后端路由必须直接引用该 Schema，前端业务 API 使用其导出的类型。
 
 ### 4.3 `apps/backend`
 
@@ -104,62 +100,58 @@ pnpm dev
 
 | 路径 | 作用 |
 | --- | --- |
-| `src/api/client.ts` | 唯一共享的 `openapi-fetch` Client |
+| `src/api/client.ts` | 唯一共享的 fetch Client |
 | `src/modules/<module>/composables/` | 封装模块 API 调用和页面状态 |
 | `src/views/` | 路由页面，不直接堆积复杂业务和网络逻辑 |
 | `src/router/` | Vue Router 配置和页面懒加载 |
 | `src/stores/` | 未来的跨页面 Pinia 状态；局部状态不要放入 store |
 | `*.test.ts` | Vitest + Vue Test Utils 组件测试 |
 
-前端不能手写一份与后端相似的接口类型，应从 `@scaffold/openapi-spec` 或类型化 API Client 获取。
+前端不能手写一份与后端相似的接口类型，应从 `@scaffold/api-contract` 获取。
 
-## 5. OpenAPI 的工作方式
+## 5. 运行时 Schema 的工作方式
 
-OpenAPI 是一份描述 HTTP 接口的 YAML。常用结构如下：
+TypeScript interface 在运行时不存在，不能阻止 curl、旧客户端或被篡改的请求提交非法 JSON。共享契约使用 TypeBox 同时定义 JSON Schema 和 TypeScript 类型：
 
-```yaml
-paths:
-  /users/{id}:
-    get:
-      operationId: getUser
-      parameters: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserResponse'
+```typescript
+import { Static, Type } from '@sinclair/typebox'
 
-components:
-  schemas:
-    UserResponse:
-      type: object
-      required: [status, data]
-      properties:
-        status:
-          type: integer
-          enum: [0]
-        data:
-          $ref: '#/components/schemas/User'
+export const UserRequestSchema = Type.Object(
+  {
+    name: Type.String({ minLength: 1, maxLength: 80 }),
+    enabled: Type.Boolean(),
+  },
+  { additionalProperties: false }
+)
+
+export type UserRequest = Static<typeof UserRequestSchema>
 ```
 
-关键概念：
+Fastify 路由直接挂载这个 Schema：
 
-- `paths`：URL、HTTP 方法、参数和响应。
-- `operationId`：接口稳定名称，必须唯一，生成工具会使用它。
-- `components.schemas`：可复用的数据结构。
-- `$ref`：引用已有 Schema，避免复制。
-- `required`：必须明确列出必填字段；只写 `properties` 不代表字段必填。
+```typescript
+app.post<{ Body: UserRequest }>(
+  '/users',
+  { schema: { body: UserRequestSchema } },
+  async function createUser(request) {
+    // request.body 已通过真实运行时校验
+  }
+)
+```
+
+关键规则：
+
+- 请求对象默认设置 `additionalProperties: false`。
+- 必填、长度、范围、格式和枚举写在 Schema 中。
+- 类型始终从 Schema 推导，不再平行手写。
+- `/docs/json` 由 Fastify 路由生成 OpenAPI，用于调试；不再编辑第二份 YAML。
 
 修改后执行：
 
 ```powershell
-pnpm gen:api
 pnpm test
 pnpm build
 ```
-
-后端契约测试会比较共享 OpenAPI 和 Fastify Swagger 的关键字段。如果测试失败，通常说明只更新了一侧 Schema。
 
 ## 6. 统一响应、错误和分页
 
@@ -218,7 +210,7 @@ interface PaginationRequest {
 }
 ```
 
-后端使用 `normalizePagination()` 应用默认值，使用 `paginatedSuccess()` 创建响应。具体 OpenAPI 接口应声明业务对象数组，例如 `UserPageResponse.list.items -> User`，不要直接以无类型的 `any[]` 结束设计。
+后端使用 `normalizePagination()` 应用默认值，使用 `paginatedSuccess()` 创建响应。具体共享 Schema 应声明业务对象数组，例如 `paginatedResponseSchema(UserSummarySchema)`，不要直接以无类型的 `any[]` 结束设计。
 
 ### 6.3 错误码
 
@@ -226,7 +218,7 @@ interface PaginationRequest {
 
 ### 6.4 前端全局响应拦截器
 
-`src/api/client.ts` 为唯一共享 Client，并注册 `globalHttpErrorMiddleware`。拦截器只处理 HTTP 401、404、500，发布 `api:global-http-error` 事件；应用入口可监听事件，统一完成重新登录、跳转 404 页面或显示服务异常提示。
+`src/api/client.ts` 为唯一共享 Client，并在收到响应后调用全局 HTTP 错误分发器。它只把 HTTP 401、404、500 发布为 `api:global-http-error` 事件；应用入口可监听事件，统一完成重新登录、跳转 404 页面或显示服务异常提示。
 
 业务 composable 不重复实现这些全局动作。它们只处理 HTTP 200 返回体中的非零 `status`，例如在表单旁显示参数错误、提示权限不足或让用户解决资源冲突。
 
@@ -236,16 +228,15 @@ interface PaginationRequest {
 
 1. 在 `docs/design/modules/` 更新用户模块设计。
 2. 在 `docs/plans/active/` 创建实施计划并建立 AI 日志。
-3. 在 `openapi.yaml` 定义 `User`、`UserResponse` 和 `/users/{id}`。
-4. 执行 `pnpm gen:api`。
-5. 在后端用户模块中编写命名处理函数，使用 `success()` 或 `failure()`。
-6. 在 Fastify 路由中声明与 OpenAPI 一致的运行时 Schema。
-7. 在前端 composable 中通过 `apiClient.GET('/users/{id}', ...)` 调用。
-8. 前端业务模块处理 HTTP 200 中的非零 `response.status`；401、404、500 的全局动作由共享拦截器处理。
-9. 添加后端路由测试、OpenAPI/Swagger 契约测试和前端状态测试。
-10. 运行生成、测试、构建和必要的数据库验证。
-11. 更新最终设计和日志，将计划归档。
-12. 验证通过后提交 Git 改动。
+3. 在 `@scaffold/api-contract` 定义请求、路径和响应 Schema，并导出推导类型。
+4. 在后端用户模块中编写命名处理函数，使用 `success()` 或 `failure()`。
+5. 在 Fastify 路由中直接挂载共享运行时 Schema。
+6. 在前端业务 API 中以契约类型调用共享 Client。
+7. 前端业务模块处理 HTTP 200 中的非零 `response.status`；401、404、500 的全局动作由共享拦截器处理。
+8. 添加合法/非法输入路由测试、Swagger 生成测试和前端状态测试。
+9. 运行测试、构建和必要的数据库验证。
+10. 更新最终设计和日志，将计划归档。
+11. 验证通过后提交 Git 改动。
 
 ## 8. 函数代码风格
 
@@ -317,7 +308,8 @@ Vitest 的断言和 Jest 类似，但与 Vite/TypeScript 集成更直接。
 - HTTP 状态码。
 - 业务 `status`、`data` 或 `err`。
 - 日期、枚举和分页等关键字段。
-- OpenAPI 与 Swagger 的契约一致性。
+- 非法 HTTP 输入被共享 Schema 在处理函数前拒绝。
+- Swagger 包含路由声明的操作和关键约束。
 
 ### 10.2 前端测试
 
@@ -345,13 +337,13 @@ pnpm test:watch # 开发时监听
 
 ## 12. 常见问题
 
-### 修改 OpenAPI 后前端类型没有变化
+### 修改 Schema 后前端类型没有变化
 
-确认运行了 `pnpm gen:api`，并检查生成目标 `packages/openapi-spec/src/schema.d.ts`。不要运行后再手改生成文件。
+确认类型通过 `Static<typeof Schema>` 推导，并从 `@scaffold/api-contract` 导出。不要在前端保留同名的旧 interface。
 
-### Swagger 和 OpenAPI 契约测试失败
+### TypeScript 已通过，为什么非法请求仍进入处理函数
 
-检查 Fastify 路由 `schema.response` 是否同步了外层统一响应、必填字段、枚举和具体 `data` 类型。
+类型不会执行运行时校验。检查 Fastify 路由是否真正设置了 `schema.body`、`schema.querystring` 或 `schema.params`，并添加 `inject` 非法输入测试。
 
 ### 数据库迁移没有生成
 

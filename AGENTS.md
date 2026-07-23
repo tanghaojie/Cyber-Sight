@@ -38,8 +38,9 @@
 
 ## 架构约束
 
-- `packages/openapi-spec/openapi.yaml` 是跨前后端、跨语言的 API 契约来源。
-- API 变化必须先更新契约，再更新生成物和实现；禁止只改前端类型或只改后端路由。
+- `packages/api-contract` 中的运行时 Schema 是当前前后端 HTTP 数据契约来源。
+- API 数据结构变化必须先更新共享 Schema；请求、查询和路径参数必须由后端在运行时校验，禁止只写会在编译后擦除的 TypeScript 类型。
+- Swagger/OpenAPI 由 Fastify 路由 Schema 生成，用于本地调试和按需互操作；没有现实跨语言或外部 API 需求时，不维护第二份手写 OpenAPI。
 - TypeScript/Fastify 是默认后端实现。只有明确的生态、运行时、性能或组织约束才引入 Java 实现。
 - 业务规则不得只存在于 Vue 组件或 Fastify 路由中，应放在可测试、与传输层解耦的模块内。
 - 数据库专属实现必须隔离在基础设施层；不得宣称只换 import 就能切换数据库。

@@ -1,6 +1,6 @@
 # AI Web Scaffold
 
-前后端分离的 pnpm monorepo 管理系统脚手架，以 OpenAPI 3.0 为契约层，内置登录、管理后台框架和用户/角色/菜单/字典管理。
+前后端分离的 pnpm monorepo 管理系统脚手架，以共享 TypeBox 运行时 Schema 约束前后端接口，内置登录、管理后台框架和用户/角色/菜单/字典管理。
 
 ## 快速开始
 
@@ -24,16 +24,15 @@ pnpm dev
 
 ## 添加新接口的步骤（AI 的工作路径）
 
-1. 修改 `packages/openapi-spec/openapi.yaml`
-2. `pnpm gen:api` — 更新前后端共享类型
-3. 在 `apps/backend/src/modules/<module>/` 实现路由
-4. 在 `apps/frontend/src/modules/<module>/composables/` 封装调用
-5. 补充路由、契约和前端状态测试，然后运行 `pnpm test && pnpm build`
+1. 在 `packages/api-contract` 定义运行时 Schema 和推导类型
+2. 在 `apps/backend/src/modules/<module>/` 挂载共享 Schema 并实现路由
+3. 在 `apps/frontend/src/modules/<module>/` 以共享类型封装调用
+4. 补充合法/非法请求、响应结构和前端状态测试
+5. 运行 `pnpm test` 和 `pnpm build`
 
 ## 常用命令
 
 ```bash
-pnpm gen:api       # 生成共享 OpenAPI 类型
 pnpm test          # 后端路由/契约测试和前端组件测试
 pnpm build         # TypeScript 检查和生产构建
 pnpm db:generate   # 根据 Drizzle Schema 生成迁移
@@ -43,12 +42,12 @@ pnpm test:db       # 检查 PostgreSQL 连接和关键表
 
 当前数据库实现是 PostgreSQL。切换 MySQL 会同时影响驱动、Drizzle Schema、迁移和测试，必须作为独立架构变更处理，不能只替换 import。
 
-## 切换后端到 Java
+## 引入 Java 后端
 
-前端通过 `@scaffold/openapi-spec` 使用共享契约类型。切换 Java 时应保持 `packages/openapi-spec/openapi.yaml` 的接口语义，并通过同一组契约回归测试验证新实现。
+当前前后端通过 `@scaffold/api-contract` 使用共享契约。Java 需求正式立项时，应先从 Fastify `/docs/json` 导出并审查 OpenAPI，建立版本化跨语言契约和回归测试；项目不为尚未发生的切换长期维护第二份手写契约。
 
 ## 开发文档
 
-- [人类维护者开发指南](docs/guides/human-maintainer-development-guide.md)：目录职责、OpenAPI、Drizzle、Vitest、新增接口和数据库维护流程。
+- [人类维护者开发指南](docs/guides/human-maintainer-development-guide.md)：目录职责、运行时 Schema、Drizzle、Vitest、新增接口和数据库维护流程。
 - [错误码参考](docs/reference/error-codes.md)：统一响应、错误码区间和登记流程。
 - [系统与模块设计](docs/design/README.md)：当前有效架构和模块边界。

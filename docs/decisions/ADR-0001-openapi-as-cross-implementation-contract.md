@@ -1,10 +1,12 @@
 ---
 title: 以 OpenAPI 作为跨实现 API 契约
-status: accepted
+status: superseded
 date: 2026-07-22
 ---
 
 # ADR-0001：以 OpenAPI 作为跨实现 API 契约
+
+> 已由 [ADR-0006](ADR-0006-runtime-schema-as-api-contract.md) 取代。项目不再为尚未确定的跨语言实现持续维护 OpenAPI-first 链路。
 
 ## 背景
 

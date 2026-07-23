@@ -1,28 +1,58 @@
-import type { components } from '@scaffold/openapi-spec'
+import type {
+  ApiResponse,
+  DictionaryRequest,
+  DictionarySummary,
+  EmptySuccessResponse,
+  ErrorResponse,
+  IdResponse,
+  MenuRequest,
+  MenuSummary,
+  PaginatedResponse,
+  RoleRequest,
+  RoleSummary,
+  UserCreate,
+  UserSummary,
+  UserUpdate,
+} from '@scaffold/api-contract'
 import { apiClient } from '../../api/client.js'
 
 export type ResourceKind = 'users' | 'roles' | 'menus' | 'dictionaries'
-export type UserRecord = components['schemas']['UserSummary']
-export type RoleRecord = components['schemas']['RoleSummary']
-export type MenuRecord = components['schemas']['MenuSummary']
-export type DictionaryRecord = components['schemas']['DictionarySummary']
-export type AdminRecord = UserRecord | RoleRecord | MenuRecord | DictionaryRecord
-type UserCreate = components['schemas']['UserCreateRequest']
-type UserUpdate = components['schemas']['UserUpdateRequest']
-type RoleRequest = components['schemas']['RoleRequest']
-type MenuRequest = components['schemas']['MenuRequest']
-type DictionaryRequest = components['schemas']['DictionaryRequest']
+export type UserRecord = UserSummary
+export type RoleRecord = RoleSummary
+export type MenuRecord = MenuSummary
+export type DictionaryRecord = DictionarySummary
+export type AdminRecord =
+  | UserRecord
+  | RoleRecord
+  | MenuRecord
+  | DictionaryRecord
+export type PageResult = PaginatedResponse<AdminRecord>
+export type MutationResult = ApiResponse<{ id: number }>
 
-export interface PageResult {
-  status: number
-  list: AdminRecord[]
-  total: number
-  err?: string
+function result<T>(
+  data: T | undefined,
+  error: ErrorResponse | undefined
+): T | ErrorResponse {
+  if (data) {
+    return data
+  }
+  if (error) {
+    return error
+  }
+  throw new Error('Backend returned an empty response')
 }
 
-export interface MutationResult {
-  status: number
-  err?: string
+function pageResult<T>(
+  data: PaginatedResponse<T> | undefined,
+  error: ErrorResponse | undefined
+): PaginatedResponse<T> {
+  if (data) {
+    return data
+  }
+  if (error) {
+    return { ...error, list: [], total: 0 }
+  }
+  throw new Error('Backend returned an empty response')
 }
 
 export async function listResource(
@@ -31,21 +61,29 @@ export async function listResource(
   pageSize: number,
   keyword: string
 ): Promise<PageResult> {
-  const params = { query: { pageNum, pageSize, ...(keyword ? { keyword } : {}) } }
+  const query = { pageNum, pageSize, ...(keyword ? { keyword } : {}) }
   if (resource === 'users') {
-    const { data, error } = await apiClient.GET('/admin/users', { params })
-    return (data ?? error) as PageResult
+    const { data, error } = await apiClient.GET<
+      PaginatedResponse<UserSummary>
+    >('/admin/users', { query })
+    return pageResult(data, error)
   }
   if (resource === 'roles') {
-    const { data, error } = await apiClient.GET('/admin/roles', { params })
-    return (data ?? error) as PageResult
+    const { data, error } = await apiClient.GET<
+      PaginatedResponse<RoleSummary>
+    >('/admin/roles', { query })
+    return pageResult(data, error)
   }
   if (resource === 'menus') {
-    const { data, error } = await apiClient.GET('/admin/menus', { params })
-    return (data ?? error) as PageResult
+    const { data, error } = await apiClient.GET<
+      PaginatedResponse<MenuSummary>
+    >('/admin/menus', { query })
+    return pageResult(data, error)
   }
-  const { data, error } = await apiClient.GET('/admin/dictionaries', { params })
-  return (data ?? error) as PageResult
+  const { data, error } = await apiClient.GET<
+    PaginatedResponse<DictionarySummary>
+  >('/admin/dictionaries', { query })
+  return pageResult(data, error)
 }
 
 export async function createResource(
@@ -53,19 +91,31 @@ export async function createResource(
   payload: Record<string, unknown>
 ): Promise<MutationResult> {
   if (resource === 'users') {
-    const { data, error } = await apiClient.POST('/admin/users', { body: payload as UserCreate })
-    return (data ?? error) as MutationResult
+    const { data, error } = await apiClient.POST<IdResponse, UserCreate>(
+      '/admin/users',
+      { body: payload as UserCreate }
+    )
+    return result(data, error)
   }
   if (resource === 'roles') {
-    const { data, error } = await apiClient.POST('/admin/roles', { body: payload as RoleRequest })
-    return (data ?? error) as MutationResult
+    const { data, error } = await apiClient.POST<IdResponse, RoleRequest>(
+      '/admin/roles',
+      { body: payload as RoleRequest }
+    )
+    return result(data, error)
   }
   if (resource === 'menus') {
-    const { data, error } = await apiClient.POST('/admin/menus', { body: payload as MenuRequest })
-    return (data ?? error) as MutationResult
+    const { data, error } = await apiClient.POST<IdResponse, MenuRequest>(
+      '/admin/menus',
+      { body: payload as MenuRequest }
+    )
+    return result(data, error)
   }
-  const { data, error } = await apiClient.POST('/admin/dictionaries', { body: payload as DictionaryRequest })
-  return (data ?? error) as MutationResult
+  const { data, error } = await apiClient.POST<IdResponse, DictionaryRequest>(
+    '/admin/dictionaries',
+    { body: payload as DictionaryRequest }
+  )
+  return result(data, error)
 }
 
 export async function updateResource(
@@ -73,37 +123,40 @@ export async function updateResource(
   id: number,
   payload: Record<string, unknown>
 ): Promise<MutationResult> {
-  const params = { path: { id } }
   if (resource === 'users') {
-    const { data, error } = await apiClient.PUT('/admin/users/{id}', { params, body: payload as UserUpdate })
-    return (data ?? error) as MutationResult
+    const { data, error } = await apiClient.PUT<IdResponse, UserUpdate>(
+      `/admin/users/${id}`,
+      { body: payload as UserUpdate }
+    )
+    return result(data, error)
   }
   if (resource === 'roles') {
-    const { data, error } = await apiClient.PUT('/admin/roles/{id}', { params, body: payload as RoleRequest })
-    return (data ?? error) as MutationResult
+    const { data, error } = await apiClient.PUT<IdResponse, RoleRequest>(
+      `/admin/roles/${id}`,
+      { body: payload as RoleRequest }
+    )
+    return result(data, error)
   }
   if (resource === 'menus') {
-    const { data, error } = await apiClient.PUT('/admin/menus/{id}', { params, body: payload as MenuRequest })
-    return (data ?? error) as MutationResult
+    const { data, error } = await apiClient.PUT<IdResponse, MenuRequest>(
+      `/admin/menus/${id}`,
+      { body: payload as MenuRequest }
+    )
+    return result(data, error)
   }
-  const { data, error } = await apiClient.PUT('/admin/dictionaries/{id}', { params, body: payload as DictionaryRequest })
-  return (data ?? error) as MutationResult
+  const { data, error } = await apiClient.PUT<IdResponse, DictionaryRequest>(
+    `/admin/dictionaries/${id}`,
+    { body: payload as DictionaryRequest }
+  )
+  return result(data, error)
 }
 
-export async function deleteResource(resource: ResourceKind, id: number): Promise<MutationResult> {
-  const params = { path: { id } }
-  if (resource === 'users') {
-    const { data, error } = await apiClient.DELETE('/admin/users/{id}', { params })
-    return (data ?? error) as MutationResult
-  }
-  if (resource === 'roles') {
-    const { data, error } = await apiClient.DELETE('/admin/roles/{id}', { params })
-    return (data ?? error) as MutationResult
-  }
-  if (resource === 'menus') {
-    const { data, error } = await apiClient.DELETE('/admin/menus/{id}', { params })
-    return (data ?? error) as MutationResult
-  }
-  const { data, error } = await apiClient.DELETE('/admin/dictionaries/{id}', { params })
-  return (data ?? error) as MutationResult
+export async function deleteResource(
+  resource: ResourceKind,
+  id: number
+): Promise<MutationResult> {
+  const { data, error } = await apiClient.DELETE<EmptySuccessResponse>(
+    `/admin/${resource}/${id}`
+  )
+  return result(data, error)
 }

@@ -1,9 +1,91 @@
-import createClient from 'openapi-fetch'
-import type { paths } from '@scaffold/openapi-spec'
-import { globalHttpErrorMiddleware } from './global-http-error.js'
+import type { ErrorResponse } from '@scaffold/api-contract'
+import { dispatchGlobalHttpError } from './global-http-error.js'
 
-export const apiClient = createClient<paths>({
-  baseUrl: '/api',
-})
+type QueryValue = string | number | boolean | undefined
 
-apiClient.use(globalHttpErrorMiddleware)
+interface RequestOptions<TBody = never> {
+  body?: TBody
+  query?: Record<string, QueryValue>
+}
+
+export interface ApiResult<TResponse> {
+  data?: TResponse
+  error?: ErrorResponse
+}
+
+function requestUrl(
+  path: string,
+  query: Record<string, QueryValue> | undefined
+): string {
+  const search = new URLSearchParams()
+  for (const [key, value] of Object.entries(query ?? {})) {
+    if (value !== undefined) {
+      search.set(key, String(value))
+    }
+  }
+
+  const querystring = search.toString()
+  return `/api${path}${querystring ? `?${querystring}` : ''}`
+}
+
+function isErrorResponse(value: unknown): value is ErrorResponse {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'status' in value &&
+    typeof value.status === 'number' &&
+    value.status !== 0 &&
+    'err' in value &&
+    typeof value.err === 'string'
+  )
+}
+
+async function request<TResponse, TBody = never>(
+  method: string,
+  path: string,
+  options: RequestOptions<TBody> = {}
+): Promise<ApiResult<TResponse>> {
+  const response = await fetch(requestUrl(path, options.query), {
+    method,
+    credentials: 'same-origin',
+    headers:
+      options.body === undefined
+        ? undefined
+        : { 'content-type': 'application/json' },
+    body:
+      options.body === undefined ? undefined : JSON.stringify(options.body),
+  })
+
+  await dispatchGlobalHttpError(response)
+  const payload: unknown = await response.json()
+
+  if (isErrorResponse(payload)) {
+    return { error: payload }
+  }
+
+  return { data: payload as TResponse }
+}
+
+export const apiClient = {
+  GET<TResponse>(
+    path: string,
+    options?: RequestOptions
+  ): Promise<ApiResult<TResponse>> {
+    return request<TResponse>('GET', path, options)
+  },
+  POST<TResponse, TBody = never>(
+    path: string,
+    options?: RequestOptions<TBody>
+  ): Promise<ApiResult<TResponse>> {
+    return request<TResponse, TBody>('POST', path, options)
+  },
+  PUT<TResponse, TBody>(
+    path: string,
+    options: RequestOptions<TBody>
+  ): Promise<ApiResult<TResponse>> {
+    return request<TResponse, TBody>('PUT', path, options)
+  },
+  DELETE<TResponse>(path: string): Promise<ApiResult<TResponse>> {
+    return request<TResponse>('DELETE', path)
+  },
+}

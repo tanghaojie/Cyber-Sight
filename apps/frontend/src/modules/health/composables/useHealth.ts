@@ -1,4 +1,5 @@
 import { ref, onMounted } from 'vue'
+import type { HealthResponse } from '@scaffold/api-contract'
 import { apiClient } from '../../../api/client.js'
 
 export function useHealth() {
@@ -10,7 +11,7 @@ export function useHealth() {
     error.value = null
 
     const { data: response, error: responseError } =
-      await apiClient.GET('/health')
+      await apiClient.GET<HealthResponse>('/health')
 
     if (responseError) {
       error.value = responseError.err ?? 'Failed to reach backend'

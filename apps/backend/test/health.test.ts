@@ -1,7 +1,5 @@
-import { readFile } from 'node:fs/promises'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { FastifyInstance } from 'fastify'
-import { parse } from 'yaml'
 import { buildApp } from '../src/app.js'
 import { ErrorCode } from '../src/shared/errors/error-codes.js'
 
@@ -66,13 +64,7 @@ describe('GET /health', () => {
     expect(Number.isNaN(Date.parse(response.json().data.timestamp))).toBe(false)
   })
 
-  it('keeps the Fastify Swagger schema aligned with the shared OpenAPI contract', async () => {
-    const contractPath = new URL(
-      '../../../packages/openapi-spec/openapi.yaml',
-      import.meta.url
-    )
-    const contract = parse(await readFile(contractPath, 'utf8'))
-
+  it('generates Swagger from the runtime route schemas', async () => {
     const response = await app.inject({
       method: 'GET',
       url: '/docs/json',
@@ -81,70 +73,79 @@ describe('GET /health', () => {
     expect(response.statusCode).toBe(200)
 
     const runtime = response.json()
-    const contractOperation = contract.paths['/health'].get
-    const runtimeOperation = runtime.paths['/health'].get
-    const contractSchema = contract.components.schemas.HealthResponse
-    const contractDataSchema = contract.components.schemas.HealthData
-    const contractErrorSchema = contract.components.schemas.ErrorResponse
-    const runtimeSchema =
-      runtimeOperation.responses['200'].content['application/json'].schema
-    const runtimeErrorSchema =
-      runtimeOperation.responses.default.content['application/json'].schema
+    const health = runtime.paths['/health'].get
+    const login =
+      runtime.paths['/auth/login'].post.requestBody.content['application/json']
+        .schema
 
-    expect(runtimeOperation.operationId).toBe(contractOperation.operationId)
-    expect(runtimeOperation.summary).toBe(contractOperation.summary)
-    expect(runtimeOperation.tags).toEqual(contractOperation.tags)
-    expect(runtimeSchema.required).toEqual(contractSchema.required)
-    expect(runtimeSchema.properties.status.enum).toEqual(
-      contractSchema.properties.status.enum
-    )
-    expect(runtimeSchema.properties.data.required).toEqual(
-      contractDataSchema.required
-    )
-    expect(runtimeSchema.properties.data.properties.status.enum).toEqual(
-      contractDataSchema.properties.status.enum
-    )
-    expect(runtimeSchema.properties.data.properties.timestamp.format).toBe(
-      contractDataSchema.properties.timestamp.format
-    )
-    expect(runtimeErrorSchema.required).toEqual(contractErrorSchema.required)
+    expect(health.operationId).toBe('getHealth')
+    expect(health.summary).toBe('Health check')
+    expect(health.tags).toEqual(['Health'])
+    expect(login.additionalProperties).toBe(false)
+    expect(login.required).toEqual(['username', 'password'])
+    expect(login.properties.username.minLength).toBe(2)
+    expect(login.properties.password.minLength).toBe(8)
   })
 
-  it('exposes every authentication and management operation from the contract', async () => {
-    const contractPath = new URL(
-      '../../../packages/openapi-spec/openapi.yaml',
-      import.meta.url
-    )
-    const contract = parse(await readFile(contractPath, 'utf8'))
+  it('exposes every authentication and management operation', async () => {
     const runtimeResponse = await app.inject({ method: 'GET', url: '/docs/json' })
     const runtime = runtimeResponse.json()
     const operations = [
-      ['/auth/login', 'post'],
-      ['/auth/logout', 'post'],
-      ['/auth/me', 'get'],
-      ['/admin/users', 'get'],
-      ['/admin/users', 'post'],
-      ['/admin/users/{id}', 'put'],
-      ['/admin/users/{id}', 'delete'],
-      ['/admin/roles', 'get'],
-      ['/admin/roles', 'post'],
-      ['/admin/roles/{id}', 'put'],
-      ['/admin/roles/{id}', 'delete'],
-      ['/admin/menus', 'get'],
-      ['/admin/menus', 'post'],
-      ['/admin/menus/{id}', 'put'],
-      ['/admin/menus/{id}', 'delete'],
-      ['/admin/dictionaries', 'get'],
-      ['/admin/dictionaries', 'post'],
-      ['/admin/dictionaries/{id}', 'put'],
-      ['/admin/dictionaries/{id}', 'delete'],
+      ['/auth/login', 'post', 'login'],
+      ['/auth/logout', 'post', 'logout'],
+      ['/auth/me', 'get', 'getCurrentUser'],
+      ['/admin/users', 'get', 'listUsers'],
+      ['/admin/users', 'post', 'createUser'],
+      ['/admin/users/{id}', 'put', 'updateUser'],
+      ['/admin/users/{id}', 'delete', 'deleteUser'],
+      ['/admin/roles', 'get', 'listRoles'],
+      ['/admin/roles', 'post', 'createRole'],
+      ['/admin/roles/{id}', 'put', 'updateRole'],
+      ['/admin/roles/{id}', 'delete', 'deleteRole'],
+      ['/admin/menus', 'get', 'listMenus'],
+      ['/admin/menus', 'post', 'createMenu'],
+      ['/admin/menus/{id}', 'put', 'updateMenu'],
+      ['/admin/menus/{id}', 'delete', 'deleteMenu'],
+      ['/admin/dictionaries', 'get', 'listDictionaries'],
+      ['/admin/dictionaries', 'post', 'createDictionary'],
+      ['/admin/dictionaries/{id}', 'put', 'updateDictionary'],
+      ['/admin/dictionaries/{id}', 'delete', 'deleteDictionary'],
     ] as const
 
-    for (const [path, method] of operations) {
-      expect(runtime.paths[path][method].operationId).toBe(
-        contract.paths[path][method].operationId
-      )
+    for (const [path, method, operationId] of operations) {
+      expect(runtime.paths[path][method].operationId).toBe(operationId)
     }
+  })
+
+  it('rejects undeclared login fields at the HTTP boundary', async () => {
+    const response = await app.inject({
+      method: 'POST',
+      url: '/auth/login',
+      payload: {
+        username: 'admin',
+        password: 'Admin@123456',
+        isAdmin: true,
+      },
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.json()).toEqual({
+      status: ErrorCode.INVALID_REQUEST,
+      err: 'Invalid request',
+    })
+  })
+
+  it('rejects pagination values outside the shared runtime schema', async () => {
+    const response = await app.inject({
+      method: 'GET',
+      url: '/admin/users?pageSize=101',
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.json()).toEqual({
+      status: ErrorCode.INVALID_REQUEST,
+      err: 'Invalid request',
+    })
   })
 
   it('returns a unified not-found response', async () => {

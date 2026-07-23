@@ -2,14 +2,14 @@
 
 ## 定位
 
-`apps/frontend` 是 Vue 3 单页应用，通过共享 OpenAPI 生成的类型访问后端。更换 Fastify 为 Java 时，前端不应依赖具体服务端框架。
+`apps/frontend` 是 Vue 3 单页应用，通过共享契约包推导的 TypeScript 类型访问后端。前端只依赖 HTTP 路径和数据约定，不依赖 Fastify 路由实现。
 
 ## 当前结构
 
 - `src/views/`：路由页面。
 - `src/modules/<module>/composables/`：模块 API 调用和页面状态封装。
 - `src/api/`：共享 API Client 和 HTTP 401/404/500 全局响应拦截器。
-- `@scaffold/openapi-spec`：前后端共享的 OpenAPI 生成类型，禁止手改。
+- `@scaffold/api-contract`：由运行时 Schema 推导的请求和响应类型。
 - `src/router/`：路由配置。
 - Pinia 已初始化，但当前没有 store。
 - `src/stores/auth.ts`：跨页面登录态、当前用户和退出流程。
@@ -20,7 +20,7 @@
 
 - Vue 组件负责展示和交互，不直接实现复杂业务规则。
 - 后端调用通过模块 composable 或 service 封装，不在多个组件中散落路径字符串。
-- API 请求和响应类型来自 OpenAPI 生成物。
+- API 请求和响应类型来自共享运行时 Schema 的推导结果。
 - 页面必须明确处理 loading、empty、error 和 success 状态。
 - 跨页面共享状态才进入 Pinia；局部状态保留在组件或 composable。
 - 新业务模块必须提供组件/逻辑测试，并为关键流程提供端到端测试。
