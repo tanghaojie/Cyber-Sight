@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify'
 import {
   ErrorResponseSchema,
   HealthResponseSchema,
+  toFastifySchema,
   type HealthResponse,
 } from '@scaffold/api-contract'
 import { success } from '../../shared/http/response.js'
@@ -22,8 +23,8 @@ export async function healthRoutes(app: FastifyInstance): Promise<void> {
         tags: ['Health'],
         summary: 'Health check',
         response: {
-          200: HealthResponseSchema,
-          default: ErrorResponseSchema,
+          200: toFastifySchema(HealthResponseSchema),
+          default: toFastifySchema(ErrorResponseSchema),
         },
       },
     },

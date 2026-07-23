@@ -36,11 +36,11 @@
 
 ## HTTP 边界与运行时校验
 
-Fastify 路由必须直接挂载 `@scaffold/api-contract` 提供的请求体、查询参数和路径参数 Schema。路由泛型使用由相同 Schema 推导的类型。类型标注不能替代校验，未经验证的 HTTP JSON 不得直接进入应用层或基础设施层。
+Fastify 路由必须通过 `toFastifySchema()` 挂载 `@scaffold/api-contract` 提供的请求体、查询参数和路径参数 Zod Schema。路由泛型使用由相同 Schema 推导的类型。类型标注不能替代校验，未经验证的 HTTP JSON 不得直接进入应用层或基础设施层。
 
 应用组装显式设置 AJV `removeAdditional: false`。共享 Schema 声明 `additionalProperties: false` 时，未声明字段必须触发统一参数错误，不能被静默删除后继续执行处理函数。
 
-响应 Schema 同样来自契约包，用于 Swagger 生成和稳定序列化。必须通过路由测试确认合法响应字段没有被 Schema 过滤。
+响应 JSON Schema 同样由契约包的 Zod Schema 派生，用于 Swagger 生成和稳定序列化。必须通过路由测试确认合法响应字段没有被 Schema 过滤。
 
 ## Java 引入边界
 

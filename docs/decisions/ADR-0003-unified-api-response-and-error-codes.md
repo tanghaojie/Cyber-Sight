@@ -7,7 +7,7 @@ superseded_by: ADR-0004-http-status-and-frontend-global-error-handling.md
 
 # ADR-0003：统一业务响应、分页和错误码
 
-> ADR-0006 仅取代本决策中依赖 OpenAPI 展开具体类型的表达方式。统一响应、分页和错误码语义继续有效，当前由共享 TypeBox Schema 与推导类型表达。
+> ADR-0006 仅取代本决策中依赖 OpenAPI 展开具体类型的表达方式。统一响应、分页和错误码语义继续有效；ADR-0007 进一步统一为共享 Zod Schema 与推导类型。
 
 ## 背景
 

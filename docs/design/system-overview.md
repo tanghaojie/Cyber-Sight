@@ -10,7 +10,7 @@ AI Web Scaffold 同时面向个人快速启动和团队统一工程规范。它�
 2. 让 AI 能快速增加业务，同时通过契约、测试、设计和计划约束改动范围。
 3. 默认使用 TypeScript/Fastify，以共享运行时 Schema 保证前后端类型与 HTTP 边界一致。
 4. 让关键决策、设计演进和 AI 协作过程可检索、可回溯。
-5. 让不熟悉 TypeBox、Drizzle 和 Vitest 的全栈维护者能够独立修改和验证项目。
+5. 让不熟悉 Zod、Drizzle 和 Vitest 的全栈维护者能够独立修改和验证项目。
 
 ## 当前组成
 
@@ -19,11 +19,11 @@ Vue 3 frontend
       |
       | shared inferred TypeScript types
       v
-TypeBox runtime contract
+Zod runtime contract
       |
-      | request validation + Swagger generation
+      | Draft 7 JSON Schema
       v
-Fastify + Drizzle
+Fastify validation + Swagger + Drizzle
       |
       v
 PostgreSQL
@@ -41,7 +41,7 @@ pnpm workspace 管理三个包：
 
 ### 可执行契约优先
 
-HTTP 数据先在共享 TypeBox Schema 中定义。Fastify 直接用它校验真实请求，TypeScript 类型从它推导，Swagger/OpenAPI 从路由按需生成。
+HTTP 数据先在共享 Zod Schema 中定义，TypeScript 类型从它推导。契约包生成 Draft 7 JSON Schema，Fastify 用于校验、响应序列化和按需生成 Swagger/OpenAPI。
 
 ### 默认单实现
 

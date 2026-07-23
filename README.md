@@ -1,6 +1,6 @@
 # AI Web Scaffold
 
-前后端分离的 pnpm monorepo 管理系统脚手架，以共享 TypeBox 运行时 Schema 约束前后端接口，内置登录、管理后台框架和用户/角色/菜单/字典管理。
+前后端分离的 pnpm monorepo 管理系统脚手架，以共享 Zod 运行时 Schema 约束前后端接口，内置登录、管理后台框架和用户/角色/菜单/字典管理。
 
 ## 快速开始
 

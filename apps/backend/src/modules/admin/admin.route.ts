@@ -1,19 +1,20 @@
 import type { FastifyInstance } from 'fastify'
 import {
-  DictionaryPageResultSchema,
-  DictionaryRequestSchema,
-  EmptyResultSchema,
-  ErrorResponseSchema,
-  IdParamsSchema,
-  ListQuerySchema,
-  MenuPageResultSchema,
-  MenuRequestSchema,
-  MutationResultSchema,
-  RolePageResultSchema,
-  RoleRequestSchema,
-  UserCreateSchema,
-  UserPageResultSchema,
-  UserUpdateSchema,
+  DictionaryPageResultSchema as DictionaryPageResultZodSchema,
+  DictionaryRequestSchema as DictionaryRequestZodSchema,
+  EmptyResultSchema as EmptyResultZodSchema,
+  ErrorResponseSchema as ErrorResponseZodSchema,
+  IdParamsSchema as IdParamsZodSchema,
+  ListQuerySchema as ListQueryZodSchema,
+  MenuPageResultSchema as MenuPageResultZodSchema,
+  MenuRequestSchema as MenuRequestZodSchema,
+  MutationResultSchema as MutationResultZodSchema,
+  RolePageResultSchema as RolePageResultZodSchema,
+  RoleRequestSchema as RoleRequestZodSchema,
+  toFastifySchema,
+  UserCreateSchema as UserCreateZodSchema,
+  UserPageResultSchema as UserPageResultZodSchema,
+  UserUpdateSchema as UserUpdateZodSchema,
   type DictionaryRequest,
   type IdParams,
   type ListQuery,
@@ -48,6 +49,23 @@ import {
   updateRole,
   updateUser,
 } from './admin.repository.js'
+
+const DictionaryPageResultSchema = toFastifySchema(
+  DictionaryPageResultZodSchema
+)
+const DictionaryRequestSchema = toFastifySchema(DictionaryRequestZodSchema)
+const EmptyResultSchema = toFastifySchema(EmptyResultZodSchema)
+const ErrorResponseSchema = toFastifySchema(ErrorResponseZodSchema)
+const IdParamsSchema = toFastifySchema(IdParamsZodSchema)
+const ListQuerySchema = toFastifySchema(ListQueryZodSchema)
+const MenuPageResultSchema = toFastifySchema(MenuPageResultZodSchema)
+const MenuRequestSchema = toFastifySchema(MenuRequestZodSchema)
+const MutationResultSchema = toFastifySchema(MutationResultZodSchema)
+const RolePageResultSchema = toFastifySchema(RolePageResultZodSchema)
+const RoleRequestSchema = toFastifySchema(RoleRequestZodSchema)
+const UserCreateSchema = toFastifySchema(UserCreateZodSchema)
+const UserPageResultSchema = toFastifySchema(UserPageResultZodSchema)
+const UserUpdateSchema = toFastifySchema(UserUpdateZodSchema)
 
 function isUniqueViolation(error: unknown): boolean {
   return (

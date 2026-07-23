@@ -6,6 +6,8 @@ date: 2026-07-23
 
 # ADR-0006：以共享运行时 Schema 作为内部 API 契约
 
+> ADR-0007 取代本决策中选择 TypeBox 的实现细节。共享运行时 Schema、类型推导和按需生成 OpenAPI 的总体决策继续有效，当前统一由 Zod 4 实现。
+
 ## 背景
 
 项目当前只有 TypeScript/Vue 前端和 TypeScript/Fastify 后端。此前为了保留未来替换为 Java 的可能性，采用手写 OpenAPI、生成 TypeScript 声明、维护 Fastify JSON Schema、再用契约测试比较两者的链路。随着管理 API 增加，同一请求结构需要在 OpenAPI 和路由 Schema 中重复表达，生成文件和一致性测试进一步增加了维护面。

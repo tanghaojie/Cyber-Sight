@@ -2,7 +2,7 @@
 
 ## 1. 这份指南适合谁
 
-本项目虽然以 AI 辅助开发为主，但所有实现必须能够由全栈工程师阅读、调试和修改。本指南面向熟悉 TypeScript、Vue、Node.js 和关系型数据库，但不熟悉 TypeBox、Drizzle ORM 或 Vitest 工作模式的维护者。
+本项目虽然以 AI 辅助开发为主，但所有实现必须能够由全栈工程师阅读、调试和修改。本指南面向熟悉 TypeScript、Vue、Node.js 和关系型数据库，但不熟悉 Zod、Drizzle ORM 或 Vitest 工作模式的维护者。
 
 阅读完后，你应该能够：
 
@@ -27,7 +27,7 @@ apps/frontend          apps/backend
 Vue 3 + fetch Client   Fastify 校验 + Swagger
 ```
 
-最重要的原则是“可执行契约优先”：接口数据变化先改共享 TypeBox Schema，后端直接用它校验真实请求，前后端类型从它推导。不要分别手写相似 interface，再靠人脑保持同步。
+最重要的原则是“可执行契约优先”：接口数据变化先改共享 Zod Schema，后端使用由它生成的 JSON Schema 校验真实请求，前后端类型从它推导。不要分别手写相似 interface，再靠人脑保持同步。
 
 ## 3. 开发环境与首次启动
 
@@ -72,7 +72,7 @@ pnpm dev
 
 这是 API 数据契约包，不包含业务实现。
 
-- `src/index.ts`：共享 TypeBox Schema、由 Schema 推导的请求/响应类型，以及统一响应泛型。
+- `src/index.ts`：共享 Zod Schema、`z.infer` 推导的请求/响应类型、Draft 7 转换函数和统一响应泛型。
 - `package.json`：让前端和后端通过 `@scaffold/api-contract` 消费同一契约。
 - `dist/`：构建产物，不作为手工编辑源。
 
@@ -111,28 +111,27 @@ pnpm dev
 
 ## 5. 运行时 Schema 的工作方式
 
-TypeScript interface 在运行时不存在，不能阻止 curl、旧客户端或被篡改的请求提交非法 JSON。共享契约使用 TypeBox 同时定义 JSON Schema 和 TypeScript 类型：
+TypeScript interface 在运行时不存在，不能阻止 curl、旧客户端或被篡改的请求提交非法 JSON。共享契约使用 Zod 4 定义运行时 Schema 并推导 TypeScript 类型：
 
 ```typescript
-import { Static, Type } from '@sinclair/typebox'
+import { z } from 'zod'
 
-export const UserRequestSchema = Type.Object(
-  {
-    name: Type.String({ minLength: 1, maxLength: 80 }),
-    enabled: Type.Boolean(),
-  },
-  { additionalProperties: false }
-)
+export const UserRequestSchema = z.strictObject({
+  name: z.string().min(1).max(80),
+  enabled: z.boolean(),
+})
 
-export type UserRequest = Static<typeof UserRequestSchema>
+export type UserRequest = z.infer<typeof UserRequestSchema>
 ```
 
-Fastify 路由直接挂载这个 Schema：
+Fastify 路由挂载由这个 Schema 派生的 JSON Schema：
 
 ```typescript
+import { toFastifySchema } from '@scaffold/api-contract'
+
 app.post<{ Body: UserRequest }>(
   '/users',
-  { schema: { body: UserRequestSchema } },
+  { schema: { body: toFastifySchema(UserRequestSchema) } },
   async function createUser(request) {
     // request.body 已通过真实运行时校验
   }
@@ -141,9 +140,11 @@ app.post<{ Body: UserRequest }>(
 
 关键规则：
 
-- 请求对象默认设置 `additionalProperties: false`。
+- 请求对象使用 `z.strictObject()`，生成 `additionalProperties: false`。
 - 必填、长度、范围、格式和枚举写在 Schema 中。
 - 类型始终从 Schema 推导，不再平行手写。
+- 路由通过 `toFastifySchema()` 生成 Draft 7 JSON Schema；不要手写转换结果。
+- HTTP 契约不得使用无法转换为 JSON Schema 的 `transform`、`Date`、`Map`、`Set` 等能力。
 - `/docs/json` 由 Fastify 路由生成 OpenAPI，用于调试；不再编辑第二份 YAML。
 
 修改后执行：
@@ -339,11 +340,11 @@ pnpm test:watch # 开发时监听
 
 ### 修改 Schema 后前端类型没有变化
 
-确认类型通过 `Static<typeof Schema>` 推导，并从 `@scaffold/api-contract` 导出。不要在前端保留同名的旧 interface。
+确认类型通过 `z.infer<typeof Schema>` 推导，并从 `@scaffold/api-contract` 导出。不要在前端保留同名的旧 interface。
 
 ### TypeScript 已通过，为什么非法请求仍进入处理函数
 
-类型不会执行运行时校验。检查 Fastify 路由是否真正设置了 `schema.body`、`schema.querystring` 或 `schema.params`，并添加 `inject` 非法输入测试。
+类型不会执行运行时校验。检查 Fastify 路由是否通过 `toFastifySchema()` 真正设置了 `schema.body`、`schema.querystring` 或 `schema.params`，并添加 `inject` 非法输入测试。
 
 ### 数据库迁移没有生成
 

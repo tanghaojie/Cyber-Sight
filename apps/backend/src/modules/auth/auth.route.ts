@@ -5,6 +5,7 @@ import {
   ErrorResponseSchema,
   LoginRequestSchema,
   LoginResultSchema,
+  toFastifySchema,
   type LoginRequest,
 } from '@scaffold/api-contract'
 import { ErrorCode } from '../../shared/errors/error-codes.js'
@@ -23,10 +24,10 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
         operationId: 'login',
         summary: 'Sign in with username and password',
         tags: ['Authentication'],
-        body: LoginRequestSchema,
+        body: toFastifySchema(LoginRequestSchema),
         response: {
-          200: LoginResultSchema,
-          default: ErrorResponseSchema,
+          200: toFastifySchema(LoginResultSchema),
+          default: toFastifySchema(ErrorResponseSchema),
         },
       },
     },
@@ -55,8 +56,8 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
         summary: 'Get the signed-in user',
         tags: ['Authentication'],
         response: {
-          200: CurrentUserResponseSchema,
-          default: ErrorResponseSchema,
+          200: toFastifySchema(CurrentUserResponseSchema),
+          default: toFastifySchema(ErrorResponseSchema),
         },
       },
     },
@@ -73,8 +74,8 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
         summary: 'Revoke the current session',
         tags: ['Authentication'],
         response: {
-          200: EmptySuccessResponseSchema,
-          default: ErrorResponseSchema,
+          200: toFastifySchema(EmptySuccessResponseSchema),
+          default: toFastifySchema(ErrorResponseSchema),
         },
       },
     },

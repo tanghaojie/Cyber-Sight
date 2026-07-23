@@ -1,5 +1,10 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { FastifyInstance } from 'fastify'
+import {
+  ListQuerySchema,
+  LoginRequestSchema,
+  toFastifySchema,
+} from '@scaffold/api-contract'
 import { buildApp } from '../src/app.js'
 import { ErrorCode } from '../src/shared/errors/error-codes.js'
 
@@ -62,6 +67,34 @@ describe('GET /health', () => {
       },
     })
     expect(Number.isNaN(Date.parse(response.json().data.timestamp))).toBe(false)
+  })
+
+  it('converts Zod contracts to Fastify-compatible Draft 7 schemas', () => {
+    const loginSchema = toFastifySchema(LoginRequestSchema)
+    const listQuerySchema = toFastifySchema(ListQuerySchema)
+
+    expect(loginSchema).not.toHaveProperty('$schema')
+    expect(loginSchema).toMatchObject({
+      type: 'object',
+      additionalProperties: false,
+      required: ['username', 'password'],
+      properties: {
+        username: { type: 'string', minLength: 2, maxLength: 50 },
+        password: { type: 'string', minLength: 8, maxLength: 128 },
+      },
+    })
+    expect(listQuerySchema).toMatchObject({
+      additionalProperties: false,
+      properties: {
+        pageNum: { type: 'integer', minimum: 1, default: 1 },
+        pageSize: {
+          type: 'integer',
+          minimum: 1,
+          maximum: 100,
+          default: 10,
+        },
+      },
+    })
   })
 
   it('generates Swagger from the runtime route schemas', async () => {

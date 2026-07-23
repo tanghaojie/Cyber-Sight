@@ -20,6 +20,6 @@
     "test": "tsc"
   },
   "dependencies": {
-    "@sinclair/typebox": "^0.34.0"
+    "zod": "^4.2.0"
   }
 }
