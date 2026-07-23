@@ -11,10 +11,12 @@
 - `src/api/`：共享 API Client 和 HTTP 401/404/500 全局响应拦截器。
 - `@scaffold/api-contract`：由运行时 Schema 推导的请求和响应类型。
 - `src/router/`：路由配置。
-- Pinia 已初始化，但当前没有 store。
+- Pinia 已初始化并用于认证 store。
 - `src/stores/auth.ts`：跨页面登录态、当前用户和退出流程。
-- `src/layouts/AdminLayout.vue`：响应式侧栏、顶栏和内容区应用框架。
-- `src/views/admin/ResourceView.vue`：用户、角色、菜单和字典的配置驱动 CRUD 页面。
+- `src/layouts/AdminLayout.vue`：响应式应用壳编排。
+- `src/components/layout/`：侧栏、顶栏和动态内容承载区。
+- `src/router/navigation.ts`：前端导航展示模型。
+- `src/views/admin/ResourceView.vue`：用户、角色、菜单和字典的配置驱动 CRUD 页面，使用 Element Plus 表格、分页和表单弹窗。
 
 ## 约束
 
@@ -24,6 +26,7 @@
 - 页面必须明确处理 loading、empty、error 和 success 状态。
 - 跨页面共享状态才进入 Pinia；局部状态保留在组件或 composable。
 - 新业务模块必须提供组件/逻辑测试，并为关键流程提供端到端测试。
+- 布局和视觉样式优先使用 Tailwind CSS；表格、表单、弹窗和反馈等通用交互优先使用 Element Plus，并通过项目视觉令牌统一主题。
 - 共享响应拦截器统一处理 HTTP `401`、`404`、`500` 并发布 `api:global-http-error` 事件；应用壳层监听事件执行登录、404 页面或 500 提示等全局动作。
 - 业务模块处理 HTTP `200` 响应中的非零业务 `status`；只有 `status === 0` 且存在预期数据时才进入成功状态。
 - 分页页面通过统一的 `pageNum`、`pageSize` 请求和 `list`、`total` 响应维护状态。
@@ -34,4 +37,4 @@
 
 - 已实现 HTTP 401 对应的登录页和路由守卫；独立 404 页面和全局 500 提示仍待后续补齐。
 - `useHealth` 成功重试时不会清理旧错误状态。
-- 已建立管理端设计令牌和响应式样式基线；系统化可访问性审计和生产环境 API 地址策略仍待补齐。
+- 已建立 Tailwind CSS、Element Plus 主题令牌和响应式样式基线；系统化可访问性审计和生产环境 API 地址策略仍待补齐。

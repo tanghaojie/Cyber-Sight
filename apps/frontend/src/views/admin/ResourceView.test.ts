@@ -1,5 +1,6 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import ElementPlus from 'element-plus'
 import ResourceView from './ResourceView.vue'
 
 const adminApi = vi.hoisted(() => ({
@@ -34,7 +35,10 @@ describe('ResourceView', () => {
   })
 
   it('renders a successful user list and status', async () => {
-    const wrapper = mount(ResourceView, { props: { resource: 'users' } })
+    const wrapper = mount(ResourceView, {
+      props: { resource: 'users' },
+      global: { plugins: [ElementPlus] },
+    })
     await flushPromises()
 
     expect(wrapper.text()).toContain('系统管理员')
@@ -44,7 +48,10 @@ describe('ResourceView', () => {
 
   it('renders the empty state', async () => {
     adminApi.listResource.mockResolvedValue({ status: 0, list: [], total: 0 })
-    const wrapper = mount(ResourceView, { props: { resource: 'roles' } })
+    const wrapper = mount(ResourceView, {
+      props: { resource: 'roles' },
+      global: { plugins: [ElementPlus] },
+    })
     await flushPromises()
 
     expect(wrapper.text()).toContain('暂无数据')
@@ -53,10 +60,14 @@ describe('ResourceView', () => {
 
   it('renders a list failure without stale rows', async () => {
     adminApi.listResource.mockRejectedValue(new Error('服务暂不可用'))
-    const wrapper = mount(ResourceView, { props: { resource: 'menus' } })
+    const wrapper = mount(ResourceView, {
+      props: { resource: 'menus' },
+      global: { plugins: [ElementPlus] },
+    })
     await flushPromises()
 
     expect(wrapper.text()).toContain('服务暂不可用')
-    expect(wrapper.findAll('tbody tr')).toHaveLength(1)
+    expect(wrapper.text()).toContain('暂无数据')
+    expect(wrapper.text()).not.toContain('系统管理员')
   })
 })

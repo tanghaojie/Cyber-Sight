@@ -14,6 +14,7 @@
 - [管理系统基础能力](archive/2026-07-22-management-system-foundation.md)：统一软删除审计、认证、管理 API 和现代化管理前端。
 - [共享运行时 Schema 契约迁移](archive/2026-07-23-runtime-schema-contract.md)：用单一可执行 Schema 替换 OpenAPI-first 双源链路。
 - [Zod Schema 统一迁移](archive/2026-07-23-zod-schema-unification.md)：以 Zod 4 统一环境变量和 HTTP 契约的 Schema 编写 API。
+- [前端应用壳组件化与动态页面加载](archive/2026-07-23-frontend-shell-componentization.md)：引入 Tailwind CSS 与 Element Plus，拆分布局组件并实现菜单路由动态加载。
 
 ## 使用规则
 

@@ -41,7 +41,7 @@ updated: 2026-07-23
 
 ## 依赖关系
 
-继续使用现有 Fastify、Zod、Drizzle、PostgreSQL、Vue Router、Pinia 与共享 fetch Client。密码散列、随机令牌和摘要使用 Node.js 内置 `crypto`。前端视觉体系使用仓库内 CSS 设计令牌和组件，不引入 UI 框架。
+继续使用现有 Fastify、Zod、Drizzle、PostgreSQL、Vue Router、Pinia 与共享 fetch Client。密码散列、随机令牌和摘要使用 Node.js 内置 `crypto`。前端视觉体系使用 Tailwind CSS、Element Plus、项目 CSS 令牌和布局组件，具体边界见[前端应用壳设计](frontend-shell.md)。
 
 ## 失败模式与安全考虑
 
