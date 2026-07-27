@@ -17,6 +17,7 @@ ADR 记录会长期影响项目的技术选择及其理由。已接受的 ADR �
 - [ADR-0011：以前端应用处理器执行全局 HTTP 错误行为](ADR-0011-registered-application-http-error-handler.md)
 - [ADR-0012：模块页面自动注册与 SCSS 分层](ADR-0012-module-view-registration-and-scss-layering.md)
 - [ADR-0013：以表意公共文件替代模块 index.ts](ADR-0013-semantic-module-entry-files.md)
-- [ADR-0014：软删除自然键使用部分唯一索引](ADR-0014-soft-delete-natural-key-uniqueness.md)
+- [ADR-0014：软删除自然键使用部分唯一索引](ADR-0014-soft-delete-natural-key-uniqueness.md)（已被 ADR-0015 取代）
+- [ADR-0015：统一软删除业务唯一性约束](ADR-0015-active-row-business-uniqueness.md)
 
 新增 ADR 时从 [ADR 模板](../templates/adr-template.md)复制，使用下一个连续编号。

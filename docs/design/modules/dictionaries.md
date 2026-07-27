@@ -19,4 +19,10 @@ updated: 2026-07-27
 
 ## 失败模式与测试策略
 
-同一类型和值保持唯一，所有读取过滤软删除记录。测试覆盖分页、表单转换、排序、状态和业务错误展示。
+同一类型和值的组合只在未删除字典项中唯一，数据库使用 `is_deleted = false` 部分唯一索引保证并发安全；软删除后允许新字典项复用相同组合，并可保留多条历史记录。所有读取过滤软删除记录。测试覆盖分页、表单转换、排序、状态、业务错误展示和有效记录唯一索引。
+
+## 相关 ADR、计划和 AI 日志
+
+- [ADR-0015：统一软删除业务唯一性约束](../../decisions/ADR-0015-active-row-business-uniqueness.md)
+- [实施计划](../../plans/archive/2026-07-27-soft-delete-unique-constraints.md)
+- [AI 协作记录](../../ai-logs/2026/07/2026-07-27-soft-delete-unique-constraints.md)

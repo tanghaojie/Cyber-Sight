@@ -27,25 +27,44 @@ export function auditColumns() {
   }
 }
 
-export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  username: varchar('username', { length: 50 }).notNull().unique(),
-  displayName: varchar('display_name', { length: 80 }).notNull(),
-  email: varchar('email', { length: 160 }).notNull().unique(),
-  passwordHash: text('password_hash').notNull(),
-  enabled: boolean('enabled').default(true).notNull(),
-  lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
-  ...auditColumns(),
-})
+export const users = pgTable(
+  'users',
+  {
+    id: serial('id').primaryKey(),
+    username: varchar('username', { length: 50 }).notNull(),
+    displayName: varchar('display_name', { length: 80 }).notNull(),
+    email: varchar('email', { length: 160 }).notNull(),
+    passwordHash: text('password_hash').notNull(),
+    enabled: boolean('enabled').default(true).notNull(),
+    lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
+    ...auditColumns(),
+  },
+  (table) => ({
+    activeUsername: uniqueIndex('users_username_active_unique')
+      .on(table.username)
+      .where(sql`${table.isDeleted} = false`),
+    activeEmail: uniqueIndex('users_email_active_unique')
+      .on(table.email)
+      .where(sql`${table.isDeleted} = false`),
+  })
+)
 
-export const roles = pgTable('roles', {
-  id: serial('id').primaryKey(),
-  name: varchar('name', { length: 80 }).notNull(),
-  code: varchar('code', { length: 50 }).notNull().unique(),
-  description: varchar('description', { length: 200 }).default('').notNull(),
-  enabled: boolean('enabled').default(true).notNull(),
-  ...auditColumns(),
-})
+export const roles = pgTable(
+  'roles',
+  {
+    id: serial('id').primaryKey(),
+    name: varchar('name', { length: 80 }).notNull(),
+    code: varchar('code', { length: 50 }).notNull(),
+    description: varchar('description', { length: 200 }).default('').notNull(),
+    enabled: boolean('enabled').default(true).notNull(),
+    ...auditColumns(),
+  },
+  (table) => ({
+    activeCode: uniqueIndex('roles_code_active_unique')
+      .on(table.code)
+      .where(sql`${table.isDeleted} = false`),
+  })
+)
 
 export const userRoles = pgTable(
   'user_roles',
@@ -60,11 +79,9 @@ export const userRoles = pgTable(
     ...auditColumns(),
   },
   (table) => ({
-    activeAssignment: uniqueIndex('user_roles_user_role_unique').on(
-      table.userId,
-      table.roleId,
-      table.isDeleted
-    ),
+    activeAssignment: uniqueIndex('user_roles_user_role_active_unique')
+      .on(table.userId, table.roleId)
+      .where(sql`${table.isDeleted} = false`),
   })
 )
 
@@ -104,11 +121,9 @@ export const roleMenus = pgTable(
     ...auditColumns(),
   },
   (table) => ({
-    activeAssignment: uniqueIndex('role_menus_role_menu_unique').on(
-      table.roleId,
-      table.menuId,
-      table.isDeleted
-    ),
+    activeAssignment: uniqueIndex('role_menus_role_menu_active_unique')
+      .on(table.roleId, table.menuId)
+      .where(sql`${table.isDeleted} = false`),
   })
 )
 
@@ -125,11 +140,9 @@ export const dictionaries = pgTable(
     ...auditColumns(),
   },
   (table) => ({
-    activeEntry: uniqueIndex('dictionaries_type_value_unique').on(
-      table.type,
-      table.value,
-      table.isDeleted
-    ),
+    activeEntry: uniqueIndex('dictionaries_type_value_active_unique')
+      .on(table.type, table.value)
+      .where(sql`${table.isDeleted} = false`),
   })
 )
 

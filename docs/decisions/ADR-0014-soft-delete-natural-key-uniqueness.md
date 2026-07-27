@@ -1,10 +1,14 @@
 ---
 title: 软删除自然键使用部分唯一索引
-status: accepted
+status: superseded
 date: 2026-07-27
+superseded_by: ADR-0015
 ---
 
 # ADR-0014：软删除自然键使用部分唯一索引
+
+本决策对菜单表的局部范围已由 [ADR-0015](ADR-0015-active-row-business-uniqueness.md)
+扩展并取代；原始背景、取舍和菜单迁移记录保留用于历史追溯。
 
 ## 背景
 

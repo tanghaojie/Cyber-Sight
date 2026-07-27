@@ -38,6 +38,7 @@ Schema 测试校验该索引是唯一索引且带有软删除条件，迁移测�
 
 ## 相关 ADR、计划和 AI 日志
 
+- [ADR-0015：统一软删除业务唯一性约束](../../decisions/ADR-0015-active-row-business-uniqueness.md)
 - [ADR-0014：软删除自然键使用部分唯一索引](../../decisions/ADR-0014-soft-delete-natural-key-uniqueness.md)
 - [实施计划](../../plans/archive/2026-07-27-menu-code-soft-delete-uniqueness.md)
 - [AI 协作记录](../../ai-logs/2026/07/2026-07-27-menu-code-soft-delete-uniqueness.md)

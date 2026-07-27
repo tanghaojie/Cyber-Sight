@@ -34,3 +34,4 @@ ai-logs/YYYY/MM/YYYY-MM-DD-<topic>.md
 - [2026-07-27：前端模块表意公共文件迁移](2026/07/2026-07-27-semantic-module-entry-files.md)
 - [2026-07-27：前端应用壳流式布局重构](2026/07/2026-07-27-frontend-layout-refactor.md)
 - [2026-07-27：菜单编码软删除唯一性修复](2026/07/2026-07-27-menu-code-soft-delete-uniqueness.md)
+- [2026-07-27：统一软删除业务唯一性约束](2026/07/2026-07-27-soft-delete-unique-constraints.md)

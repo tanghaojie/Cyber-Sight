@@ -1,5 +1,5 @@
 import { getTableColumns } from 'drizzle-orm'
-import { getTableConfig } from 'drizzle-orm/pg-core'
+import { getTableConfig, type PgTable } from 'drizzle-orm/pg-core'
 import { describe, expect, it } from 'vitest'
 import {
   authSessions,
@@ -19,6 +19,32 @@ const tables = [
   roleMenus,
   dictionaries,
   authSessions,
+]
+
+const activeBusinessIdentityIndexes: Array<{
+  table: PgTable
+  name: string
+  columns: string[]
+}> = [
+  { table: users, name: 'users_username_active_unique', columns: ['username'] },
+  { table: users, name: 'users_email_active_unique', columns: ['email'] },
+  { table: roles, name: 'roles_code_active_unique', columns: ['code'] },
+  { table: menus, name: 'menus_code_active_unique', columns: ['code'] },
+  {
+    table: userRoles,
+    name: 'user_roles_user_role_active_unique',
+    columns: ['user_id', 'role_id'],
+  },
+  {
+    table: roleMenus,
+    name: 'role_menus_role_menu_active_unique',
+    columns: ['role_id', 'menu_id'],
+  },
+  {
+    table: dictionaries,
+    name: 'dictionaries_type_value_active_unique',
+    columns: ['type', 'value'],
+  },
 ]
 
 describe('database lifecycle fields', () => {
@@ -41,19 +67,30 @@ describe('menu routing fields', () => {
   })
 })
 
-describe('menu code uniqueness', () => {
-  it('only requires unique codes for active menus', () => {
-    const activeCodeIndex = getTableConfig(menus).indexes.find(
-      (index) => index.config.name === 'menus_code_active_unique'
-    )
+describe('soft-delete uniqueness', () => {
+  it.each(activeBusinessIdentityIndexes)(
+    '$name only requires unique business identities for active rows',
+    ({ table, name, columns }) => {
+      const tableConfig = getTableConfig(table)
+      const activeIndex = tableConfig.indexes.find(
+        (index) => index.config.name === name
+      )
 
-    expect(activeCodeIndex?.config.unique).toBe(true)
-    expect(
-      activeCodeIndex?.config.columns.map((column) => (
-        'name' in column ? column.name : undefined
-      ))
-    ).toEqual(['code'])
-    expect(activeCodeIndex?.config.where).toBeDefined()
-    expect(getTableConfig(menus).uniqueConstraints).toHaveLength(0)
+      expect(activeIndex?.config.unique).toBe(true)
+      expect(
+        activeIndex?.config.columns.map((column) => (
+          'name' in column ? column.name : undefined
+        ))
+      ).toEqual(columns)
+      expect(activeIndex?.config.where).toBeDefined()
+      expect(tableConfig.uniqueConstraints).toHaveLength(0)
+    }
+  )
+
+  it('keeps session token hashes globally unique after soft deletion', () => {
+    expect(authSessions.tokenHash.isUnique).toBe(true)
+    expect(authSessions.tokenHash.uniqueName).toBe(
+      'auth_sessions_token_hash_unique'
+    )
   })
 })
