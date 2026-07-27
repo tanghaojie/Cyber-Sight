@@ -1,4 +1,5 @@
 import { getTableColumns } from 'drizzle-orm'
+import { getTableConfig } from 'drizzle-orm/pg-core'
 import { describe, expect, it } from 'vitest'
 import {
   authSessions,
@@ -37,5 +38,22 @@ describe('menu routing fields', () => {
     const columns = getTableColumns(menus)
     expect(columns).toHaveProperty('component')
     expect(columns).toHaveProperty('externalUrl')
+  })
+})
+
+describe('menu code uniqueness', () => {
+  it('only requires unique codes for active menus', () => {
+    const activeCodeIndex = getTableConfig(menus).indexes.find(
+      (index) => index.config.name === 'menus_code_active_unique'
+    )
+
+    expect(activeCodeIndex?.config.unique).toBe(true)
+    expect(
+      activeCodeIndex?.config.columns.map((column) => (
+        'name' in column ? column.name : undefined
+      ))
+    ).toEqual(['code'])
+    expect(activeCodeIndex?.config.where).toBeDefined()
+    expect(getTableConfig(menus).uniqueConstraints).toHaveLength(0)
   })
 })

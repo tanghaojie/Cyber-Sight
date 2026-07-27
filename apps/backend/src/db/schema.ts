@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm'
 import {
   boolean,
   integer,
@@ -67,20 +68,28 @@ export const userRoles = pgTable(
   })
 )
 
-export const menus = pgTable('menus', {
-  id: serial('id').primaryKey(),
-  parentId: integer('parent_id').default(0).notNull(),
-  name: varchar('name', { length: 80 }).notNull(),
-  code: varchar('code', { length: 80 }).notNull().unique(),
-  path: varchar('path', { length: 160 }).default('').notNull(),
-  component: varchar('component', { length: 160 }).default('').notNull(),
-  externalUrl: varchar('external_url', { length: 500 }).default('').notNull(),
-  icon: varchar('icon', { length: 50 }).default('').notNull(),
-  sortOrder: integer('sort_order').default(0).notNull(),
-  type: menuType('type').default('menu').notNull(),
-  enabled: boolean('enabled').default(true).notNull(),
-  ...auditColumns(),
-})
+export const menus = pgTable(
+  'menus',
+  {
+    id: serial('id').primaryKey(),
+    parentId: integer('parent_id').default(0).notNull(),
+    name: varchar('name', { length: 80 }).notNull(),
+    code: varchar('code', { length: 80 }).notNull(),
+    path: varchar('path', { length: 160 }).default('').notNull(),
+    component: varchar('component', { length: 160 }).default('').notNull(),
+    externalUrl: varchar('external_url', { length: 500 }).default('').notNull(),
+    icon: varchar('icon', { length: 50 }).default('').notNull(),
+    sortOrder: integer('sort_order').default(0).notNull(),
+    type: menuType('type').default('menu').notNull(),
+    enabled: boolean('enabled').default(true).notNull(),
+    ...auditColumns(),
+  },
+  (table) => ({
+    activeCode: uniqueIndex('menus_code_active_unique')
+      .on(table.code)
+      .where(sql`${table.isDeleted} = false`),
+  })
+)
 
 export const roleMenus = pgTable(
   'role_menus',

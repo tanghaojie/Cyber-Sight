@@ -22,6 +22,7 @@
 - [前端模块页面自动注册与 SCSS 重构](archive/2026-07-27-frontend-registry-and-scss.md)：自动发现模块页面注册文件，分层迁移全局 SCSS 并提高侧栏对比度。
 - [前端模块表意公共文件迁移](archive/2026-07-27-semantic-module-entry-files.md)：删除前端模块级 `index.ts`，改用按职责命名并登记的公共文件。
 - [前端应用壳流式布局重构](archive/2026-07-27-frontend-layout-refactor.md)：修复侧栏脱离布局流后遮挡主内容和顶栏的问题，统一桌面网格与移动抽屉边界。
+- [菜单编码软删除唯一性修复](archive/2026-07-27-menu-code-soft-delete-uniqueness.md)：以部分唯一索引允许菜单编码在软删除后复用。
 
 ## 使用规则
 
