@@ -1,46 +1,40 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
+import type { NavigationMenu } from '@scaffold/api-contract'
 import AppSidebar from './AppSidebar.vue'
-import { navigationGroups } from '../../router/navigation.js'
+
+const items: NavigationMenu[] = [
+  {
+    id: 1, parentId: 0, name: '组织与权限', code: 'ORGANIZATION', icon: 'layers', sortOrder: 10,
+    type: 'directory', path: '', component: '', externalUrl: '',
+    children: [
+      { id: 2, parentId: 1, name: '用户管理', code: 'USERS', icon: 'users', sortOrder: 10, type: 'menu', path: '/users', component: 'users', externalUrl: '', children: [] },
+      { id: 3, parentId: 1, name: '产品文档', code: 'DOCS', icon: 'external', sortOrder: 20, type: 'button', path: '', component: '', externalUrl: 'https://example.com', children: [] },
+    ],
+  },
+]
 
 describe('AppSidebar', () => {
-  it('renders every navigation item and emits after navigation', async () => {
+  it('renders directory, internal menu and safe external button', async () => {
     const wrapper = mount(AppSidebar, {
-      props: {
-        groups: navigationGroups,
-        open: true,
-      },
+      props: { items, open: true },
       global: {
         stubs: {
-          RouterLink: {
-            props: ['to'],
-            template: '<a :data-to="to" @click="$emit(\'click\')"><slot /></a>',
-          },
+          RouterLink: { props: ['to'], template: '<a :data-to="to" @click="$emit(\'click\')"><slot /></a>' },
         },
       },
     })
-
-    expect(wrapper.text()).toContain('工作台')
-    expect(wrapper.text()).toContain('用户管理')
-    expect(wrapper.find('[data-to="/dictionaries"]').exists()).toBe(true)
-
-    await wrapper.find('[data-to="/users"]').trigger('click')
+    expect(wrapper.text()).toContain('组织与权限')
+    expect(wrapper.find('[data-to="/users"]').exists()).toBe(true)
+    expect(wrapper.get('a[href="https://example.com"]').attributes('rel')).toBe('noopener noreferrer')
+    await wrapper.get('[data-to="/users"]').trigger('click')
     expect(wrapper.emitted('navigate')?.length).toBeGreaterThan(0)
   })
 
-  it('emits close from the mobile close button', async () => {
-    const wrapper = mount(AppSidebar, {
-      props: {
-        groups: navigationGroups,
-        open: true,
-      },
-      global: {
-        stubs: {
-          RouterLink: { template: '<a><slot /></a>' },
-        },
-      },
-    })
-
+  it('collapses a directory and emits close on mobile', async () => {
+    const wrapper = mount(AppSidebar, { props: { items, open: true }, global: { stubs: { RouterLink: { template: '<a><slot /></a>' } } } })
+    await wrapper.get('.sidebar-directory').trigger('click')
+    expect(wrapper.text()).not.toContain('用户管理')
     await wrapper.get('[aria-label="关闭菜单"]').trigger('click')
     expect(wrapper.emitted('close')).toHaveLength(1)
   })

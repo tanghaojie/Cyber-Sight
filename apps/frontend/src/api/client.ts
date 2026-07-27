@@ -1,5 +1,5 @@
 import type { ErrorResponse } from '@scaffold/api-contract'
-import { dispatchGlobalHttpError } from './global-http-error.js'
+import { handleGlobalHttpError } from './global-http-error.js'
 
 type QueryValue = string | number | boolean | undefined
 
@@ -56,7 +56,7 @@ async function request<TResponse, TBody = never>(
       options.body === undefined ? undefined : JSON.stringify(options.body),
   })
 
-  await dispatchGlobalHttpError(response)
+  await handleGlobalHttpError(response)
   const payload: unknown = await response.json()
 
   if (isErrorResponse(payload)) {

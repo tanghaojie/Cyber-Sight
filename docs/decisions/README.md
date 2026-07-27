@@ -13,5 +13,7 @@ ADR 记录会长期影响项目的技术选择及其理由。已接受的 ADR �
 - [ADR-0007：以 Zod 作为统一 Schema 编写源](ADR-0007-zod-as-unified-schema-source.md)
 - [ADR-0008：前端采用 Tailwind CSS 与 Element Plus](ADR-0008-tailwind-and-element-plus.md)
 - [ADR-0009：以独立模块目录和公共入口隔离业务能力](ADR-0009-module-folders-and-public-boundaries.md)
+- [ADR-0010：以数据库菜单树驱动导航并通过受控注册表加载页面](ADR-0010-database-navigation-and-controlled-view-registry.md)
+- [ADR-0011：以前端应用处理器执行全局 HTTP 错误行为](ADR-0011-registered-application-http-error-handler.md)
 
 新增 ADR 时从 [ADR 模板](../templates/adr-template.md)复制，使用下一个连续编号。

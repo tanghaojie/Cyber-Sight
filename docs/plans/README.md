@@ -16,6 +16,7 @@
 - [Zod Schema 统一迁移](archive/2026-07-23-zod-schema-unification.md)：以 Zod 4 统一环境变量和 HTTP 契约的 Schema 编写 API。
 - [前端应用壳组件化与动态页面加载](archive/2026-07-23-frontend-shell-componentization.md)：引入 Tailwind CSS 与 Element Plus，拆分布局组件并实现菜单路由动态加载。
 - [模块隔离与独立目录约束](archive/2026-07-27-module-isolation-constraints.md)：强制业务模块使用独立目录、公共入口、单向依赖和明确数据所有权。
+- [JTLab 品牌、动态导航与前端模块拆分](archive/2026-07-27-jtlab-dynamic-navigation.md)：统一品牌主题，以数据库菜单树驱动路由并拆分四个基础资料模块。
 
 ## 使用规则
 

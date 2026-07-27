@@ -1,8 +1,8 @@
 <template>
-  <header class="sticky top-0 z-30 flex h-24 items-center justify-between border-b border-[#dce2dc] bg-[#f5f4ee]/90 px-5 backdrop-blur-xl sm:px-8 lg:px-10">
+  <header class="sticky top-0 z-30 flex h-24 items-center justify-between border-b border-[var(--line)] bg-[rgba(242,247,244,.9)] px-5 backdrop-blur-xl sm:px-8 lg:px-10">
     <div class="flex min-w-0 items-center gap-4">
       <button
-        class="grid size-11 shrink-0 place-items-center rounded-2xl border border-[#d8ded8] bg-white text-[#53635d] shadow-sm transition hover:-translate-y-0.5 hover:border-[#aab7ae] lg:hidden"
+        class="grid size-11 shrink-0 place-items-center rounded-2xl border border-[var(--line)] bg-white text-[var(--ink-soft)] shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--primary)] lg:hidden"
         type="button"
         aria-label="打开菜单"
         @click="$emit('open-menu')"
@@ -13,21 +13,21 @@
         <p class="mb-1 hidden text-[9px] font-extrabold tracking-[.2em] text-[#829087] uppercase sm:block">
           {{ eyebrow }}
         </p>
-        <h1 class="truncate font-display text-xl font-black tracking-[-.025em] text-[#17241f] sm:text-2xl">
+        <h1 class="truncate font-display text-xl font-black tracking-[-.025em] text-[var(--ink)] sm:text-2xl">
           {{ title }}
         </h1>
       </div>
     </div>
 
     <div class="flex items-center gap-3">
-      <div class="hidden items-center gap-2 rounded-full border border-[#dce2dc] bg-white/65 px-3 py-2 text-[10px] font-bold tracking-wide text-[#607068] md:flex">
-        <span class="size-1.5 rounded-full bg-[#4c9d74]" />
-        LIVE · SG
+      <div class="hidden items-center gap-2 rounded-full border border-[var(--line)] bg-white/65 px-3 py-2 text-[10px] font-bold tracking-wide text-[var(--muted)] md:flex">
+        <span class="size-1.5 rounded-full bg-[var(--primary-deep)]" />
+        LIVE · LAB
       </div>
 
       <el-dropdown trigger="click" @command="handleCommand">
         <button class="flex items-center gap-2.5 rounded-2xl p-1.5 pr-2 text-left transition hover:bg-white/75">
-          <span class="grid size-10 place-items-center rounded-xl bg-[#173b31] text-sm font-black text-[#c9ff57] shadow-lg shadow-emerald-950/10">
+          <span class="grid size-10 place-items-center rounded-xl bg-[var(--primary-deep)] text-sm font-black text-[var(--primary)] shadow-lg shadow-emerald-950/10">
             {{ initials }}
           </span>
           <span class="hidden min-w-0 sm:block">

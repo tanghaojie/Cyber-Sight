@@ -73,6 +73,8 @@ export const menus = pgTable('menus', {
   name: varchar('name', { length: 80 }).notNull(),
   code: varchar('code', { length: 80 }).notNull().unique(),
   path: varchar('path', { length: 160 }).default('').notNull(),
+  component: varchar('component', { length: 160 }).default('').notNull(),
+  externalUrl: varchar('external_url', { length: 500 }).default('').notNull(),
   icon: varchar('icon', { length: 50 }).default('').notNull(),
   sortOrder: integer('sort_order').default(0).notNull(),
   type: menuType('type').default('menu').notNull(),

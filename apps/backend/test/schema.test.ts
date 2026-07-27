@@ -31,3 +31,11 @@ describe('database lifecycle fields', () => {
     expect(columns).toHaveProperty('updatedBy')
   })
 })
+
+describe('menu routing fields', () => {
+  it('stores controlled view identifiers and external URLs separately', () => {
+    const columns = getTableColumns(menus)
+    expect(columns).toHaveProperty('component')
+    expect(columns).toHaveProperty('externalUrl')
+  })
+})

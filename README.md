@@ -1,6 +1,8 @@
-# AI Web Scaffold
+# JTLab
 
-前后端分离的 pnpm monorepo 管理系统脚手架，以共享 Zod 运行时 Schema 约束前后端接口，内置登录、管理后台框架和用户/角色/菜单/字典管理。
+JTLab（桀士实验室）是前后端分离的 pnpm monorepo 管理系统脚手架，以共享 Zod 运行时 Schema 约束前后端接口，内置登录、数据库动态菜单、管理后台框架和用户/角色/菜单/字典管理。
+
+前端默认主色为 `#70CFA2`。品牌配置位于 `apps/frontend/src/config/app.config.ts`，也可复制 `apps/frontend/.env.example` 后通过 `VITE_APP_NAME`、`VITE_APP_FULL_NAME`、`VITE_APP_TAGLINE` 和 `VITE_APP_PRODUCT_LABEL` 按部署环境覆盖。
 
 ## 快速开始
 
@@ -19,6 +21,8 @@ pnpm dev
 - Swagger UI：http://localhost:3000/docs
 
 首次执行迁移会创建本地管理员 `admin / Admin@123456`。该凭据仅用于本地初始化，进入共享或生产环境前必须修改。
+
+菜单路由由数据库生成：目录负责展开子节点，菜单通过受控组件标识加载站内页面，按钮打开 `http/https` 外链。新增页面时先从业务模块公共入口暴露懒加载器，再登记到 `apps/frontend/src/router/view-registry.ts`，最后在菜单管理中选择组件标识。
 
 所有业务表统一使用软删除，并包含 `is_deleted`、`created_at`、`created_by`、`updated_at`、`updated_by` 五个生命周期字段。
 

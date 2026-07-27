@@ -13,15 +13,15 @@ updated: 2026-07-23
 
 ## 范围与非目标
 
-本次包含管理端登录态、管理页面框架、空白首页、四类基础资料的查询与增删改、角色关联和菜单树展示。暂不实现租户、组织机构、细粒度按钮权限、注册、找回密码、文件上传和生产级单点登录。
+本次包含管理端登录态、管理页面框架、工作台、四类基础资料的查询与增删改、角色关联、数据库动态菜单树和外链按钮。暂不实现租户、组织机构、细粒度接口按钮权限、注册、找回密码、文件上传和生产级单点登录。
 
 ## 职责与边界
 
 - `packages/api-contract` 定义认证和管理 API 的运行时 Schema 与推导类型。
 - `apps/backend/src/modules/auth` 负责凭据校验、会话创建/撤销与当前用户解析。
-- `apps/backend/src/modules/admin` 负责管理资源用例；路由只处理 HTTP 映射，仓储隔离 Drizzle 查询。
+- `apps/backend/src/modules/users|roles|menus|dictionaries` 分别负责各自管理用例，路由只处理 HTTP 映射，仓储隔离 Drizzle 查询。
 - `apps/backend/src/db` 定义业务表、统一审计列和软删除过滤规则。
-- `apps/frontend/src/layouts` 负责导航、顶栏和内容区框架；`modules/auth` 管理跨页面登录态；`views/admin` 负责资源页面交互。
+- `apps/frontend/src/layouts` 负责导航、顶栏和内容区框架；`modules/auth` 管理登录态；四个业务模块各自拥有页面和 API；`modules/navigation` 缓存当前用户菜单树。
 
 ## 公共接口
 
@@ -30,6 +30,7 @@ updated: 2026-07-23
 - 角色：`GET/POST /admin/roles`、`PUT/DELETE /admin/roles/{id}`。
 - 菜单：`GET/POST /admin/menus`、`PUT/DELETE /admin/menus/{id}`。
 - 字典：`GET/POST /admin/dictionaries`、`PUT/DELETE /admin/dictionaries/{id}`。
+- 当前用户导航：`GET /navigation/menus`；菜单全量树：`GET /admin/menus/tree`。
 
 列表接口接受可选 `pageNum`、`pageSize` 和 `keyword`，继续遵守统一分页响应。删除接口只执行软删除。
 
@@ -37,7 +38,7 @@ updated: 2026-07-23
 
 所有持久化业务表默认包含五个生命周期字段：`is_deleted`、`created_at`、`created_by`、`updated_at`、`updated_by`。用户需求中重复出现“更新时间”，本设计按常用审计语义将第五项解释为“更新人”。业务读取默认附加 `is_deleted = false`，删除操作更新软删除标志和更新审计信息，不执行物理删除。
 
-核心表包括 `users`、`roles`、`user_roles`、`menus`、`role_menus`、`dictionaries` 和 `auth_sessions`。登录时使用 Node.js `scrypt` 校验密码；服务端生成不可预测会话令牌，只持久化令牌哈希，并通过 `HttpOnly`、`SameSite=Lax` Cookie 传递。退出时软删除当前会话。
+核心表包括 `users`、`roles`、`user_roles`、`menus`、`role_menus`、`dictionaries` 和 `auth_sessions`。菜单以 `parentId` 构树，使用 `component` 选择受控站内页面，使用 `externalUrl` 保存 `http/https` 外链。登录时使用 Node.js `scrypt` 校验密码；服务端生成不可预测会话令牌，只持久化令牌哈希，并通过 `HttpOnly`、`SameSite=Lax` Cookie 传递。
 
 ## 依赖关系
 

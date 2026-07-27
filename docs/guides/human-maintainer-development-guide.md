@@ -104,7 +104,7 @@ pnpm dev
 | --- | --- |
 | `src/api/client.ts` | 唯一共享的 fetch Client |
 | `src/modules/<module>/composables/` | 封装模块 API 调用和页面状态 |
-| `src/views/` | 路由页面，不直接堆积复杂业务和网络逻辑 |
+| `src/modules/<module>/pages/` | 模块拥有的路由页面，不直接堆积复杂业务和网络逻辑 |
 | `src/router/` | Vue Router 配置和页面懒加载 |
 | `src/stores/` | 未来的跨页面 Pinia 状态；局部状态不要放入 store |
 | `*.test.ts` | Vitest + Vue Test Utils 组件测试 |
@@ -234,7 +234,7 @@ interface PaginationRequest {
 
 ### 6.4 前端全局响应拦截器
 
-`src/api/client.ts` 为唯一共享 Client，并在收到响应后调用全局 HTTP 错误分发器。它只把 HTTP 401、404、500 发布为 `api:global-http-error` 事件；应用入口可监听事件，统一完成重新登录、跳转 404 页面或显示服务异常提示。
+`src/api/client.ts` 为唯一共享 Client，并在收到响应后调用已注册的全局 HTTP 错误处理器。它只处理 HTTP 401、404、500；应用入口注入清会话、跳转登录或 404 页面以及 ElMessage 服务异常提示。HTTP 200 中的非零业务状态仍由发起请求的模块处理。
 
 业务 composable 不重复实现这些全局动作。它们只处理 HTTP 200 返回体中的非零 `status`，例如在表单旁显示参数错误、提示权限不足或让用户解决资源冲突。
 

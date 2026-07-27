@@ -13,7 +13,7 @@
 - `src/db/`：Drizzle Schema 与数据库客户端。
 - `drizzle.config.ts`：数据库迁移生成配置。
 - `src/modules/auth/`：密码散列、数据库会话、登录/退出和当前用户解析。
-- `src/modules/admin/`：用户、角色、菜单和字典管理 API 与 Drizzle 仓储。
+- `src/modules/users|roles|menus|dictionaries/`：四个独立管理 API 与 Drizzle 仓储；菜单模块额外提供当前用户导航树。
 
 应用组装与网络监听必须分离，使测试可以通过 Fastify `inject` 验证路由而不占用端口。环境变量由集中配置模块加载和校验，数据库客户端在应用关闭时释放。
 

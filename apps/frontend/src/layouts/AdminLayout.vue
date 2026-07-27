@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#f5f4ee]">
+  <div class="min-h-screen bg-[var(--canvas)]">
     <button
       v-if="sidebarOpen"
       class="fixed inset-0 z-[35] border-0 bg-[#091510]/55 backdrop-blur-[2px] lg:hidden"
@@ -8,7 +8,8 @@
       @click="sidebarOpen = false"
     />
     <AppSidebar
-      :groups="navigationGroups"
+      :items="navigation.items"
+      :loading="navigation.loading"
       :open="sidebarOpen"
       @close="sidebarOpen = false"
       @navigate="sidebarOpen = false"
@@ -28,23 +29,32 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppHeader from '../components/layout/AppHeader.vue'
 import AppMain from '../components/layout/AppMain.vue'
 import AppSidebar from '../components/layout/AppSidebar.vue'
-import { navigationGroups } from '../router/navigation.js'
-import { useAuthStore } from '../stores/auth.js'
+import { installMenuRoutes, clearDynamicRoutes } from '../router/index.js'
+import { useAuthStore } from '../modules/auth/index.js'
+import { useNavigationStore } from '../modules/navigation/index.js'
+import { appConfig } from '../config/app.config.js'
 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
+const navigation = useNavigationStore()
 const sidebarOpen = ref(false)
 const pageTitle = computed(() => String(route.meta.title ?? '管理控制台'))
-const pageEyebrow = computed(() => String(route.meta.eyebrow ?? 'NOVA MANAGEMENT'))
+const pageEyebrow = computed(() => String(route.meta.eyebrow ?? `${appConfig.name.toUpperCase()} / MANAGEMENT`))
+
+watch(() => navigation.items, function refreshRoutes(items) {
+  if (navigation.loaded) installMenuRoutes(router, items)
+}, { deep: true })
 
 async function handleLogout() {
   await auth.logout()
+  navigation.clear()
+  clearDynamicRoutes()
   await router.replace('/login')
 }
 </script>
