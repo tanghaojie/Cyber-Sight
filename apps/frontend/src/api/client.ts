@@ -13,10 +13,7 @@ export interface ApiResult<TResponse> {
   error?: ErrorResponse
 }
 
-function requestUrl(
-  path: string,
-  query: Record<string, QueryValue> | undefined
-): string {
+function requestUrl(path: string, query: Record<string, QueryValue> | undefined): string {
   const search = new URLSearchParams()
   for (const [key, value] of Object.entries(query ?? {})) {
     if (value !== undefined) {
@@ -43,17 +40,13 @@ function isErrorResponse(value: unknown): value is ErrorResponse {
 async function request<TResponse, TBody = never>(
   method: string,
   path: string,
-  options: RequestOptions<TBody> = {}
+  options: RequestOptions<TBody> = {},
 ): Promise<ApiResult<TResponse>> {
   const response = await fetch(requestUrl(path, options.query), {
     method,
     credentials: 'same-origin',
-    headers:
-      options.body === undefined
-        ? undefined
-        : { 'content-type': 'application/json' },
-    body:
-      options.body === undefined ? undefined : JSON.stringify(options.body),
+    headers: options.body === undefined ? undefined : { 'content-type': 'application/json' },
+    body: options.body === undefined ? undefined : JSON.stringify(options.body),
   })
 
   await handleGlobalHttpError(response)
@@ -67,21 +60,18 @@ async function request<TResponse, TBody = never>(
 }
 
 export const apiClient = {
-  GET<TResponse>(
-    path: string,
-    options?: RequestOptions
-  ): Promise<ApiResult<TResponse>> {
+  GET<TResponse>(path: string, options?: RequestOptions): Promise<ApiResult<TResponse>> {
     return request<TResponse>('GET', path, options)
   },
   POST<TResponse, TBody = never>(
     path: string,
-    options?: RequestOptions<TBody>
+    options?: RequestOptions<TBody>,
   ): Promise<ApiResult<TResponse>> {
     return request<TResponse, TBody>('POST', path, options)
   },
   PUT<TResponse, TBody>(
     path: string,
-    options: RequestOptions<TBody>
+    options: RequestOptions<TBody>,
   ): Promise<ApiResult<TResponse>> {
     return request<TResponse, TBody>('PUT', path, options)
   },

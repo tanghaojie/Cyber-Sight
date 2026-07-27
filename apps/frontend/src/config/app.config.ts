@@ -20,5 +20,10 @@ export const viewComponentOptions = Object.freeze([
 ])
 
 export function brandInitials(name = appConfig.name): string {
-  return name.replace(/[^a-z0-9]/gi, '').slice(0, 2).toUpperCase() || 'JT'
+  return (
+    name
+      .replace(/[^a-z0-9]/gi, '')
+      .slice(0, 2)
+      .toUpperCase() || 'JT'
+  )
 }

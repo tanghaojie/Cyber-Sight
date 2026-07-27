@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
-import { createApplicationHttpErrorHandler, type ApplicationHttpErrorActions } from './application-http-error.js'
+import {
+  createApplicationHttpErrorHandler,
+  type ApplicationHttpErrorActions,
+} from './application-http-error.js'
 
 function actions(route = { name: 'users', fullPath: '/users' }) {
   const value: ApplicationHttpErrorActions = {

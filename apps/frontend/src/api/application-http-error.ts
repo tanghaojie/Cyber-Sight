@@ -10,7 +10,7 @@ export interface ApplicationHttpErrorActions {
 }
 
 export function createApplicationHttpErrorHandler(
-  actions: ApplicationHttpErrorActions
+  actions: ApplicationHttpErrorActions,
 ): GlobalHttpErrorHandler {
   return async function applicationHttpErrorHandler(detail: GlobalHttpErrorDetail) {
     const current = actions.currentRoute()
