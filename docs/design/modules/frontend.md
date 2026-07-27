@@ -20,6 +20,9 @@
 
 ## 约束
 
+- 新业务能力必须建立 `src/modules/<module>/` 独立目录，并以 `index.ts` 作为公共入口。模块拥有自己的页面、组件、composable、service、局部 store 和测试；`src/router/`、`src/views/` 与 `src/stores/` 中的存量业务代码在实质修改时迁入对应模块。
+- 路由和应用壳只能从模块公共入口加载业务页面或注册信息；禁止一个模块深层导入另一个模块的组件、composable、service 或 store。
+- 跨模块状态和操作通过目标模块公开的只读查询、命令或事件协作。不得直接修改其他模块的 Pinia store；真正领域无关的 UI 与 Client 能力才进入共享目录。
 - Vue 组件负责展示和交互，不直接实现复杂业务规则。
 - 后端调用通过模块 composable 或 service 封装，不在多个组件中散落路径字符串。
 - API 请求和响应类型来自共享运行时 Schema 的推导结果。

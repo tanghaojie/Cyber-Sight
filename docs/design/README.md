@@ -5,6 +5,7 @@
 ## 系统级设计
 
 - [系统概览](system-overview.md)：目标、边界、核心原则和演进方向。
+- [模块边界与独立目录](module-boundaries.md)：业务模块的目录、公共入口、依赖方向、数据所有权和迁移门禁。
 - [文档治理](documentation-governance.md)：文档类型、生命周期和 AI 文档门禁。
 - [测试策略](testing-strategy.md)：测试分层、默认测试边界和契约校验。
 - [管理系统基础能力](management-system.md)：认证、软删除审计、基础资料模块和管理端框架。

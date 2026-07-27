@@ -26,3 +26,4 @@ ai-logs/YYYY/MM/YYYY-MM-DD-<topic>.md
 - [2026-07-23：从 OpenAPI-first 迁移到共享运行时 Schema](2026/07/2026-07-23-runtime-schema-contract.md)
 - [2026-07-23：统一使用 Zod Schema](2026/07/2026-07-23-zod-schema-unification.md)
 - [2026-07-23：前端应用壳组件化与动态页面加载](2026/07/2026-07-23-frontend-shell-componentization.md)
+- [2026-07-27：模块隔离与独立目录约束](2026/07/2026-07-27-module-isolation-constraints.md)

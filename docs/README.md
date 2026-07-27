@@ -25,10 +25,11 @@ docs/
 新成员或 AI 开始工作时，按以下顺序建立上下文：
 
 1. [系统概览](design/system-overview.md)
-2. 与任务相关的[模块设计](design/README.md)
-3. 相关的[架构决策](decisions/README.md)
-4. [进行中的实施计划](plans/README.md)
-5. 必要时查看历史计划和 [AI 协作记录](ai-logs/README.md)
+2. [模块边界与独立目录](design/module-boundaries.md)
+3. 与任务相关的[模块设计](design/README.md)
+4. 相关的[架构决策](decisions/README.md)
+5. [进行中的实施计划](plans/README.md)
+6. 必要时查看历史计划和 [AI 协作记录](ai-logs/README.md)
 
 第一次参与项目开发的人类维护者应先阅读[人类维护者开发指南](guides/human-maintainer-development-guide.md)。
 业务错误码统一查询和登记在[错误码参考](reference/error-codes.md)。
