@@ -1,14 +1,14 @@
 @theme {
-  --font-display: "Bahnschrift", "Aptos Display", "Noto Sans SC", sans-serif;
+  --font-display: 'Bahnschrift', 'Aptos Display', 'Noto Sans SC', sans-serif;
 }
 
 :root {
-  font-family: "Microsoft YaHei UI", "Noto Sans SC", sans-serif;
+  font-family: 'Microsoft YaHei UI', 'Noto Sans SC', sans-serif;
   color: #183a30;
   background: #f2f7f4;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --font-display: "Bahnschrift", "Aptos Display", "Noto Sans SC", sans-serif;
+  --font-display: 'Bahnschrift', 'Aptos Display', 'Noto Sans SC', sans-serif;
   --primary: #70cfa2;
   --primary-deep: #246b51;
   --primary-dark: #123c31;
@@ -21,6 +21,7 @@
   --line: #d8e6de;
   --surface: #ffffff;
   --success: #2f9268;
+  --warning: #e3f11e;
   --danger: #d84f62;
   --sidebar-surface: #151817;
   --sidebar-surface-deep: #090b0a;

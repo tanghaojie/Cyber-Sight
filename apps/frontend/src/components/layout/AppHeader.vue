@@ -17,11 +17,6 @@
     </div>
 
     <div class="app-header__actions">
-      <div class="app-header__lab-status">
-        <span />
-        LIVE · LAB
-      </div>
-
       <el-dropdown trigger="click" @command="handleCommand">
         <button class="app-header__user" type="button">
           <span class="app-header__avatar">{{ initials }}</span>
