@@ -14,7 +14,7 @@ updated: 2026-07-27
 ## 公共接口
 
 - HTTP：`GET/POST /admin/dictionaries`、`PUT/DELETE /admin/dictionaries/{id}`。
-- 前端入口：字典管理页面懒加载器。
+- 前端公共文件：`view-registry.ts` 登记字典管理页面；`dictionaries.api.ts` 暴露字典管理 API。
 - 契约：`DictionarySummary`、`DictionaryRequest` 及分页响应。
 
 ## 失败模式与测试策略

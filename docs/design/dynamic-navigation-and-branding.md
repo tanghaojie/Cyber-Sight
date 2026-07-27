@@ -31,7 +31,7 @@ updated: 2026-07-27
 
 - `GET /navigation/menus`：返回当前登录用户可访问的启用菜单树，响应为 `{ status: 0, data: MenuTreeNode[] }`。
 - 菜单记录新增 `component` 和 `externalUrl`：目录无需页面组件；菜单必须配置站内 `path` 与已注册 `component`；按钮必须配置 `http/https` 外链。
-- 各前端业务模块的 `index.ts` 公开本模块所需的稳定业务 API，不公开页面内部状态；`view-registry.ts` 是只允许路由组合根按约定发现的页面注册清单，不供其他业务模块导入。
+- 各前端业务模块通过 `*.api.ts`、`*.store.ts`、`*.routes.ts` 等表意文件公开稳定业务能力，不创建默认 `index.ts`；`view-registry.ts` 是只允许路由组合根按约定发现的页面注册清单，不供其他业务模块导入。
 - `installGlobalHttpErrorHandler()` 在应用启动时注入清会话、路由跳转和消息提示行为。
 
 ## 数据模型与数据流
@@ -54,7 +54,7 @@ users -> user_roles -> roles -> role_menus -> menus
 
 ## 依赖关系
 
-路由组合根只依赖各模块公共入口和 `navigation` 模块。`navigation` 依赖共享 API Client；业务页面之间不互相导入。后端 `menus` 模块通过 `auth` 公共入口获取当前用户，并通过自己的仓储查询菜单与角色关系。
+路由组合根只依赖各模块登记的公共路由、注册和 store 文件。`navigation` 依赖共享 API Client；业务页面之间不互相导入。后端 `menus` 模块通过 `auth` 已登记的公共能力获取当前用户，并通过自己的仓储查询菜单与角色关系。
 
 ## 失败模式与安全考虑
 

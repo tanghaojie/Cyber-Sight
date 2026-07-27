@@ -1,7 +1,8 @@
 ---
 title: ADR-0009 以独立模块目录和公共入口隔离业务能力
-status: accepted
+status: superseded
 date: 2026-07-27
+superseded_by: ADR-0013
 ---
 
 # ADR-0009：以独立模块目录和公共入口隔离业务能力
@@ -61,3 +62,5 @@ date: 2026-07-27
 
 - `docs/design/module-boundaries.md`
 - `docs/plans/archive/2026-07-27-module-isolation-constraints.md`
+
+> 本 ADR 关于“模块必须使用 `index.ts` 作为默认唯一公共入口”的部分已由 ADR-0013 取代；独立模块目录、显式公共边界和单向依赖等其余决策继续有效。

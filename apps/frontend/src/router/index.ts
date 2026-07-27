@@ -1,9 +1,10 @@
 import { createRouter, createWebHistory, type RouteRecordRaw, type Router } from 'vue-router'
 import type { NavigationMenu } from '@scaffold/api-contract'
 import { pinia } from '../stores/pinia.js'
-import { useAuthStore, loginPage } from '../modules/auth/index.js'
-import { useNavigationStore } from '../modules/navigation/index.js'
-import { notFoundPage } from '../modules/errors/index.js'
+import { loginPage } from '../modules/auth/auth.routes.js'
+import { useAuthStore } from '../modules/auth/auth.store.js'
+import { notFoundPage } from '../modules/errors/error.routes.js'
+import { useNavigationStore } from '../modules/navigation/navigation.store.js'
 import { viewRegistry } from './view-registry.js'
 
 const dynamicRouteRemovers: Array<() => void> = []

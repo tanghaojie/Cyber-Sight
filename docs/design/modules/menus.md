@@ -15,7 +15,7 @@ updated: 2026-07-27
 
 - 管理 HTTP：`GET/POST /admin/menus`、`PUT/DELETE /admin/menus/{id}`。
 - 导航 HTTP：`GET /navigation/menus`。
-- 前端入口：菜单管理页面懒加载器、菜单 API 和菜单类型。
+- 前端公共文件：`view-registry.ts` 登记菜单管理页面；`menus.api.ts` 暴露菜单 API；`menu-options.ts` 暴露角色授权所需的 `listMenuTreeOptions` 与 `MenuTreeOption`。
 - 契约：`MenuSummary`、`MenuRequest`、`NavigationMenu`、导航树响应。
 
 ## 数据流、失败模式与测试

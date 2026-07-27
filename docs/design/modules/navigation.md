@@ -13,7 +13,7 @@ updated: 2026-07-27
 
 ## 公共接口
 
-- `useNavigationStore()`：`items`、`flatItems`、`load(force)`、`clear()`。
+- `navigation.store.ts` 暴露 `useNavigationStore()`：`items`、`flatItems`、`load(force)`、`clear()`。
 - 后端依赖：`GET /navigation/menus`。
 
 ## 失败模式与测试

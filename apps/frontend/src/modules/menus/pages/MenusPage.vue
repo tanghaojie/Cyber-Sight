@@ -48,7 +48,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import type { MenuRequest, MenuSummary } from '@scaffold/api-contract'
 import AppIcon from '../../../components/AppIcon.vue'
 import { viewComponentOptions } from '../../../config/app.config.js'
-import { useNavigationStore } from '../../navigation/index.js'
+import { useNavigationStore } from '../../navigation/navigation.store.js'
 import { buildMenuTree, type MenuTreeRecord } from '../menu-tree.js'
 import { createMenu, deleteMenu, listAllMenus, updateMenu } from '../menus.api.js'
 

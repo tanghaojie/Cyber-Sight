@@ -42,7 +42,7 @@ import { onMounted, reactive, ref } from 'vue'
 import { Delete, EditPen, Plus, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { RoleRequest, RoleSummary } from '@scaffold/api-contract'
-import { listMenuTreeOptions, type MenuTreeOption } from '../../menus/index.js'
+import { listMenuTreeOptions, type MenuTreeOption } from '../../menus/menu-options.js'
 import { createRole, deleteRole, listRoles, updateRole } from '../roles.api.js'
 
 const records = ref<RoleSummary[]>([])

@@ -14,7 +14,7 @@ updated: 2026-07-27
 ## 公共接口
 
 - HTTP：`GET/POST /admin/users`、`PUT/DELETE /admin/users/{id}`。
-- 前端入口：用户管理页面懒加载器。
+- 前端公共文件：`view-registry.ts` 登记用户管理页面；`users.api.ts` 暴露用户管理 API。
 - 契约：`UserSummary`、`UserCreate`、`UserUpdate` 及分页响应。
 
 ## 依赖、数据流与失败模式
@@ -23,4 +23,4 @@ updated: 2026-07-27
 
 ## 测试策略
 
-覆盖分页、表单转换、角色 ID、业务错误展示、软删除和模块公共入口类型检查。
+覆盖分页、表单转换、角色 ID、业务错误展示、软删除和模块公共文件类型检查。

@@ -7,7 +7,7 @@
 ## 当前结构
 
 - `src/modules/<module>/pages/`：各业务模块拥有的路由页面。
-- `src/modules/<module>/`：模块 API、页面状态和唯一公共入口。
+- `src/modules/<module>/`：模块 API、页面状态和按职责命名的公共文件。
 - `src/api/`：共享 API Client 和 HTTP 401/404/500 全局响应拦截器。
 - `@scaffold/api-contract`：由运行时 Schema 推导的请求和响应类型。
 - `src/router/`：路由配置。
@@ -23,8 +23,9 @@
 
 ## 约束
 
-- 新业务能力必须建立 `src/modules/<module>/` 独立目录，并以 `index.ts` 作为公共入口。模块拥有自己的页面、组件、composable、service、局部 store 和测试；`src/router/`、`src/views/` 与 `src/stores/` 中的存量业务代码在实质修改时迁入对应模块。
-- 路由和应用壳只能从模块公共入口加载业务页面或注册信息；禁止一个模块深层导入另一个模块的组件、composable、service 或 store。
+- 新业务能力必须建立 `src/modules/<module>/` 独立目录，并通过 `*.routes.ts`、`*.store.ts`、`*.api.ts`、`view-registry.ts` 等表意文件暴露公共能力，避免创建 `index.ts` 或无差别转发的 barrel。模块拥有自己的页面、组件、composable、service、局部 store 和测试；`src/router/`、`src/views/` 与 `src/stores/` 中的存量业务代码在实质修改时迁入对应模块。
+- 路由和应用壳只能从模块设计中登记的公共文件加载业务页面、状态或注册信息；禁止一个模块导入另一个模块未登记的组件、composable、service 或 store。
+- 当前公共文件包括：`auth/auth.store.ts`、`auth/auth.routes.ts`、`navigation/navigation.store.ts`、`errors/error.routes.ts`、各管理模块的 `*.api.ts`，以及由路由组合根按约定发现的 `view-registry.ts`。`menus/menu-options.ts` 是角色模块读取菜单选项的公共用例文件。
 - 需要被数据库菜单选择的模块页面必须在本模块 `view-registry.ts` 的 `registerViews()` 中显式登记稳定组件标识；路由组合根自动发现该约定文件，禁止中心注册表继续手工导入业务模块。组件标识必须非空且全局唯一。
 - 跨模块状态和操作通过目标模块公开的只读查询、命令或事件协作。不得直接修改其他模块的 Pinia store；真正领域无关的 UI 与 Client 能力才进入共享目录。
 - Vue 组件负责展示和交互，不直接实现复杂业务规则。

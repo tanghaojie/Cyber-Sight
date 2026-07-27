@@ -96,7 +96,7 @@ pnpm dev
 
 `app.ts` 与 `server.ts` 必须保持分离。否则测试导入应用时会直接占用端口，无法使用 Fastify `inject` 进行快速测试。
 
-业务模块必须拥有独立的 `src/modules/<module>/` 目录和 `index.ts` 公共入口。路由、应用服务、领域规则、仓储和业务数据模型放在该模块目录内；`app.ts` 只从公共入口注册模块。不得深层导入其他模块文件，也不得直接访问其他模块的仓储或数据表。
+业务模块必须拥有独立的 `src/modules/<module>/` 目录，并以 `<module>.routes.ts`、`<module>.service.ts`、`<module>.api.ts` 等表意文件公开稳定能力，避免创建 `index.ts` barrel。路由、应用服务、领域规则、仓储和业务数据模型放在该模块目录内；`app.ts` 只从设计中登记的公共文件注册模块。不得导入其他模块未登记的内部文件，也不得直接访问其他模块的仓储或数据表。
 
 ### 4.4 `apps/frontend`
 
@@ -111,15 +111,15 @@ pnpm dev
 
 前端不能手写一份与后端相似的接口类型，应从 `@scaffold/api-contract` 获取。
 
-新业务页面、组件、composable、service、局部 store 和测试都归入对应 `src/modules/<module>/`，由模块 `index.ts` 暴露路由需要的页面或注册信息。根级 `views`、`stores` 只保留存量或真正应用级能力；实质修改存量业务时应迁入模块目录。
+新业务页面、组件、composable、service、局部 store 和测试都归入对应 `src/modules/<module>/`，由 `view-registry.ts`、`*.routes.ts`、`*.store.ts` 等表意文件暴露路由或应用壳需要的能力。根级 `views`、`stores` 只保留存量或真正应用级能力；实质修改存量业务时应迁入模块目录。
 
 ### 4.5 模块边界检查
 
 新增或实质修改模块前，先阅读[模块边界与独立目录](../design/module-boundaries.md)，并确认：
 
 1. 前端、后端和契约使用同一个稳定模块名。
-2. 模块所有业务文件位于独立目录，并有最小公共入口。
-3. 跨模块引用只指向公共入口，没有深层导入或循环依赖。
+2. 模块所有业务文件位于独立目录，并以最小、表意的公共文件暴露能力。
+3. 跨模块引用只指向设计登记的公共文件，没有未登记的内部导入或循环依赖。
 4. 业务数据有唯一所有者，其他模块不会绕过接口直接访问其 store、仓储或表。
 5. `shared` 中没有为逃避归属判断而放入的业务代码。
 6. 模块单元测试和跨模块集成测试覆盖公共边界。
@@ -244,7 +244,7 @@ interface PaginationRequest {
 
 1. 在 `docs/design/modules/` 更新用户模块设计。
 2. 在 `docs/plans/active/` 创建实施计划并建立 AI 日志。
-3. 确认前端、后端和契约分别使用 `src/modules/users/` 独立目录及其公共入口。
+3. 确认前端、后端和契约分别使用 `src/modules/users/` 独立目录及其已登记的表意公共文件。
 4. 在 `@scaffold/api-contract` 的用户模块中定义请求、路径和响应 Schema，并从模块入口导出推导类型。
 5. 在后端用户模块中编写命名处理函数，使用 `success()` 或 `failure()`。
 6. 在 Fastify 路由中直接挂载共享运行时 Schema。

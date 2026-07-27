@@ -14,7 +14,7 @@ updated: 2026-07-27
 ## 公共接口
 
 - HTTP：`GET/POST /admin/roles`、`PUT/DELETE /admin/roles/{id}`。
-- 前端入口：角色管理页面懒加载器。
+- 前端公共文件：`view-registry.ts` 登记角色管理页面；`roles.api.ts` 暴露角色管理 API 以及用户模块所需的 `listRoleOptions` 与 `RoleOption`。
 - 契约：`RoleSummary`、`RoleRequest` 及分页响应。
 
 ## 依赖、数据流与失败模式
@@ -23,4 +23,4 @@ updated: 2026-07-27
 
 ## 测试策略
 
-覆盖分页、菜单授权转换、业务错误展示、软删除和模块公共入口。
+覆盖分页、菜单授权转换、业务错误展示、软删除和模块公共文件。

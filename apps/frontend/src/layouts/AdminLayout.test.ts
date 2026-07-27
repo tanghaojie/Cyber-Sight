@@ -14,14 +14,14 @@ vi.mock('vue-router', () => ({
   useRouter: () => ({ replace: mocks.replace }),
 }))
 
-vi.mock('../modules/auth/index.js', () => ({
+vi.mock('../modules/auth/auth.store.js', () => ({
   useAuthStore: () => ({
     user: { displayName: '系统管理员', roles: ['SUPER_ADMIN'] },
     logout: mocks.logout,
   }),
 }))
 
-vi.mock('../modules/navigation/index.js', () => ({
+vi.mock('../modules/navigation/navigation.store.js', () => ({
   useNavigationStore: () => ({
     items: [],
     loading: false,

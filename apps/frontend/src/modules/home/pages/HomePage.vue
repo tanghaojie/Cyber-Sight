@@ -22,7 +22,7 @@
 import { computed } from 'vue'
 import { appConfig } from '../../../config/app.config.js'
 import AppIcon from '../../../components/AppIcon.vue'
-import { useNavigationStore } from '../../navigation/index.js'
+import { useNavigationStore } from '../../navigation/navigation.store.js'
 
 const navigation = useNavigationStore()
 const quickEntries = computed(() => navigation.flatItems.filter((item) => (item.type === 'menu' && item.path !== '/') || item.type === 'button').slice(0, 4))

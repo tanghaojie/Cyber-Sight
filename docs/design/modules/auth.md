@@ -15,7 +15,7 @@ updated: 2026-07-27
 
 - HTTP：`POST /auth/login`、`POST /auth/logout`、`GET /auth/me`。
 - 后端入口：`authRoutes`、`requireCurrentUser`、`currentUserFromRequest`、`hashPassword`。
-- 前端入口：`useAuthStore` 与登录页面懒加载器。
+- 前端公共文件：`auth.store.ts` 暴露 `useAuthStore`；`auth.routes.ts` 暴露登录页面懒加载器 `loginPage`。
 
 ## 失败模式与测试
 

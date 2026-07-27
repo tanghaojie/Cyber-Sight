@@ -31,3 +31,4 @@ ai-logs/YYYY/MM/YYYY-MM-DD-<topic>.md
 - [2026-07-27：旧菜单数据兼容与导航容错](2026/07/2026-07-27-legacy-menu-compatibility.md)
 - [2026-07-27：AI Git 暂存区门禁与提交署名](2026/07/2026-07-27-ai-git-safety-and-attribution.md)
 - [2026-07-27：前端模块页面自动注册与 SCSS 重构](2026/07/2026-07-27-frontend-registry-and-scss.md)
+- [2026-07-27：前端模块表意公共文件迁移](2026/07/2026-07-27-semantic-module-entry-files.md)

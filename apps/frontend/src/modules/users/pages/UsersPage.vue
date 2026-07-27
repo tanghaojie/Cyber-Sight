@@ -60,7 +60,7 @@ import { onMounted, reactive, ref } from 'vue'
 import { Delete, EditPen, Plus, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { UserCreate, UserSummary, UserUpdate } from '@scaffold/api-contract'
-import { listRoleOptions, type RoleOption } from '../../roles/index.js'
+import { listRoleOptions, type RoleOption } from '../../roles/roles.api.js'
 import { createUser, deleteUser, listUsers, updateUser } from '../users.api.js'
 
 const records = ref<UserSummary[]>([])
