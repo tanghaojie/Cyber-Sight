@@ -47,5 +47,5 @@ Schema 测试校验所有业务表包含五个字段；仓储测试覆盖删除�
 
 ## 相关设计和计划
 
-- [管理系统基础能力设计](../design/management-system.md)
-- [实施计划](../plans/archive/2026-07-22-management-system-foundation.md)
+- [后端模块设计](../design/modules/backend.md)
+- [实施计划](../archive/plans/2026-07-22-management-system-foundation.md)

@@ -1,37 +1,14 @@
-# AI 协作记录
+# 活动 AI 协作记录
 
-AI 协作记录用于回溯用户与 AI 在一次任务中的目标、关键确认、重要假设、实施结果和遗留问题。
+本目录只保留尚未结束任务的结构化摘要。记录用户目标、关键确认、重要假设、方案、验证和未决问题；不复制完整聊天、敏感信息、冗长命令输出或 Git 已能表达的逐行改动。
 
-## 目录与命名
+## 进行中
 
-```text
-ai-logs/YYYY/MM/YYYY-MM-DD-<topic>.md
-```
+当前没有进行中的协作记录。
 
-同一任务跨多轮对话时优先更新同一文件；目标明显变化时创建新文件。使用 [AI 日志模板](../templates/ai-session-log-template.md)。
+## 生命周期
 
-## 记录与不记录
-
-应记录：用户目标、关键问答、方案选择、重要假设、实际验证、未决事项和相关文档。
-
-不记录：完整聊天复制、敏感信息、无关闲聊、大段命令输出，以及 Git 已能清楚表达的逐行改动。
-
-## 记录索引
-
-- [2026-07-22：项目背景确认与文档治理](2026/07/2026-07-22-project-context-and-documentation-governance.md)
-- [2026-07-22：测试、接口契约与 PostgreSQL 基线](2026/07/2026-07-22-testing-contract-database-baseline.md)
-- [2026-07-22：维护者指南与统一 API 响应](2026/07/2026-07-22-maintainer-guide-and-api-response-standard.md)
-- [2026-07-22：HTTP 状态与前端全局拦截器](2026/07/2026-07-22-http-status-and-global-interceptor.md)
-- [2026-07-22：管理系统基础能力](2026/07/2026-07-22-management-system-foundation.md)
-- [2026-07-23：从 OpenAPI-first 迁移到共享运行时 Schema](2026/07/2026-07-23-runtime-schema-contract.md)
-- [2026-07-23：统一使用 Zod Schema](2026/07/2026-07-23-zod-schema-unification.md)
-- [2026-07-23：前端应用壳组件化与动态页面加载](2026/07/2026-07-23-frontend-shell-componentization.md)
-- [2026-07-27：模块隔离与独立目录约束](2026/07/2026-07-27-module-isolation-constraints.md)
-- [2026-07-27：JTLab 品牌、动态导航与前端模块拆分](2026/07/2026-07-27-jtlab-dynamic-navigation.md)
-- [2026-07-27：旧菜单数据兼容与导航容错](2026/07/2026-07-27-legacy-menu-compatibility.md)
-- [2026-07-27：AI Git 暂存区门禁与提交署名](2026/07/2026-07-27-ai-git-safety-and-attribution.md)
-- [2026-07-27：前端模块页面自动注册与 SCSS 重构](2026/07/2026-07-27-frontend-registry-and-scss.md)
-- [2026-07-27：前端模块表意公共文件迁移](2026/07/2026-07-27-semantic-module-entry-files.md)
-- [2026-07-27：前端应用壳流式布局重构](2026/07/2026-07-27-frontend-layout-refactor.md)
-- [2026-07-27：菜单编码软删除唯一性修复](2026/07/2026-07-27-menu-code-soft-delete-uniqueness.md)
-- [2026-07-27：统一软删除业务唯一性约束](2026/07/2026-07-27-soft-delete-unique-constraints.md)
+- 使用 [AI 日志模板](../templates/ai-session-log-template.md)创建 `YYYY/MM/YYYY-MM-DD-<topic>.md`。
+- 同一任务跨多轮时更新同一文件，目标明显变化时新建文件。
+- 任务完成、取消或被取代后填写最终结果，并移入 `docs/archive/ai-logs/YYYY/MM/`。
+- 历史协作记录从[归档索引](../archive/README.md)按需查找，不属于默认上下文。

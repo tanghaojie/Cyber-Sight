@@ -1,66 +1,44 @@
-# 系统设计概览
+---
+title: 系统概览
+status: accepted
+owner: project maintainers
+updated: 2026-07-28
+---
 
-## 定位
+# 系统概览
 
-JTLab（桀士实验室）同时面向个人快速启动和团队统一工程规范。它不是某个业务系统，而是让人和 AI 在明确边界内持续生成业务模块的全栈母版。
-
-## 核心目标
-
-1. 用最少初始化工作跑通前端、后端、数据库和 API 类型链路。
-2. 让 AI 能快速增加业务，同时通过契约、测试、设计和计划约束改动范围。
-3. 默认使用 TypeScript/Fastify，以共享运行时 Schema 保证前后端类型与 HTTP 边界一致。
-4. 让关键决策、设计演进和 AI 协作过程可检索、可回溯。
-5. 让不熟悉 Zod、Drizzle 和 Vitest 的全栈维护者能够独立修改和验证项目。
+JTLab（桀士实验室）是用于快速生成管理类业务模块的 pnpm 全栈脚手架，不是某个具体业务系统。它通过运行时契约、模块边界、测试和文档门禁，让人和 AI 在明确约束内持续扩展。
 
 ## 当前组成
 
 ```text
 Vue 3 frontend
-      |
-      | shared inferred TypeScript types
-      v
-Zod runtime contract
-      |
-      | Draft 7 JSON Schema
-      v
-Fastify validation + Swagger + Drizzle
-      |
-      v
-PostgreSQL
+    -> inferred TypeScript types
+Zod 4 runtime contract
+    -> Draft 7 JSON Schema
+Fastify 4 + Swagger + Drizzle
+    -> PostgreSQL
 ```
 
-pnpm workspace 管理三个包：
+- `apps/frontend`：Vue Router、Pinia、Tailwind CSS、Element Plus 和响应式管理端。
+- `apps/backend`：Fastify 服务、认证、管理 API、Drizzle 仓储和数据库迁移。
+- `packages/api-contract`：HTTP Zod Schema、推导类型与 `toFastifySchema()`。
 
-- `apps/frontend`：Vue 3 用户界面。
-- `apps/backend`：默认的 Fastify 后端实现。
-- `packages/api-contract`：前后端共享的运行时 Schema 与推导类型。
+现有业务包括健康检查、会话认证、工作台、用户、角色、数据库动态菜单和字典。业务表统一使用软删除及五项生命周期审计字段。
 
-当前已包含 `/health` 演示链路，以及管理系统认证、用户、角色、数据库动态菜单和字典基础业务域。数据库业务表统一采用软删除和五项生命周期审计字段，前端提供 JTLab 响应式管理布局。
+## 不可绕过的边界
 
-## 设计原则
+- HTTP 结构先写共享 Zod Schema；Fastify 在边界执行运行时校验。
+- 业务能力按 `src/modules/<module>/` 组织，跨模块只依赖已登记的表意公共文件。
+- Fastify 是当前唯一后端；没有现实跨语言需求时不维护手写 OpenAPI 或 Java 双实现。
+- PostgreSQL 专属 Schema、迁移和查询留在基础设施层，不能宣称只换 import 即可切库。
+- 非简单变更同步更新设计、计划、测试和 AI 协作记录。
 
-### 可执行契约优先
+模块或跨层任务继续读[模块边界](module-boundaries.md)与对应[模块设计](README.md)；需要理解长期取舍时再从[ADR 索引](../decisions/README.md)选择相关记录。
 
-HTTP 数据先在共享 Zod Schema 中定义，TypeScript 类型从它推导。契约包生成 Draft 7 JSON Schema，Fastify 用于校验、响应序列化和按需生成 Swagger/OpenAPI。
+## 已知缺口
 
-### 默认单实现
-
-Fastify 是默认后端，不同时维护等价 Java 服务。只有明确需求出现时，才为特定模块或整个后端引入 Java；届时先导出并审查 Fastify 生成的 OpenAPI，再建立跨语言发布契约。
-
-### 模块化而非文件堆积
-
-每个业务能力必须位于独立模块文件夹，并具有明确职责、已登记的表意公共文件、依赖方向、数据所有权和测试边界。同一能力在前端、后端和 API 契约中使用一致模块名；其他模块只能通过已登记的公共文件协作，禁止导入未登记的内部实现、循环依赖和直接访问其他模块的内部状态或数据实现。传输、应用、领域和基础设施职责应逐步分离，路由与 Vue 组件不能承载全部业务规则。详细门禁见[模块边界与独立目录](module-boundaries.md)。
-
-### 文档与代码同生命周期
-
-设计、实施计划、ADR 和 AI 协作记录都是交付物。非简单代码变更没有对应文档时，不视为完成。
-
-## 已知差距
-
-- 前后端统一消费共享运行时 Schema 推导类型；Fastify 直接使用同一 Schema 做请求校验和 Swagger 生成。
-- PostgreSQL/MySQL 可切换能力仍是愿景，当前实现绑定 PostgreSQL。
-- 已建立测试、契约校验、迁移与配置校验最小基线；仍缺少 CI 和生产部署基线。
-- 业务 API 已统一普通响应、分页、错误码和全局错误处理；新增业务模块必须沿用该约定。
-- 管理系统已具备基础会话认证、角色/菜单关系、树形动态路由与外链按钮，但细粒度接口权限、组织/租户、初始密码安全注入和生产部署策略仍待后续演进。
-
-这些差距应通过后续 ADR 和实施计划逐步解决，不在没有需求和验证的情况下大规模预构建。
+- 尚无 CI 和生产部署基线。
+- 细粒度接口权限、组织/租户、生产级初始密码注入仍未实现。
+- 健康检查是存活检查，不包含数据库 readiness。
+- PostgreSQL/MySQL 可切换仍是愿景，当前实现绑定 PostgreSQL。

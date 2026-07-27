@@ -45,6 +45,6 @@ HTTP 200 的非零业务状态仍由业务模块处理，不进入全局处理�
 
 ## 相关设计和计划
 
-- `docs/design/dynamic-navigation-and-branding.md`
+- `docs/design/frontend-shell.md`
 - `docs/decisions/ADR-0004-http-status-and-frontend-global-error-handling.md`
-- `docs/plans/archive/2026-07-27-jtlab-dynamic-navigation.md`
+- `docs/archive/plans/2026-07-27-jtlab-dynamic-navigation.md`

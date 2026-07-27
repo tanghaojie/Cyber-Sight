@@ -349,9 +349,9 @@ pnpm test:watch # 开发时监听
 - `docs/design/`：最终有效设计。
 - `docs/decisions/`：长期技术取舍。
 - `docs/plans/active/`：正在执行的计划。
-- `docs/ai-logs/`：人与 AI 的结构化协作摘要。
+- `docs/ai-logs/`：尚未结束任务的人与 AI 结构化协作摘要。
 
-完成后更新实际结果，将计划移动到 `archive/`。所有约定验证通过后必须提交 Git；验证失败或存在归属不明改动时不得勉强提交。
+完成后更新实际结果，将计划和 AI 日志分别移动到 `docs/archive/plans/`、`docs/archive/ai-logs/`。历史资料默认不读取，需要复盘时从 `docs/archive/README.md` 定位。所有约定验证通过后必须提交 Git；验证失败或存在归属不明改动时不得勉强提交。
 
 ## 12. 常见问题
 

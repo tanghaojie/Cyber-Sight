@@ -51,8 +51,8 @@ date: 2026-07-27
 
 ## 相关设计和计划
 
-- `docs/design/dynamic-navigation-and-branding.md`
-- `docs/plans/archive/2026-07-27-jtlab-dynamic-navigation.md`
+- `docs/design/frontend-shell.md`
+- `docs/archive/plans/2026-07-27-jtlab-dynamic-navigation.md`
 
 ## 2026-07-27 补充：存量数据兼容边界
 

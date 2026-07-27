@@ -59,4 +59,4 @@ ADR-0009 使用模块级 `index.ts` 建立单一公共入口，能够阻止调�
 
 - `docs/design/module-boundaries.md`
 - `docs/design/modules/frontend.md`
-- `docs/plans/archive/2026-07-27-semantic-module-entry-files.md`
+- `docs/archive/plans/2026-07-27-semantic-module-entry-files.md`

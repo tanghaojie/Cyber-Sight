@@ -1,8 +1,7 @@
 ---
 title: 统一业务响应、分页和错误码
-status: superseded
+status: accepted
 date: 2026-07-22
-superseded_by: ADR-0004-http-status-and-frontend-global-error-handling.md
 ---
 
 # ADR-0003：统一业务响应、分页和错误码

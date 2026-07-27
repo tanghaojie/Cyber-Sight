@@ -54,6 +54,5 @@ date: 2026-07-27
 ## 相关设计和计划
 
 - `docs/design/frontend-shell.md`
-- `docs/design/dynamic-navigation-and-branding.md`
 - `docs/design/modules/frontend.md`
-- `docs/plans/archive/2026-07-27-frontend-registry-and-scss.md`
+- `docs/archive/plans/2026-07-27-frontend-registry-and-scss.md`

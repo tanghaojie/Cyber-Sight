@@ -1,58 +1,51 @@
-# 项目文档中心
+# 项目文档入口
 
-`docs/` 保存项目长期有效的设计、决策、实施计划和 AI 协作记录。聊天内容只能作为临时上下文，仓库中的文档才是后续开发和回溯的依据。
+`docs/` 的当前区只保存完成任务所需的现行事实；历史设计、已取代 ADR、完成计划和完成日志集中在 `archive/`，默认不读取。
 
-## 目录结构
+## AI 最小阅读协议
+
+每次任务按以下顺序建立上下文：
+
+1. 阅读本文件。
+2. 检查 [进行中的计划](plans/README.md)，避免重复实施。
+3. 从[设计索引](design/README.md)选择与改动直接相关的文档；不要遍历全部设计。
+4. 只有需要理解长期取舍时，才从[现行 ADR 索引](decisions/README.md)选择相关记录。
+5. 错误码、人工操作和模板分别按需查询 `reference/`、`guides/`、`templates/`。
+
+跨模块、新模块或架构任务应额外阅读[系统概览](design/system-overview.md)和[模块边界](design/module-boundaries.md)。局部修复只读所属模块设计和直接相关 ADR。
+
+禁止为“先熟悉项目”而递归读取整个 `docs/`。`docs/archive/**` 不属于默认上下文；只有用户要求历史、排查回归/兼容性、当前文档明确引用历史证据，或准备恢复旧方案时，才先从[归档索引](archive/README.md)定位一至两份文件。
+
+## 当前目录
 
 ```text
 docs/
-├── README.md                 # 文档入口、导航与生命周期
-├── design/                  # 当前有效的系统与模块设计
-│   ├── system-overview.md
-│   └── modules/
-├── decisions/               # ADR：重要且长期有效的技术决策
-├── guides/                  # 面向人类维护者的操作型开发指南
-├── reference/               # 错误码等需要持续维护的参考表
-├── plans/
-│   ├── active/              # 正在实施的计划
-│   └── archive/             # 已完成、取消或被替代的历史计划
-├── ai-logs/YYYY/MM/         # AI 协作过程的结构化摘要
-└── templates/               # 设计、计划、ADR、AI 日志模板
+├── design/          # 当前系统与模块设计
+├── decisions/       # 仍有效的 ADR
+├── plans/active/    # 正在执行的计划
+├── ai-logs/         # 正在执行任务的协作记录
+├── guides/          # 人类操作指南，按需阅读
+├── reference/       # 当前参考表，按需查询
+├── templates/       # 文档模板
+└── archive/         # 历史证据，默认不读取
 ```
 
-## 阅读顺序
+## 生命周期
 
-新成员或 AI 开始工作时，按以下顺序建立上下文：
-
-1. [系统概览](design/system-overview.md)
-2. [模块边界与独立目录](design/module-boundaries.md)
-3. 与任务相关的[模块设计](design/README.md)
-4. 相关的[架构决策](decisions/README.md)
-5. [进行中的实施计划](plans/README.md)
-6. 必要时查看历史计划和 [AI 协作记录](ai-logs/README.md)
-
-第一次参与项目开发的人类维护者应先阅读[人类维护者开发指南](guides/human-maintainer-development-guide.md)。
-业务错误码统一查询和登记在[错误码参考](reference/error-codes.md)。
-
-## 文档分工
-
-| 文档 | 回答的问题 | 生命周期 |
+| 类型 | 当前区 | 进入归档的条件 |
 | --- | --- | --- |
-| Design | 系统现在应该如何工作，边界是什么 | 持续更新，始终描述当前设计 |
-| ADR | 为什么选择这个长期方案 | 追加为主，旧决策通过新 ADR 替代 |
-| Plan | 这次准备怎样实施和验证 | 执行中持续更新，完成后归档 |
-| AI Log | 人与 AI 当时沟通了什么、做了什么 | 按任务追加结构化摘要 |
+| Design | `design/` | 被合并、废弃或大幅重写 |
+| ADR | `decisions/` | 被后续 ADR 取代 |
+| Plan | `plans/active/` | 完成、取消或被取代 |
+| AI Log | `ai-logs/YYYY/MM/` | 对应任务结束 |
 
-原始聊天记录可能保存在外部工具中，但不作为仓库内的设计依据。对后续有价值的内容必须提炼到上述四类文档中。
+当前设计始终描述“现在怎样工作”。当前 ADR 只解释仍有效的长期取舍。计划和日志不复制正式结论，任务结束后与历史过程一起归档。详细规则见[分层文档与历史归档](design/documentation-governance.md)。
 
-## 强制规则
+## 强制规则与命名
 
-根目录 [AGENTS.md](../AGENTS.md) 定义 AI 修改仓库时的 Git 暂存区硬门禁、文档门禁和提交模型标记。AI 在首次修改前必须确认暂存区为空；非简单代码改动必须同时具备设计、计划和 AI 协作记录；形成长期技术决策时还必须增加 ADR。
+根目录 [AGENTS.md](../AGENTS.md) 定义 Git 暂存区门禁、文档门禁、归档步骤和 AI 提交标记。
 
-## 命名约定
-
-- 设计文档：使用稳定语义名称，例如 `backend.md`、`api-contract.md`。
-- 实施计划：`YYYY-MM-DD-<topic>.md`。
-- AI 日志：`YYYY-MM-DD-<topic>.md`，放入对应年月目录。
-- ADR：`ADR-NNNN-<topic>.md`，序号递增且不复用。
-- 文件名使用英文小写和连字符，正文默认使用中文，代码标识保持原样。
+- 设计：稳定英文小写名称，如 `backend.md`。
+- 计划和日志：`YYYY-MM-DD-<topic>.md`。
+- ADR：`ADR-NNNN-<topic>.md`，编号递增且不复用。
+- 正文默认中文，代码标识保持原样。

@@ -28,5 +28,3 @@ updated: 2026-07-27
 ## 相关 ADR、计划和 AI 日志
 
 - [ADR-0015：统一软删除业务唯一性约束](../../decisions/ADR-0015-active-row-business-uniqueness.md)
-- [实施计划](../../plans/archive/2026-07-27-soft-delete-unique-constraints.md)
-- [AI 协作记录](../../ai-logs/2026/07/2026-07-27-soft-delete-unique-constraints.md)
