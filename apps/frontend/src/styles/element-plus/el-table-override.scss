@@ -1,0 +1,21 @@
+html body .el-table {
+  --el-table-border-color: #e5eee9;
+  --el-table-header-bg-color: #f1f7f3;
+  --el-table-row-hover-bg-color: #f4faf7;
+  --el-table-bg-color: transparent;
+  --el-table-tr-bg-color: transparent;
+
+  th.el-table__cell {
+    height: 50px;
+    color: #69837a;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 0.045em;
+  }
+
+  td.el-table__cell {
+    height: 66px;
+    color: var(--ink-soft);
+    font-size: 12px;
+  }
+}

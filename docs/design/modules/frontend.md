@@ -16,13 +16,16 @@
 - `src/layouts/AdminLayout.vue`：响应式应用壳编排。
 - `src/components/layout/`：侧栏、顶栏和动态内容承载区。
 - `src/modules/navigation`：当前用户数据库菜单树与加载状态。
-- `src/router/view-registry.ts`：受控页面组件注册表。
+- `src/modules/**/view-registry.ts`：模块拥有的动态页面注册清单。
+- `src/router/view-registry.ts`：构建期自动发现、冲突校验和只读注册表组装。
+- `src/styles/main.scss`：只负责组合 Tailwind、基础样式、布局样式和按 Element Plus 组件拆分的 SCSS 覆盖。
 - `src/modules/users|roles|menus|dictionaries`：四个相互独立的管理页面和 API service。
 
 ## 约束
 
 - 新业务能力必须建立 `src/modules/<module>/` 独立目录，并以 `index.ts` 作为公共入口。模块拥有自己的页面、组件、composable、service、局部 store 和测试；`src/router/`、`src/views/` 与 `src/stores/` 中的存量业务代码在实质修改时迁入对应模块。
 - 路由和应用壳只能从模块公共入口加载业务页面或注册信息；禁止一个模块深层导入另一个模块的组件、composable、service 或 store。
+- 需要被数据库菜单选择的模块页面必须在本模块 `view-registry.ts` 的 `registerViews()` 中显式登记稳定组件标识；路由组合根自动发现该约定文件，禁止中心注册表继续手工导入业务模块。组件标识必须非空且全局唯一。
 - 跨模块状态和操作通过目标模块公开的只读查询、命令或事件协作。不得直接修改其他模块的 Pinia store；真正领域无关的 UI 与 Client 能力才进入共享目录。
 - Vue 组件负责展示和交互，不直接实现复杂业务规则。
 - 后端调用通过模块 composable 或 service 封装，不在多个组件中散落路径字符串。
@@ -30,7 +33,7 @@
 - 页面必须明确处理 loading、empty、error 和 success 状态。
 - 跨页面共享状态才进入 Pinia；局部状态保留在组件或 composable。
 - 新业务模块必须提供组件/逻辑测试，并为关键流程提供端到端测试。
-- 布局和视觉样式优先使用 Tailwind CSS；表格、表单、弹窗和反馈等通用交互优先使用 Element Plus，并通过项目视觉令牌统一主题。
+- 布局和视觉样式优先使用 Tailwind CSS；需要全局维护的样式使用 SCSS 并按基础样式、布局职责和第三方组件边界拆分。表格、表单、弹窗和反馈等通用交互优先使用 Element Plus；其全局变量与每类组件覆盖不得混放在 `main.scss`。
 - 共享响应拦截器统一识别 HTTP `401`、`404`、`500` 并调用应用启动时注册的处理器；401 清状态并跳登录、404 跳错误页、500 使用 ElMessage 显示 `err`。
 - 业务模块处理 HTTP `200` 响应中的非零业务 `status`；只有 `status === 0` 且存在预期数据时才进入成功状态。
 - 分页页面通过统一的 `pageNum`、`pageSize` 请求和 `list`、`total` 响应维护状态。

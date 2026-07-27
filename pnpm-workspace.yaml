@@ -8,5 +8,6 @@ onlyBuiltDependencies:
 
 confirmModulesPurge: false
 allowBuilds:
+  '@parcel/watcher': false
   esbuild: true
   vue-demi: true

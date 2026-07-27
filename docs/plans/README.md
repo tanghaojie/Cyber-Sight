@@ -19,6 +19,7 @@
 - [JTLab 品牌、动态导航与前端模块拆分](archive/2026-07-27-jtlab-dynamic-navigation.md)：统一品牌主题，以数据库菜单树驱动路由并拆分四个基础资料模块。
 - [旧菜单数据兼容与导航容错](archive/2026-07-27-legacy-menu-compatibility.md)：兼容存量菜单读取，过滤无效导航，修复动态 URL 首次匹配与侧栏默认隐藏。
 - [AI Git 暂存区门禁与提交署名](archive/2026-07-27-ai-git-safety-and-attribution.md)：阻止 AI 混入人类既有暂存内容，并强制 AI 提交记录真实模型名称。
+- [前端模块页面自动注册与 SCSS 重构](archive/2026-07-27-frontend-registry-and-scss.md)：自动发现模块页面注册文件，分层迁移全局 SCSS 并提高侧栏对比度。
 
 ## 使用规则
 

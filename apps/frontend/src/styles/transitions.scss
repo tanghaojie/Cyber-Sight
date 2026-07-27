@@ -1,0 +1,25 @@
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 170ms ease, transform 220ms ease;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(9px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

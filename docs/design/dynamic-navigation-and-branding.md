@@ -22,7 +22,7 @@ updated: 2026-07-27
 - `src/config/app.config.ts` 提供品牌名、品牌缩写、产品说明和主色等可修改配置；页面不得散落硬编码品牌名。
 - `menus` 模块拥有菜单 CRUD、当前用户导航树、树构造规则以及菜单数据契约。
 - 前端 `navigation` 模块获取导航树并维护加载状态；应用路由组合根根据树中 `menu` 节点动态注册子路由。
-- `src/router/view-registry.ts` 是数据库组件标识到模块公开懒加载器的唯一受控映射。
+- 各业务模块通过约定文件名 `src/modules/**/view-registry.ts` 公开 `registerViews()`，声明数据库组件标识到本模块页面懒加载器的映射；`src/router/view-registry.ts` 使用 Vite `import.meta.glob` 在构建期自动发现这些文件并生成唯一的只读受控映射。
 - `AppSidebar` 只渲染传入的树：`directory` 展开/折叠，`menu` 使用站内路由，`button` 使用新窗口外链。
 - 用户、角色、菜单和字典页面分别由 `users`、`roles`、`menus`、`dictionaries` 模块拥有，不再复用配置驱动的业务 `ResourceView.vue`。
 - 共享 API Client 识别 HTTP 401/404/500，并调用应用在启动时注册的处理器；不再广播 DOM 事件。
@@ -31,12 +31,12 @@ updated: 2026-07-27
 
 - `GET /navigation/menus`：返回当前登录用户可访问的启用菜单树，响应为 `{ status: 0, data: MenuTreeNode[] }`。
 - 菜单记录新增 `component` 和 `externalUrl`：目录无需页面组件；菜单必须配置站内 `path` 与已注册 `component`；按钮必须配置 `http/https` 外链。
-- 各前端业务模块的 `index.ts` 公开页面懒加载器和本模块所需的稳定 API，不公开页面内部状态。
+- 各前端业务模块的 `index.ts` 公开本模块所需的稳定业务 API，不公开页面内部状态；`view-registry.ts` 是只允许路由组合根按约定发现的页面注册清单，不供其他业务模块导入。
 - `installGlobalHttpErrorHandler()` 在应用启动时注入清会话、路由跳转和消息提示行为。
 
 ## 数据模型与数据流
 
-登录用户进入受保护路由时，路由守卫先恢复会话，再请求 `/navigation/menus`。后端按用户角色与 `role_menus` 过滤启用、未删除菜单，并补齐被授权节点的祖先目录，按 `sortOrder` 和 `id` 构造树。前端保存树并为其中有效 `menu` 节点注册路由；页面组件通过 `component` 在受控注册表中解析并懒加载。
+登录用户进入受保护路由时，路由守卫先恢复会话，再请求 `/navigation/menus`。后端按用户角色与 `role_menus` 过滤启用、未删除菜单，并补齐被授权节点的祖先目录，按 `sortOrder` 和 `id` 构造树。前端构建时扫描模块注册文件，按稳定文件路径顺序调用注册函数并冻结映射；运行时保存菜单树并为其中有效 `menu` 节点注册路由，页面组件通过 `component` 在受控注册表中解析并懒加载。
 
 ```text
 users -> user_roles -> roles -> role_menus -> menus
@@ -59,6 +59,7 @@ users -> user_roles -> roles -> role_menus -> menus
 ## 失败模式与安全考虑
 
 - 未注册或为空的 `component` 不生成动态路由，并在菜单管理页标记为配置问题。
+- 模块注册表拒绝空白或重复组件标识，注册文件缺少 `registerViews()` 时应用启动失败并指出对应文件，避免错误被静默掩盖。
 - 外链只接受 `http:` 与 `https:`，使用 `target="_blank"` 和 `rel="noopener noreferrer"`。
 - 循环父子关系、节点自引用和孤立父节点在树构造时被隔离；菜单写入时拒绝自身作为父级。
 - HTTP 401 清空本地用户和导航状态后跳转登录页，并保留原目标路径；404 跳转独立错误页；500 通过 `ElMessage.error(err)` 展示安全错误文本。
@@ -89,12 +90,13 @@ users -> user_roles -> roles -> role_menus -> menus
 
 ## 未决问题
 
-- 后续若模块数量增加，可为页面组件注册表增加自动一致性检查或生成脚本。
+- 菜单管理页尚未直接读取构建期注册表生成组件下拉选项，组件标识仍由管理员输入；后续可在不暴露任意加载能力的前提下增加只读选项来源。
 - 菜单修改后是否通过服务端推送使所有在线会话即时刷新，留待存在实时权限撤销需求时评估。
 
 ## 相关 ADR、计划和 AI 日志
 
 - `docs/decisions/ADR-0010-database-navigation-and-controlled-view-registry.md`
+- `docs/decisions/ADR-0012-module-view-registration-and-scss-layering.md`
 - `docs/decisions/ADR-0011-registered-application-http-error-handler.md`
 - `docs/plans/archive/2026-07-27-jtlab-dynamic-navigation.md`
 - `docs/ai-logs/2026/07/2026-07-27-jtlab-dynamic-navigation.md`

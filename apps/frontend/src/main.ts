@@ -8,7 +8,7 @@ import { useNavigationStore } from './modules/navigation/index.js'
 import { installGlobalHttpErrorHandler } from './api/global-http-error.js'
 import { createApplicationHttpErrorHandler } from './api/application-http-error.js'
 import { appConfig } from './config/app.config.js'
-import './styles/main.css'
+import './styles/main.scss'
 
 const app = createApp(App)
 app.use(pinia)
