@@ -21,6 +21,7 @@
 - [AI Git 暂存区门禁与提交署名](archive/2026-07-27-ai-git-safety-and-attribution.md)：阻止 AI 混入人类既有暂存内容，并强制 AI 提交记录真实模型名称。
 - [前端模块页面自动注册与 SCSS 重构](archive/2026-07-27-frontend-registry-and-scss.md)：自动发现模块页面注册文件，分层迁移全局 SCSS 并提高侧栏对比度。
 - [前端模块表意公共文件迁移](archive/2026-07-27-semantic-module-entry-files.md)：删除前端模块级 `index.ts`，改用按职责命名并登记的公共文件。
+- [前端应用壳流式布局重构](archive/2026-07-27-frontend-layout-refactor.md)：修复侧栏脱离布局流后遮挡主内容和顶栏的问题，统一桌面网格与移动抽屉边界。
 
 ## 使用规则
 

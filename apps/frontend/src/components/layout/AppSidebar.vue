@@ -1,5 +1,5 @@
 <template>
-  <aside class="app-sidebar" :class="open ? 'translate-x-0' : '-translate-x-full'">
+  <aside id="app-sidebar" class="app-sidebar" :class="{ 'app-sidebar--open': open }">
     <div class="sidebar-atmosphere" />
     <header class="sidebar-brand">
       <span class="brand-mark">{{ brandInitials() }}</span>

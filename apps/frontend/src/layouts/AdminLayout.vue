@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen bg-[var(--canvas)]">
+  <div class="app-shell">
     <button
       v-if="sidebarOpen"
-      class="fixed inset-0 z-[35] border-0 bg-[#091510]/55 backdrop-blur-[2px] lg:hidden"
+      class="app-shell__scrim"
       type="button"
       aria-label="关闭菜单"
       @click="sidebarOpen = false"
@@ -14,7 +14,7 @@
       @close="sidebarOpen = false"
       @navigate="sidebarOpen = false"
     />
-    <section class="min-w-0 lg:pl-[280px]">
+    <section class="app-shell__content">
       <AppHeader
         :title="pageTitle"
         :eyebrow="pageEyebrow"
@@ -43,7 +43,7 @@ const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const navigation = useNavigationStore()
-const sidebarOpen = ref(true)
+const sidebarOpen = ref(false)
 const pageTitle = computed(() => String(route.meta.title ?? '管理控制台'))
 const pageEyebrow = computed(() => String(route.meta.eyebrow ?? `${appConfig.name.toUpperCase()} / MANAGEMENT`))
 

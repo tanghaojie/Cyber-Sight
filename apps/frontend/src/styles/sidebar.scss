@@ -3,13 +3,25 @@
   inset: 0 auto 0 0;
   z-index: 40;
   display: flex;
-  width: 280px;
+  width: min(280px, calc(100vw - 48px));
+  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   flex-direction: column;
+  visibility: hidden;
   color: var(--sidebar-text);
   background: linear-gradient(180deg, var(--sidebar-surface) 0%, var(--sidebar-surface-deep) 100%);
   box-shadow: 18px 0 48px rgba(4, 7, 6, 0.24);
-  transition: transform 0.3s ease;
+  pointer-events: none;
+  transform: translate3d(-100%, 0, 0);
+  transition: transform 0.3s ease, visibility 0s linear 0.3s;
+}
+
+.app-sidebar--open {
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate3d(0, 0, 0);
+  transition-delay: 0s;
 }
 
 .sidebar-atmosphere {
@@ -261,7 +273,17 @@
 
 @media (min-width: 1024px) {
   .app-sidebar {
-    transform: translateX(0) !important;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    grid-column: 1;
+    grid-row: 1;
+    width: 280px;
+    visibility: visible;
+    box-shadow: 12px 0 36px rgba(4, 7, 6, 0.14);
+    pointer-events: auto;
+    transform: none;
+    transition: none;
   }
 }
 

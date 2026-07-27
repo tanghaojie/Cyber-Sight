@@ -24,6 +24,7 @@ describe('AppSidebar', () => {
         },
       },
     })
+    expect(wrapper.classes()).toContain('app-sidebar--open')
     expect(wrapper.text()).toContain('组织与权限')
     expect(wrapper.find('[data-to="/users"]').exists()).toBe(true)
     expect(wrapper.get('a[href="https://example.com"]').attributes('rel')).toBe('noopener noreferrer')
