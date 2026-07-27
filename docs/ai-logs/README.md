@@ -29,3 +29,4 @@ ai-logs/YYYY/MM/YYYY-MM-DD-<topic>.md
 - [2026-07-27：模块隔离与独立目录约束](2026/07/2026-07-27-module-isolation-constraints.md)
 - [2026-07-27：JTLab 品牌、动态导航与前端模块拆分](2026/07/2026-07-27-jtlab-dynamic-navigation.md)
 - [2026-07-27：旧菜单数据兼容与导航容错](2026/07/2026-07-27-legacy-menu-compatibility.md)
+- [2026-07-27：AI Git 暂存区门禁与提交署名](2026/07/2026-07-27-ai-git-safety-and-attribution.md)
