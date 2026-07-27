@@ -53,3 +53,7 @@ date: 2026-07-27
 
 - `docs/design/dynamic-navigation-and-branding.md`
 - `docs/plans/archive/2026-07-27-jtlab-dynamic-navigation.md`
+
+## 2026-07-27 补充：存量数据兼容边界
+
+菜单写入契约负责阻止新的无效配置；菜单摘要读取契约允许返回旧版本遗留的字段组合，以便管理员修正。运行时导航是执行边界，只接收具备完整站内路由信息或合法 HTTP(S) 地址的节点。无效旧节点不会参与导航和动态路由，但也不会被系统自动删除或猜测性改写。

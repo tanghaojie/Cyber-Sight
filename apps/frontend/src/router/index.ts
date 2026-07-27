@@ -52,6 +52,7 @@ const router = createRouter({
     { path: '/login', name: 'login', component: loginPage, meta: { public: true, title: '登录' } },
     { path: '/404', name: 'not-found', component: notFoundPage, meta: { public: true, title: '页面未找到' } },
     { path: '/', name: 'admin-root', component: () => import('../layouts/AdminLayout.vue'), children: [] },
+    { path: '/:pathMatch(.*)*', name: 'dynamic-fallback', component: notFoundPage },
   ],
 })
 
@@ -69,7 +70,7 @@ router.beforeEach(async function authenticationGuard(to) {
     installMenuRoutes(router, navigation.items)
     return to.fullPath
   }
-  if (!to.matched.length) {
+  if (to.name === 'dynamic-fallback') {
     return { name: 'not-found', query: { from: to.fullPath } }
   }
   return true

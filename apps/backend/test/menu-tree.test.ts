@@ -25,4 +25,16 @@ describe('navigation menu tree', () => {
     const cyclic = [{ ...rows[0], parentId: 1 }]
     expect(buildNavigationTree(cyclic)[0].id).toBe(1)
   })
+
+  it('keeps legacy invalid records out of executable navigation', () => {
+    const legacyRows = [
+      ...rows,
+      { ...rows[1], id: 4, code: 'LEGACY_PAGE', component: '' },
+      { ...rows[2], id: 5, code: 'LEGACY_BUTTON', externalUrl: '' },
+    ]
+
+    const tree = buildNavigationTree(legacyRows)
+
+    expect(tree[0].children.map((item) => item.id)).toEqual([2, 3])
+  })
 })

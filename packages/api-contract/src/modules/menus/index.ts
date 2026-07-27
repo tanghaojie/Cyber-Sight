@@ -45,18 +45,19 @@ export const MenuRequestSchema = z.discriminatedUnion('type', [
   externalButtonRequestSchema,
 ])
 
-function withSummaryFields<T extends z.ZodRawShape>(shape: T) {
-  return AuditFieldsSchema.extend({
-    id: z.number().int(),
-    ...shape,
-  })
-}
-
-export const MenuSummarySchema = z.discriminatedUnion('type', [
-  withSummaryFields(directoryRequestSchema.shape),
-  withSummaryFields(pageMenuRequestSchema.shape),
-  withSummaryFields(externalButtonRequestSchema.shape),
-])
+export const MenuSummarySchema = AuditFieldsSchema.extend({
+  id: z.number().int(),
+  parentId: z.number().int().min(0),
+  name: z.string().min(1).max(80),
+  code: z.string().min(2).max(80),
+  path: z.string().max(160),
+  component: z.string().max(160),
+  externalUrl: z.string().max(500),
+  icon: z.string().max(50),
+  sortOrder: z.number().int().min(0),
+  type: z.enum(['directory', 'menu', 'button']),
+  enabled: z.boolean(),
+})
 
 export const MenuPageResponseSchema = paginatedResponseSchema(MenuSummarySchema)
 export const MenuPageResultSchema = z.union([

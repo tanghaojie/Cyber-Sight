@@ -57,12 +57,23 @@ function hasParentCycle(
   return false
 }
 
+function isUsableNavigationRow(row: NavigationRow): boolean {
+  if (row.type === 'directory') return true
+  if (row.type === 'menu') {
+    return row.path.startsWith('/') && row.component.trim().length > 0
+  }
+  return /^https?:\/\//i.test(row.externalUrl)
+}
+
 export function buildNavigationTree(
   rows: NavigationRow[],
   allowedMenuIds?: ReadonlySet<number>
 ): NavigationMenu[] {
-  const allRowsById = new Map(rows.map((row) => [row.id, row]))
-  const visibleIds = allowedMenuIds ? new Set(allowedMenuIds) : new Set(rows.map((row) => row.id))
+  const usableRows = rows.filter(isUsableNavigationRow)
+  const allRowsById = new Map(usableRows.map((row) => [row.id, row]))
+  const visibleIds = allowedMenuIds
+    ? new Set(allowedMenuIds)
+    : new Set(usableRows.map((row) => row.id))
 
   if (allowedMenuIds) {
     for (const id of allowedMenuIds) {
@@ -76,7 +87,9 @@ export function buildNavigationTree(
     }
   }
 
-  const visibleRows = orderedRows(rows.filter((row) => visibleIds.has(row.id)))
+  const visibleRows = orderedRows(
+    usableRows.filter((row) => visibleIds.has(row.id))
+  )
   const visibleRowsById = new Map(visibleRows.map((row) => [row.id, row]))
   const nodesById = new Map<number, NavigationMenu>(
     visibleRows.map((row) => [row.id, { ...row, children: [] }])

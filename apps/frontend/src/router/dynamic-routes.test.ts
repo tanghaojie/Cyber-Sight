@@ -1,7 +1,7 @@
 import { createMemoryHistory, createRouter } from 'vue-router'
 import { describe, expect, it } from 'vitest'
 import type { NavigationMenu } from '@scaffold/api-contract'
-import { clearDynamicRoutes, installMenuRoutes } from './index.js'
+import router, { clearDynamicRoutes, installMenuRoutes } from './index.js'
 
 describe('database dynamic routes', () => {
   it('registers known view components and ignores unknown identifiers', () => {
@@ -17,5 +17,9 @@ describe('database dynamic routes', () => {
     expect(target.resolve('/users').name).toBe('menu-1')
     expect(target.resolve('/unknown').matched).toHaveLength(0)
     clearDynamicRoutes()
+  })
+
+  it('matches a direct dynamic URL with the protected startup fallback', () => {
+    expect(router.resolve('/menus').name).toBe('dynamic-fallback')
   })
 })

@@ -43,7 +43,7 @@ const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const navigation = useNavigationStore()
-const sidebarOpen = ref(false)
+const sidebarOpen = ref(true)
 const pageTitle = computed(() => String(route.meta.title ?? '管理控制台'))
 const pageEyebrow = computed(() => String(route.meta.eyebrow ?? `${appConfig.name.toUpperCase()} / MANAGEMENT`))
 
