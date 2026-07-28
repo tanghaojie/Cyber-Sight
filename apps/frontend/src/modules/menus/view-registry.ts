@@ -4,5 +4,5 @@ import type { ViewRegistrar } from '../../shared/routing/view-registry.js'
 const menusPage: RouteComponent = () => import('./pages/MenusPage.vue')
 
 export function registerViews(appViews: ViewRegistrar): void {
-  appViews.register('menus', menusPage)
+  appViews.register('menus', '菜单管理', menusPage)
 }

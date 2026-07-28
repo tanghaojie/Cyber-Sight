@@ -4,5 +4,5 @@ import type { ViewRegistrar } from '../../shared/routing/view-registry.js'
 const dictionariesPage: RouteComponent = () => import('./pages/DictionariesPage.vue')
 
 export function registerViews(appViews: ViewRegistrar): void {
-  appViews.register('dictionaries', dictionariesPage)
+  appViews.register('dictionaries', '字典管理', dictionariesPage)
 }

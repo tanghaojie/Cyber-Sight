@@ -18,33 +18,39 @@ describe('view registry', () => {
   })
 
   it('rejects duplicate view names instead of silently overriding them', () => {
-    expect(() => createViewRegistry({
-      './alpha/view-registry.ts': {
-        registerViews(registrar: ViewRegistrar) {
-          registrar.register('shared-view', testComponent)
+    expect(() =>
+      createViewRegistry({
+        './alpha/view-registry.ts': {
+          registerViews(registrar: ViewRegistrar) {
+            registrar.register('shared-view', 'shared-view', testComponent)
+          },
         },
-      },
-      './beta/view-registry.ts': {
-        registerViews(registrar: ViewRegistrar) {
-          registrar.register('shared-view', testComponent)
+        './beta/view-registry.ts': {
+          registerViews(registrar: ViewRegistrar) {
+            registrar.register('shared-view', 'shared-view', testComponent)
+          },
         },
-      },
-    })).toThrow('Duplicate view name "shared-view"')
+      }),
+    ).toThrow('Duplicate view name "shared-view"')
   })
 
   it('rejects files that do not export the registration function', () => {
-    expect(() => createViewRegistry({
-      './invalid/view-registry.ts': {},
-    })).toThrow('must export registerViews()')
+    expect(() =>
+      createViewRegistry({
+        './invalid/view-registry.ts': {},
+      }),
+    ).toThrow('must export registerViews()')
   })
 
   it('rejects unstable view names', () => {
-    expect(() => createViewRegistry({
-      './invalid-name/view-registry.ts': {
-        registerViews(registrar: ViewRegistrar) {
-          registrar.register('../private-page', testComponent)
+    expect(() =>
+      createViewRegistry({
+        './invalid-name/view-registry.ts': {
+          registerViews(registrar: ViewRegistrar) {
+            registrar.register('../private-page', 'private-page', testComponent)
+          },
         },
-      },
-    })).toThrow('Invalid view name "../private-page"')
+      }),
+    ).toThrow('Invalid view name "../private-page"')
   })
 })

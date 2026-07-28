@@ -164,10 +164,11 @@
             <el-form-item label="页面组件" required
               ><el-select v-model="form.component" class="w-full" placeholder="选择已注册页面"
                 ><el-option
-                  v-for="option in viewComponentOptions"
-                  :key="option.value"
-                  :label="option.label"
-                  :value="option.value" /></el-select
+                  v-for="(data, key) of viewRegistry"
+                  :key="key"
+                  :label="data.label"
+                  :value="key"
+                /> </el-select
             ></el-form-item>
           </template>
           <el-form-item
@@ -197,7 +198,7 @@ import { Delete, EditPen, Plus, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { MenuRequest, MenuSummary } from '@scaffold/api-contract'
 import AppIcon from '../../../components/AppIcon.vue'
-import { viewComponentOptions } from '../../../config/app.config.js'
+import { viewRegistry } from '../../../router/view-registry.js'
 import { iconOptions } from '../../../shared/icons/icon-registry.js'
 import { layoutOptions } from '../../../shared/routing/layout-registry.js'
 import { useNavigationStore } from '../../navigation/navigation.store.js'
@@ -270,9 +271,7 @@ const routePlaceholder = computed(() =>
   form.parentId === 0 ? '例如 /system' : '例如 users 或 /users',
 )
 const routeHint = computed(() =>
-  form.parentId === 0
-    ? '根节点必须以 / 开头'
-    : '相对路径会拼接上级目录；以 / 开头时使用绝对路径',
+  form.parentId === 0 ? '根节点必须以 / 开头' : '相对路径会拼接上级目录；以 / 开头时使用绝对路径',
 )
 
 async function load(): Promise<void> {

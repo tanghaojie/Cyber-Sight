@@ -13,10 +13,7 @@ import { useAuthStore } from '../modules/auth/auth.store.js'
 import { notFoundPage } from '../modules/errors/error.routes.js'
 import { useNavigationStore } from '../modules/navigation/navigation.store.js'
 import { resolveMenuPath } from '../shared/routing/menu-paths.js'
-import {
-  DEFAULT_LAYOUT,
-  layoutRegistry,
-} from '../shared/routing/layout-registry.js'
+import { DEFAULT_LAYOUT, layoutRegistry } from '../shared/routing/layout-registry.js'
 import { viewRegistry } from './view-registry.js'
 
 const dynamicRouteRemovers: Array<() => void> = []
@@ -28,7 +25,15 @@ function childPath(path: string): string {
 
 interface RouteRegistries {
   layouts?: Readonly<Record<string, RouteComponent>>
-  views?: Readonly<Record<string, RouteComponent>>
+  views?: Readonly<
+    Record<
+      string,
+      {
+        label: string
+        component: RouteComponent
+      }
+    >
+  >
 }
 
 export function installMenuRoutes(
@@ -56,9 +61,9 @@ export function installMenuRoutes(
       }
       if (node.type !== 'menu' || !resolvedPath || seenPaths.has(resolvedPath)) continue
 
-      const component = views[node.component]
+      const componentInfo = views[node.component]
       const layout = layouts[selectedLayout || DEFAULT_LAYOUT]
-      if (!component || !layout) continue
+      if (!componentInfo || !layout) continue
 
       seenPaths.add(resolvedPath)
       const route: RouteRecordRaw = {
@@ -69,7 +74,7 @@ export function installMenuRoutes(
           {
             path: '',
             name: `menu-${node.id}`,
-            component,
+            component: componentInfo.component,
             meta: {
               title: node.name,
               eyebrow: [...ancestorNames, node.name].join(' / '),
@@ -96,7 +101,12 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/login', name: 'login', component: loginPage, meta: { public: true, title: '登录' } },
-    { path: '/404', name: 'not-found', component: notFoundPage, meta: { public: true, title: '页面未找到' } },
+    {
+      path: '/404',
+      name: 'not-found',
+      component: notFoundPage,
+      meta: { public: true, title: '页面未找到' },
+    },
     { path: '/', name: 'admin-root', component: RouterView, children: [] },
     { path: '/:pathMatch(.*)*', name: 'dynamic-fallback', component: notFoundPage },
   ],

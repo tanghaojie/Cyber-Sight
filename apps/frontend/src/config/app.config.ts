@@ -11,14 +11,6 @@ export const appConfig = Object.freeze({
   primaryColor: '#70CFA2',
 })
 
-export const viewComponentOptions = Object.freeze([
-  { value: 'home', label: '工作台总览' },
-  { value: 'users', label: '用户管理' },
-  { value: 'roles', label: '角色管理' },
-  { value: 'menus', label: '菜单管理' },
-  { value: 'dictionaries', label: '字典管理' },
-])
-
 export function brandInitials(name = appConfig.name): string {
   return (
     name
