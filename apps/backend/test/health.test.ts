@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import type { FastifyInstance } from 'fastify'
 import {
   ListQuerySchema,
@@ -157,11 +157,11 @@ describe('GET /health', () => {
       displayName: '系统管理员',
       roles: ['SUPER_ADMIN'],
     }
-    const token = await app.authTokens.issue(currentUser)
+    const issued = await app.authTokens.issue(currentUser)
     const response = await app.inject({
       method: 'GET',
       url: '/auth/me',
-      headers: { authorization: `Bearer ${token}` },
+      headers: { authorization: `Bearer ${issued.token}` },
     })
 
     expect(response.statusCode).toBe(200)
@@ -182,28 +182,37 @@ describe('GET /health', () => {
   })
 
   it('revokes the current bearer token on logout', async () => {
-    const token = await app.authTokens.issue({
+    const issued = await app.authTokens.issue({
       id: 2,
       username: 'operator',
       displayName: 'Operator',
       roles: ['USER'],
     })
-    const headers = { authorization: `Bearer ${token}` }
+    const headers = { authorization: `Bearer ${issued.token}` }
+    const originalDb = app.db
+    const updateWhere = vi.fn().mockResolvedValue([])
+    const update = vi.fn(() => ({
+      set: vi.fn(() => ({ where: updateWhere })),
+    }))
+    app.db = { update } as unknown as FastifyInstance['db']
 
-    const logout = await app.inject({
-      method: 'POST',
-      url: '/auth/logout',
-      headers,
-    })
-    const currentUser = await app.inject({
-      method: 'GET',
-      url: '/auth/me',
-      headers,
-    })
+    try {
+      const logout = await app.inject({
+        method: 'POST',
+        url: '/auth/logout',
+        headers,
+      })
 
-    expect(logout.statusCode).toBe(200)
-    expect(logout.json()).toEqual({ status: 0 })
-    expect(currentUser.statusCode).toBe(401)
+      expect(logout.statusCode).toBe(200)
+      expect(logout.json()).toEqual({ status: 0 })
+      expect(update).toHaveBeenCalledOnce()
+      expect(updateWhere).toHaveBeenCalledOnce()
+      await expect(
+        app.authTokens.resolve(issued.token, async () => null)
+      ).resolves.toBeNull()
+    } finally {
+      app.db = originalDb
+    }
   })
 
   it('rejects undeclared login fields at the HTTP boundary', async () => {

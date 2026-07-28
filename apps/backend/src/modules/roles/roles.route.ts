@@ -4,7 +4,10 @@ import {
   RolePageResultSchema, RoleRequestSchema, toFastifySchema,
   type IdParams, type ListQuery, type RoleRequest,
 } from '@scaffold/api-contract'
-import { requireCurrentUser, revokeAllTokens } from '../auth/auth.service.js'
+import {
+  invalidateAllTokenCache,
+  requireCurrentUser,
+} from '../auth/auth.service.js'
 import { ensureUpdated, mutationResult, normalizedListQuery } from '../../shared/http/route-helpers.js'
 import { paginatedSuccess, success } from '../../shared/http/response.js'
 import { createRole, listRoles, softDeleteRole, updateRole } from './roles.repository.js'
@@ -28,7 +31,7 @@ export async function roleRoutes(app: FastifyInstance): Promise<void> {
   }, async function updateRoleHandler(request) {
     const actor = await requireCurrentUser(app, request)
     ensureUpdated(app, await updateRole(app, request.params.id, request.body, actor.id))
-    revokeAllTokens(app)
+    invalidateAllTokenCache(app)
     return success({ id: request.params.id })
   })
   app.delete<{ Params: IdParams }>('/admin/roles/:id', {
@@ -36,7 +39,7 @@ export async function roleRoutes(app: FastifyInstance): Promise<void> {
   }, async function deleteRoleHandler(request) {
     const actor = await requireCurrentUser(app, request)
     ensureUpdated(app, await softDeleteRole(app, request.params.id, actor.id))
-    revokeAllTokens(app)
+    invalidateAllTokenCache(app)
     return success()
   })
 }

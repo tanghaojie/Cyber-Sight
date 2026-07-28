@@ -20,6 +20,7 @@
 | [ADR-0002](decisions/ADR-0002-shared-generated-api-types.md) | 被 ADR-0006 取代 | [ADR-0006](../decisions/ADR-0006-runtime-schema-as-api-contract.md) |
 | [ADR-0009](decisions/ADR-0009-module-folders-and-public-boundaries.md) | 入口策略被 ADR-0013 取代，其余规则已进入当前设计 | [模块边界](../design/module-boundaries.md)与 [ADR-0013](../decisions/ADR-0013-semantic-module-entry-files.md) |
 | [ADR-0014](decisions/ADR-0014-soft-delete-natural-key-uniqueness.md) | 被 ADR-0015 扩展取代 | [ADR-0015](../decisions/ADR-0015-active-row-business-uniqueness.md) |
+| [ADR-0019](decisions/ADR-0019-jwt-lru-token-cache.md) | 错误地把 LRU 容量作为有效会话容量 | [ADR-0020](../decisions/ADR-0020-persistent-jwt-session-cache.md) |
 
 ## 完成计划与协作记录
 
@@ -49,5 +50,6 @@
 | 文档上下文压缩与统一归档 | [计划](plans/2026-07-28-documentation-context-compression.md) | [日志](ai-logs/2026/07/2026-07-28-documentation-context-compression.md) |
 | 菜单分层路由与 SVG 图标注册表 | [计划](plans/2026-07-28-menu-routing-svg-icons.md) | [日志](ai-logs/2026/07/2026-07-28-menu-routing-svg-icons.md) |
 | JWT Bearer 与 LRU 认证改造 | [计划](plans/2026-07-28-jwt-lru-authentication.md) | [日志](ai-logs/2026/07/2026-07-28-jwt-lru-authentication.md) |
+| JWT 数据库会话与 LRU 读缓存修正 | [计划](plans/2026-07-28-persistent-jwt-session-cache.md) | [日志](ai-logs/2026/07/2026-07-28-persistent-jwt-session-cache.md) |
 
 归档内容不继续同步当前实现；发现冲突时以当前设计、现行 ADR、代码和测试为准。

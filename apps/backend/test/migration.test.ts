@@ -22,11 +22,19 @@ function migrationContaining(fragment: string): string {
   return migrationSql
 }
 
-describe('database migrations', () => {
-  it('removes the database-backed authentication session table', () => {
-    const migrationSql = migrationContaining('DROP TABLE "auth_sessions"')
+function latestMigrationSql(): string {
+  const migrations = migrationSqlFiles()
+  const latest = migrations.at(-1)
+  if (!latest) throw new Error('No migrations found')
+  return latest
+}
 
-    expect(migrationSql).toContain('DROP TABLE "auth_sessions"')
+describe('database migrations', () => {
+  it('restores the database-backed authentication session table', () => {
+    const migrationSql = latestMigrationSql()
+
+    expect(migrationSql).toContain('CREATE TABLE IF NOT EXISTS "auth_sessions"')
+    expect(migrationSql).toContain('CONSTRAINT "auth_sessions_token_hash_unique" UNIQUE("token_hash")')
   })
 
   it('adds a backwards-compatible layout identifier to menus', () => {

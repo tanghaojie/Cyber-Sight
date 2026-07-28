@@ -84,8 +84,8 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
       },
     },
     async function logout(request) {
-      await requireCurrentUser(app, request)
-      await revokeCurrentToken(app, request)
+      const user = await requireCurrentUser(app, request)
+      await revokeCurrentToken(app, request, user.id)
       return success()
     }
   )

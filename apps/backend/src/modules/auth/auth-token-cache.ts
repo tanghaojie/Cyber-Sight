@@ -12,6 +12,26 @@ interface TokenEntry {
   user: CurrentUser
 }
 
+export interface VerifiedJwt {
+  expiresAt: number
+  jti: string
+  subject: string
+}
+
+export interface LoadedTokenSession {
+  expiresAt: number
+  user: CurrentUser
+}
+
+export interface IssuedJwt {
+  expiresAt: Date
+  token: string
+}
+
+type TokenSessionLoader = (
+  verified: VerifiedJwt
+) => Promise<LoadedTokenSession | null>
+
 interface JwtTokenCacheOptions {
   capacity?: number
   ttlMs?: number
@@ -46,7 +66,7 @@ export class JwtTokenCache {
     return this.entries.size
   }
 
-  async issue(user: CurrentUser): Promise<string> {
+  async issue(user: CurrentUser): Promise<IssuedJwt> {
     const issuedAt = this.now()
     const expiresAt = issuedAt + this.ttlMs
     const jti = randomUUID()
@@ -63,30 +83,48 @@ export class JwtTokenCache {
     this.pruneExpired(issuedAt)
     this.entries.set(jti, { expiresAt, user })
     this.evictLeastRecentlyUsed()
-    return token
+    return { expiresAt: new Date(expiresAt), token }
   }
 
-  async resolve(token: string): Promise<CurrentUser | null> {
+  async resolve(
+    token: string,
+    loadSession: TokenSessionLoader
+  ): Promise<CurrentUser | null> {
     const verified = await this.verify(token)
     if (!verified) {
       return null
     }
 
     const entry = this.entries.get(verified.jti)
-    if (
-      !entry ||
-      entry.expiresAt <= this.now() ||
-      String(entry.user.id) !== verified.subject
-    ) {
-      if (entry) {
+    if (entry) {
+      if (
+        entry.expiresAt <= this.now() ||
+        String(entry.user.id) !== verified.subject
+      ) {
         this.entries.delete(verified.jti)
+        return null
       }
+
+      this.entries.delete(verified.jti)
+      this.entries.set(verified.jti, entry)
+      return entry.user
+    }
+
+    const loaded = await loadSession(verified)
+    if (
+      !loaded ||
+      loaded.expiresAt <= this.now() ||
+      String(loaded.user.id) !== verified.subject
+    ) {
       return null
     }
 
-    this.entries.delete(verified.jti)
-    this.entries.set(verified.jti, entry)
-    return entry.user
+    this.entries.set(verified.jti, {
+      expiresAt: Math.min(loaded.expiresAt, verified.expiresAt),
+      user: loaded.user,
+    })
+    this.evictLeastRecentlyUsed()
+    return loaded.user
   }
 
   async revoke(token: string): Promise<boolean> {
@@ -94,15 +132,15 @@ export class JwtTokenCache {
     return verified ? this.entries.delete(verified.jti) : false
   }
 
-  revokeUser(userId: number): number {
-    let revoked = 0
+  invalidateUser(userId: number): number {
+    let invalidated = 0
     for (const [jti, entry] of this.entries) {
       if (entry.user.id === userId) {
         this.entries.delete(jti)
-        revoked += 1
+        invalidated += 1
       }
     }
-    return revoked
+    return invalidated
   }
 
   clear(): void {
@@ -129,7 +167,7 @@ export class JwtTokenCache {
 
   private async verify(
     token: string
-  ): Promise<{ jti: string; subject: string } | null> {
+  ): Promise<VerifiedJwt | null> {
     try {
       const { payload } = await jwtVerify(token, this.key, {
         algorithms: ['HS256'],
@@ -137,10 +175,14 @@ export class JwtTokenCache {
         currentDate: new Date(this.now()),
         issuer: JWT_ISSUER,
       })
-      if (!payload.jti || !payload.sub) {
+      if (!payload.jti || !payload.sub || typeof payload.exp !== 'number') {
         return null
       }
-      return { jti: payload.jti, subject: payload.sub }
+      return {
+        expiresAt: payload.exp * 1000,
+        jti: payload.jti,
+        subject: payload.sub,
+      }
     } catch {
       return null
     }

@@ -1,10 +1,12 @@
 ---
 title: 使用 JWT 与进程内 LRU 活跃令牌缓存
-status: accepted
+status: superseded
 date: 2026-07-28
 ---
 
 # ADR-0019：使用 JWT 与进程内 LRU 活跃令牌缓存
+
+> 已由 ADR-0020 取代。LRU 只应限制缓存容量，不能限制持久化有效会话数量。
 
 ## 背景
 

@@ -15,6 +15,7 @@ import {
   type UserUpdate,
 } from '@scaffold/api-contract'
 import {
+  invalidateUserTokenCache,
   requireCurrentUser,
   revokeUserTokens,
 } from '../auth/auth.service.js'
@@ -64,7 +65,7 @@ export async function userRoutes(app: FastifyInstance): Promise<void> {
     const actor = await requireCurrentUser(app, request)
     try {
       ensureUpdated(app, await updateUser(app, request.params.id, request.body, actor.id))
-      revokeUserTokens(app, request.params.id)
+      invalidateUserTokenCache(app, request.params.id)
       return success({ id: request.params.id })
     } catch (error) {
       if (isUniqueViolation(error)) return failure(ErrorCode.RESOURCE_CONFLICT, 'Resource already exists')
@@ -81,7 +82,7 @@ export async function userRoutes(app: FastifyInstance): Promise<void> {
     const actor = await requireCurrentUser(app, request)
     if (actor.id === request.params.id) throw app.httpErrors.forbidden('You cannot delete your own account')
     ensureUpdated(app, await softDeleteUser(app, request.params.id, actor.id))
-    revokeUserTokens(app, request.params.id)
+    await revokeUserTokens(app, request.params.id, actor.id)
     return success()
   })
 }

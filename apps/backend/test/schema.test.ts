@@ -2,6 +2,7 @@ import { getTableColumns } from 'drizzle-orm'
 import { getTableConfig, type PgTable } from 'drizzle-orm/pg-core'
 import { describe, expect, it } from 'vitest'
 import {
+  authSessions,
   dictionaries,
   menus,
   roleMenus,
@@ -17,6 +18,7 @@ const tables = [
   menus,
   roleMenus,
   dictionaries,
+  authSessions,
 ]
 
 const activeBusinessIdentityIndexes: Array<{
@@ -85,4 +87,11 @@ describe('soft-delete uniqueness', () => {
       expect(tableConfig.uniqueConstraints).toHaveLength(0)
     }
   )
+
+  it('keeps persisted session token hashes globally unique', () => {
+    expect(authSessions.tokenHash.isUnique).toBe(true)
+    expect(authSessions.tokenHash.uniqueName).toBe(
+      'auth_sessions_token_hash_unique'
+    )
+  })
 })

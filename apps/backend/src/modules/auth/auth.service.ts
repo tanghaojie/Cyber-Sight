@@ -1,8 +1,12 @@
-import { and, eq } from 'drizzle-orm'
+import { and, eq, gt } from 'drizzle-orm'
 import type { FastifyInstance, FastifyRequest } from 'fastify'
 import type { CurrentUser, LoginData } from '@scaffold/api-contract'
-import { roles, userRoles, users } from '../../db/schema.js'
-import { verifyPassword } from './auth.security.js'
+import { authSessions, roles, userRoles, users } from '../../db/schema.js'
+import type {
+  LoadedTokenSession,
+  VerifiedJwt,
+} from './auth-token-cache.js'
+import { hashSessionToken, verifyPassword } from './auth.security.js'
 
 function bearerToken(request: FastifyRequest): string | null {
   const authorization = request.headers.authorization
@@ -29,6 +33,57 @@ async function rolesForUser(
     )
 
   return rows.map((row) => row.code)
+}
+
+async function loadPersistedSession(
+  app: FastifyInstance,
+  token: string,
+  verified: VerifiedJwt
+): Promise<LoadedTokenSession | null> {
+  const userId = Number(verified.subject)
+  if (!Number.isSafeInteger(userId) || userId < 1) {
+    return null
+  }
+
+  const [row] = await app.db
+    .select({
+      displayName: users.displayName,
+      expiresAt: authSessions.expiresAt,
+      id: users.id,
+      username: users.username,
+    })
+    .from(authSessions)
+    .innerJoin(
+      users,
+      and(
+        eq(authSessions.userId, users.id),
+        eq(users.enabled, true),
+        eq(users.isDeleted, false)
+      )
+    )
+    .where(
+      and(
+        eq(authSessions.tokenHash, hashSessionToken(token)),
+        eq(authSessions.userId, userId),
+        eq(authSessions.isDeleted, false),
+        gt(authSessions.expiresAt, new Date())
+      )
+    )
+    .limit(1)
+
+  if (!row) {
+    return null
+  }
+
+  return {
+    expiresAt: row.expiresAt.getTime(),
+    user: {
+      id: row.id,
+      username: row.username,
+      displayName: row.displayName,
+      roles: await rolesForUser(app, row.id),
+    },
+  }
 }
 
 export async function authenticateCredentials(
@@ -64,9 +119,23 @@ export async function authenticateCredentials(
     displayName: user.displayName,
     roles: await rolesForUser(app, user.id),
   }
+  const issued = await app.authTokens.issue(currentUser)
+  try {
+    await app.db.insert(authSessions).values({
+      userId: user.id,
+      tokenHash: hashSessionToken(issued.token),
+      expiresAt: issued.expiresAt,
+      createdBy: user.id,
+      updatedBy: user.id,
+    })
+  } catch (error) {
+    await app.authTokens.revoke(issued.token)
+    throw error
+  }
+
   return {
     user: currentUser,
-    token: await app.authTokens.issue(currentUser),
+    token: issued.token,
   }
 }
 
@@ -79,7 +148,9 @@ export async function currentUserFromRequest(
     return null
   }
 
-  return app.authTokens.resolve(token)
+  return app.authTokens.resolve(token, function loadSession(verified) {
+    return loadPersistedSession(app, token, verified)
+  })
 }
 
 export async function requireCurrentUser(
@@ -95,18 +166,48 @@ export async function requireCurrentUser(
 
 export async function revokeCurrentToken(
   app: FastifyInstance,
-  request: FastifyRequest
+  request: FastifyRequest,
+  actorId: number
 ): Promise<void> {
   const token = bearerToken(request)
   if (token) {
+    await app.db
+      .update(authSessions)
+      .set({ isDeleted: true, updatedAt: new Date(), updatedBy: actorId })
+      .where(
+        and(
+          eq(authSessions.tokenHash, hashSessionToken(token)),
+          eq(authSessions.isDeleted, false)
+        )
+      )
     await app.authTokens.revoke(token)
   }
 }
 
-export function revokeUserTokens(app: FastifyInstance, userId: number): number {
-  return app.authTokens.revokeUser(userId)
+export function invalidateUserTokenCache(
+  app: FastifyInstance,
+  userId: number
+): number {
+  return app.authTokens.invalidateUser(userId)
 }
 
-export function revokeAllTokens(app: FastifyInstance): void {
+export async function revokeUserTokens(
+  app: FastifyInstance,
+  userId: number,
+  actorId: number
+): Promise<void> {
+  app.authTokens.invalidateUser(userId)
+  await app.db
+    .update(authSessions)
+    .set({ isDeleted: true, updatedAt: new Date(), updatedBy: actorId })
+    .where(
+      and(
+        eq(authSessions.userId, userId),
+        eq(authSessions.isDeleted, false)
+      )
+    )
+}
+
+export function invalidateAllTokenCache(app: FastifyInstance): void {
   app.authTokens.clear()
 }

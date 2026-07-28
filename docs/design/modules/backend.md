@@ -12,7 +12,7 @@
 - `src/modules/`：按业务能力组织的路由模块。
 - `src/db/`：Drizzle Schema 与数据库客户端。
 - `drizzle.config.ts`：数据库迁移生成配置。
-- `src/modules/auth/`：密码散列、JWT、进程内 LRU 活跃令牌缓存、登录/退出和当前用户解析。
+- `src/modules/auth/`：密码散列、JWT、数据库 token 会话、进程内 LRU 读缓存、登录/退出和当前用户解析。
 - `src/modules/users|roles|menus|dictionaries/`：四个独立管理 API 与 Drizzle 仓储；菜单模块额外提供当前用户导航树。
 
 应用组装与网络监听必须分离，使测试可以通过 Fastify `inject` 验证路由而不占用端口。环境变量由集中配置模块加载和校验，数据库客户端在应用关闭时释放。
@@ -61,6 +61,7 @@ Java 引入不是简单代码生成，需要独立的设计、ADR、迁移计划
 - Drizzle 迁移文件进入版本控制，数据库结构变化通过迁移执行。
 - 默认单元和路由测试不得依赖本机数据库；数据库集成验证使用独立命令显式运行。
 - 所有业务表包含 `is_deleted`、`created_at`、`created_by`、`updated_at`、`updated_by`；仓储查询显式过滤软删除数据。
+- `auth_sessions` 由 auth 模块独占读写，但当前与其他存量表一起登记在 `src/db/schema.ts`；Drizzle Kit 0.23 无法在 NodeNext 源码中解析跨文件 `.js` Schema 依赖，后续升级工具链时再迁入模块目录。
 
 ## 仍待解决
 

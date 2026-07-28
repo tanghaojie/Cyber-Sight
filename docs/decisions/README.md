@@ -10,7 +10,7 @@
 - [ADR-0006](ADR-0006-runtime-schema-as-api-contract.md)：共享运行时 Schema 作为内部 HTTP 契约。
 - [ADR-0007](ADR-0007-zod-as-unified-schema-source.md)：Zod 4 是 Schema 编写源。
 - [ADR-0015](ADR-0015-active-row-business-uniqueness.md)：有效业务记录使用部分唯一索引。
-- [ADR-0019](ADR-0019-jwt-lru-token-cache.md)：Bearer JWT 使用单进程 LRU 活跃令牌允许列表，容量固定为 100。
+- [ADR-0020](ADR-0020-persistent-jwt-session-cache.md)：数据库持久化全部 JWT 会话，实例内 LRU 只缓存最近 100 个验证结果。
 
 ## 前端与模块边界
 
