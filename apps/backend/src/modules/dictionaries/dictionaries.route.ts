@@ -4,7 +4,7 @@ import {
   IdParamsSchema, ListQuerySchema, MutationResultSchema, toFastifySchema,
   type DictionaryRequest, type IdParams, type ListQuery,
 } from '@scaffold/api-contract'
-import { requireCurrentUser } from '../auth/index.js'
+import { requireCurrentUser } from '../auth/auth.service.js'
 import { ensureUpdated, mutationResult, normalizedListQuery } from '../../shared/http/route-helpers.js'
 import { paginatedSuccess, success } from '../../shared/http/response.js'
 import { createDictionary, listDictionaries, softDeleteDictionary, updateDictionary } from './dictionaries.repository.js'

@@ -1,4 +1,5 @@
 import type { ErrorResponse } from '@scaffold/api-contract'
+import { getAccessToken } from './access-token.js'
 import { handleGlobalHttpError } from './global-http-error.js'
 
 type QueryValue = string | number | boolean | undefined
@@ -42,10 +43,14 @@ async function request<TResponse, TBody = never>(
   path: string,
   options: RequestOptions<TBody> = {},
 ): Promise<ApiResult<TResponse>> {
+  const headers: Record<string, string> = {}
+  const token = getAccessToken()
+  if (token) headers.authorization = `Bearer ${token}`
+  if (options.body !== undefined) headers['content-type'] = 'application/json'
+
   const response = await fetch(requestUrl(path, options.query), {
     method,
-    credentials: 'same-origin',
-    headers: options.body === undefined ? undefined : { 'content-type': 'application/json' },
+    headers,
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
   })
 

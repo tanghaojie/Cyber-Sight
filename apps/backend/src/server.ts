@@ -1,7 +1,7 @@
 import { buildApp } from './app.js'
 import { env } from './config/env.js'
 
-const app = await buildApp()
+const app = await buildApp({}, { jwtSecret: env.JWT_SECRET })
 
 try {
   await app.listen({

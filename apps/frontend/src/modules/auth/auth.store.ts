@@ -1,6 +1,17 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { CurrentUser, CurrentUserResponse, EmptySuccessResponse, LoginRequest } from '@scaffold/api-contract'
+import type {
+  CurrentUser,
+  CurrentUserResponse,
+  EmptySuccessResponse,
+  LoginRequest,
+  LoginSuccessResponse,
+} from '@scaffold/api-contract'
+import {
+  clearAccessToken,
+  getAccessToken,
+  setAccessToken,
+} from '../../api/access-token.js'
 import { apiClient } from '../../api/client.js'
 
 function responseError(data: unknown, fallback: string): string {
@@ -17,10 +28,14 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(username: string, password: string): Promise<string | null> {
     busy.value = true
     try {
-      const { data, error } = await apiClient.POST<CurrentUserResponse, LoginRequest>('/auth/login', { body: { username, password } })
+      const { data, error } = await apiClient.POST<
+        LoginSuccessResponse,
+        LoginRequest
+      >('/auth/login', { body: { username, password } })
       const response = data ?? error
       if (response && response.status === 0 && 'data' in response && response.data) {
-        user.value = response.data
+        user.value = response.data.user
+        setAccessToken(response.data.token)
         checked.value = true
         return null
       }
@@ -34,6 +49,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function fetchCurrentUser(): Promise<void> {
     if (checked.value) return
+    if (!getAccessToken()) {
+      checked.value = true
+      return
+    }
     try {
       const { data } = await apiClient.GET<CurrentUserResponse>('/auth/me')
       if (data?.status === 0 && data.data) user.value = data.data
@@ -45,6 +64,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function clearSession(): void {
+    clearAccessToken()
     user.value = null
     checked.value = true
   }

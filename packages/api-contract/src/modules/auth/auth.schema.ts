@@ -16,13 +16,21 @@ export const CurrentUserSchema = z.strictObject({
   roles: z.array(z.string()),
 })
 
+export const LoginDataSchema = z.strictObject({
+  user: CurrentUserSchema,
+  token: z.string().min(1),
+})
+
 export const CurrentUserResponseSchema = apiResponseSchema(CurrentUserSchema)
+export const LoginSuccessResponseSchema = apiResponseSchema(LoginDataSchema)
 export const LoginResultSchema = z.union([
-  CurrentUserResponseSchema,
+  LoginSuccessResponseSchema,
   ErrorResponseSchema,
 ])
 
 export type LoginRequest = z.infer<typeof LoginRequestSchema>
 export type CurrentUser = z.infer<typeof CurrentUserSchema>
+export type LoginData = z.infer<typeof LoginDataSchema>
 export type CurrentUserResponse = z.infer<typeof CurrentUserResponseSchema>
+export type LoginSuccessResponse = z.infer<typeof LoginSuccessResponseSchema>
 export type LoginResult = z.infer<typeof LoginResultSchema>

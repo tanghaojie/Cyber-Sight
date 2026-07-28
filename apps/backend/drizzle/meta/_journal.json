@@ -43,6 +43,13 @@
       "when": 1785211372368,
       "tag": "0005_pretty_wallow",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1785226013040,
+      "tag": "0006_lively_doctor_strange",
+      "breakpoints": true
     }
   ]
 }

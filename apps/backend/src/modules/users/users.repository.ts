@@ -7,7 +7,7 @@ import {
   pageOffset,
   type RepositoryListQuery,
 } from '../../shared/database/pagination.js'
-import { hashPassword } from '../auth/index.js'
+import { hashPassword } from '../auth/auth.security.js'
 
 export async function listUsers(
   app: FastifyInstance,

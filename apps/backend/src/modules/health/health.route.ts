@@ -22,6 +22,7 @@ export async function healthRoutes(app: FastifyInstance): Promise<void> {
         operationId: 'getHealth',
         tags: ['Health'],
         summary: 'Health check',
+        security: [],
         response: {
           200: toFastifySchema(HealthResponseSchema),
           default: toFastifySchema(ErrorResponseSchema),

@@ -12,7 +12,7 @@
 - `@scaffold/api-contract`：由运行时 Schema 推导的请求和响应类型。
 - `src/router/`：路由配置。
 - Pinia 已初始化并用于认证 store。
-- `src/modules/auth/auth.store.ts`：跨页面登录态、当前用户、清会话和退出流程。
+- `src/modules/auth/auth.store.ts`：跨页面登录态、当前用户、Bearer token 持久化、清会话和退出流程。
 - `src/layouts/AdminLayout.vue`：响应式应用壳编排。
 - `src/components/layout/`：侧栏、顶栏和动态内容承载区。
 - `src/modules/navigation`：当前用户数据库菜单树与加载状态。
@@ -34,6 +34,7 @@
 - 跨模块状态和操作通过目标模块公开的只读查询、命令或事件协作。不得直接修改其他模块的 Pinia store；真正领域无关的 UI 与 Client 能力才进入共享目录。
 - Vue 组件负责展示和交互，不直接实现复杂业务规则。
 - 后端调用通过模块 composable 或 service 封装，不在多个组件中散落路径字符串。
+- 共享 API Client 从领域无关的 access-token 存储读取 token，并为请求统一附加 `Authorization: Bearer <token>`；认证 store 负责在登录、退出和 HTTP 401 时写入或清除 token。
 - API 请求和响应类型来自共享运行时 Schema 的推导结果。
 - 页面必须明确处理 loading、empty、error 和 success 状态。
 - 跨页面共享状态才进入 Pinia；局部状态保留在组件或 composable。

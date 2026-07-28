@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { clearAccessToken, setAccessToken } from './access-token.js'
 import { apiClient } from './client.js'
 
 afterEach(() => {
+  clearAccessToken()
   vi.unstubAllGlobals()
 })
 
@@ -60,5 +62,27 @@ describe('API client', () => {
     expect(result).toEqual({
       error: { status: 1001, err: 'Invalid request' },
     })
+  })
+
+  it('adds the persisted access token as a bearer authorization header', async () => {
+    setAccessToken('signed.jwt.token')
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ status: 0 }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    await apiClient.GET<{ status: 0 }>('/protected')
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/protected',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          authorization: 'Bearer signed.jwt.token',
+        }),
+      })
+    )
   })
 })

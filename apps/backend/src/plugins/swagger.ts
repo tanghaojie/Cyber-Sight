@@ -11,6 +11,16 @@ export async function registerSwagger(app: FastifyInstance) {
         description: 'JTLab management platform — runtime-safe and modular',
       },
       servers: [{ url: 'http://localhost:3000' }],
+      security: [{ bearerAuth: [] }],
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: 'http',
+            scheme: 'bearer',
+            bearerFormat: 'JWT',
+          },
+        },
+      },
     },
   })
 

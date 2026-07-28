@@ -1,34 +1,16 @@
-import { and, eq, gt } from 'drizzle-orm'
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
-import type { CurrentUser } from '@scaffold/api-contract'
-import { authSessions, roles, userRoles, users } from '../../db/schema.js'
-import {
-  createSessionToken,
-  hashSessionToken,
-  verifyPassword,
-} from './auth.security.js'
+import { and, eq } from 'drizzle-orm'
+import type { FastifyInstance, FastifyRequest } from 'fastify'
+import type { CurrentUser, LoginData } from '@scaffold/api-contract'
+import { roles, userRoles, users } from '../../db/schema.js'
+import { verifyPassword } from './auth.security.js'
 
-const SESSION_COOKIE = 'scaffold_session'
-const SESSION_TTL_MS = 8 * 60 * 60 * 1000
-
-function parseCookie(header: string | undefined, name: string): string | null {
-  if (!header) {
+function bearerToken(request: FastifyRequest): string | null {
+  const authorization = request.headers.authorization
+  if (!authorization) {
     return null
   }
-
-  for (const part of header.split(';')) {
-    const [cookieName, ...valueParts] = part.trim().split('=')
-    if (cookieName === name) {
-      return decodeURIComponent(valueParts.join('='))
-    }
-  }
-
-  return null
-}
-
-function sessionCookie(token: string, maxAge: number): string {
-  const value = token ? encodeURIComponent(token) : ''
-  return `${SESSION_COOKIE}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}`
+  const match = /^Bearer ([^\s]+)$/i.exec(authorization)
+  return match?.[1] ?? null
 }
 
 async function rolesForUser(
@@ -52,9 +34,8 @@ async function rolesForUser(
 export async function authenticateCredentials(
   app: FastifyInstance,
   username: string,
-  password: string,
-  reply: FastifyReply
-): Promise<CurrentUser | null> {
+  password: string
+): Promise<LoginData | null> {
   const [user] = await app.db
     .select()
     .from(users)
@@ -71,28 +52,21 @@ export async function authenticateCredentials(
     return null
   }
 
-  const token = createSessionToken()
   const now = new Date()
-  const expiresAt = new Date(now.getTime() + SESSION_TTL_MS)
-
-  await app.db.insert(authSessions).values({
-    userId: user.id,
-    tokenHash: hashSessionToken(token),
-    expiresAt,
-    createdBy: user.id,
-    updatedBy: user.id,
-  })
   await app.db
     .update(users)
     .set({ lastLoginAt: now, updatedAt: now, updatedBy: user.id })
     .where(eq(users.id, user.id))
 
-  reply.header('set-cookie', sessionCookie(token, SESSION_TTL_MS / 1000))
-  return {
+  const currentUser = {
     id: user.id,
     username: user.username,
     displayName: user.displayName,
     roles: await rolesForUser(app, user.id),
+  }
+  return {
+    user: currentUser,
+    token: await app.authTokens.issue(currentUser),
   }
 }
 
@@ -100,40 +74,12 @@ export async function currentUserFromRequest(
   app: FastifyInstance,
   request: FastifyRequest
 ): Promise<CurrentUser | null> {
-  const token = parseCookie(request.headers.cookie, SESSION_COOKIE)
+  const token = bearerToken(request)
   if (!token) {
     return null
   }
 
-  const [row] = await app.db
-    .select({
-      id: users.id,
-      username: users.username,
-      displayName: users.displayName,
-    })
-    .from(authSessions)
-    .innerJoin(
-      users,
-      and(
-        eq(authSessions.userId, users.id),
-        eq(users.enabled, true),
-        eq(users.isDeleted, false)
-      )
-    )
-    .where(
-      and(
-        eq(authSessions.tokenHash, hashSessionToken(token)),
-        eq(authSessions.isDeleted, false),
-        gt(authSessions.expiresAt, new Date())
-      )
-    )
-    .limit(1)
-
-  if (!row) {
-    return null
-  }
-
-  return { ...row, roles: await rolesForUser(app, row.id) }
+  return app.authTokens.resolve(token)
 }
 
 export async function requireCurrentUser(
@@ -147,23 +93,20 @@ export async function requireCurrentUser(
   return user
 }
 
-export async function revokeCurrentSession(
+export async function revokeCurrentToken(
   app: FastifyInstance,
-  request: FastifyRequest,
-  reply: FastifyReply,
-  actorId: number
+  request: FastifyRequest
 ): Promise<void> {
-  const token = parseCookie(request.headers.cookie, SESSION_COOKIE)
+  const token = bearerToken(request)
   if (token) {
-    await app.db
-      .update(authSessions)
-      .set({ isDeleted: true, updatedAt: new Date(), updatedBy: actorId })
-      .where(
-        and(
-          eq(authSessions.tokenHash, hashSessionToken(token)),
-          eq(authSessions.isDeleted, false)
-        )
-      )
+    await app.authTokens.revoke(token)
   }
-  reply.header('set-cookie', sessionCookie('', 0))
+}
+
+export function revokeUserTokens(app: FastifyInstance, userId: number): number {
+  return app.authTokens.revokeUser(userId)
+}
+
+export function revokeAllTokens(app: FastifyInstance): void {
+  app.authTokens.clear()
 }

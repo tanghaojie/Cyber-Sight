@@ -15,7 +15,7 @@ import {
   type MenuRequest,
   isValidMenuPath,
 } from '@scaffold/api-contract'
-import { requireCurrentUser } from '../auth/index.js'
+import { requireCurrentUser } from '../auth/auth.service.js'
 import { ErrorCode } from '../../shared/errors/error-codes.js'
 import {
   ensureUpdated,

@@ -10,7 +10,7 @@ JTLab（桀士实验室）是前后端分离的 pnpm monorepo 管理系统脚手
 pnpm install
 # Windows PowerShell
 Copy-Item apps/backend/.env.example apps/backend/.env
-# 编辑 apps/backend/.env 填写数据库连接
+# 编辑 apps/backend/.env，填写数据库连接和至少 32 个字符的 JWT_SECRET
 pnpm db:migrate
 pnpm dev
 ```

@@ -150,6 +150,62 @@ describe('GET /health', () => {
     }
   })
 
+  it('documents and accepts JWT bearer authentication without a session query', async () => {
+    const currentUser = {
+      id: 1,
+      username: 'admin',
+      displayName: '系统管理员',
+      roles: ['SUPER_ADMIN'],
+    }
+    const token = await app.authTokens.issue(currentUser)
+    const response = await app.inject({
+      method: 'GET',
+      url: '/auth/me',
+      headers: { authorization: `Bearer ${token}` },
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.json()).toEqual({ status: 0, data: currentUser })
+
+    const runtime = (await app.inject({ method: 'GET', url: '/docs/json' })).json()
+    expect(runtime.components.securitySchemes.bearerAuth).toEqual({
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+    })
+    expect(runtime.paths['/auth/me'].get.security).toEqual([
+      { bearerAuth: [] },
+    ])
+    expect(runtime.security).toEqual([{ bearerAuth: [] }])
+    expect(runtime.paths['/auth/login'].post.security).toEqual([])
+    expect(runtime.paths['/health'].get.security).toEqual([])
+  })
+
+  it('revokes the current bearer token on logout', async () => {
+    const token = await app.authTokens.issue({
+      id: 2,
+      username: 'operator',
+      displayName: 'Operator',
+      roles: ['USER'],
+    })
+    const headers = { authorization: `Bearer ${token}` }
+
+    const logout = await app.inject({
+      method: 'POST',
+      url: '/auth/logout',
+      headers,
+    })
+    const currentUser = await app.inject({
+      method: 'GET',
+      url: '/auth/me',
+      headers,
+    })
+
+    expect(logout.statusCode).toBe(200)
+    expect(logout.json()).toEqual({ status: 0 })
+    expect(currentUser.statusCode).toBe(401)
+  })
+
   it('rejects undeclared login fields at the HTTP boundary', async () => {
     const response = await app.inject({
       method: 'POST',
@@ -248,7 +304,7 @@ describe('GET /health', () => {
     ['GET', '/admin/menus'],
     ['GET', '/admin/dictionaries'],
   ] as const)(
-    'protects %s %s when no session cookie is present',
+    'protects %s %s when no bearer token is present',
     async (method, url) => {
       const response = await app.inject({ method, url })
 

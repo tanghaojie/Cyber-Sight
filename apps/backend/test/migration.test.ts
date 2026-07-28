@@ -23,6 +23,12 @@ function migrationContaining(fragment: string): string {
 }
 
 describe('database migrations', () => {
+  it('removes the database-backed authentication session table', () => {
+    const migrationSql = migrationContaining('DROP TABLE "auth_sessions"')
+
+    expect(migrationSql).toContain('DROP TABLE "auth_sessions"')
+  })
+
   it('adds a backwards-compatible layout identifier to menus', () => {
     const migrationSql = migrationContaining('ADD COLUMN "layout"')
 

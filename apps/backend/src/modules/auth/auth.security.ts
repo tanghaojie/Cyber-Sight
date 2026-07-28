@@ -1,5 +1,4 @@
 import {
-  createHash,
   randomBytes,
   scrypt as scryptCallback,
   timingSafeEqual,
@@ -31,12 +30,4 @@ export async function verifyPassword(
 
   const actual = (await scrypt(password, salt, KEY_LENGTH)) as Buffer
   return timingSafeEqual(actual, expected)
-}
-
-export function createSessionToken(): string {
-  return randomBytes(32).toString('base64url')
-}
-
-export function hashSessionToken(token: string): string {
-  return createHash('sha256').update(token).digest('hex')
 }

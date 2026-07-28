@@ -13,8 +13,10 @@ import { failure, success } from '../../shared/http/response.js'
 import {
   authenticateCredentials,
   requireCurrentUser,
-  revokeCurrentSession,
+  revokeCurrentToken,
 } from './auth.service.js'
+
+const bearerSecurity = [{ bearerAuth: [] }]
 
 export async function authRoutes(app: FastifyInstance): Promise<void> {
   app.post<{ Body: LoginRequest }>(
@@ -24,6 +26,7 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
         operationId: 'login',
         summary: 'Sign in with username and password',
         tags: ['Authentication'],
+        security: [],
         body: toFastifySchema(LoginRequestSchema),
         response: {
           200: toFastifySchema(LoginResultSchema),
@@ -31,20 +34,19 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
         },
       },
     },
-    async function login(request, reply) {
-      const user = await authenticateCredentials(
+    async function login(request) {
+      const loginData = await authenticateCredentials(
         app,
         request.body.username,
-        request.body.password,
-        reply
+        request.body.password
       )
-      if (!user) {
+      if (!loginData) {
         return failure(
           ErrorCode.INVALID_CREDENTIALS,
           'Incorrect username or password'
         )
       }
-      return success(user)
+      return success(loginData)
     }
   )
 
@@ -55,6 +57,7 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
         operationId: 'getCurrentUser',
         summary: 'Get the signed-in user',
         tags: ['Authentication'],
+        security: bearerSecurity,
         response: {
           200: toFastifySchema(CurrentUserResponseSchema),
           default: toFastifySchema(ErrorResponseSchema),
@@ -71,17 +74,18 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
     {
       schema: {
         operationId: 'logout',
-        summary: 'Revoke the current session',
+        summary: 'Revoke the current token',
         tags: ['Authentication'],
+        security: bearerSecurity,
         response: {
           200: toFastifySchema(EmptySuccessResponseSchema),
           default: toFastifySchema(ErrorResponseSchema),
         },
       },
     },
-    async function logout(request, reply) {
-      const user = await requireCurrentUser(app, request)
-      await revokeCurrentSession(app, request, reply, user.id)
+    async function logout(request) {
+      await requireCurrentUser(app, request)
+      await revokeCurrentToken(app, request)
       return success()
     }
   )

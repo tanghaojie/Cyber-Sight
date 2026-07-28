@@ -42,7 +42,7 @@ Vue 3 + fetch Client   Fastify 校验 + Swagger
 ```powershell
 pnpm install
 Copy-Item apps/backend/.env.example apps/backend/.env
-# 编辑 apps/backend/.env，填写本地 DATABASE_URL
+# 编辑 apps/backend/.env，填写本地 DATABASE_URL 和至少 32 个字符的 JWT_SECRET
 pnpm db:migrate
 pnpm dev
 ```
