@@ -1,11 +1,11 @@
 import { ElMessage } from 'element-plus'
 import type { Pinia } from 'pinia'
 import type { Router } from 'vue-router'
-import { createApplicationHttpErrorHandler } from '@/api/applicationHttpError.js'
-import { installGlobalHttpErrorHandler } from '@/api/globalHttpError.js'
-import { useAuthStore } from '@/modules/auth/auth.store.js'
-import { useNavigationStore } from '@/modules/navigation/navigation.store.js'
-import { clearDynamicRoutes } from '@/router/dynamicRoutes.js'
+import { createApplicationHttpErrorHandler } from '@/api/applicationHttpError'
+import { installGlobalHttpErrorHandler } from '@/api/globalHttpError'
+import { useAuthStore } from '@/modules/auth/auth.store'
+import { useNavigationStore } from '@/modules/navigation/navigation.store'
+import { clearDynamicRoutes } from '@/router/dynamicRoutes'
 
 export function registerHttpErrorHandler(router: Router, pinia: Pinia): void {
   installGlobalHttpErrorHandler(

@@ -64,7 +64,7 @@ import { onMounted, ref } from 'vue'
 import { Delete, EditPen, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { DictionarySummary } from '@scaffold/api-contract'
-import { deleteDictionary, listDictionaries } from '@/modules/dictionaries/dictionaries.api.js'
+import { deleteDictionary, listDictionaries } from '@/modules/dictionaries/dictionaries.api'
 
 const emit = defineEmits<{
   edit: [dictionary: DictionarySummary]

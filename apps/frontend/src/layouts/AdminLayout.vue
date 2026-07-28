@@ -34,10 +34,10 @@ import { useRoute, useRouter } from 'vue-router'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import AppMain from '@/components/layout/AppMain.vue'
 import AppSidebar from '@/components/layout/AppSidebar.vue'
-import { clearDynamicRoutes, installMenuRoutes } from '@/router/dynamicRoutes.js'
-import { useAuthStore } from '@/modules/auth/auth.store.js'
-import { useNavigationStore } from '@/modules/navigation/navigation.store.js'
-import { appConfig } from '@/config/app.config.js'
+import { clearDynamicRoutes, installMenuRoutes } from '@/router/dynamicRoutes'
+import { useAuthStore } from '@/modules/auth/auth.store'
+import { useNavigationStore } from '@/modules/navigation/navigation.store'
+import { appConfig } from '@/config/app.config'
 
 const route = useRoute()
 const router = useRouter()

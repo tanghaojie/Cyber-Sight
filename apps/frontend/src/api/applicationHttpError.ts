@@ -1,4 +1,4 @@
-import type { GlobalHttpErrorDetail, GlobalHttpErrorHandler } from './globalHttpError.js'
+import type { GlobalHttpErrorDetail, GlobalHttpErrorHandler } from './globalHttpError'
 
 export interface ApplicationHttpErrorActions {
   currentRoute(): { name?: string; fullPath: string }

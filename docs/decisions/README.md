@@ -27,5 +27,6 @@
 - [ADR-0016](ADR-0016-tiered-documentation-and-archive.md)：当前文档与历史证据分层归档。
 - [ADR-0021](ADR-0021-source-alias-and-automated-formatting.md)：各 workspace 的 `@/src` 别名与项目级自动格式化。
 - [ADR-0022](ADR-0022-maintainer-owned-frontend-validation.md)：移除前端自动化测试，由维护者人工验收。
+- [ADR-0023](ADR-0023-frontend-extensionless-typescript-imports.md)：前端本地 TypeScript 模块省略扩展名，Node ESM workspace 保留 `.js`。
 
 新增 ADR 时使用 [ADR 模板](../templates/adr-template.md)和下一个连续编号。ADR 被取代后更新替代关系并移入 `docs/archive/decisions/`，编号不得复用。

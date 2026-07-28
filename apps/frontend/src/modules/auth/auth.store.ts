@@ -7,8 +7,8 @@ import type {
   LoginRequest,
   LoginSuccessResponse,
 } from '@scaffold/api-contract'
-import { clearAccessToken, getAccessToken, setAccessToken } from '@/shared/accessToken.js'
-import { apiClient } from '@/api/client.js'
+import { clearAccessToken, getAccessToken, setAccessToken } from '@/shared/accessToken'
+import { apiClient } from '@/api/client'
 
 function responseError(data: unknown, fallback: string): string {
   if (typeof data === 'object' && data !== null && 'err' in data && typeof data.err === 'string')

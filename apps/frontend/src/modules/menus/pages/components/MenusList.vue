@@ -98,9 +98,9 @@ import { Delete, EditPen, Plus, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { MenuSummary } from '@scaffold/api-contract'
 import AppIcon from '@/components/AppIcon.vue'
-import { useNavigationStore } from '@/modules/navigation/navigation.store.js'
-import { buildMenuTree, type MenuTreeRecord } from '@/modules/menus/menu-tree.js'
-import { deleteMenu, listAllMenus } from '@/modules/menus/menus.api.js'
+import { useNavigationStore } from '@/modules/navigation/navigation.store'
+import { buildMenuTree, type MenuTreeRecord } from '@/modules/menus/menu-tree'
+import { deleteMenu, listAllMenus } from '@/modules/menus/menus.api'
 
 type MenuType = MenuSummary['type']
 

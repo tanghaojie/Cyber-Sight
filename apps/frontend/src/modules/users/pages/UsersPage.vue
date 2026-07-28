@@ -18,7 +18,7 @@
 import { onMounted, ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import type { UserSummary } from '@scaffold/api-contract'
-import { listRoleOptions, type RoleOption } from '@/modules/roles/roles.api.js'
+import { listRoleOptions, type RoleOption } from '@/modules/roles/roles.api'
 import UserDialog from './components/UserDialog.vue'
 import UsersList from './components/UsersList.vue'
 

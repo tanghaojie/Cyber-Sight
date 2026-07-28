@@ -55,8 +55,8 @@
 import { reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { UserCreate, UserSummary, UserUpdate } from '@scaffold/api-contract'
-import type { RoleOption } from '@/modules/roles/roles.api.js'
-import { createUser, updateUser } from '@/modules/users/users.api.js'
+import type { RoleOption } from '@/modules/roles/roles.api'
+import { createUser, updateUser } from '@/modules/users/users.api'
 
 const props = defineProps<{
   user: UserSummary | null

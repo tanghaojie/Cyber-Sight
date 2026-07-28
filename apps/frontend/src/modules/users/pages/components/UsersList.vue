@@ -73,8 +73,8 @@ import { onMounted, ref } from 'vue'
 import { Delete, EditPen, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { UserSummary } from '@scaffold/api-contract'
-import type { RoleOption } from '@/modules/roles/roles.api.js'
-import { deleteUser, listUsers } from '@/modules/users/users.api.js'
+import type { RoleOption } from '@/modules/roles/roles.api'
+import { deleteUser, listUsers } from '@/modules/users/users.api'
 
 const props = defineProps<{
   roleOptions: RoleOption[]

@@ -1,4 +1,4 @@
-import { createViewRegistry, type ViewRegistrationModule } from '@/shared/routing/view-registry.js'
+import { createViewRegistry, type ViewRegistrationModule } from '@/shared/routing/view-registry'
 
 const viewRegistrationModules = import.meta.glob<ViewRegistrationModule>(
   '@/modules/**/view-registry.ts',

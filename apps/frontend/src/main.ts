@@ -1,11 +1,11 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import router from './router/index.js'
-import { pinia } from './stores/pinia.js'
-import { appConfig } from './config/app.config.js'
+import router from './router/index'
+import { pinia } from './stores/pinia'
+import { appConfig } from './config/app.config'
 import 'virtual:svg-icons-register'
 import './styles/main.scss'
-import { registerHttpErrorHandler } from './bootstrap/registerHttpErrorHandler.js'
+import { registerHttpErrorHandler } from './bootstrap/registerHttpErrorHandler'
 
 const app = createApp(App)
 app.use(pinia)

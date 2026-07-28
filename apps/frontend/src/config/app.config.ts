@@ -1,4 +1,4 @@
-import { genInitials } from '@/shared/genInitials.js'
+import { genInitials } from '@/shared/genInitials'
 
 function configuredValue(value: string | undefined, fallback: string): string {
   const normalized = value?.trim()

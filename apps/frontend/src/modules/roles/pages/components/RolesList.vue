@@ -73,7 +73,7 @@ import { onMounted, ref } from 'vue'
 import { Delete, EditPen, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { RoleSummary } from '@scaffold/api-contract'
-import { deleteRole, listRoles } from '@/modules/roles/roles.api.js'
+import { deleteRole, listRoles } from '@/modules/roles/roles.api'
 
 const emit = defineEmits<{
   edit: [role: RoleSummary]

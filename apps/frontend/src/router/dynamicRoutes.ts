@@ -5,12 +5,12 @@ import {
   type Router,
 } from 'vue-router'
 import type { NavigationMenu } from '@scaffold/api-contract'
-import { pinia } from '@/stores/pinia.js'
-import { useAuthStore } from '@/modules/auth/auth.store.js'
-import { useNavigationStore } from '@/modules/navigation/navigation.store.js'
-import { resolveMenuPath } from '@/shared/routing/menu-paths.js'
-import { DEFAULT_LAYOUT, layoutRegistry } from '@/shared/routing/layout-registry.js'
-import { viewRegistry } from './view-registry.js'
+import { pinia } from '@/stores/pinia'
+import { useAuthStore } from '@/modules/auth/auth.store'
+import { useNavigationStore } from '@/modules/navigation/navigation.store'
+import { resolveMenuPath } from '@/shared/routing/menu-paths'
+import { DEFAULT_LAYOUT, layoutRegistry } from '@/shared/routing/layout-registry'
+import { viewRegistry } from './view-registry'
 
 const dynamicRouteRemovers: Array<() => void> = []
 let routesReady = false

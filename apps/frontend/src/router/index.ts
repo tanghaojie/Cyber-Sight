@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { notFoundPage } from '@/modules/errors/error.routes.js'
-import constRoutes from './constRoutes.js'
-import { authenticationRouteGuard } from './dynamicRoutes.js'
+import { notFoundPage } from '@/modules/errors/error.routes'
+import constRoutes from './constRoutes'
+import { authenticationRouteGuard } from './dynamicRoutes'
 
 const router = createRouter({
   history: createWebHistory(),

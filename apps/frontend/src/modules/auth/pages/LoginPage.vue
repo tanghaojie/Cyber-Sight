@@ -72,8 +72,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { appConfig, brandInitials } from '@/config/app.config.js'
-import { useAuthStore } from '@/modules/auth/auth.store.js'
+import { appConfig, brandInitials } from '@/config/app.config'
+import { useAuthStore } from '@/modules/auth/auth.store'
 
 const auth = useAuthStore()
 const route = useRoute()

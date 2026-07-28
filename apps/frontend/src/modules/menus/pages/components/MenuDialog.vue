@@ -89,12 +89,12 @@ import { computed, reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { MenuRequest, MenuSummary } from '@scaffold/api-contract'
 import AppIcon from '@/components/AppIcon.vue'
-import { createInternalMenuCode, menuPathError } from '@/modules/menus/menu-form.js'
-import { createMenu, updateMenu } from '@/modules/menus/menus.api.js'
-import { useNavigationStore } from '@/modules/navigation/navigation.store.js'
-import { viewRegistry } from '@/router/view-registry.js'
-import { iconOptions } from '@/shared/icons/icon-registry.js'
-import { layoutRegistry } from '@/shared/routing/layout-registry.js'
+import { createInternalMenuCode, menuPathError } from '@/modules/menus/menu-form'
+import { createMenu, updateMenu } from '@/modules/menus/menus.api'
+import { useNavigationStore } from '@/modules/navigation/navigation.store'
+import { viewRegistry } from '@/router/view-registry'
+import { iconOptions } from '@/shared/icons/icon-registry'
+import { layoutRegistry } from '@/shared/routing/layout-registry'
 
 type MenuType = MenuSummary['type']
 interface MenuForm {

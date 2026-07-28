@@ -51,8 +51,8 @@
 import { onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { RoleRequest, RoleSummary } from '@scaffold/api-contract'
-import { listMenuTreeOptions, type MenuTreeOption } from '@/modules/menus/menu-options.js'
-import { createRole, updateRole } from '@/modules/roles/roles.api.js'
+import { listMenuTreeOptions, type MenuTreeOption } from '@/modules/menus/menu-options'
+import { createRole, updateRole } from '@/modules/roles/roles.api'
 
 const props = defineProps<{
   role: RoleSummary | null

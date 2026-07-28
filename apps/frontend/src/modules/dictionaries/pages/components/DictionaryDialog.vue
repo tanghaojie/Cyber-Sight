@@ -39,7 +39,7 @@
 import { reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { DictionaryRequest, DictionarySummary } from '@scaffold/api-contract'
-import { createDictionary, updateDictionary } from '@/modules/dictionaries/dictionaries.api.js'
+import { createDictionary, updateDictionary } from '@/modules/dictionaries/dictionaries.api'
 
 const props = defineProps<{
   dictionary: DictionarySummary | null

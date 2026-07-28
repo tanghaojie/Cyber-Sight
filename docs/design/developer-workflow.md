@@ -2,7 +2,7 @@
 title: 开发工作流
 status: accepted
 owner: project maintainers
-updated: 2026-07-28
+updated: 2026-07-29
 ---
 
 # 开发工作流
@@ -23,6 +23,10 @@ TypeScript 编译后由 `tsc-alias` 把别名改写成可被 Node.js 执行的�
 `dist`。契约构建还必须扫描产物中的 `@/` 残留并实际导入包入口。根目录测试会构建契约包并
 运行后端测试，不包含前端；任何只执行 `tsc` 的契约脚本都会用未改写的产物覆盖可运行的
 `dist`。
+
+前端由 Vite 打包且使用 TypeScript `Bundler` 模块解析，本地 TypeScript 模块的静态导入、
+导出和动态导入省略 `.js`、`.ts` 后缀；Vue 单文件组件保留 `.vue` 后缀。后端与契约包由
+Node.js 原生 ESM 执行编译产物，本地 TypeScript 源码引用继续书写运行时 `.js` 后缀。
 
 ## 代码格式
 

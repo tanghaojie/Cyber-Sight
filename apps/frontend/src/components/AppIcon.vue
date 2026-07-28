@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { resolveIconName } from '@/shared/icons/icon-registry.js'
+import { resolveIconName } from '@/shared/icons/icon-registry'
 
 const props = defineProps<{ name: string }>()
 const symbolId = computed(() => `#icon-${resolveIconName(props.name)}`)

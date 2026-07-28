@@ -1,6 +1,6 @@
 import { RouterView } from 'vue-router'
-import { loginPage } from '@/modules/auth/auth.routes.js'
-import { notFoundPage } from '@/modules/errors/error.routes.js'
+import { loginPage } from '@/modules/auth/auth.routes'
+import { notFoundPage } from '@/modules/errors/error.routes'
 
 const routes = [
   { path: '/login', name: 'login', component: loginPage, meta: { public: true, title: '登录' } },

@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { appConfig, brandInitials } from '@/config/app.config.js'
+import { appConfig, brandInitials } from '@/config/app.config'
 
 const route = useRoute(),
   router = useRouter()

@@ -6,8 +6,8 @@ import type {
   MenuSummary,
   PaginatedResponse,
 } from '@scaffold/api-contract'
-import { apiClient } from '@/api/client.js'
-import { apiResult, pageResult, type ApiMutationResult } from '@/api/result.js'
+import { apiClient } from '@/api/client'
+import { apiResult, pageResult, type ApiMutationResult } from '@/api/result'
 
 export async function listMenus(pageNum: number, pageSize: number, keyword = '') {
   const { data, error } = await apiClient.GET<PaginatedResponse<MenuSummary>>('/admin/menus', {

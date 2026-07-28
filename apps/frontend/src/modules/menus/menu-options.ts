@@ -1,5 +1,5 @@
-import { buildMenuTreeOptions, type MenuTreeOption } from './menu-tree.js'
-import { listAllMenus } from './menus.api.js'
+import { buildMenuTreeOptions, type MenuTreeOption } from './menu-tree'
+import { listAllMenus } from './menus.api'
 
 export type { MenuTreeOption }
 

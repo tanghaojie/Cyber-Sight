@@ -32,10 +32,10 @@
 
 <script setup lang="ts">
 import type { NavigationMenu } from '@scaffold/api-contract'
-import { appConfig, brandInitials } from '@/config/app.config.js'
+import { appConfig, brandInitials } from '@/config/app.config'
 import AppIcon from '@/components/AppIcon.vue'
 import SidebarTree from './SidebarTree.vue'
-import { useHealth } from '@/modules/health/composables/useHealth.js'
+import { useHealth } from '@/modules/health/composables/useHealth'
 
 defineProps<{ items: NavigationMenu[]; open: boolean; loading?: boolean }>()
 defineEmits<{ close: []; navigate: [] }>()

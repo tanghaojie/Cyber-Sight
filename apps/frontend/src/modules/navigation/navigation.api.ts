@@ -1,5 +1,5 @@
 import type { NavigationMenuResponse } from '@scaffold/api-contract'
-import { apiClient } from '@/api/client.js'
+import { apiClient } from '@/api/client'
 
 export async function fetchNavigation() {
   const { data, error } = await apiClient.GET<NavigationMenuResponse>('/navigation/menus')
