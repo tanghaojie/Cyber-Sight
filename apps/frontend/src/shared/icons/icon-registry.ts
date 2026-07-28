@@ -15,11 +15,11 @@ function iconNameFromSymbolId(symbolId: string): string {
 }
 
 export const iconNames = Object.freeze(
-  [
-    ...new Set(unwrapSymbolIds(symbolIds as SvgIconNamesModule).map(iconNameFromSymbolId)),
-  ].sort(function sortIconNames(left, right) {
-    return left.localeCompare(right)
-  }),
+  [...new Set(unwrapSymbolIds(symbolIds as SvgIconNamesModule).map(iconNameFromSymbolId))].sort(
+    function sortIconNames(left, right) {
+      return left.localeCompare(right)
+    },
+  ),
 )
 
 const iconNameSet = new Set(iconNames)

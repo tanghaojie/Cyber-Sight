@@ -8,13 +8,9 @@ import {
   toFastifySchema,
   type LoginRequest,
 } from '@scaffold/api-contract'
-import { ErrorCode } from '../../shared/errors/error-codes.js'
-import { failure, success } from '../../shared/http/response.js'
-import {
-  authenticateCredentials,
-  requireCurrentUser,
-  revokeCurrentToken,
-} from './auth.service.js'
+import { ErrorCode } from '@/shared/errors/error-codes.js'
+import { failure, success } from '@/shared/http/response.js'
+import { authenticateCredentials, requireCurrentUser, revokeCurrentToken } from './auth.service.js'
 
 const bearerSecurity = [{ bearerAuth: [] }]
 
@@ -38,16 +34,13 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
       const loginData = await authenticateCredentials(
         app,
         request.body.username,
-        request.body.password
+        request.body.password,
       )
       if (!loginData) {
-        return failure(
-          ErrorCode.INVALID_CREDENTIALS,
-          'Incorrect username or password'
-        )
+        return failure(ErrorCode.INVALID_CREDENTIALS, 'Incorrect username or password')
       }
       return success(loginData)
-    }
+    },
   )
 
   app.get(
@@ -66,7 +59,7 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
     },
     async function getCurrentUser(request) {
       return success(await requireCurrentUser(app, request))
-    }
+    },
   )
 
   app.post(
@@ -87,6 +80,6 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
       const user = await requireCurrentUser(app, request)
       await revokeCurrentToken(app, request, user.id)
       return success()
-    }
+    },
   )
 }

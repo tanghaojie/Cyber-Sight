@@ -1,9 +1,5 @@
 import { z } from 'zod'
-import {
-  AuditFieldsSchema,
-  ErrorResponseSchema,
-  paginatedResponseSchema,
-} from '../../shared/http.js'
+import { AuditFieldsSchema, ErrorResponseSchema, paginatedResponseSchema } from '@/shared/http.js'
 
 export const DictionarySummarySchema = AuditFieldsSchema.extend({
   id: z.number().int(),
@@ -24,9 +20,7 @@ export const DictionaryRequestSchema = z.strictObject({
   remark: z.string().max(200),
 })
 
-export const DictionaryPageResponseSchema = paginatedResponseSchema(
-  DictionarySummarySchema
-)
+export const DictionaryPageResponseSchema = paginatedResponseSchema(DictionarySummarySchema)
 export const DictionaryPageResultSchema = z.union([
   DictionaryPageResponseSchema,
   ErrorResponseSchema,
@@ -34,9 +28,5 @@ export const DictionaryPageResultSchema = z.union([
 
 export type DictionarySummary = z.infer<typeof DictionarySummarySchema>
 export type DictionaryRequest = z.infer<typeof DictionaryRequestSchema>
-export type DictionaryPageResponse = z.infer<
-  typeof DictionaryPageResponseSchema
->
-export type DictionaryPageResult = z.infer<
-  typeof DictionaryPageResultSchema
->
+export type DictionaryPageResponse = z.infer<typeof DictionaryPageResponseSchema>
+export type DictionaryPageResult = z.infer<typeof DictionaryPageResultSchema>

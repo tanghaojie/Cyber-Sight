@@ -4,7 +4,7 @@ import {
   AuditFieldsSchema,
   ErrorResponseSchema,
   paginatedResponseSchema,
-} from '../../shared/http.js'
+} from '@/shared/http.js'
 
 const integerArray = z.array(z.number().int())
 
@@ -19,17 +19,18 @@ export const RoleSummarySchema = AuditFieldsSchema.extend({
 
 export const RoleRequestSchema = z.strictObject({
   name: z.string().min(1).max(80),
-  code: z.string().min(2).max(50).regex(/^[A-Z0-9_]+$/),
+  code: z
+    .string()
+    .min(2)
+    .max(50)
+    .regex(/^[A-Z0-9_]+$/),
   description: z.string().max(200),
   enabled: z.boolean(),
   menuIds: integerArray,
 })
 
 export const RolePageResponseSchema = paginatedResponseSchema(RoleSummarySchema)
-export const RolePageResultSchema = z.union([
-  RolePageResponseSchema,
-  ErrorResponseSchema,
-])
+export const RolePageResultSchema = z.union([RolePageResponseSchema, ErrorResponseSchema])
 export const RoleListResponseSchema = apiResponseSchema(z.array(RoleSummarySchema))
 
 export type RoleSummary = z.infer<typeof RoleSummarySchema>

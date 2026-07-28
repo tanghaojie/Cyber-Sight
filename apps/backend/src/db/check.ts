@@ -25,7 +25,7 @@ try {
       `version=${connection.serverVersion}`,
       `usersTable=${connection.usersTable ?? 'missing'}`,
       `migrationsTable=${connection.migrationsTable ?? 'missing'}`,
-    ].join(', ')
+    ].join(', '),
   )
 } finally {
   await databaseClient.end()

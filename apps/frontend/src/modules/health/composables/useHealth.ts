@@ -1,6 +1,6 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import type { HealthResponse } from '@scaffold/api-contract'
-import { apiClient } from '../../../api/client.js'
+import { apiClient } from '@/api/client.js'
 
 export function useHealth() {
   const status = ref<'loading' | 'error' | 'ok'>('loading')

@@ -1,11 +1,8 @@
 import { and, eq, gt } from 'drizzle-orm'
 import type { FastifyInstance, FastifyRequest } from 'fastify'
 import type { CurrentUser, LoginData } from '@scaffold/api-contract'
-import { authSessions, roles, userRoles, users } from '../../db/schema.js'
-import type {
-  LoadedTokenSession,
-  VerifiedJwt,
-} from './auth-token-cache.js'
+import { authSessions, roles, userRoles, users } from '@/db/schema.js'
+import type { LoadedTokenSession, VerifiedJwt } from './auth-token-cache.js'
 import { hashSessionToken, verifyPassword } from './auth.security.js'
 
 function bearerToken(request: FastifyRequest): string | null {
@@ -17,20 +14,12 @@ function bearerToken(request: FastifyRequest): string | null {
   return match?.[1] ?? null
 }
 
-async function rolesForUser(
-  app: FastifyInstance,
-  userId: number
-): Promise<string[]> {
+async function rolesForUser(app: FastifyInstance, userId: number): Promise<string[]> {
   const rows = await app.db
     .select({ code: roles.code })
     .from(userRoles)
-    .innerJoin(
-      roles,
-      and(eq(userRoles.roleId, roles.id), eq(roles.isDeleted, false))
-    )
-    .where(
-      and(eq(userRoles.userId, userId), eq(userRoles.isDeleted, false))
-    )
+    .innerJoin(roles, and(eq(userRoles.roleId, roles.id), eq(roles.isDeleted, false)))
+    .where(and(eq(userRoles.userId, userId), eq(userRoles.isDeleted, false)))
 
   return rows.map((row) => row.code)
 }
@@ -38,7 +27,7 @@ async function rolesForUser(
 async function loadPersistedSession(
   app: FastifyInstance,
   token: string,
-  verified: VerifiedJwt
+  verified: VerifiedJwt,
 ): Promise<LoadedTokenSession | null> {
   const userId = Number(verified.subject)
   if (!Number.isSafeInteger(userId) || userId < 1) {
@@ -55,19 +44,15 @@ async function loadPersistedSession(
     .from(authSessions)
     .innerJoin(
       users,
-      and(
-        eq(authSessions.userId, users.id),
-        eq(users.enabled, true),
-        eq(users.isDeleted, false)
-      )
+      and(eq(authSessions.userId, users.id), eq(users.enabled, true), eq(users.isDeleted, false)),
     )
     .where(
       and(
         eq(authSessions.tokenHash, hashSessionToken(token)),
         eq(authSessions.userId, userId),
         eq(authSessions.isDeleted, false),
-        gt(authSessions.expiresAt, new Date())
-      )
+        gt(authSessions.expiresAt, new Date()),
+      ),
     )
     .limit(1)
 
@@ -89,18 +74,12 @@ async function loadPersistedSession(
 export async function authenticateCredentials(
   app: FastifyInstance,
   username: string,
-  password: string
+  password: string,
 ): Promise<LoginData | null> {
   const [user] = await app.db
     .select()
     .from(users)
-    .where(
-      and(
-        eq(users.username, username),
-        eq(users.enabled, true),
-        eq(users.isDeleted, false)
-      )
-    )
+    .where(and(eq(users.username, username), eq(users.enabled, true), eq(users.isDeleted, false)))
     .limit(1)
 
   if (!user || !(await verifyPassword(password, user.passwordHash))) {
@@ -141,7 +120,7 @@ export async function authenticateCredentials(
 
 export async function currentUserFromRequest(
   app: FastifyInstance,
-  request: FastifyRequest
+  request: FastifyRequest,
 ): Promise<CurrentUser | null> {
   const token = bearerToken(request)
   if (!token) {
@@ -155,7 +134,7 @@ export async function currentUserFromRequest(
 
 export async function requireCurrentUser(
   app: FastifyInstance,
-  request: FastifyRequest
+  request: FastifyRequest,
 ): Promise<CurrentUser> {
   const user = await currentUserFromRequest(app, request)
   if (!user) {
@@ -167,7 +146,7 @@ export async function requireCurrentUser(
 export async function revokeCurrentToken(
   app: FastifyInstance,
   request: FastifyRequest,
-  actorId: number
+  actorId: number,
 ): Promise<void> {
   const token = bearerToken(request)
   if (token) {
@@ -175,37 +154,26 @@ export async function revokeCurrentToken(
       .update(authSessions)
       .set({ isDeleted: true, updatedAt: new Date(), updatedBy: actorId })
       .where(
-        and(
-          eq(authSessions.tokenHash, hashSessionToken(token)),
-          eq(authSessions.isDeleted, false)
-        )
+        and(eq(authSessions.tokenHash, hashSessionToken(token)), eq(authSessions.isDeleted, false)),
       )
     await app.authTokens.revoke(token)
   }
 }
 
-export function invalidateUserTokenCache(
-  app: FastifyInstance,
-  userId: number
-): number {
+export function invalidateUserTokenCache(app: FastifyInstance, userId: number): number {
   return app.authTokens.invalidateUser(userId)
 }
 
 export async function revokeUserTokens(
   app: FastifyInstance,
   userId: number,
-  actorId: number
+  actorId: number,
 ): Promise<void> {
   app.authTokens.invalidateUser(userId)
   await app.db
     .update(authSessions)
     .set({ isDeleted: true, updatedAt: new Date(), updatedBy: actorId })
-    .where(
-      and(
-        eq(authSessions.userId, userId),
-        eq(authSessions.isDeleted, false)
-      )
-    )
+    .where(and(eq(authSessions.userId, userId), eq(authSessions.isDeleted, false)))
 }
 
 export function invalidateAllTokenCache(app: FastifyInstance): void {

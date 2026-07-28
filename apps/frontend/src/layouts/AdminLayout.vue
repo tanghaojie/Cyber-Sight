@@ -31,13 +31,13 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import AppHeader from '../components/layout/AppHeader.vue'
-import AppMain from '../components/layout/AppMain.vue'
-import AppSidebar from '../components/layout/AppSidebar.vue'
-import { installMenuRoutes, clearDynamicRoutes } from '../router/index.js'
-import { useAuthStore } from '../modules/auth/auth.store.js'
-import { useNavigationStore } from '../modules/navigation/navigation.store.js'
-import { appConfig } from '../config/app.config.js'
+import AppHeader from '@/components/layout/AppHeader.vue'
+import AppMain from '@/components/layout/AppMain.vue'
+import AppSidebar from '@/components/layout/AppSidebar.vue'
+import { installMenuRoutes, clearDynamicRoutes } from '@/router/index.js'
+import { useAuthStore } from '@/modules/auth/auth.store.js'
+import { useNavigationStore } from '@/modules/navigation/navigation.store.js'
+import { appConfig } from '@/config/app.config.js'
 
 const route = useRoute()
 const router = useRouter()

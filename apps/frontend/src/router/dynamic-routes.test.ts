@@ -8,12 +8,7 @@ const directoryLayout: RouteComponent = { template: '<router-view />' }
 const menuLayout: RouteComponent = { template: '<router-view />' }
 const usersView: RouteComponent = { template: '<p>users</p>' }
 
-function menu(
-  id: number,
-  path: string,
-  component: string,
-  layout = '',
-): NavigationMenu {
+function menu(id: number, path: string, component: string, layout = ''): NavigationMenu {
   return {
     id,
     parentId: 0,
@@ -46,7 +41,7 @@ function targetRouter() {
 
 const registries = {
   layouts: { AdminLayout: adminLayout, DirectoryLayout: directoryLayout, MenuLayout: menuLayout },
-  views: { users: usersView },
+  views: { users: { label: '用户管理', component: usersView } },
 }
 
 describe('database dynamic routes', () => {
@@ -74,7 +69,9 @@ describe('database dynamic routes', () => {
     ]
 
     expect(installMenuRoutes(target, nodes, registries)).toBe(4)
-    expect(target.resolve('/organization/users').matched[1].components?.default).toBe(directoryLayout)
+    expect(target.resolve('/organization/users').matched[1].components?.default).toBe(
+      directoryLayout,
+    )
     expect(target.resolve('/custom').matched[1].components?.default).toBe(menuLayout)
     expect(target.resolve('/default').matched[1].components?.default).toBe(adminLayout)
     expect(target.resolve('/').name).toBe('menu-5')

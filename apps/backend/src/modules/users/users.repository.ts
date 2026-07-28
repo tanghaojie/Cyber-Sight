@@ -1,18 +1,11 @@
 import { and, count, eq, ilike, inArray, or } from 'drizzle-orm'
 import type { FastifyInstance } from 'fastify'
 import type { UserCreate, UserUpdate } from '@scaffold/api-contract'
-import { userRoles, users } from '../../db/schema.js'
-import {
-  auditView,
-  pageOffset,
-  type RepositoryListQuery,
-} from '../../shared/database/pagination.js'
-import { hashPassword } from '../auth/auth.security.js'
+import { userRoles, users } from '@/db/schema.js'
+import { auditView, pageOffset, type RepositoryListQuery } from '@/shared/database/pagination.js'
+import { hashPassword } from '@/modules/auth/auth.security.js'
 
-export async function listUsers(
-  app: FastifyInstance,
-  query: RepositoryListQuery
-) {
+export async function listUsers(app: FastifyInstance, query: RepositoryListQuery) {
   const keyword = query.keyword?.trim()
   const predicate = and(
     eq(users.isDeleted, false),
@@ -20,9 +13,9 @@ export async function listUsers(
       ? or(
           ilike(users.username, `%${keyword}%`),
           ilike(users.displayName, `%${keyword}%`),
-          ilike(users.email, `%${keyword}%`)
+          ilike(users.email, `%${keyword}%`),
         )
-      : undefined
+      : undefined,
   )
   const rows = await app.db
     .select()
@@ -31,22 +24,14 @@ export async function listUsers(
     .orderBy(users.id)
     .limit(query.pageSize)
     .offset(pageOffset(query))
-  const [{ value: total }] = await app.db
-    .select({ value: count() })
-    .from(users)
-    .where(predicate)
+  const [{ value: total }] = await app.db.select({ value: count() }).from(users).where(predicate)
 
   const ids = rows.map((row) => row.id)
   const assignments = ids.length
     ? await app.db
         .select({ userId: userRoles.userId, roleId: userRoles.roleId })
         .from(userRoles)
-        .where(
-          and(
-            inArray(userRoles.userId, ids),
-            eq(userRoles.isDeleted, false)
-          )
-        )
+        .where(and(inArray(userRoles.userId, ids), eq(userRoles.isDeleted, false)))
     : []
 
   return {
@@ -57,9 +42,7 @@ export async function listUsers(
       displayName: row.displayName,
       email: row.email,
       enabled: row.enabled,
-      roleIds: assignments
-        .filter((item) => item.userId === row.id)
-        .map((item) => item.roleId),
+      roleIds: assignments.filter((item) => item.userId === row.id).map((item) => item.roleId),
       lastLoginAt: row.lastLoginAt?.toISOString() ?? null,
       ...auditView(row),
     })),
@@ -70,7 +53,7 @@ async function replaceUserRoles(
   app: FastifyInstance,
   userId: number,
   roleIds: number[],
-  actorId: number
+  actorId: number,
 ): Promise<void> {
   const now = new Date()
   await app.db
@@ -103,7 +86,7 @@ async function replaceUserRoles(
 export async function createUser(
   app: FastifyInstance,
   input: UserCreate,
-  actorId: number
+  actorId: number,
 ): Promise<number> {
   const [created] = await app.db
     .insert(users)
@@ -125,11 +108,9 @@ export async function updateUser(
   app: FastifyInstance,
   id: number,
   input: UserUpdate,
-  actorId: number
+  actorId: number,
 ): Promise<boolean> {
-  const passwordHash = input.password
-    ? await hashPassword(input.password)
-    : undefined
+  const passwordHash = input.password ? await hashPassword(input.password) : undefined
   const updated = await app.db
     .update(users)
     .set({
@@ -150,7 +131,7 @@ export async function updateUser(
 export async function softDeleteUser(
   app: FastifyInstance,
   id: number,
-  actorId: number
+  actorId: number,
 ): Promise<boolean> {
   const result = await app.db
     .update(users)

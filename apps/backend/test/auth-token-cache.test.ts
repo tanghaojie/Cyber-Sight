@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { CurrentUser } from '@scaffold/api-contract'
-import { JwtTokenCache } from '../src/modules/auth/auth-token-cache.js'
+import { JwtTokenCache } from '@/modules/auth/auth-token-cache.js'
 
 const SECRET = 'test-only-jwt-secret-at-least-32-characters'
 
@@ -29,15 +29,10 @@ describe('JWT LRU token cache', () => {
 
     expect(cache.size).toBe(100)
     await expect(
-      cache.resolve(
-        tokens[0],
-        async ({ subject }) => persisted.get(Number(subject)) ?? null
-      )
+      cache.resolve(tokens[0], async ({ subject }) => persisted.get(Number(subject)) ?? null),
     ).resolves.toEqual(user(1))
     expect(cache.size).toBe(100)
-    await expect(
-      cache.resolve(tokens[100], async () => null)
-    ).resolves.toEqual(user(101))
+    await expect(cache.resolve(tokens[100], async () => null)).resolves.toEqual(user(101))
   })
 
   it('evicts the least recently used token when capacity is reached', async () => {
@@ -45,9 +40,7 @@ describe('JWT LRU token cache', () => {
     const first = await cache.issue(user(1))
     const second = await cache.issue(user(2))
 
-    await expect(
-      cache.resolve(first.token, async () => null)
-    ).resolves.toEqual(user(1))
+    await expect(cache.resolve(first.token, async () => null)).resolves.toEqual(user(1))
     const third = await cache.issue(user(3))
 
     expect(cache.size).toBe(2)
@@ -55,11 +48,9 @@ describe('JWT LRU token cache', () => {
       cache.resolve(second.token, async () => ({
         user: user(2),
         expiresAt: second.expiresAt.getTime(),
-      }))
+      })),
     ).resolves.toEqual(user(2))
-    await expect(
-      cache.resolve(third.token, async () => null)
-    ).resolves.toEqual(user(3))
+    await expect(cache.resolve(third.token, async () => null)).resolves.toEqual(user(3))
   })
 
   it('rejects tampered, expired, and explicitly revoked tokens', async () => {
@@ -69,20 +60,22 @@ describe('JWT LRU token cache', () => {
       now: () => now,
     })
     const issued = await cache.issue(user(1))
-    const tampered = `${issued.token.slice(0, -1)}${
-      issued.token.endsWith('a') ? 'b' : 'a'
-    }`
+    const tampered = `${issued.token.slice(0, -1)}${issued.token.endsWith('a') ? 'b' : 'a'}`
 
-    await expect(cache.resolve(tampered, async () => ({
-      user: user(1),
-      expiresAt: issued.expiresAt.getTime(),
-    }))).resolves.toBeNull()
+    await expect(
+      cache.resolve(tampered, async () => ({
+        user: user(1),
+        expiresAt: issued.expiresAt.getTime(),
+      })),
+    ).resolves.toBeNull()
     await expect(cache.resolve(issued.token, async () => null)).resolves.toEqual(user(1))
     now += 1_001
-    await expect(cache.resolve(issued.token, async () => ({
-      user: user(1),
-      expiresAt: issued.expiresAt.getTime(),
-    }))).resolves.toBeNull()
+    await expect(
+      cache.resolve(issued.token, async () => ({
+        user: user(1),
+        expiresAt: issued.expiresAt.getTime(),
+      })),
+    ).resolves.toBeNull()
 
     const replacement = await cache.issue(user(1))
     await expect(cache.revoke(replacement.token)).resolves.toBe(true)
@@ -96,10 +89,12 @@ describe('JWT LRU token cache', () => {
     const other = await cache.issue(user(2))
 
     expect(cache.invalidateUser(1)).toBe(2)
-    await expect(cache.resolve(first.token, async () => ({
-      user: user(1),
-      expiresAt: first.expiresAt.getTime(),
-    }))).resolves.toEqual(user(1))
+    await expect(
+      cache.resolve(first.token, async () => ({
+        user: user(1),
+        expiresAt: first.expiresAt.getTime(),
+      })),
+    ).resolves.toEqual(user(1))
     await expect(cache.resolve(second.token, async () => null)).resolves.toBeNull()
     await expect(cache.resolve(other.token, async () => null)).resolves.toEqual(user(2))
   })

@@ -1,9 +1,4 @@
-import {
-  createHash,
-  randomBytes,
-  scrypt as scryptCallback,
-  timingSafeEqual,
-} from 'node:crypto'
+import { createHash, randomBytes, scrypt as scryptCallback, timingSafeEqual } from 'node:crypto'
 import { promisify } from 'node:util'
 
 const scrypt = promisify(scryptCallback)
@@ -15,10 +10,7 @@ export async function hashPassword(password: string): Promise<string> {
   return `scrypt:${salt}:${derived.toString('hex')}`
 }
 
-export async function verifyPassword(
-  password: string,
-  encoded: string
-): Promise<boolean> {
+export async function verifyPassword(password: string, encoded: string): Promise<boolean> {
   const [algorithm, salt, expectedHex] = encoded.split(':')
   if (algorithm !== 'scrypt' || !salt || !expectedHex) {
     return false

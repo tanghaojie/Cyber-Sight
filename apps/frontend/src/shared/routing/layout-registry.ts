@@ -2,7 +2,7 @@ import type { RouteComponent } from 'vue-router'
 
 export const DEFAULT_LAYOUT = 'AdminLayout'
 
-const layoutModules = import.meta.glob<RouteComponent>('../../layouts/*.vue', {
+const layoutModules = import.meta.glob<RouteComponent>('@/layouts/*.vue', {
   import: 'default',
 })
 

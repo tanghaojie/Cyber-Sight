@@ -9,17 +9,9 @@ import {
   roles,
   userRoles,
   users,
-} from '../src/db/schema.js'
+} from '@/db/schema.js'
 
-const tables = [
-  users,
-  roles,
-  userRoles,
-  menus,
-  roleMenus,
-  dictionaries,
-  authSessions,
-]
+const tables = [users, roles, userRoles, menus, roleMenus, dictionaries, authSessions]
 
 const activeBusinessIdentityIndexes: Array<{
   table: PgTable
@@ -73,25 +65,19 @@ describe('soft-delete uniqueness', () => {
     '$name only requires unique business identities for active rows',
     ({ table, name, columns }) => {
       const tableConfig = getTableConfig(table)
-      const activeIndex = tableConfig.indexes.find(
-        (index) => index.config.name === name
-      )
+      const activeIndex = tableConfig.indexes.find((index) => index.config.name === name)
 
       expect(activeIndex?.config.unique).toBe(true)
       expect(
-        activeIndex?.config.columns.map((column) => (
-          'name' in column ? column.name : undefined
-        ))
+        activeIndex?.config.columns.map((column) => ('name' in column ? column.name : undefined)),
       ).toEqual(columns)
       expect(activeIndex?.config.where).toBeDefined()
       expect(tableConfig.uniqueConstraints).toHaveLength(0)
-    }
+    },
   )
 
   it('keeps persisted session token hashes globally unique', () => {
     expect(authSessions.tokenHash.isUnique).toBe(true)
-    expect(authSessions.tokenHash.uniqueName).toBe(
-      'auth_sessions_token_hash_unique'
-    )
+    expect(authSessions.tokenHash.uniqueName).toBe('auth_sessions_token_hash_unique')
   })
 })

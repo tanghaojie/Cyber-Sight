@@ -16,13 +16,9 @@ export const menuType = pgEnum('menu_type', ['directory', 'menu', 'button'])
 export function auditColumns() {
   return {
     isDeleted: boolean('is_deleted').default(false).notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     createdBy: integer('created_by').default(0).notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
     updatedBy: integer('updated_by').default(0).notNull(),
   }
 }
@@ -46,7 +42,7 @@ export const users = pgTable(
     activeEmail: uniqueIndex('users_email_active_unique')
       .on(table.email)
       .where(sql`${table.isDeleted} = false`),
-  })
+  }),
 )
 
 export const roles = pgTable(
@@ -63,7 +59,7 @@ export const roles = pgTable(
     activeCode: uniqueIndex('roles_code_active_unique')
       .on(table.code)
       .where(sql`${table.isDeleted} = false`),
-  })
+  }),
 )
 
 export const userRoles = pgTable(
@@ -82,7 +78,7 @@ export const userRoles = pgTable(
     activeAssignment: uniqueIndex('user_roles_user_role_active_unique')
       .on(table.userId, table.roleId)
       .where(sql`${table.isDeleted} = false`),
-  })
+  }),
 )
 
 export const menus = pgTable(
@@ -106,7 +102,7 @@ export const menus = pgTable(
     activeCode: uniqueIndex('menus_code_active_unique')
       .on(table.code)
       .where(sql`${table.isDeleted} = false`),
-  })
+  }),
 )
 
 export const roleMenus = pgTable(
@@ -125,7 +121,7 @@ export const roleMenus = pgTable(
     activeAssignment: uniqueIndex('role_menus_role_menu_active_unique')
       .on(table.roleId, table.menuId)
       .where(sql`${table.isDeleted} = false`),
-  })
+  }),
 )
 
 export const dictionaries = pgTable(
@@ -144,7 +140,7 @@ export const dictionaries = pgTable(
     activeEntry: uniqueIndex('dictionaries_type_value_active_unique')
       .on(table.type, table.value)
       .where(sql`${table.isDeleted} = false`),
-  })
+  }),
 )
 
 export const authSessions = pgTable('auth_sessions', {

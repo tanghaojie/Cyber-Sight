@@ -28,9 +28,7 @@ export interface IssuedJwt {
   token: string
 }
 
-type TokenSessionLoader = (
-  verified: VerifiedJwt
-) => Promise<LoadedTokenSession | null>
+type TokenSessionLoader = (verified: VerifiedJwt) => Promise<LoadedTokenSession | null>
 
 interface JwtTokenCacheOptions {
   capacity?: number
@@ -86,10 +84,7 @@ export class JwtTokenCache {
     return { expiresAt: new Date(expiresAt), token }
   }
 
-  async resolve(
-    token: string,
-    loadSession: TokenSessionLoader
-  ): Promise<CurrentUser | null> {
+  async resolve(token: string, loadSession: TokenSessionLoader): Promise<CurrentUser | null> {
     const verified = await this.verify(token)
     if (!verified) {
       return null
@@ -97,10 +92,7 @@ export class JwtTokenCache {
 
     const entry = this.entries.get(verified.jti)
     if (entry) {
-      if (
-        entry.expiresAt <= this.now() ||
-        String(entry.user.id) !== verified.subject
-      ) {
+      if (entry.expiresAt <= this.now() || String(entry.user.id) !== verified.subject) {
         this.entries.delete(verified.jti)
         return null
       }
@@ -111,11 +103,7 @@ export class JwtTokenCache {
     }
 
     const loaded = await loadSession(verified)
-    if (
-      !loaded ||
-      loaded.expiresAt <= this.now() ||
-      String(loaded.user.id) !== verified.subject
-    ) {
+    if (!loaded || loaded.expiresAt <= this.now() || String(loaded.user.id) !== verified.subject) {
       return null
     }
 
@@ -165,9 +153,7 @@ export class JwtTokenCache {
     }
   }
 
-  private async verify(
-    token: string
-  ): Promise<VerifiedJwt | null> {
+  private async verify(token: string): Promise<VerifiedJwt | null> {
     try {
       const { payload } = await jwtVerify(token, this.key, {
         algorithms: ['HS256'],

@@ -63,7 +63,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue'
 import type { NavigationMenu } from '@scaffold/api-contract'
-import AppIcon from '../AppIcon.vue'
+import AppIcon from '@/components/AppIcon.vue'
 
 const props = withDefaults(defineProps<{ items: NavigationMenu[]; depth?: number }>(), { depth: 0 })
 defineEmits<{ navigate: [] }>()

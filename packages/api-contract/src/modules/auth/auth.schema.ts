@@ -1,8 +1,5 @@
 import { z } from 'zod'
-import {
-  apiResponseSchema,
-  ErrorResponseSchema,
-} from '../../shared/http.js'
+import { apiResponseSchema, ErrorResponseSchema } from '@/shared/http.js'
 
 export const LoginRequestSchema = z.strictObject({
   username: z.string().min(2).max(50),
@@ -23,10 +20,7 @@ export const LoginDataSchema = z.strictObject({
 
 export const CurrentUserResponseSchema = apiResponseSchema(CurrentUserSchema)
 export const LoginSuccessResponseSchema = apiResponseSchema(LoginDataSchema)
-export const LoginResultSchema = z.union([
-  LoginSuccessResponseSchema,
-  ErrorResponseSchema,
-])
+export const LoginResultSchema = z.union([LoginSuccessResponseSchema, ErrorResponseSchema])
 
 export type LoginRequest = z.infer<typeof LoginRequestSchema>
 export type CurrentUser = z.infer<typeof CurrentUserSchema>

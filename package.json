@@ -10,6 +10,21 @@
     "test:db": "pnpm --filter @scaffold/backend db:check",
     "db:generate": "pnpm --filter @scaffold/backend db:generate",
     "db:migrate": "pnpm --filter @scaffold/backend db:migrate",
+    "format": "prettier --write . --ignore-unknown",
+    "format:check": "prettier --check . --ignore-unknown",
+    "lint-staged": "lint-staged",
+    "prepare": "simple-git-hooks",
     "preinstall": "npx only-allow pnpm"
+  },
+  "lint-staged": {
+    "*.{js,mjs,cjs,ts,mts,cts,tsx,vue,json,jsonc,md,yml,yaml,css,scss,html}": "prettier --write --ignore-unknown"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "devDependencies": {
+    "lint-staged": "^17.2.0",
+    "prettier": "^3.9.6",
+    "simple-git-hooks": "^2.13.1"
   }
 }

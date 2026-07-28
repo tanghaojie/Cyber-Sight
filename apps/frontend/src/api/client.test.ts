@@ -13,7 +13,7 @@ describe('API client', () => {
       new Response(JSON.stringify({ status: 0, data: { value: 'ok' } }), {
         status: 200,
         headers: { 'content-type': 'application/json' },
-      })
+      }),
     )
     vi.stubGlobal('fetch', fetchMock)
 
@@ -26,7 +26,7 @@ describe('API client', () => {
 
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/example?pageNum=2&keyword=hello+world',
-      expect.objectContaining({ method: 'GET' })
+      expect.objectContaining({ method: 'GET' }),
     )
     expect(result).toEqual({
       data: { status: 0, data: { value: 'ok' } },
@@ -35,20 +35,14 @@ describe('API client', () => {
 
   it('sends typed JSON and separates a business error from success data', async () => {
     const fetchMock = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({ status: 1001, err: 'Invalid request' }),
-        {
-          status: 200,
-          headers: { 'content-type': 'application/json' },
-        }
-      )
+      new Response(JSON.stringify({ status: 1001, err: 'Invalid request' }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      }),
     )
     vi.stubGlobal('fetch', fetchMock)
 
-    const result = await apiClient.POST<
-      { status: 0 },
-      { username: string }
-    >('/example', {
+    const result = await apiClient.POST<{ status: 0 }, { username: string }>('/example', {
       body: { username: 'admin' },
     })
 
@@ -57,7 +51,7 @@ describe('API client', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ username: 'admin' }),
-      })
+      }),
     )
     expect(result).toEqual({
       error: { status: 1001, err: 'Invalid request' },
@@ -70,7 +64,7 @@ describe('API client', () => {
       new Response(JSON.stringify({ status: 0 }), {
         status: 200,
         headers: { 'content-type': 'application/json' },
-      })
+      }),
     )
     vi.stubGlobal('fetch', fetchMock)
 
@@ -82,7 +76,7 @@ describe('API client', () => {
         headers: expect.objectContaining({
           authorization: 'Bearer signed.jwt.token',
         }),
-      })
+      }),
     )
   })
 })

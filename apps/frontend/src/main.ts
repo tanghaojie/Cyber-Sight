@@ -16,30 +16,35 @@ app.use(pinia)
 app.use(router)
 document.title = appConfig.name
 
-installGlobalHttpErrorHandler(createApplicationHttpErrorHandler({
-  currentRoute() {
-    return {
-      name: typeof router.currentRoute.value.name === 'string' ? router.currentRoute.value.name : undefined,
-      fullPath: router.currentRoute.value.fullPath,
-    }
-  },
-  clearSession() {
-    const auth = useAuthStore(pinia)
-    auth.clearSession()
-  },
-  clearNavigation() {
-    const navigation = useNavigationStore(pinia)
-    navigation.clear()
-  },
-  clearRoutes() {
-    clearDynamicRoutes()
-  },
-  replace(location) {
-    return router.replace(location)
-  },
-  showError(message) {
-    ElMessage.error(message)
-  },
-}))
+installGlobalHttpErrorHandler(
+  createApplicationHttpErrorHandler({
+    currentRoute() {
+      return {
+        name:
+          typeof router.currentRoute.value.name === 'string'
+            ? router.currentRoute.value.name
+            : undefined,
+        fullPath: router.currentRoute.value.fullPath,
+      }
+    },
+    clearSession() {
+      const auth = useAuthStore(pinia)
+      auth.clearSession()
+    },
+    clearNavigation() {
+      const navigation = useNavigationStore(pinia)
+      navigation.clear()
+    },
+    clearRoutes() {
+      clearDynamicRoutes()
+    },
+    replace(location) {
+      return router.replace(location)
+    },
+    showError(message) {
+      ElMessage.error(message)
+    },
+  }),
+)
 
 app.mount('#app')

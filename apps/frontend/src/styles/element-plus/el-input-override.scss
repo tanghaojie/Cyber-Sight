@@ -2,6 +2,8 @@ html body .el-input__wrapper {
   box-shadow: 0 0 0 1px var(--line) inset;
 
   &.is-focus {
-    box-shadow: 0 0 0 1px var(--primary-deep) inset, 0 0 0 3px rgba(112, 207, 162, 0.16);
+    box-shadow:
+      0 0 0 1px var(--primary-deep) inset,
+      0 0 0 3px rgba(112, 207, 162, 0.16);
   }
 }

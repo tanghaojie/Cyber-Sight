@@ -15,14 +15,15 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "dev": "tsc --watch --preserveWatchOutput",
-    "test": "tsc"
+    "test": "tsc && tsc-alias"
   },
   "dependencies": {
     "zod": "^4.2.0"
   },
   "devDependencies": {
+    "tsc-alias": "^1.9.1",
     "typescript": "^5.9.3"
   }
 }

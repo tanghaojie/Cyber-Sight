@@ -60,13 +60,13 @@ pnpm dev
 
 ### 4.1 仓库根目录
 
-| 文件或目录 | 作用 | 修改时机 |
-| --- | --- | --- |
-| `package.json` | 跨 workspace 的统一命令 | 增加全局命令或根开发依赖 |
-| `pnpm-workspace.yaml` | workspace 范围和依赖构建许可 | 增加包或批准依赖安装脚本 |
-| `tsconfig.base.json` | 前后端共享 TypeScript 基线 | 修改全项目编译规则 |
-| `AGENTS.md` | AI 必须遵守的仓库规则 | 调整开发、文档、验证或提交约定 |
-| `docs/` | 设计、ADR、计划、指南和 AI 记录 | 非简单任务必须同步维护 |
+| 文件或目录            | 作用                            | 修改时机                       |
+| --------------------- | ------------------------------- | ------------------------------ |
+| `package.json`        | 跨 workspace 的统一命令         | 增加全局命令或根开发依赖       |
+| `pnpm-workspace.yaml` | workspace 范围和依赖构建许可    | 增加包或批准依赖安装脚本       |
+| `tsconfig.base.json`  | 前后端共享 TypeScript 基线      | 修改全项目编译规则             |
+| `AGENTS.md`           | AI 必须遵守的仓库规则           | 调整开发、文档、验证或提交约定 |
+| `docs/`               | 设计、ADR、计划、指南和 AI 记录 | 非简单任务必须同步维护         |
 
 ### 4.2 `packages/api-contract`
 
@@ -80,19 +80,19 @@ pnpm dev
 
 ### 4.3 `apps/backend`
 
-| 路径 | 作用 |
-| --- | --- |
-| `src/server.ts` | 读取环境配置并监听端口，只负责进程启动 |
-| `src/app.ts` | 组装 Fastify 插件和业务模块，测试直接调用 `buildApp()` |
-| `src/config/env.ts` | 加载和校验环境变量 |
-| `src/plugins/` | Swagger、数据库、统一响应等横切能力 |
-| `src/modules/<module>/` | 按业务能力组织的路由入口 |
-| `src/shared/http/` | 响应包装、分页默认值等公共 HTTP 规则 |
-| `src/shared/errors/` | 可执行错误码常量 |
-| `src/db/schema.ts` | Drizzle 数据模型定义 |
-| `src/db/index.ts` | PostgreSQL 客户端和 Drizzle 实例 |
-| `drizzle/` | 已生成并需要提交的 SQL 迁移和快照 |
-| `test/` | Fastify 路由、契约和公共辅助函数测试 |
+| 路径                    | 作用                                                   |
+| ----------------------- | ------------------------------------------------------ |
+| `src/server.ts`         | 读取环境配置并监听端口，只负责进程启动                 |
+| `src/app.ts`            | 组装 Fastify 插件和业务模块，测试直接调用 `buildApp()` |
+| `src/config/env.ts`     | 加载和校验环境变量                                     |
+| `src/plugins/`          | Swagger、数据库、统一响应等横切能力                    |
+| `src/modules/<module>/` | 按业务能力组织的路由入口                               |
+| `src/shared/http/`      | 响应包装、分页默认值等公共 HTTP 规则                   |
+| `src/shared/errors/`    | 可执行错误码常量                                       |
+| `src/db/schema.ts`      | Drizzle 数据模型定义                                   |
+| `src/db/index.ts`       | PostgreSQL 客户端和 Drizzle 实例                       |
+| `drizzle/`              | 已生成并需要提交的 SQL 迁移和快照                      |
+| `test/`                 | Fastify 路由、契约和公共辅助函数测试                   |
 
 `app.ts` 与 `server.ts` 必须保持分离。否则测试导入应用时会直接占用端口，无法使用 Fastify `inject` 进行快速测试。
 
@@ -100,14 +100,14 @@ pnpm dev
 
 ### 4.4 `apps/frontend`
 
-| 路径 | 作用 |
-| --- | --- |
-| `src/api/client.ts` | 唯一共享的 fetch Client |
-| `src/modules/<module>/composables/` | 封装模块 API 调用和页面状态 |
-| `src/modules/<module>/pages/` | 模块拥有的路由页面，不直接堆积复杂业务和网络逻辑 |
-| `src/router/` | Vue Router 配置和页面懒加载 |
-| `src/stores/` | 未来的跨页面 Pinia 状态；局部状态不要放入 store |
-| `*.test.ts` | Vitest + Vue Test Utils 组件测试 |
+| 路径                                | 作用                                             |
+| ----------------------------------- | ------------------------------------------------ |
+| `src/api/client.ts`                 | 唯一共享的 fetch Client                          |
+| `src/modules/<module>/composables/` | 封装模块 API 调用和页面状态                      |
+| `src/modules/<module>/pages/`       | 模块拥有的路由页面，不直接堆积复杂业务和网络逻辑 |
+| `src/router/`                       | Vue Router 配置和页面懒加载                      |
+| `src/stores/`                       | 未来的跨页面 Pinia 状态；局部状态不要放入 store  |
+| `*.test.ts`                         | Vitest + Vue Test Utils 组件测试                 |
 
 前端不能手写一份与后端相似的接口类型，应从 `@scaffold/api-contract` 获取。
 
@@ -149,7 +149,7 @@ app.post<{ Body: UserRequest }>(
   { schema: { body: toFastifySchema(UserRequestSchema) } },
   async function createUser(request) {
     // request.body 已通过真实运行时校验
-  }
+  },
 )
 ```
 

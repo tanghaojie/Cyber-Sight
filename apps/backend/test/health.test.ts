@@ -1,12 +1,8 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import type { FastifyInstance } from 'fastify'
-import {
-  ListQuerySchema,
-  LoginRequestSchema,
-  toFastifySchema,
-} from '@scaffold/api-contract'
-import { buildApp } from '../src/app.js'
-import { ErrorCode } from '../src/shared/errors/error-codes.js'
+import { ListQuerySchema, LoginRequestSchema, toFastifySchema } from '@scaffold/api-contract'
+import { buildApp } from '@/app.js'
+import { ErrorCode } from '@/shared/errors/error-codes.js'
 
 let app: FastifyInstance
 
@@ -43,7 +39,7 @@ beforeAll(async () => {
     },
     async function validationRoute() {
       return { status: ErrorCode.SUCCESS }
-    }
+    },
   )
 })
 
@@ -107,9 +103,7 @@ describe('GET /health', () => {
 
     const runtime = response.json()
     const health = runtime.paths['/health'].get
-    const login =
-      runtime.paths['/auth/login'].post.requestBody.content['application/json']
-        .schema
+    const login = runtime.paths['/auth/login'].post.requestBody.content['application/json'].schema
 
     expect(health.operationId).toBe('getHealth')
     expect(health.summary).toBe('Health check')
@@ -173,9 +167,7 @@ describe('GET /health', () => {
       scheme: 'bearer',
       bearerFormat: 'JWT',
     })
-    expect(runtime.paths['/auth/me'].get.security).toEqual([
-      { bearerAuth: [] },
-    ])
+    expect(runtime.paths['/auth/me'].get.security).toEqual([{ bearerAuth: [] }])
     expect(runtime.security).toEqual([{ bearerAuth: [] }])
     expect(runtime.paths['/auth/login'].post.security).toEqual([])
     expect(runtime.paths['/health'].get.security).toEqual([])
@@ -207,9 +199,7 @@ describe('GET /health', () => {
       expect(logout.json()).toEqual({ status: 0 })
       expect(update).toHaveBeenCalledOnce()
       expect(updateWhere).toHaveBeenCalledOnce()
-      await expect(
-        app.authTokens.resolve(issued.token, async () => null)
-      ).resolves.toBeNull()
+      await expect(app.authTokens.resolve(issued.token, async () => null)).resolves.toBeNull()
     } finally {
       app.db = originalDb
     }
@@ -277,20 +267,13 @@ describe('GET /health', () => {
     ['/test-forbidden', ErrorCode.FORBIDDEN, 'Operation forbidden'],
     ['/test-conflict', ErrorCode.RESOURCE_CONFLICT, 'Resource conflict'],
     ['/test-rate-limit', ErrorCode.RATE_LIMITED, 'Too many requests'],
-    [
-      '/test-external-error',
-      ErrorCode.EXTERNAL_DEPENDENCY_ERROR,
-      'Dependency unavailable',
-    ],
-  ])(
-    'returns business error %s with HTTP 200',
-    async (url, status, err) => {
-      const response = await app.inject({ method: 'GET', url })
+    ['/test-external-error', ErrorCode.EXTERNAL_DEPENDENCY_ERROR, 'Dependency unavailable'],
+  ])('returns business error %s with HTTP 200', async (url, status, err) => {
+    const response = await app.inject({ method: 'GET', url })
 
-      expect(response.statusCode).toBe(200)
-      expect(response.json()).toEqual({ status, err })
-    }
-  )
+    expect(response.statusCode).toBe(200)
+    expect(response.json()).toEqual({ status, err })
+  })
 
   it('preserves HTTP 401 for global authentication handling', async () => {
     const response = await app.inject({
@@ -312,16 +295,13 @@ describe('GET /health', () => {
     ['GET', '/admin/roles'],
     ['GET', '/admin/menus'],
     ['GET', '/admin/dictionaries'],
-  ] as const)(
-    'protects %s %s when no bearer token is present',
-    async (method, url) => {
-      const response = await app.inject({ method, url })
+  ] as const)('protects %s %s when no bearer token is present', async (method, url) => {
+    const response = await app.inject({ method, url })
 
-      expect(response.statusCode).toBe(401)
-      expect(response.json()).toEqual({
-        status: ErrorCode.UNAUTHORIZED,
-        err: 'Authentication required',
-      })
-    }
-  )
+    expect(response.statusCode).toBe(401)
+    expect(response.json()).toEqual({
+      status: ErrorCode.UNAUTHORIZED,
+      err: 'Authentication required',
+    })
+  })
 })

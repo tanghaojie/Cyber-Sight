@@ -7,15 +7,12 @@ import type {
   LoginRequest,
   LoginSuccessResponse,
 } from '@scaffold/api-contract'
-import {
-  clearAccessToken,
-  getAccessToken,
-  setAccessToken,
-} from '../../api/access-token.js'
-import { apiClient } from '../../api/client.js'
+import { clearAccessToken, getAccessToken, setAccessToken } from '@/api/access-token.js'
+import { apiClient } from '@/api/client.js'
 
 function responseError(data: unknown, fallback: string): string {
-  if (typeof data === 'object' && data !== null && 'err' in data && typeof data.err === 'string') return data.err
+  if (typeof data === 'object' && data !== null && 'err' in data && typeof data.err === 'string')
+    return data.err
   return fallback
 }
 
@@ -28,10 +25,10 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(username: string, password: string): Promise<string | null> {
     busy.value = true
     try {
-      const { data, error } = await apiClient.POST<
-        LoginSuccessResponse,
-        LoginRequest
-      >('/auth/login', { body: { username, password } })
+      const { data, error } = await apiClient.POST<LoginSuccessResponse, LoginRequest>(
+        '/auth/login',
+        { body: { username, password } },
+      )
       const response = data ?? error
       if (response && response.status === 0 && 'data' in response && response.data) {
         user.value = response.data.user

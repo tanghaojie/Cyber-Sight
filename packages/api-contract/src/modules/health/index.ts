@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { apiResponseSchema } from '../../shared/http.js'
+import { apiResponseSchema } from '@/shared/http.js'
 
 export const HealthDataSchema = z.strictObject({
   status: z.literal('ok'),

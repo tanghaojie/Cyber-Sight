@@ -1,5 +1,5 @@
 import type { RouteComponent } from 'vue-router'
-import type { ViewRegistrar } from '../../shared/routing/view-registry.js'
+import type { ViewRegistrar } from '@/shared/routing/view-registry.js'
 
 const homePage: RouteComponent = () => import('./pages/HomePage.vue')
 

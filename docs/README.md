@@ -32,12 +32,12 @@ docs/
 
 ## 生命周期
 
-| 类型 | 当前区 | 进入归档的条件 |
-| --- | --- | --- |
-| Design | `design/` | 被合并、废弃或大幅重写 |
-| ADR | `decisions/` | 被后续 ADR 取代 |
-| Plan | `plans/active/` | 完成、取消或被取代 |
-| AI Log | `ai-logs/YYYY/MM/` | 对应任务结束 |
+| 类型   | 当前区             | 进入归档的条件         |
+| ------ | ------------------ | ---------------------- |
+| Design | `design/`          | 被合并、废弃或大幅重写 |
+| ADR    | `decisions/`       | 被后续 ADR 取代        |
+| Plan   | `plans/active/`    | 完成、取消或被取代     |
+| AI Log | `ai-logs/YYYY/MM/` | 对应任务结束           |
 
 当前设计始终描述“现在怎样工作”。当前 ADR 只解释仍有效的长期取舍。计划和日志不复制正式结论，任务结束后与历史过程一起归档。详细规则见[分层文档与历史归档](design/documentation-governance.md)。
 

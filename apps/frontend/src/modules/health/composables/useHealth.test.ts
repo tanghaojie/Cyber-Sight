@@ -5,7 +5,7 @@ import { useHealth } from './useHealth.js'
 
 const mockedGet = vi.hoisted(() => vi.fn())
 
-vi.mock('../../../api/client.js', () => ({
+vi.mock('@/api/client.js', () => ({
   apiClient: {
     GET: mockedGet,
   },
@@ -44,9 +44,7 @@ describe('useHealth', () => {
     await flushPromises()
 
     expect(wrapper.get('[data-status]').text()).toBe('ok')
-    expect(wrapper.get('[data-timestamp]').text()).toBe(
-      '2026-07-22T08:00:00.000Z'
-    )
+    expect(wrapper.get('[data-timestamp]').text()).toBe('2026-07-22T08:00:00.000Z')
     expect(wrapper.get('[data-error]').text()).toBe('')
   })
 

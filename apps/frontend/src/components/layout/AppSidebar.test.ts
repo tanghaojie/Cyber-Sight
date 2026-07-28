@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { NavigationMenu } from '@scaffold/api-contract'
 import AppSidebar from './AppSidebar.vue'
 
-vi.mock('../../modules/health/composables/useHealth.js', () => ({
+vi.mock('@/modules/health/composables/useHealth.js', () => ({
   useHealth() {
     return { status: 'ok', timestamp: '2026-07-28T00:00:00.000Z', error: null }
   },

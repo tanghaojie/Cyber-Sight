@@ -1,5 +1,5 @@
 import type { RouteComponent } from 'vue-router'
-import type { ViewRegistrationModule } from '../shared/routing/view-registry.js'
+import type { ViewRegistrationModule } from '@/shared/routing/view-registry.js'
 
 function isViewRegistrationModule(value: unknown): value is ViewRegistrationModule {
   return (
@@ -43,7 +43,7 @@ export function createViewRegistry(
 }
 
 const viewRegistrationModules = import.meta.glob<ViewRegistrationModule>(
-  '../modules/**/view-registry.ts',
+  '@/modules/**/view-registry.ts',
   { eager: true },
 )
 

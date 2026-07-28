@@ -1,11 +1,6 @@
-import type {
-  FastifyError,
-  FastifyInstance,
-  FastifyReply,
-  FastifyRequest,
-} from 'fastify'
-import { ErrorCode } from '../shared/errors/error-codes.js'
-import { failure } from '../shared/http/response.js'
+import type { FastifyError, FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
+import { ErrorCode } from '@/shared/errors/error-codes.js'
+import { failure } from '@/shared/http/response.js'
 
 function errorCodeForHttpStatus(httpStatus: number): number {
   switch (httpStatus) {
@@ -26,9 +21,7 @@ function errorCodeForHttpStatus(httpStatus: number): number {
     case 504:
       return ErrorCode.EXTERNAL_DEPENDENCY_ERROR
     default:
-      return httpStatus >= 500
-        ? ErrorCode.INTERNAL_ERROR
-        : ErrorCode.INVALID_REQUEST
+      return httpStatus >= 500 ? ErrorCode.INTERNAL_ERROR : ErrorCode.INVALID_REQUEST
   }
 }
 
@@ -55,23 +48,16 @@ function responseHttpStatus(sourceHttpStatus: number): number {
   }
 }
 
-async function handleNotFound(
-  _request: FastifyRequest,
-  reply: FastifyReply
-): Promise<void> {
-  await reply
-    .code(404)
-    .send(failure(ErrorCode.RESOURCE_NOT_FOUND, 'Resource not found'))
+async function handleNotFound(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  await reply.code(404).send(failure(ErrorCode.RESOURCE_NOT_FOUND, 'Resource not found'))
 }
 
 async function handleError(
   error: FastifyError,
   request: FastifyRequest,
-  reply: FastifyReply
+  reply: FastifyReply,
 ): Promise<void> {
-  const sourceHttpStatus = error.validation
-    ? 400
-    : Math.max(400, error.statusCode ?? 500)
+  const sourceHttpStatus = error.validation ? 400 : Math.max(400, error.statusCode ?? 500)
 
   if (sourceHttpStatus >= 500) {
     request.log.error(error)
@@ -79,17 +65,10 @@ async function handleError(
 
   await reply
     .code(responseHttpStatus(sourceHttpStatus))
-    .send(
-      failure(
-        errorCodeForHttpStatus(sourceHttpStatus),
-        errorMessage(error, sourceHttpStatus)
-      )
-    )
+    .send(failure(errorCodeForHttpStatus(sourceHttpStatus), errorMessage(error, sourceHttpStatus)))
 }
 
-export async function registerResponseHandling(
-  app: FastifyInstance
-): Promise<void> {
+export async function registerResponseHandling(app: FastifyInstance): Promise<void> {
   app.setNotFoundHandler(handleNotFound)
   app.setErrorHandler(handleError)
 }

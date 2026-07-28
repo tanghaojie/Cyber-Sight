@@ -1,16 +1,8 @@
 import { and, count, eq, ilike, inArray, or } from 'drizzle-orm'
 import type { FastifyInstance } from 'fastify'
-import type {
-  CurrentUser,
-  MenuRequest,
-  NavigationMenu,
-} from '@scaffold/api-contract'
-import { menus, roleMenus, roles, userRoles } from '../../db/schema.js'
-import {
-  auditView,
-  pageOffset,
-  type RepositoryListQuery,
-} from '../../shared/database/pagination.js'
+import type { CurrentUser, MenuRequest, NavigationMenu } from '@scaffold/api-contract'
+import { menus, roleMenus, roles, userRoles } from '@/db/schema.js'
+import { auditView, pageOffset, type RepositoryListQuery } from '@/shared/database/pagination.js'
 
 type NavigationRow = Omit<NavigationMenu, 'children'>
 
@@ -39,15 +31,10 @@ function menuSummary(row: typeof menus.$inferSelect) {
 }
 
 function orderedRows(rows: NavigationRow[]): NavigationRow[] {
-  return [...rows].sort(
-    (left, right) => left.sortOrder - right.sortOrder || left.id - right.id
-  )
+  return [...rows].sort((left, right) => left.sortOrder - right.sortOrder || left.id - right.id)
 }
 
-function hasParentCycle(
-  row: NavigationRow,
-  rowsById: Map<number, NavigationRow>
-): boolean {
+function hasParentCycle(row: NavigationRow, rowsById: Map<number, NavigationRow>): boolean {
   const visited = new Set([row.id])
   let parentId = row.parentId
   while (parentId > 0) {
@@ -68,7 +55,7 @@ function isUsableNavigationRow(row: NavigationRow): boolean {
 
 export function buildNavigationTree(
   rows: NavigationRow[],
-  allowedMenuIds?: ReadonlySet<number>
+  allowedMenuIds?: ReadonlySet<number>,
 ): NavigationMenu[] {
   const usableRows = rows.filter(isUsableNavigationRow)
   const allRowsById = new Map(usableRows.map((row) => [row.id, row]))
@@ -88,12 +75,10 @@ export function buildNavigationTree(
     }
   }
 
-  const visibleRows = orderedRows(
-    usableRows.filter((row) => visibleIds.has(row.id))
-  )
+  const visibleRows = orderedRows(usableRows.filter((row) => visibleIds.has(row.id)))
   const visibleRowsById = new Map(visibleRows.map((row) => [row.id, row]))
   const nodesById = new Map<number, NavigationMenu>(
-    visibleRows.map((row) => [row.id, { ...row, children: [] }])
+    visibleRows.map((row) => [row.id, { ...row, children: [] }]),
   )
   const roots: NavigationMenu[] = []
 
@@ -109,16 +94,11 @@ export function buildNavigationTree(
   return roots
 }
 
-export async function listMenus(
-  app: FastifyInstance,
-  query: RepositoryListQuery
-) {
+export async function listMenus(app: FastifyInstance, query: RepositoryListQuery) {
   const keyword = query.keyword?.trim()
   const predicate = and(
     eq(menus.isDeleted, false),
-    keyword
-      ? or(ilike(menus.name, `%${keyword}%`), ilike(menus.code, `%${keyword}%`))
-      : undefined
+    keyword ? or(ilike(menus.name, `%${keyword}%`), ilike(menus.code, `%${keyword}%`)) : undefined,
   )
   const rows = await app.db
     .select()
@@ -127,10 +107,7 @@ export async function listMenus(
     .orderBy(menus.sortOrder, menus.id)
     .limit(query.pageSize)
     .offset(pageOffset(query))
-  const [{ value: total }] = await app.db
-    .select({ value: count() })
-    .from(menus)
-    .where(predicate)
+  const [{ value: total }] = await app.db.select({ value: count() }).from(menus).where(predicate)
   return {
     total,
     list: rows.map(menuSummary),
@@ -148,7 +125,7 @@ export async function listAllMenus(app: FastifyInstance) {
 
 export async function listNavigationMenus(
   app: FastifyInstance,
-  user: CurrentUser
+  user: CurrentUser,
 ): Promise<NavigationMenu[]> {
   const rows = await app.db
     .select()
@@ -165,29 +142,17 @@ export async function listNavigationMenus(
     .from(userRoles)
     .innerJoin(
       roles,
-      and(
-        eq(userRoles.roleId, roles.id),
-        eq(roles.enabled, true),
-        eq(roles.isDeleted, false)
-      )
+      and(eq(userRoles.roleId, roles.id), eq(roles.enabled, true), eq(roles.isDeleted, false)),
     )
-    .innerJoin(
-      roleMenus,
-      and(eq(roleMenus.roleId, roles.id), eq(roleMenus.isDeleted, false))
-    )
-    .where(
-      and(eq(userRoles.userId, user.id), eq(userRoles.isDeleted, false))
-    )
-  return buildNavigationTree(
-    navigationRows,
-    new Set(assignments.map((item) => item.menuId))
-  )
+    .innerJoin(roleMenus, and(eq(roleMenus.roleId, roles.id), eq(roleMenus.isDeleted, false)))
+    .where(and(eq(userRoles.userId, user.id), eq(userRoles.isDeleted, false)))
+  return buildNavigationTree(navigationRows, new Set(assignments.map((item) => item.menuId)))
 }
 
 export async function validateMenuParent(
   app: FastifyInstance,
   parentId: number,
-  currentId?: number
+  currentId?: number,
 ): Promise<boolean> {
   if (parentId === 0) return true
   if (parentId === currentId) return false
@@ -215,7 +180,7 @@ export async function validateMenuParent(
 export async function createMenu(
   app: FastifyInstance,
   input: MenuRequest,
-  actorId: number
+  actorId: number,
 ): Promise<number> {
   const [created] = await app.db
     .insert(menus)
@@ -228,7 +193,7 @@ export async function updateMenu(
   app: FastifyInstance,
   id: number,
   input: MenuRequest,
-  actorId: number
+  actorId: number,
 ): Promise<boolean> {
   const result = await app.db
     .update(menus)
@@ -238,10 +203,7 @@ export async function updateMenu(
   return result.length > 0
 }
 
-export async function hasActiveMenuChildren(
-  app: FastifyInstance,
-  id: number
-): Promise<boolean> {
+export async function hasActiveMenuChildren(app: FastifyInstance, id: number): Promise<boolean> {
   const [child] = await app.db
     .select({ id: menus.id })
     .from(menus)
@@ -253,7 +215,7 @@ export async function hasActiveMenuChildren(
 export async function softDeleteMenu(
   app: FastifyInstance,
   id: number,
-  actorId: number
+  actorId: number,
 ): Promise<boolean> {
   const result = await app.db
     .update(menus)

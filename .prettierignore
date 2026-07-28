@@ -1,0 +1,8 @@
+**/node_modules
+**/dist
+**/coverage
+.codegraph
+.pnpm-store
+apps/backend/drizzle/meta
+docs/archive
+pnpm-lock.yaml

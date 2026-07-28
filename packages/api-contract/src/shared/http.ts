@@ -25,13 +25,7 @@ export function toFastifySchema(schema: z.ZodType): FastifyJsonSchema {
 
 export const PaginationRequestSchema = z.strictObject({
   pageNum: z.number().int().min(1).optional().meta({ default: 1 }),
-  pageSize: z
-    .number()
-    .int()
-    .min(1)
-    .max(100)
-    .optional()
-    .meta({ default: 10 }),
+  pageSize: z.number().int().min(1).max(100).optional().meta({ default: 10 }),
 })
 
 export const ListQuerySchema = PaginationRequestSchema.extend({
@@ -71,14 +65,8 @@ export function paginatedResponseSchema<T extends z.ZodType>(item: T) {
 }
 
 export const IdResponseSchema = apiResponseSchema(IdDataSchema)
-export const MutationResultSchema = z.union([
-  IdResponseSchema,
-  ErrorResponseSchema,
-])
-export const EmptyResultSchema = z.union([
-  EmptySuccessResponseSchema,
-  ErrorResponseSchema,
-])
+export const MutationResultSchema = z.union([IdResponseSchema, ErrorResponseSchema])
+export const EmptyResultSchema = z.union([EmptySuccessResponseSchema, ErrorResponseSchema])
 
 export const AuditFieldsSchema = z.strictObject({
   isDeleted: z.boolean(),

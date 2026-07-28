@@ -13,10 +13,7 @@ export function resolveMenuPath(path: string, parentPath = ''): string {
   return normalizeAbsolutePath(`${parentPath}/${value}`)
 }
 
-export function resolveNavigationPaths(
-  nodes: NavigationMenu[],
-  parentPath = '',
-): NavigationMenu[] {
+export function resolveNavigationPaths(nodes: NavigationMenu[], parentPath = ''): NavigationMenu[] {
   return nodes.map(function resolveNode(node) {
     const path = node.type === 'button' ? node.path : resolveMenuPath(node.path, parentPath)
     const childParentPath = node.type === 'directory' ? path : parentPath

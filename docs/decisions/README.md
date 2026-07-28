@@ -25,5 +25,6 @@
 ## 工程治理
 
 - [ADR-0016](ADR-0016-tiered-documentation-and-archive.md)：当前文档与历史证据分层归档。
+- [ADR-0021](ADR-0021-source-alias-and-automated-formatting.md)：各 workspace 的 `@/src` 别名与项目级自动格式化。
 
 新增 ADR 时使用 [ADR 模板](../templates/adr-template.md)和下一个连续编号。ADR 被取代后更新替代关系并移入 `docs/archive/decisions/`，编号不得复用。

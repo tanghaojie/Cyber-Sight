@@ -4,12 +4,16 @@ import {
   AuditFieldsSchema,
   ErrorResponseSchema,
   paginatedResponseSchema,
-} from '../../shared/http.js'
+} from '@/shared/http.js'
 
 const menuCommonShape = {
   parentId: z.number().int().min(0),
   name: z.string().min(1).max(80),
-  code: z.string().min(2).max(80).regex(/^[A-Z0-9_]+$/),
+  code: z
+    .string()
+    .min(2)
+    .max(80)
+    .regex(/^[A-Z0-9_]+$/),
   icon: z.string().max(50),
   sortOrder: z.number().int().min(0),
   enabled: z.boolean(),
@@ -39,7 +43,11 @@ const externalButtonRequestSchema = z.strictObject({
   path: z.literal(''),
   component: z.literal(''),
   layout: z.literal(''),
-  externalUrl: z.string().min(1).max(500).regex(/^https?:\/\//i),
+  externalUrl: z
+    .string()
+    .min(1)
+    .max(500)
+    .regex(/^https?:\/\//i),
 })
 
 export const MenuRequestSchema = z.discriminatedUnion('type', [
@@ -64,10 +72,7 @@ export const MenuSummarySchema = AuditFieldsSchema.extend({
 })
 
 export const MenuPageResponseSchema = paginatedResponseSchema(MenuSummarySchema)
-export const MenuPageResultSchema = z.union([
-  MenuPageResponseSchema,
-  ErrorResponseSchema,
-])
+export const MenuPageResultSchema = z.union([MenuPageResponseSchema, ErrorResponseSchema])
 export const MenuListResponseSchema = apiResponseSchema(z.array(MenuSummarySchema))
 
 const NavigationMenuBaseSchema = z.strictObject({
@@ -92,25 +97,19 @@ export type NavigationMenu = NavigationMenuBase & {
 export const NavigationMenuSchema: z.ZodType<NavigationMenu> = z.lazy(() =>
   NavigationMenuBaseSchema.extend({
     children: z.array(NavigationMenuSchema),
-  })
+  }),
 )
 
-export const NavigationMenuResponseSchema = apiResponseSchema(
-  z.array(NavigationMenuSchema)
-)
+export const NavigationMenuResponseSchema = apiResponseSchema(z.array(NavigationMenuSchema))
 
 export type MenuRequest = z.infer<typeof MenuRequestSchema>
 export type MenuSummary = z.infer<typeof MenuSummarySchema>
 export type MenuPageResponse = z.infer<typeof MenuPageResponseSchema>
 export type MenuPageResult = z.infer<typeof MenuPageResultSchema>
 export type MenuListResponse = z.infer<typeof MenuListResponseSchema>
-export type NavigationMenuResponse = z.infer<
-  typeof NavigationMenuResponseSchema
->
+export type NavigationMenuResponse = z.infer<typeof NavigationMenuResponseSchema>
 
-export function isValidMenuPath(
-  input: Pick<MenuRequest, 'parentId' | 'path' | 'type'>
-): boolean {
+export function isValidMenuPath(input: Pick<MenuRequest, 'parentId' | 'path' | 'type'>): boolean {
   if (input.type === 'button') return true
   const path = input.path.trim()
   return path.length > 0 && (input.parentId > 0 || path.startsWith('/'))

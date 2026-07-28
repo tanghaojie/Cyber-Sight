@@ -7,6 +7,7 @@
 ## 当前结构
 
 - `src/modules/<module>/pages/`：各业务模块拥有的路由页面。
+- `src/modules/<module>/pages/components/`：仅供所属页面使用的列表、Dialog 等页面级组件。
 - `src/modules/<module>/`：模块 API、页面状态和按职责命名的公共文件。
 - `src/api/`：共享 API Client 和 HTTP 401/404/500 全局响应拦截器。
 - `@scaffold/api-contract`：由运行时 Schema 推导的请求和响应类型。
@@ -22,6 +23,8 @@
 - `src/assets/icons/*.svg`、`src/shared/icons/icon-registry.ts` 与 `src/components/AppIcon.vue`：由 Vite 构建期发现图标源、生成 sprite/只读选项，并通过稳定名称渲染。
 - `src/styles/main.scss`：只负责组合 Tailwind、基础样式、布局样式和按 Element Plus 组件拆分的 SCSS 覆盖。
 - `src/modules/users|roles|menus|dictionaries`：四个相互独立的管理页面和 API service。
+- users、roles、menus、dictionaries 的 `*Page.vue` 只负责页面级聚合；列表查询、展示与删除由
+  `*List.vue` 承担，新增/编辑表单和保存由 `*Dialog.vue` 承担。
 
 ## 约束
 
@@ -37,6 +40,8 @@
 - 共享 API Client 从领域无关的 access-token 存储读取 token，并为请求统一附加 `Authorization: Bearer <token>`；认证 store 负责在登录、退出和 HTTP 401 时写入或清除 token。
 - API 请求和响应类型来自共享运行时 Schema 的推导结果。
 - 页面必须明确处理 loading、empty、error 和 success 状态。
+- 列表 + 新增/编辑形态的管理页面应把内部组件放在本模块 `pages/components/`；Page 只组合
+  标题操作、列表和 Dialog，并协调保存后的列表刷新，不重复承载表格和完整表单实现。
 - 跨页面共享状态才进入 Pinia；局部状态保留在组件或 composable。
 - 新业务模块必须提供组件/逻辑测试，并为关键流程提供端到端测试。
 - 布局和视觉样式优先使用 Tailwind CSS；需要全局维护的样式使用 SCSS 并按基础样式、布局职责和第三方组件边界拆分。表格、表单、弹窗和反馈等通用交互优先使用 Element Plus；其全局变量与每类组件覆盖不得混放在 `main.scss`。

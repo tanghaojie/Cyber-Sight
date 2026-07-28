@@ -5,7 +5,7 @@ import {
   toFastifySchema,
   type HealthResponse,
 } from '@scaffold/api-contract'
-import { success } from '../../shared/http/response.js'
+import { success } from '@/shared/http/response.js'
 
 async function getHealth(): Promise<HealthResponse> {
   return success({
@@ -29,6 +29,6 @@ export async function healthRoutes(app: FastifyInstance): Promise<void> {
         },
       },
     },
-    getHealth
+    getHealth,
   )
 }

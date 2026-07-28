@@ -1,8 +1,8 @@
 import { shallowMount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
-import AppHeader from '../components/layout/AppHeader.vue'
-import AppMain from '../components/layout/AppMain.vue'
-import AppSidebar from '../components/layout/AppSidebar.vue'
+import AppHeader from '@/components/layout/AppHeader.vue'
+import AppMain from '@/components/layout/AppMain.vue'
+import AppSidebar from '@/components/layout/AppSidebar.vue'
 import AdminLayout from './AdminLayout.vue'
 
 const mocks = vi.hoisted(() => ({
@@ -16,14 +16,14 @@ vi.mock('vue-router', () => ({
   useRouter: () => ({ replace: mocks.replace }),
 }))
 
-vi.mock('../modules/auth/auth.store.js', () => ({
+vi.mock('@/modules/auth/auth.store.js', () => ({
   useAuthStore: () => ({
     user: { displayName: '系统管理员', roles: ['SUPER_ADMIN'] },
     logout: mocks.logout,
   }),
 }))
 
-vi.mock('../modules/navigation/navigation.store.js', () => ({
+vi.mock('@/modules/navigation/navigation.store.js', () => ({
   useNavigationStore: () => ({
     items: [],
     loading: false,
@@ -32,7 +32,7 @@ vi.mock('../modules/navigation/navigation.store.js', () => ({
   }),
 }))
 
-vi.mock('../router/index.js', () => ({
+vi.mock('@/router/index.js', () => ({
   installMenuRoutes: vi.fn(),
   clearDynamicRoutes: vi.fn(),
 }))

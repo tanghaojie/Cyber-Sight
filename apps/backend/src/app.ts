@@ -18,7 +18,7 @@ interface AppDependencies {
 
 export async function buildApp(
   options: FastifyServerOptions = {},
-  dependencies: AppDependencies = {}
+  dependencies: AppDependencies = {},
 ) {
   const app = Fastify({
     logger: true,
@@ -30,8 +30,7 @@ export async function buildApp(
     ...options,
   })
 
-  const jwtSecret =
-    dependencies.jwtSecret ?? randomBytes(32).toString('base64url')
+  const jwtSecret = dependencies.jwtSecret ?? randomBytes(32).toString('base64url')
   app.decorate('authTokens', new JwtTokenCache(jwtSecret))
 
   app.register(sensible)

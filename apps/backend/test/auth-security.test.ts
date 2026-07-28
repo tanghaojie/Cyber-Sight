@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  hashSessionToken,
-  hashPassword,
-  verifyPassword,
-} from '../src/modules/auth/auth.security.js'
+import { hashSessionToken, hashPassword, verifyPassword } from '@/modules/auth/auth.security.js'
 
 describe('authentication security helpers', () => {
   it('hashes and verifies a password without storing the password', async () => {

@@ -1,14 +1,8 @@
 import type { FastifyInstance, FastifyRequest } from 'fastify'
 import { describe, expect, it, vi } from 'vitest'
-import {
-  authenticateCredentials,
-  currentUserFromRequest,
-} from '../src/modules/auth/auth.service.js'
-import { JwtTokenCache } from '../src/modules/auth/auth-token-cache.js'
-import {
-  hashPassword,
-  hashSessionToken,
-} from '../src/modules/auth/auth.security.js'
+import { authenticateCredentials, currentUserFromRequest } from '@/modules/auth/auth.service.js'
+import { JwtTokenCache } from '@/modules/auth/auth-token-cache.js'
+import { hashPassword, hashSessionToken } from '@/modules/auth/auth.security.js'
 
 const SECRET = 'test-only-jwt-secret-at-least-32-characters'
 
@@ -49,11 +43,7 @@ describe('authentication service persistence cache', () => {
       },
     } as unknown as FastifyInstance
 
-    const result = await authenticateCredentials(
-      app,
-      userRow.username,
-      password
-    )
+    const result = await authenticateCredentials(app, userRow.username, password)
 
     expect(result?.user).toEqual({
       id: 7,
@@ -67,7 +57,7 @@ describe('authentication service persistence cache', () => {
         userId: 7,
         tokenHash: hashSessionToken(result?.token ?? ''),
         expiresAt: expect.any(Date),
-      })
+      }),
     )
     expect(insertValues.mock.calls[0]?.[0]).not.toHaveProperty('token')
   })
@@ -89,12 +79,14 @@ describe('authentication service persistence cache', () => {
         from: vi.fn(() => ({
           innerJoin: vi.fn(() => ({
             where: vi.fn(() => ({
-              limit: vi.fn().mockResolvedValue([{
-                id: currentUser.id,
-                username: currentUser.username,
-                displayName: currentUser.displayName,
-                expiresAt: issued.expiresAt,
-              }]),
+              limit: vi.fn().mockResolvedValue([
+                {
+                  id: currentUser.id,
+                  username: currentUser.username,
+                  displayName: currentUser.displayName,
+                  expiresAt: issued.expiresAt,
+                },
+              ]),
             })),
           })),
         })),
@@ -114,14 +106,10 @@ describe('authentication service persistence cache', () => {
       headers: { authorization: `Bearer ${issued.token}` },
     } as FastifyRequest
 
-    await expect(currentUserFromRequest(app, request)).resolves.toEqual(
-      currentUser
-    )
+    await expect(currentUserFromRequest(app, request)).resolves.toEqual(currentUser)
     expect(select).toHaveBeenCalledTimes(2)
 
-    await expect(currentUserFromRequest(app, request)).resolves.toEqual(
-      currentUser
-    )
+    await expect(currentUserFromRequest(app, request)).resolves.toEqual(currentUser)
     expect(select).toHaveBeenCalledTimes(2)
   })
 })

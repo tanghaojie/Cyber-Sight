@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  isValidMenuPath,
-  MenuListResponseSchema,
-  MenuRequestSchema,
-} from '@scaffold/api-contract'
+import { isValidMenuPath, MenuListResponseSchema, MenuRequestSchema } from '@scaffold/api-contract'
 
 const auditFields = {
   isDeleted: false,
@@ -45,31 +41,37 @@ describe('legacy menu response compatibility', () => {
       sortOrder: 0,
       enabled: true,
     }
-    expect(MenuRequestSchema.safeParse({
-      ...common,
-      type: 'directory',
-      path: '/administration',
-      component: '',
-      layout: 'AdminLayout',
-      externalUrl: '',
-    }).success).toBe(true)
-    expect(MenuRequestSchema.safeParse({
-      ...common,
-      type: 'menu',
-      parentId: 1,
-      path: 'test',
-      component: 'test',
-      layout: 'AdminLayout',
-      externalUrl: '',
-    }).success).toBe(true)
-    expect(MenuRequestSchema.safeParse({
-      ...common,
-      type: 'button',
-      path: '',
-      component: '',
-      layout: 'AdminLayout',
-      externalUrl: 'https://example.com',
-    }).success).toBe(false)
+    expect(
+      MenuRequestSchema.safeParse({
+        ...common,
+        type: 'directory',
+        path: '/administration',
+        component: '',
+        layout: 'AdminLayout',
+        externalUrl: '',
+      }).success,
+    ).toBe(true)
+    expect(
+      MenuRequestSchema.safeParse({
+        ...common,
+        type: 'menu',
+        parentId: 1,
+        path: 'test',
+        component: 'test',
+        layout: 'AdminLayout',
+        externalUrl: '',
+      }).success,
+    ).toBe(true)
+    expect(
+      MenuRequestSchema.safeParse({
+        ...common,
+        type: 'button',
+        path: '',
+        component: '',
+        layout: 'AdminLayout',
+        externalUrl: 'https://example.com',
+      }).success,
+    ).toBe(false)
   })
 
   it('requires absolute root paths and allows relative descendant paths', () => {

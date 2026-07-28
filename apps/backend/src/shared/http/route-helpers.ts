@@ -1,15 +1,10 @@
 import type { FastifyInstance } from 'fastify'
 import type { ListQuery } from '@scaffold/api-contract'
-import { ErrorCode } from '../errors/error-codes.js'
+import { ErrorCode } from '@/shared/errors/error-codes.js'
 import { failure, normalizePagination, success } from './response.js'
 
 export function isUniqueViolation(error: unknown): boolean {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    error.code === '23505'
-  )
+  return typeof error === 'object' && error !== null && 'code' in error && error.code === '23505'
 }
 
 export function normalizedListQuery(query: ListQuery) {

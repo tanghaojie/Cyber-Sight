@@ -31,6 +31,13 @@
 4. `docs/archive/**` 默认不得读取。只有用户明确要求历史、当前文档明确引用历史证据、排查回归/兼容性或准备恢复旧方案时，才先读 `docs/archive/README.md` 并选择最相关的一至两份文件。
 5. 不得仅凭聊天上下文推断长期约定；长期有效的结论必须写入仓库文档。
 
+## 代码格式
+
+- 仓库根目录 `.prettierrc.json` 是 JavaScript、TypeScript、Vue、JSON、Markdown 和样式文件的
+  唯一格式来源；AI 生成代码时必须直接遵守该配置，不得从个人编辑器设置推断额外规则。
+- 完成代码修改后执行 `pnpm format`，并在最终验证中执行 `pnpm format:check`。
+- pre-commit hook 只负责格式化已暂存文件，不能代替测试、构建或 AI 对最终 diff 的检查。
+
 ## 文档门禁
 
 以下任一情况都属于“非简单改动”：

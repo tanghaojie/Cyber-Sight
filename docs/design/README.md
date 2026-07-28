@@ -8,6 +8,7 @@
 - [模块边界](module-boundaries.md)：独立目录、公共文件、依赖和数据所有权；新模块或跨模块改动必读。
 - [分层文档与历史归档](documentation-governance.md)：最小阅读协议和文档生命周期；文档治理任务必读。
 - [测试策略](testing-strategy.md)：测试分层、契约校验和数据库测试边界。
+- [开发工作流](developer-workflow.md)：源码别名、项目格式配置、编辑器和 Git 自动格式化。
 - [前端应用壳](frontend-shell.md)：品牌、布局、数据库导航、页面注册和全局 HTTP 错误行为。
 
 ## Workspace 与模块

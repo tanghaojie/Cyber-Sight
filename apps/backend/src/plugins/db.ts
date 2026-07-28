@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify'
 import fp from 'fastify-plugin'
-import { databaseClient, db } from '../db/index.js'
+import { databaseClient, db } from '@/db/index.js'
 
 declare module 'fastify' {
   interface FastifyInstance {

@@ -42,7 +42,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { ArrowDown, SwitchButton } from '@element-plus/icons-vue'
-import AppIcon from '../AppIcon.vue'
+import AppIcon from '@/components/AppIcon.vue'
 
 const props = defineProps<{
   title: string

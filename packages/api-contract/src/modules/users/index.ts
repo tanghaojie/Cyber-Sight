@@ -1,9 +1,5 @@
 import { z } from 'zod'
-import {
-  AuditFieldsSchema,
-  ErrorResponseSchema,
-  paginatedResponseSchema,
-} from '../../shared/http.js'
+import { AuditFieldsSchema, ErrorResponseSchema, paginatedResponseSchema } from '@/shared/http.js'
 
 const integerArray = z.array(z.number().int())
 
@@ -35,10 +31,7 @@ export const UserUpdateSchema = z.strictObject({
 })
 
 export const UserPageResponseSchema = paginatedResponseSchema(UserSummarySchema)
-export const UserPageResultSchema = z.union([
-  UserPageResponseSchema,
-  ErrorResponseSchema,
-])
+export const UserPageResultSchema = z.union([UserPageResponseSchema, ErrorResponseSchema])
 
 export type UserSummary = z.infer<typeof UserSummarySchema>
 export type UserCreate = z.infer<typeof UserCreateSchema>

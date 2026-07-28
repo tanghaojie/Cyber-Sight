@@ -1,6 +1,6 @@
 import type { RouteComponent } from 'vue-router'
 import { describe, expect, it } from 'vitest'
-import type { ViewRegistrar } from '../shared/routing/view-registry.js'
+import type { ViewRegistrar } from '@/shared/routing/view-registry.js'
 import { createViewRegistry, viewRegistry } from './view-registry.js'
 
 const testComponent: RouteComponent = () => Promise.resolve({})
@@ -31,7 +31,7 @@ describe('view registry', () => {
           },
         },
       }),
-    ).toThrow('Duplicate view name "shared-view"')
+    ).toThrow('Duplicate view key "shared-view"')
   })
 
   it('rejects files that do not export the registration function', () => {
@@ -51,6 +51,6 @@ describe('view registry', () => {
           },
         },
       }),
-    ).toThrow('Invalid view name "../private-page"')
+    ).toThrow('Invalid view key "../private-page"')
   })
 })

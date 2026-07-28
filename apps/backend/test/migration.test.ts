@@ -7,13 +7,10 @@ interface MigrationJournal {
 
 function migrationSqlFiles(): string[] {
   const journalUrl = new URL('../drizzle/meta/_journal.json', import.meta.url)
-  const journal = JSON.parse(
-    readFileSync(journalUrl, 'utf8')
-  ) as MigrationJournal
-  return journal.entries.map(({ tag }) => readFileSync(
-    new URL(`../drizzle/${tag}.sql`, import.meta.url),
-    'utf8'
-  ))
+  const journal = JSON.parse(readFileSync(journalUrl, 'utf8')) as MigrationJournal
+  return journal.entries.map(({ tag }) =>
+    readFileSync(new URL(`../drizzle/${tag}.sql`, import.meta.url), 'utf8'),
+  )
 }
 
 function migrationContaining(fragment: string): string {
@@ -34,7 +31,9 @@ describe('database migrations', () => {
     const migrationSql = latestMigrationSql()
 
     expect(migrationSql).toContain('CREATE TABLE IF NOT EXISTS "auth_sessions"')
-    expect(migrationSql).toContain('CONSTRAINT "auth_sessions_token_hash_unique" UNIQUE("token_hash")')
+    expect(migrationSql).toContain(
+      'CONSTRAINT "auth_sessions_token_hash_unique" UNIQUE("token_hash")',
+    )
   })
 
   it('adds a backwards-compatible layout identifier to menus', () => {
@@ -48,15 +47,9 @@ describe('database migrations', () => {
   it('replaces the menu code constraint with an active-row unique index', () => {
     const migrationSql = migrationContaining('menus_code_active_unique')
 
-    expect(migrationSql).toContain(
-      'ALTER TABLE "menus" DROP CONSTRAINT "menus_code_unique"'
-    )
-    expect(migrationSql).toContain(
-      'CREATE UNIQUE INDEX IF NOT EXISTS "menus_code_active_unique"'
-    )
-    expect(migrationSql).toContain(
-      '("code") WHERE "menus"."is_deleted" = false'
-    )
+    expect(migrationSql).toContain('ALTER TABLE "menus" DROP CONSTRAINT "menus_code_unique"')
+    expect(migrationSql).toContain('CREATE UNIQUE INDEX IF NOT EXISTS "menus_code_active_unique"')
+    expect(migrationSql).toContain('("code") WHERE "menus"."is_deleted" = false')
   })
 
   it('replaces every other business identity constraint with active-row indexes', () => {
@@ -84,9 +77,7 @@ describe('database migrations', () => {
       'users_username_active_unique',
       'users_email_active_unique',
     ]) {
-      expect(migrationSql).toContain(
-        `CREATE UNIQUE INDEX IF NOT EXISTS "${activeIndex}"`
-      )
+      expect(migrationSql).toContain(`CREATE UNIQUE INDEX IF NOT EXISTS "${activeIndex}"`)
     }
     expect(migrationSql.match(/WHERE \"[^\"]+\"\.\"is_deleted\" = false/g)).toHaveLength(6)
     expect(migrationSql).not.toContain('auth_sessions_token_hash_unique')

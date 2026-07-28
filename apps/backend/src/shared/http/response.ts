@@ -1,9 +1,5 @@
-import type {
-  ApiResponse,
-  PaginatedResponse,
-  PaginationRequest,
-} from '@scaffold/api-contract'
-import { ErrorCode } from '../errors/error-codes.js'
+import type { ApiResponse, PaginatedResponse, PaginationRequest } from '@scaffold/api-contract'
+import { ErrorCode } from '@/shared/errors/error-codes.js'
 
 export function success<T>(data: T): { status: 0; data: T }
 export function success(): { status: 0 }
@@ -25,7 +21,7 @@ export function failure(status: number, err: string): ApiResponse<never> {
 
 export function paginatedSuccess<T>(
   list: T[],
-  total: number
+  total: number,
 ): { status: 0; list: T[]; total: number } {
   return {
     status: ErrorCode.SUCCESS,
@@ -34,10 +30,7 @@ export function paginatedSuccess<T>(
   }
 }
 
-export function paginatedFailure(
-  status: number,
-  err: string
-): PaginatedResponse<never> {
+export function paginatedFailure(status: number, err: string): PaginatedResponse<never> {
   if (status === ErrorCode.SUCCESS) {
     throw new Error('Failure responses must use a non-zero error code')
   }
@@ -50,9 +43,7 @@ export function paginatedFailure(
   }
 }
 
-export function normalizePagination(
-  request: PaginationRequest = {}
-): Required<PaginationRequest> {
+export function normalizePagination(request: PaginationRequest = {}): Required<PaginationRequest> {
   const pageNum = request.pageNum ?? 1
   const pageSize = request.pageSize ?? 10
 
