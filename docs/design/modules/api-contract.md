@@ -63,7 +63,8 @@ TypeScript 只能检查参与编译的源码，类型在运行时会被擦除。
 - 契约包通过 TypeScript 构建验证 Zod Schema 与推导类型，后端转换测试验证派生的 Draft 7 JSON Schema 有效。
 - 后端使用 `Fastify.inject` 测试合法与非法输入、默认值、额外字段和响应序列化。
 - Swagger 测试只验证运行时路由确实暴露预期操作和关键约束，不再比较第二份 OpenAPI。
-- 前端测试 mock 共享 Client，验证成功、业务失败和全局 HTTP 错误边界。
+- 前端通过 TypeScript 与生产构建验证契约消费可以解析；成功、业务失败和全局 HTTP 错误
+  行为由维护者人工验收。
 
 ## 决策依据
 

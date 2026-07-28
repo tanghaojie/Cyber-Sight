@@ -52,5 +52,6 @@
 | JWT Bearer 与 LRU 认证改造       | [计划](plans/2026-07-28-jwt-lru-authentication.md)                     | [日志](ai-logs/2026/07/2026-07-28-jwt-lru-authentication.md)                       |
 | JWT 数据库会话与 LRU 读缓存修正  | [计划](plans/2026-07-28-persistent-jwt-session-cache.md)               | [日志](ai-logs/2026/07/2026-07-28-persistent-jwt-session-cache.md)                 |
 | 源码路径、格式化与管理页面组件化 | [计划](plans/2026-07-28-source-format-and-page-components.md)          | [日志](ai-logs/2026/07/2026-07-28-source-format-and-page-components.md)            |
+| 前端自动化测试移除               | [计划](plans/2026-07-28-remove-frontend-unit-tests.md)                | [日志](ai-logs/2026/07/2026-07-28-remove-frontend-unit-tests.md)                    |
 
 归档内容不继续同步当前实现；发现冲突时以当前设计、现行 ADR、代码和测试为准。

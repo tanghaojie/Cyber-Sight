@@ -13,13 +13,13 @@ updated: 2026-07-28
 workspace 的 `src` 目录。导入当前目录或子目录文件时保留 `./` 相对路径；只要导入路径
 需要先返回上级目录，就从 `@/` 开始写完整的源码路径。
 
-别名同时登记在 TypeScript 和实际执行工具中：前端由 Vite/Vitest 解析，后端与契约包在
+别名同时登记在 TypeScript 和实际执行工具中：前端由 Vite 解析，后端与契约包在
 TypeScript 编译后由 `tsc-alias` 把别名改写成可被 Node.js 执行的相对路径，后端 Vitest
 另登记同一别名。`import.meta.glob` 使用 Vite 支持的 `@/` 别名。文件系统 URL 等不是模块
 导入的运行时相对路径不参与迁移。
 
-契约包的 `build` 与 `test` 都必须在 `tsc` 后执行 `tsc-alias`。根目录测试会先运行契约包，
-再并行运行前后端测试；若契约测试只执行 `tsc`，就会用未改写的产物覆盖可运行的 `dist`。
+契约包的 `build` 与 `test` 都必须在 `tsc` 后执行 `tsc-alias`。根目录测试会构建契约包并
+运行后端测试，不包含前端；若契约测试只执行 `tsc`，就会用未改写的产物覆盖可运行的 `dist`。
 
 ## 代码格式
 
@@ -41,7 +41,8 @@ TypeScript 编译后由 `tsc-alias` 把别名改写成可被 Node.js 执行的�
 也不能替代构建和测试。
 
 AI 修改代码时必须遵循根目录 `AGENTS.md`：生成内容直接服从仓库 Prettier 配置，验证阶段
-执行 `pnpm format` 和 `pnpm format:check`，再运行与改动相称的测试和构建。
+执行 `pnpm format` 和 `pnpm format:check`。后端与契约变更运行相称的自动化测试；前端只
+执行类型检查和生产构建，功能与浏览器验收交给维护者。
 
 ## 失败模式与验证
 
@@ -51,6 +52,8 @@ AI 修改代码时必须遵循根目录 `AGENTS.md`：生成内容直接服从�
   `prettier.requireConfig`。
 - Node.js 产物仍包含 `@/`：构建脚本必须在 `tsc` 后执行 `tsc-alias`，并在生产构建后搜索
   `dist` 验证没有残留源码别名。
-- 交付验证至少执行 `pnpm format:check`、`pnpm test` 和 `pnpm build`。
+- 交付验证至少执行 `pnpm format:check` 和 `pnpm build`；涉及后端或契约时再执行相称的
+  `pnpm test`，前端人工验收结果由维护者确认。
 
-长期取舍见 [ADR-0021](../decisions/ADR-0021-source-alias-and-automated-formatting.md)。
+长期取舍见 [ADR-0021](../decisions/ADR-0021-source-alias-and-automated-formatting.md)和
+[ADR-0022](../decisions/ADR-0022-maintainer-owned-frontend-validation.md)。

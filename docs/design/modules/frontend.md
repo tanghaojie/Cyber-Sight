@@ -28,7 +28,7 @@
 
 ## 约束
 
-- 新业务能力必须建立 `src/modules/<module>/` 独立目录，并通过 `*.routes.ts`、`*.store.ts`、`*.api.ts`、`view-registry.ts` 等表意文件暴露公共能力，避免创建 `index.ts` 或无差别转发的 barrel。模块拥有自己的页面、组件、composable、service、局部 store 和测试；`src/router/`、`src/views/` 与 `src/stores/` 中的存量业务代码在实质修改时迁入对应模块。
+- 新业务能力必须建立 `src/modules/<module>/` 独立目录，并通过 `*.routes.ts`、`*.store.ts`、`*.api.ts`、`view-registry.ts` 等表意文件暴露公共能力，避免创建 `index.ts` 或无差别转发的 barrel。模块拥有自己的页面、组件、composable、service 和局部 store；`src/router/`、`src/views/` 与 `src/stores/` 中的存量业务代码在实质修改时迁入对应模块。
 - 路由和应用壳只能从模块设计中登记的公共文件加载业务页面、状态或注册信息；禁止一个模块导入另一个模块未登记的组件、composable、service 或 store。
 - 当前公共文件包括：`auth/auth.store.ts`、`auth/auth.routes.ts`、`navigation/navigation.store.ts`、`errors/error.routes.ts`、各管理模块的 `*.api.ts`，以及由路由组合根按约定发现的 `view-registry.ts`。`menus/menu-options.ts` 是角色模块读取菜单选项的公共用例文件。
 - 需要被数据库菜单选择的模块页面必须在本模块 `view-registry.ts` 的 `registerViews()` 中显式登记稳定组件标识；路由组合根自动发现该约定文件，禁止中心注册表继续手工导入业务模块。组件标识必须非空且全局唯一。
@@ -43,16 +43,19 @@
 - 列表 + 新增/编辑形态的管理页面应把内部组件放在本模块 `pages/components/`；Page 只组合
   标题操作、列表和 Dialog，并协调保存后的列表刷新，不重复承载表格和完整表单实现。
 - 跨页面共享状态才进入 Pinia；局部状态保留在组件或 composable。
-- 新业务模块必须提供组件/逻辑测试，并为关键流程提供端到端测试。
+- 新业务模块必须在设计或交付说明中列出维护者需要人工验收的成功、失败和关键交互场景。
 - 布局和视觉样式优先使用 Tailwind CSS；需要全局维护的样式使用 SCSS 并按基础样式、布局职责和第三方组件边界拆分。表格、表单、弹窗和反馈等通用交互优先使用 Element Plus；其全局变量与每类组件覆盖不得混放在 `main.scss`。
 - 共享响应拦截器统一识别 HTTP `401`、`404`、`500` 并调用应用启动时注册的处理器；401 清状态并跳登录、404 跳错误页、500 使用 ElMessage 显示 `err`。
 - 业务模块处理 HTTP `200` 响应中的非零业务 `status`；只有 `status === 0` 且存在预期数据时才进入成功状态。
 - 分页页面通过统一的 `pageNum`、`pageSize` 请求和 `list`、`total` 响应维护状态。
 
-前端测试使用 Vitest、Vue Test Utils 和 jsdom。页面测试应隔离网络，通过 mock composable 或 API Client 验证 loading、error 和 success 展示；真实前后端流程留给端到端测试。
+前端不维护 Vitest、Vue Test Utils、jsdom 或其他自动化测试环境。AI 可执行格式、类型检查和
+生产构建；页面的 loading、empty、error、success、表单交互和真实前后端流程由维护者人工
+验收。除非维护者在具体任务中明确要求，AI 不创建或运行前端测试及浏览器测试。
 
 ## 当前缺口
 
-- 已实现 HTTP 401 登录重定向、独立 404 页面和全局 500 提示；后续需补充端到端浏览器自动化。
+- 已实现 HTTP 401 登录重定向、独立 404 页面和全局 500 提示；这些行为的回归风险由维护者
+  人工浏览器验收承担。
 - `useHealth` 成功重试时不会清理旧错误状态。
 - 已建立 Tailwind CSS、Element Plus 主题令牌和响应式样式基线；系统化可访问性审计和生产环境 API 地址策略仍待补齐。

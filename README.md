@@ -32,13 +32,13 @@ pnpm dev
 1. 在 `packages/api-contract` 定义运行时 Schema 和推导类型
 2. 在 `apps/backend/src/modules/<module>/` 挂载共享 Schema 并实现路由
 3. 在 `apps/frontend/src/modules/<module>/` 以共享类型封装调用
-4. 补充合法/非法请求、响应结构和前端状态测试
-5. 运行 `pnpm test` 和 `pnpm build`
+4. 补充合法/非法请求和响应结构的后端测试，列出前端人工验收场景
+5. 运行适用的后端/契约测试和 `pnpm build`；前端功能及浏览器行为由维护者验收
 
 ## 常用命令
 
 ```bash
-pnpm test          # 后端路由/契约测试和前端组件测试
+pnpm test          # 契约构建校验和后端测试，不包含前端
 pnpm build         # TypeScript 检查和生产构建
 pnpm db:generate   # 根据 Drizzle Schema 生成迁移
 pnpm db:migrate    # 应用迁移
@@ -53,6 +53,6 @@ pnpm test:db       # 检查 PostgreSQL 连接和关键表
 
 ## 开发文档
 
-- [人类维护者开发指南](docs/guides/human-maintainer-development-guide.md)：目录职责、运行时 Schema、Drizzle、Vitest、新增接口和数据库维护流程。
+- [人类维护者开发指南](docs/guides/human-maintainer-development-guide.md)：目录职责、运行时 Schema、Drizzle、后端测试、前端人工验收和数据库维护流程。
 - [错误码参考](docs/reference/error-codes.md)：统一响应、错误码区间和登记流程。
 - [系统与模块设计](docs/design/README.md)：当前有效架构和模块边界。

@@ -29,7 +29,7 @@ date: 2026-07-28
 ## 决策
 
 采用方案 3。当前目录或子目录使用 `./`；需要返回上级目录的模块导入使用 `@/`。前端
-Vite/Vitest 原生登记 alias；后端和契约包由 TypeScript `paths` 提供开发期类型解析，并在
+Vite 原生登记前端 alias；后端和契约包由 TypeScript `paths` 提供开发期类型解析，并在
 `tsc` 后运行 `tsc-alias` 生成 Node.js 可执行产物。运行时文件 URL 不伪装成模块 alias。
 
 根目录 Prettier 配置固定 `semi: false`、`singleQuote: true`、`printWidth: 100`。VS Code
@@ -54,7 +54,7 @@ format-on-save 提供即时反馈，`lint-staged` 与 `simple-git-hooks` 在 pre
 ## 验证和复审条件
 
 - 搜索源码模块导入，不应存在以 `../` 开始的 specifier；运行时文件 URL 和测试数据字符串除外。
-- `pnpm format:check`、`pnpm test` 和 `pnpm build` 通过。
+- `pnpm format:check` 和 `pnpm build` 通过；`pnpm test` 只覆盖契约构建校验与后端测试。
 - 后端与契约包构建产物不包含 `@/` specifier，后端启动入口可由 Node.js 解析。
 - 若未来统一切换到原生支持 import map 的运行时或构建器，复审 `tsc-alias`，不改变源码约定。
 

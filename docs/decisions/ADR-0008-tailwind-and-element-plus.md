@@ -20,7 +20,7 @@ date: 2026-07-23
 
 - 前端新增 Tailwind CSS、Element Plus 及其图标依赖。
 - 组件模板会同时出现 Tailwind 工具类和 Element Plus 组件。
-- 需要在构建和测试环境中加载 Element Plus 样式与 Tailwind 入口。
+- 需要在 Vite 构建中加载 Element Plus 样式与 Tailwind 入口。
 - 新页面应复用应用壳、导航模型和共享视觉令牌，避免重新创建平行的布局体系。
 
 ## 备选方案
