@@ -23,6 +23,14 @@ function migrationContaining(fragment: string): string {
 }
 
 describe('database migrations', () => {
+  it('adds a backwards-compatible layout identifier to menus', () => {
+    const migrationSql = migrationContaining('ADD COLUMN "layout"')
+
+    expect(migrationSql).toContain(
+      `ALTER TABLE "menus" ADD COLUMN "layout" varchar(160) DEFAULT '' NOT NULL`,
+    )
+  })
+
   it('replaces the menu code constraint with an active-row unique index', () => {
     const migrationSql = migrationContaining('menus_code_active_unique')
 

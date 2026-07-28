@@ -26,10 +26,36 @@ describe('legacy menu response compatibility', () => {
       ...auditFields,
     }
 
-    expect(
-      MenuListResponseSchema.safeParse({ status: 0, data: [legacyButton] })
-        .success
-    ).toBe(true)
+    const parsed = MenuListResponseSchema.safeParse({ status: 0, data: [legacyButton] })
+    expect(parsed.success).toBe(true)
+    if (parsed.success) expect(parsed.data.data?.[0].layout).toBe('')
     expect(MenuRequestSchema.safeParse(legacyButton).success).toBe(false)
+  })
+
+  it('accepts layouts for directories and menus but not external buttons', () => {
+    const common = {
+      parentId: 0,
+      name: '测试',
+      code: 'TEST_MENU',
+      icon: '',
+      sortOrder: 0,
+      enabled: true,
+    }
+    expect(MenuRequestSchema.safeParse({
+      ...common,
+      type: 'menu',
+      path: '/test',
+      component: 'test',
+      layout: 'AdminLayout',
+      externalUrl: '',
+    }).success).toBe(true)
+    expect(MenuRequestSchema.safeParse({
+      ...common,
+      type: 'button',
+      path: '',
+      component: '',
+      layout: 'AdminLayout',
+      externalUrl: 'https://example.com',
+    }).success).toBe(false)
   })
 })

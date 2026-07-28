@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { buildNavigationTree } from '../src/modules/menus/index.js'
+import { buildNavigationTree } from '../src/modules/menus/menus.repository.js'
 
 const rows = [
-  { id: 1, parentId: 0, name: '组织与权限', code: 'ORGANIZATION', icon: 'layers', sortOrder: 10, type: 'directory' as const, path: '', component: '', externalUrl: '' },
-  { id: 2, parentId: 1, name: '用户管理', code: 'USERS', icon: 'users', sortOrder: 10, type: 'menu' as const, path: '/users', component: 'users', externalUrl: '' },
-  { id: 3, parentId: 1, name: '文档', code: 'DOCS', icon: 'external', sortOrder: 20, type: 'button' as const, path: '', component: '', externalUrl: 'https://example.com' },
+  { id: 1, parentId: 0, name: '组织与权限', code: 'ORGANIZATION', icon: 'layers', sortOrder: 10, type: 'directory' as const, path: '', component: '', layout: 'AdminLayout', externalUrl: '' },
+  { id: 2, parentId: 1, name: '用户管理', code: 'USERS', icon: 'users', sortOrder: 10, type: 'menu' as const, path: '/users', component: 'users', layout: '', externalUrl: '' },
+  { id: 3, parentId: 1, name: '文档', code: 'DOCS', icon: 'external', sortOrder: 20, type: 'button' as const, path: '', component: '', layout: '', externalUrl: 'https://example.com' },
 ]
 
 describe('navigation menu tree', () => {

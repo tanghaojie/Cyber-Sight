@@ -20,6 +20,7 @@ const directoryRequestSchema = z.strictObject({
   type: z.literal('directory'),
   path: z.literal(''),
   component: z.literal(''),
+  layout: z.string().max(160),
   externalUrl: z.literal(''),
 })
 
@@ -28,6 +29,7 @@ const pageMenuRequestSchema = z.strictObject({
   type: z.literal('menu'),
   path: z.string().min(1).max(160).regex(/^\//),
   component: z.string().min(1).max(160),
+  layout: z.string().max(160),
   externalUrl: z.literal(''),
 })
 
@@ -36,6 +38,7 @@ const externalButtonRequestSchema = z.strictObject({
   type: z.literal('button'),
   path: z.literal(''),
   component: z.literal(''),
+  layout: z.literal(''),
   externalUrl: z.string().min(1).max(500).regex(/^https?:\/\//i),
 })
 
@@ -52,6 +55,7 @@ export const MenuSummarySchema = AuditFieldsSchema.extend({
   code: z.string().min(2).max(80),
   path: z.string().max(160),
   component: z.string().max(160),
+  layout: z.string().max(160).default(''),
   externalUrl: z.string().max(500),
   icon: z.string().max(50),
   sortOrder: z.number().int().min(0),
@@ -76,6 +80,7 @@ const NavigationMenuBaseSchema = z.strictObject({
   type: z.enum(['directory', 'menu', 'button']),
   path: z.string(),
   component: z.string(),
+  layout: z.string(),
   externalUrl: z.string(),
 })
 

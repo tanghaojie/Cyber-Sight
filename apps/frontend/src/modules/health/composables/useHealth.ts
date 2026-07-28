@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import type { HealthResponse } from '@scaffold/api-contract'
 import { apiClient } from '../../../api/client.js'
 
@@ -33,6 +33,7 @@ export function useHealth() {
 
   async function fetchHealthInterval() {
     clearInterval(healthTimer.value)
+    await fetchHealth()
 
     healthTimer.value = window.setInterval(async () => {
       await fetchHealth()

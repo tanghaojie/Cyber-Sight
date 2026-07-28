@@ -1,43 +1,81 @@
-import { createRouter, createWebHistory, type RouteRecordRaw, type Router } from 'vue-router'
+import {
+  createRouter,
+  createWebHistory,
+  RouterView,
+  type RouteComponent,
+  type RouteRecordRaw,
+  type Router,
+} from 'vue-router'
 import type { NavigationMenu } from '@scaffold/api-contract'
 import { pinia } from '../stores/pinia.js'
 import { loginPage } from '../modules/auth/auth.routes.js'
 import { useAuthStore } from '../modules/auth/auth.store.js'
 import { notFoundPage } from '../modules/errors/error.routes.js'
 import { useNavigationStore } from '../modules/navigation/navigation.store.js'
+import {
+  DEFAULT_LAYOUT,
+  layoutRegistry,
+} from '../shared/routing/layout-registry.js'
 import { viewRegistry } from './view-registry.js'
 
 const dynamicRouteRemovers: Array<() => void> = []
 let routesReady = false
 
-function flatten(nodes: NavigationMenu[]): NavigationMenu[] {
-  return nodes.flatMap((node) => [node, ...flatten(node.children)])
-}
-
 function childPath(path: string): string {
   return path === '/' ? '' : path.replace(/^\/+/, '')
 }
 
-export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[]): number {
+interface RouteRegistries {
+  layouts?: Readonly<Record<string, RouteComponent>>
+  views?: Readonly<Record<string, RouteComponent>>
+}
+
+export function installMenuRoutes(
+  targetRouter: Router,
+  nodes: NavigationMenu[],
+  registries: RouteRegistries = {},
+): number {
   clearDynamicRoutes()
+  const layouts = registries.layouts ?? layoutRegistry
+  const views = registries.views ?? viewRegistry
   const seenPaths = new Set<string>()
-  for (const node of flatten(nodes)) {
-    if (node.type !== 'menu' || !node.path || seenPaths.has(node.path)) continue
-    const component = viewRegistry[node.component]
-    if (!component) continue
-    seenPaths.add(node.path)
-    const route: RouteRecordRaw = {
-      path: childPath(node.path),
-      name: `menu-${node.id}`,
-      component,
-      meta: {
-        title: node.name,
-        eyebrow: node.code.replaceAll('_', ' / '),
-        menuId: node.id,
-      },
+
+  function registerNodes(items: NavigationMenu[], inheritedLayout = ''): void {
+    for (const node of items) {
+      const selectedLayout = node.layout || inheritedLayout
+      if (node.type === 'directory') {
+        registerNodes(node.children, selectedLayout)
+        continue
+      }
+      if (node.type !== 'menu' || !node.path || seenPaths.has(node.path)) continue
+
+      const component = views[node.component]
+      const layout = layouts[selectedLayout || DEFAULT_LAYOUT]
+      if (!component || !layout) continue
+
+      seenPaths.add(node.path)
+      const route: RouteRecordRaw = {
+        path: childPath(node.path),
+        name: `menu-layout-${node.id}`,
+        component: layout,
+        children: [
+          {
+            path: '',
+            name: `menu-${node.id}`,
+            component,
+            meta: {
+              title: node.name,
+              eyebrow: node.code.replaceAll('_', ' / '),
+              menuId: node.id,
+            },
+          },
+        ],
+      }
+      dynamicRouteRemovers.push(targetRouter.addRoute('admin-root', route))
     }
-    dynamicRouteRemovers.push(targetRouter.addRoute('admin-root', route))
   }
+
+  registerNodes(nodes)
   routesReady = true
   return dynamicRouteRemovers.length
 }
@@ -52,7 +90,7 @@ const router = createRouter({
   routes: [
     { path: '/login', name: 'login', component: loginPage, meta: { public: true, title: '登录' } },
     { path: '/404', name: 'not-found', component: notFoundPage, meta: { public: true, title: '页面未找到' } },
-    { path: '/', name: 'admin-root', component: () => import('../layouts/AdminLayout.vue'), children: [] },
+    { path: '/', name: 'admin-root', component: RouterView, children: [] },
     { path: '/:pathMatch(.*)*', name: 'dynamic-fallback', component: notFoundPage },
   ],
 })

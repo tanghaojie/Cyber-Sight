@@ -1,7 +1,13 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { NavigationMenu } from '@scaffold/api-contract'
 import AppSidebar from './AppSidebar.vue'
+
+vi.mock('../../modules/health/composables/useHealth.js', () => ({
+  useHealth() {
+    return { status: 'ok', timestamp: '2026-07-28T00:00:00.000Z', error: null }
+  },
+}))
 
 const items: NavigationMenu[] = [
   {
@@ -14,6 +20,7 @@ const items: NavigationMenu[] = [
     type: 'directory',
     path: '',
     component: '',
+    layout: 'AdminLayout',
     externalUrl: '',
     children: [
       {
@@ -26,6 +33,7 @@ const items: NavigationMenu[] = [
         type: 'menu',
         path: '/users',
         component: 'users',
+        layout: '',
         externalUrl: '',
         children: [],
       },
@@ -39,6 +47,7 @@ const items: NavigationMenu[] = [
         type: 'button',
         path: '',
         component: '',
+        layout: '',
         externalUrl: 'https://example.com',
         children: [],
       },

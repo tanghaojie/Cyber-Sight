@@ -29,6 +29,7 @@
 | --- | --- | --- |
 | 初始脚手架 | [计划](plans/2026-06-05-ai-friendly-web-scaffold.md) | — |
 | 文档治理 | [计划](plans/2026-07-22-documentation-governance.md) | [日志](ai-logs/2026/07/2026-07-22-project-context-and-documentation-governance.md) |
+| 菜单动态布局 | [计划](plans/2026-07-28-menu-dynamic-layouts.md) | [日志](ai-logs/2026/07/2026-07-28-menu-dynamic-layouts.md) |
 | 测试、契约与数据库基线 | [计划](plans/2026-07-22-testing-contract-database-baseline.md) | [日志](ai-logs/2026/07/2026-07-22-testing-contract-database-baseline.md) |
 | 维护指南与 API 响应 | [计划](plans/2026-07-22-maintainer-guide-and-api-response-standard.md) | [日志](ai-logs/2026/07/2026-07-22-maintainer-guide-and-api-response-standard.md) |
 | HTTP 状态与全局拦截 | [计划](plans/2026-07-22-http-status-and-global-interceptor.md) | [日志](ai-logs/2026/07/2026-07-22-http-status-and-global-interceptor.md) |

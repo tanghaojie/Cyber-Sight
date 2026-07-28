@@ -128,6 +128,17 @@
           <el-form-item label="图标"
             ><el-input v-model.trim="form.icon" placeholder="例如 menu、book、external"
           /></el-form-item>
+          <el-form-item v-if="form.type !== 'button'" label="布局">
+            <el-select v-model="form.layout" class="w-full" placeholder="选择布局">
+              <el-option label="继承上级或使用默认布局" value="" />
+              <el-option
+                v-for="option in layoutOptions"
+                :key="option.value"
+                :label="option.label"
+                :value="option.value"
+              />
+            </el-select>
+          </el-form-item>
           <el-form-item label="排序"
             ><el-input-number v-model="form.sortOrder" :min="0" :max="9999" class="!w-full"
           /></el-form-item>
@@ -172,6 +183,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import type { MenuRequest, MenuSummary } from '@scaffold/api-contract'
 import AppIcon from '../../../components/AppIcon.vue'
 import { viewComponentOptions } from '../../../config/app.config.js'
+import { layoutOptions } from '../../../shared/routing/layout-registry.js'
 import { useNavigationStore } from '../../navigation/navigation.store.js'
 import { buildMenuTree, type MenuTreeRecord } from '../menu-tree.js'
 import { createMenu, deleteMenu, listAllMenus, updateMenu } from '../menus.api.js'
@@ -183,6 +195,7 @@ interface MenuForm {
   code: string
   path: string
   component: string
+  layout: string
   externalUrl: string
   icon: string
   sortOrder: number
@@ -206,6 +219,7 @@ const form = reactive<MenuForm>({
   code: '',
   path: '',
   component: '',
+  layout: '',
   externalUrl: '',
   icon: '',
   sortOrder: 0,
@@ -260,6 +274,7 @@ function resetForm(parentId = 0): void {
     code: '',
     path: '',
     component: '',
+    layout: '',
     externalUrl: '',
     icon: '',
     sortOrder: 0,
@@ -281,6 +296,7 @@ function openEdit(row: MenuTreeRecord): void {
     code: row.code,
     path: row.path,
     component: row.component,
+    layout: row.layout,
     externalUrl: row.externalUrl,
     icon: row.icon,
     sortOrder: row.sortOrder,
@@ -304,10 +320,31 @@ function payload(): MenuRequest {
     enabled: form.enabled,
   }
   if (form.type === 'directory')
-    return { ...common, type: 'directory', path: '', component: '', externalUrl: '' }
+    return {
+      ...common,
+      type: 'directory',
+      path: '',
+      component: '',
+      layout: form.layout,
+      externalUrl: '',
+    }
   if (form.type === 'button')
-    return { ...common, type: 'button', path: '', component: '', externalUrl: form.externalUrl }
-  return { ...common, type: 'menu', path: form.path, component: form.component, externalUrl: '' }
+    return {
+      ...common,
+      type: 'button',
+      path: '',
+      component: '',
+      layout: '',
+      externalUrl: form.externalUrl,
+    }
+  return {
+    ...common,
+    type: 'menu',
+    path: form.path,
+    component: form.component,
+    layout: form.layout,
+    externalUrl: '',
+  }
 }
 
 async function submit(): Promise<void> {
@@ -370,6 +407,7 @@ watch(
       form.component = ''
     }
     if (type !== 'button') form.externalUrl = ''
+    if (type === 'button') form.layout = ''
   },
 )
 onMounted(load)

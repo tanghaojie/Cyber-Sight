@@ -22,6 +22,7 @@ function navigationRow(row: typeof menus.$inferSelect): NavigationRow {
     code: row.code,
     path: row.path,
     component: row.component,
+    layout: row.layout,
     externalUrl: row.externalUrl,
     icon: row.icon,
     sortOrder: row.sortOrder,

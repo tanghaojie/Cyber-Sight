@@ -60,9 +60,10 @@ describe('database lifecycle fields', () => {
 })
 
 describe('menu routing fields', () => {
-  it('stores controlled view identifiers and external URLs separately', () => {
+  it('stores controlled view and layout identifiers separately from external URLs', () => {
     const columns = getTableColumns(menus)
     expect(columns).toHaveProperty('component')
+    expect(columns).toHaveProperty('layout')
     expect(columns).toHaveProperty('externalUrl')
   })
 })

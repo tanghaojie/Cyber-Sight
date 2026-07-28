@@ -1,0 +1,1 @@
+ALTER TABLE "menus" ADD COLUMN "layout" varchar(160) DEFAULT '' NOT NULL;
