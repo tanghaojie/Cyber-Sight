@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { notFoundPage } from '@/modules/errors/error.routes.js'
-import constRoutes from './constRoutes'
-import { authenticationRouteGuard } from './dynamicRoutes'
+import constRoutes from './constRoutes.js'
+import { authenticationRouteGuard } from './dynamicRoutes.js'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -11,8 +11,8 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach(async (to, from, next) => {
-  await authenticationRouteGuard(to, from, next, router)
+router.beforeEach(async function authenticationGuard(to) {
+  return authenticationRouteGuard(to, router)
 })
 
 export default router

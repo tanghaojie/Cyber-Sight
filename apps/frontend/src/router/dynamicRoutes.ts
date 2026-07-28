@@ -1,8 +1,6 @@
 import {
-  NavigationGuardNext,
-  RouteLocationNormalized,
-  RouteLocationNormalizedLoaded,
   type RouteComponent,
+  type RouteLocationNormalized,
   type RouteRecordRaw,
   type Router,
 } from 'vue-router'
@@ -12,7 +10,7 @@ import { useAuthStore } from '@/modules/auth/auth.store.js'
 import { useNavigationStore } from '@/modules/navigation/navigation.store.js'
 import { resolveMenuPath } from '@/shared/routing/menu-paths.js'
 import { DEFAULT_LAYOUT, layoutRegistry } from '@/shared/routing/layout-registry.js'
-import { viewRegistry } from '@/shared/routing/view-registry.js'
+import { viewRegistry } from './view-registry.js'
 
 const dynamicRouteRemovers: Array<() => void> = []
 let routesReady = false
@@ -107,32 +105,27 @@ export function clearDynamicRoutes(): void {
   routesReady = false
 }
 
-export async function authenticationRouteGuard(
-  to: RouteLocationNormalized,
-  from: RouteLocationNormalizedLoaded,
-  next: NavigationGuardNext,
-  router: Router,
-) {
+export async function authenticationRouteGuard(to: RouteLocationNormalized, router: Router) {
   const auth = useAuthStore(pinia)
   const navigation = useNavigationStore(pinia)
 
   if (to.meta.public) {
     if (to.name === 'login' && auth.isAuthenticated) {
-      next('/')
+      return '/'
     }
-    next()
+    return true
   }
   await auth.fetchCurrentUser()
   if (!auth.isAuthenticated) {
-    next({ name: 'login', query: { redirect: to.fullPath } })
+    return { name: 'login', query: { redirect: to.fullPath } }
   }
   if (!routesReady) {
     await navigation.load()
     installMenuRoutes(router, navigation.items)
-    next(to.fullPath)
+    return to.fullPath
   }
   if (to.name === 'dynamic-fallback') {
-    next({ name: 'not-found', query: { from: to.fullPath } })
+    return { name: 'not-found', query: { from: to.fullPath } }
   }
-  next()
+  return true
 }

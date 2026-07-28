@@ -73,6 +73,6 @@ updated: 2026-07-27
 
 - `docs/archive/design/dynamic-navigation-and-branding.md`
 - `docs/decisions/ADR-0010-database-navigation-and-controlled-view-registry.md`
-- `docs/decisions/ADR-0011-registered-applicationHttpError-handler.md`
+- `docs/decisions/ADR-0011-registered-application-http-error-handler.md`
 - `docs/archive/ai-logs/2026/07/2026-07-27-jtlab-dynamic-navigation.md`
 - 提交主题：`feat: add JTLab dynamic navigation and modular admin pages`

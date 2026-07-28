@@ -32,8 +32,7 @@
 
 <script setup lang="ts">
 import type { NavigationMenu } from '@scaffold/api-contract'
-import { appConfig } from '@/config/app.config.js'
-import { brandInitials } from '@/shared/genInitials.js'
+import { appConfig, brandInitials } from '@/config/app.config.js'
 import AppIcon from '@/components/AppIcon.vue'
 import SidebarTree from './SidebarTree.vue'
 import { useHealth } from '@/modules/health/composables/useHealth.js'

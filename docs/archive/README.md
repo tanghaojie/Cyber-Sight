@@ -54,5 +54,6 @@
 | 源码路径、格式化与管理页面组件化 | [计划](plans/2026-07-28-source-format-and-page-components.md)          | [日志](ai-logs/2026/07/2026-07-28-source-format-and-page-components.md)            |
 | 前端自动化测试移除               | [计划](plans/2026-07-28-remove-frontend-unit-tests.md)                | [日志](ai-logs/2026/07/2026-07-28-remove-frontend-unit-tests.md)                    |
 | API 契约构建别名修复             | [计划](plans/2026-07-28-api-contract-alias-output.md)                 | [日志](ai-logs/2026/07/2026-07-28-api-contract-alias-output.md)                     |
+| 前端工程结构重构审查与修复       | [计划](plans/2026-07-28-review-frontend-structure-refactor.md)        | [日志](ai-logs/2026/07/2026-07-28-review-frontend-structure-refactor.md)             |
 
 归档内容不继续同步当前实现；发现冲突时以当前设计、现行 ADR、代码和测试为准。

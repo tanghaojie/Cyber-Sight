@@ -16,7 +16,7 @@
 
 - [ADR-0008](ADR-0008-tailwind-and-element-plus.md)：Tailwind CSS 与 Element Plus 的职责分工。
 - [ADR-0010](ADR-0010-database-navigation-and-controlled-view-registry.md)：数据库导航与受控页面注册表。
-- [ADR-0011](ADR-0011-registered-applicationHttpError-handler.md)：应用注入全局 HTTP 错误处理器。
+- [ADR-0011](ADR-0011-registered-application-http-error-handler.md)：应用注入全局 HTTP 错误处理器。
 - [ADR-0012](ADR-0012-module-view-registration-and-scss-layering.md)：模块页面自动注册与 SCSS 分层。
 - [ADR-0013](ADR-0013-semantic-module-entry-files.md)：使用表意公共文件，不使用模块 barrel。
 - [ADR-0017](ADR-0017-database-selected-layout-registry.md)：菜单选择构建期受控布局，并按目录继承生成动态路由。

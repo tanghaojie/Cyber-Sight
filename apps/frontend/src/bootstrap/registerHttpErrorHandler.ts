@@ -1,13 +1,13 @@
-import { installGlobalHttpErrorHandler } from './globalHttpError.js'
-import { createApplicationHttpErrorHandler } from './applicationHttpError.js'
-import { Router } from 'vue-router'
-import { Pinia } from 'pinia'
 import { ElMessage } from 'element-plus'
-import { clearDynamicRoutes } from '@/router/dynamicRoutes.js'
+import type { Pinia } from 'pinia'
+import type { Router } from 'vue-router'
+import { createApplicationHttpErrorHandler } from '@/api/applicationHttpError.js'
+import { installGlobalHttpErrorHandler } from '@/api/globalHttpError.js'
 import { useAuthStore } from '@/modules/auth/auth.store.js'
 import { useNavigationStore } from '@/modules/navigation/navigation.store.js'
+import { clearDynamicRoutes } from '@/router/dynamicRoutes.js'
 
-export function registorHttpErrorHander(router: Router, pinia: Pinia) {
+export function registerHttpErrorHandler(router: Router, pinia: Pinia): void {
   installGlobalHttpErrorHandler(
     createApplicationHttpErrorHandler({
       currentRoute() {

@@ -11,17 +11,22 @@ updated: 2026-07-28
 
 前端应用壳统一承载 JTLab 品牌、响应式布局、数据库导航和业务页面出口，不拥有业务页面状态。
 
-- `src/config/app.config.ts`：品牌名、说明和主色配置。
+- `src/config/app.config.ts`：品牌名、说明、主色和品牌缩写组装。
+- `src/shared/genInitials.ts`：不依赖应用配置的通用缩写纯函数。
 - `src/layouts/AdminLayout.vue`：应用壳编排与移动抽屉状态。
 - `src/components/layout/`：侧栏、顶栏和嵌套路由出口。
 - `src/modules/navigation/navigation.store.ts`：当前用户菜单树缓存。
 - `src/modules/**/view-registry.ts`：业务模块登记页面懒加载器。
 - `src/router/view-registry.ts`：构建期自动发现、唯一性校验和只读注册表。
 - `src/shared/routing/layout-registry.ts`：构建期发现 `src/layouts/*.vue`，生成受控布局注册表和菜单表单选项。
+- `src/router/constRoutes.ts`：登录、404 和默认应用壳等静态路由。
+- `src/router/dynamicRoutes.ts`：认证守卫、动态菜单路由安装和移除。
 - `src/assets/icons/*.svg`：独立 SVG 图标源；Vite 在构建期生成 sprite 和图标名称清单。
 - `src/shared/icons/icon-registry.ts`：把构建期图标名称转为只读名称和菜单表单选项。
 - `src/components/AppIcon.vue`：通过 SVG sprite 的 `<use>` 节点按稳定名称渲染图标。
-- `src/router/index.ts`：静态登录、404、默认应用壳，以及认证后动态布局与页面路由组装。
+- `src/router/index.ts`：创建 Router，并组装静态路由、动态回退和认证守卫。
+- `src/bootstrap/registerHttpErrorHandler.ts`：启动时组装 Router、Pinia、认证、导航和全局 HTTP 错误动作。
+- `src/shared/accessToken.ts`：领域无关的浏览器访问令牌存储适配器。
 
 页面通过模块注册文件进入 `RouterView`。应用壳不能按菜单名称写业务分支，数据库组件标识不能成为任意动态 import 路径。
 
@@ -54,4 +59,4 @@ Tailwind CSS 负责布局、间距、响应式和多数视觉样式；Element Pl
 - 桌面布局、移动抽屉、侧栏对比度和 Element Plus 视觉覆盖由维护者在浏览器中人工检查；
   AI 默认不运行浏览器测试。
 
-相关长期决策：[ADR-0008](../decisions/ADR-0008-tailwind-and-element-plus.md)、[ADR-0010](../decisions/ADR-0010-database-navigation-and-controlled-view-registry.md)、[ADR-0011](../decisions/ADR-0011-registered-applicationHttpError-handler.md)、[ADR-0012](../decisions/ADR-0012-module-view-registration-and-scss-layering.md)、[ADR-0018](../decisions/ADR-0018-vite-svg-icon-registry.md)、[ADR-0022](../decisions/ADR-0022-maintainer-owned-frontend-validation.md)。
+相关长期决策：[ADR-0008](../decisions/ADR-0008-tailwind-and-element-plus.md)、[ADR-0010](../decisions/ADR-0010-database-navigation-and-controlled-view-registry.md)、[ADR-0011](../decisions/ADR-0011-registered-application-http-error-handler.md)、[ADR-0012](../decisions/ADR-0012-module-view-registration-and-scss-layering.md)、[ADR-0018](../decisions/ADR-0018-vite-svg-icon-registry.md)、[ADR-0022](../decisions/ADR-0022-maintainer-owned-frontend-validation.md)。

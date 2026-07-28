@@ -1,6 +1,6 @@
 import type { ErrorResponse } from '@scaffold/api-contract'
 import { getAccessToken } from '@/shared/accessToken.js'
-import { handleGlobalHttpError } from './globalHttpError'
+import { handleGlobalHttpError } from './globalHttpError.js'
 
 type QueryValue = string | number | boolean | undefined
 

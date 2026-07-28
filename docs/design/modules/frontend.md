@@ -18,7 +18,8 @@
 - `src/components/layout/`：侧栏、顶栏和动态内容承载区。
 - `src/modules/navigation`：当前用户数据库菜单树与加载状态。
 - `src/modules/**/view-registry.ts`：模块拥有的动态页面注册清单。
-- `src/shared/routing/view-registry.ts`：构建期自动发现、冲突校验和只读注册表组装。
+- `src/shared/routing/view-registry.ts`：页面登记协议与只读注册表构造函数，不扫描或依赖业务模块。
+- `src/router/view-registry.ts`：构建期自动发现业务模块登记文件并组装只读页面注册表。
 - `src/shared/routing/layout-registry.ts`：自动发现 `src/layouts/*.vue` 并提供只读布局注册表与表单选项。
 - `src/assets/icons/*.svg`、`src/shared/icons/icon-registry.ts` 与 `src/components/AppIcon.vue`：由 Vite 构建期发现图标源、生成 sprite/只读选项，并通过稳定名称渲染。
 - `src/styles/main.scss`：只负责组合 Tailwind、基础样式、布局样式和按 Element Plus 组件拆分的 SCSS 覆盖。
@@ -38,6 +39,8 @@
 - Vue 组件负责展示和交互，不直接实现复杂业务规则。
 - 后端调用通过模块 composable 或 service 封装，不在多个组件中散落路径字符串。
 - 共享 API Client 从领域无关的 access-token 存储读取 token，并为请求统一附加 `Authorization: Bearer <token>`；认证 store 负责在登录、退出和 HTTP 401 时写入或清除 token。
+- `src/router/constRoutes.ts` 声明静态路由，`src/router/dynamicRoutes.ts` 承担认证守卫和菜单路由生命周期；守卫每个分支只返回一次导航结果。
+- 应用级 HTTP 错误动作由 `src/bootstrap/registerHttpErrorHandler.ts` 在启动时组装，`src/api/` 不直接拥有 Router 或业务 store。
 - API 请求和响应类型来自共享运行时 Schema 的推导结果。
 - 页面必须明确处理 loading、empty、error 和 success 状态。
 - 列表 + 新增/编辑形态的管理页面应把内部组件放在本模块 `pages/components/`；Page 只组合

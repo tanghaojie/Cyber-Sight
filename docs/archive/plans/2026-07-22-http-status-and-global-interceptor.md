@@ -29,7 +29,7 @@ updated: 2026-07-22
 ## 实际结果
 
 - Fastify 全局错误处理先保留原始错误语义生成业务码，再将对外 HTTP 状态限制为 200、401、404、500。
-- `openapi-fetch` Client 注册共享中间件，为 401、404、500 发布 `api:globalHttpError` 事件。
+- `openapi-fetch` Client 注册共享中间件，为 401、404、500 发布 `api:global-http-error` 事件。
 - 业务模块继续处理 HTTP 200 中的非零 `status`，全局拦截器不处理这类响应。
 - Vite 构建存在既有 CJS Node API 弃用警告，不影响交付。
 

@@ -22,8 +22,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { appConfig } from '@/config/app.config.js'
-import { brandInitials } from '@/shared/genInitials.js'
+import { appConfig, brandInitials } from '@/config/app.config.js'
 
 const route = useRoute(),
   router = useRouter()

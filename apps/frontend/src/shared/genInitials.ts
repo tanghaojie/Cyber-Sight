@@ -1,9 +1,3 @@
-import { appConfig } from '@/config/app.config'
-
-export function brandInitials(): string {
-  return genInitials(appConfig.name)
-}
-
 /**
  * 生成首字母
  * @param name

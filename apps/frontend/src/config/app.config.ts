@@ -1,3 +1,5 @@
+import { genInitials } from '@/shared/genInitials.js'
+
 function configuredValue(value: string | undefined, fallback: string): string {
   const normalized = value?.trim()
   return normalized || fallback
@@ -10,3 +12,7 @@ export const appConfig = Object.freeze({
   productLabel: configuredValue(import.meta.env.VITE_APP_PRODUCT_LABEL, 'LAB CONTROL'),
   primaryColor: '#70CFA2',
 })
+
+export function brandInitials(): string {
+  return genInitials(appConfig.name)
+}

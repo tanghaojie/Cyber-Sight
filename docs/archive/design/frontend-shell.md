@@ -21,7 +21,7 @@ replaced_by: docs/design/frontend-shell.md
 - `src/components/layout/AppMain.vue`：承载嵌套路由，通过 `RouterView` 动态加载页面并提供页面切换过渡。
 - `src/modules/navigation`：当前用户数据库菜单树的前端缓存。
 - `src/modules/**/view-registry.ts`：业务模块声明组件标识与页面懒加载器的注册函数。
-- `src/shared/routing/view-registry.ts`：在构建期自动发现模块注册文件、校验组件标识唯一性并生成只读受控映射。
+- `src/router/view-registry.ts`：在构建期自动发现模块注册文件、校验组件标识唯一性并生成只读受控映射。
 - `src/router/index.ts`：只静态声明登录、404 和应用壳；认证后根据菜单树注册业务子路由。
 - `src/modules/<module>/pages`：模块拥有的页面组件，不负责应用壳和全局导航。
 
