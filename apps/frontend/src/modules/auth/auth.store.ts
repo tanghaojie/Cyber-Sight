@@ -45,7 +45,9 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function fetchCurrentUser(): Promise<void> {
-    if (checked.value) return
+    if (checked.value) {
+      return
+    }
     if (!getAccessToken()) {
       checked.value = true
       return
