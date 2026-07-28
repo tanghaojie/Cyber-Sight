@@ -31,7 +31,9 @@ async function readErrorBody(response: Response): Promise<{ status?: number; err
 }
 
 export async function handleGlobalHttpError(response: Response): Promise<void> {
-  if (!isGlobalHttpErrorStatus(response.status) || !globalHttpErrorHandler) return
+  if (!isGlobalHttpErrorStatus(response.status) || !globalHttpErrorHandler) {
+    return
+  }
   const body = await readErrorBody(response)
   await globalHttpErrorHandler({ httpStatus: response.status, status: body.status, err: body.err })
 }

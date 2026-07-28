@@ -44,10 +44,10 @@
           <el-select v-model="form.layout" class="w-full" placeholder="选择布局">
             <el-option label="继承上级或使用默认布局" value="" />
             <el-option
-              v-for="option in layoutOptions"
-              :key="option.value"
-              :label="option.label"
-              :value="option.value"
+              v-for="(data, key) in layoutRegistry"
+              :key="key"
+              :label="data.label"
+              :value="key"
             />
           </el-select>
         </el-form-item>
@@ -92,9 +92,9 @@ import AppIcon from '@/components/AppIcon.vue'
 import { createInternalMenuCode, menuPathError } from '@/modules/menus/menu-form.js'
 import { createMenu, updateMenu } from '@/modules/menus/menus.api.js'
 import { useNavigationStore } from '@/modules/navigation/navigation.store.js'
-import { viewRegistry } from '@/router/view-registry.js'
+import { viewRegistry } from '@/shared/routing/view-registry'
 import { iconOptions } from '@/shared/icons/icon-registry.js'
-import { layoutOptions } from '@/shared/routing/layout-registry.js'
+import { layoutRegistry } from '@/shared/routing/layout-registry.js'
 
 type MenuType = MenuSummary['type']
 interface MenuForm {

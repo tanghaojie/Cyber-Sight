@@ -4,8 +4,8 @@
     <header class="sidebar-brand">
       <span class="brand-mark">{{ brandInitials() }}</span>
       <div>
-        <strong>{{ appConfig.name }}</strong
-        ><small>{{ appConfig.productLabel }}</small>
+        <strong>{{ appConfig.name }}</strong>
+        <small>{{ appConfig.productLabel }}</small>
       </div>
       <button class="sidebar-close" type="button" aria-label="关闭菜单" @click="$emit('close')">
         <AppIcon name="close" />
@@ -32,7 +32,8 @@
 
 <script setup lang="ts">
 import type { NavigationMenu } from '@scaffold/api-contract'
-import { appConfig, brandInitials } from '@/config/app.config.js'
+import { appConfig } from '@/config/app.config.js'
+import { brandInitials } from '@/shared/genInitials.js'
 import AppIcon from '@/components/AppIcon.vue'
 import SidebarTree from './SidebarTree.vue'
 import { useHealth } from '@/modules/health/composables/useHealth.js'

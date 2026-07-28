@@ -13,16 +13,23 @@ function layoutName(modulePath: string): string {
 
 export function createLayoutRegistry(
   modules: Readonly<Record<string, RouteComponent>>,
-): Readonly<Record<string, RouteComponent>> {
-  const layouts: Record<string, RouteComponent> = Object.create(null)
+): Readonly<Record<string, { label: string; component: RouteComponent }>> {
+  const layouts: Record<string, { label: string; component: RouteComponent }> = Object.create(null)
 
   for (const [modulePath, component] of Object.entries(modules).sort(([left], [right]) =>
     left.localeCompare(right),
   )) {
     const name = layoutName(modulePath)
-    if (!name) throw new Error(`Invalid layout file "${modulePath}"`)
-    if (Object.hasOwn(layouts, name)) throw new Error(`Duplicate layout name "${name}"`)
-    layouts[name] = component
+    if (!name) {
+      throw new Error(`Invalid layout file "${modulePath}"`)
+    }
+    if (Object.hasOwn(layouts, name)) {
+      throw new Error(`Duplicate layout name "${name}"`)
+    }
+    layouts[name] = {
+      label: name,
+      component,
+    }
   }
 
   if (!Object.hasOwn(layouts, DEFAULT_LAYOUT)) {
@@ -33,6 +40,3 @@ export function createLayoutRegistry(
 }
 
 export const layoutRegistry = createLayoutRegistry(layoutModules)
-export const layoutOptions = Object.freeze(
-  Object.keys(layoutRegistry).map((name) => ({ value: name, label: name })),
-)

@@ -14,7 +14,8 @@ import { notFoundPage } from '@/modules/errors/error.routes.js'
 import { useNavigationStore } from '@/modules/navigation/navigation.store.js'
 import { resolveMenuPath } from '@/shared/routing/menu-paths.js'
 import { DEFAULT_LAYOUT, layoutRegistry } from '@/shared/routing/layout-registry.js'
-import { viewRegistry } from './view-registry.js'
+import { viewRegistry } from '@/shared/routing/view-registry.js'
+import constRoutes from './constRoutes'
 
 const dynamicRouteRemovers: Array<() => void> = []
 let routesReady = false
@@ -24,7 +25,15 @@ function childPath(path: string): string {
 }
 
 interface RouteRegistries {
-  layouts?: Readonly<Record<string, RouteComponent>>
+  layouts?: Readonly<
+    Record<
+      string,
+      {
+        label: string
+        component: RouteComponent
+      }
+    >
+  >
   views?: Readonly<
     Record<
       string,
@@ -52,33 +61,37 @@ export function installMenuRoutes(
     parentPath = '',
     ancestorNames: string[] = [],
   ): void {
-    for (const node of items) {
-      const selectedLayout = node.layout || inheritedLayout
-      const resolvedPath = resolveMenuPath(node.path, parentPath)
-      if (node.type === 'directory') {
-        registerNodes(node.children, selectedLayout, resolvedPath, [...ancestorNames, node.name])
+    for (const item of items) {
+      const selectedLayout = item.layout || inheritedLayout
+      const resolvedPath = resolveMenuPath(item.path, parentPath)
+      if (item.type === 'directory') {
+        registerNodes(item.children, selectedLayout, resolvedPath, [...ancestorNames, item.name])
         continue
       }
-      if (node.type !== 'menu' || !resolvedPath || seenPaths.has(resolvedPath)) continue
+      if (item.type !== 'menu' || !resolvedPath || seenPaths.has(resolvedPath)) {
+        continue
+      }
 
-      const componentInfo = views[node.component]
+      const componentInfo = views[item.component]
       const layout = layouts[selectedLayout || DEFAULT_LAYOUT]
-      if (!componentInfo || !layout) continue
+      if (!componentInfo || !layout) {
+        continue
+      }
 
       seenPaths.add(resolvedPath)
       const route: RouteRecordRaw = {
         path: childPath(resolvedPath),
-        name: `menu-layout-${node.id}`,
-        component: layout,
+        name: `menu-layout-${item.id}`,
+        component: layout.component,
         children: [
           {
             path: '',
-            name: `menu-${node.id}`,
+            name: `menu-${item.id}`,
             component: componentInfo.component,
             meta: {
-              title: node.name,
-              eyebrow: [...ancestorNames, node.name].join(' / '),
-              menuId: node.id,
+              title: item.name,
+              eyebrow: [...ancestorNames, item.name].join(' / '),
+              menuId: item.id,
             },
           },
         ],
@@ -100,14 +113,7 @@ export function clearDynamicRoutes(): void {
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/login', name: 'login', component: loginPage, meta: { public: true, title: '登录' } },
-    {
-      path: '/404',
-      name: 'not-found',
-      component: notFoundPage,
-      meta: { public: true, title: '页面未找到' },
-    },
-    { path: '/', name: 'admin-root', component: RouterView, children: [] },
+    ...constRoutes,
     { path: '/:pathMatch(.*)*', name: 'dynamic-fallback', component: notFoundPage },
   ],
 })

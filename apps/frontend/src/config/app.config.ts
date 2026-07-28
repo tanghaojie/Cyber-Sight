@@ -10,12 +10,3 @@ export const appConfig = Object.freeze({
   productLabel: configuredValue(import.meta.env.VITE_APP_PRODUCT_LABEL, 'LAB CONTROL'),
   primaryColor: '#70CFA2',
 })
-
-export function brandInitials(name = appConfig.name): string {
-  return (
-    name
-      .replace(/[^a-z0-9]/gi, '')
-      .slice(0, 2)
-      .toUpperCase() || 'JT'
-  )
-}
