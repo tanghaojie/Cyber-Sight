@@ -15,9 +15,12 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc && tsc-alias",
-    "dev": "tsc --watch --preserveWatchOutput",
-    "test": "tsc && tsc-alias"
+    "build": "tsc && tsc-alias && pnpm verify:dist",
+    "dev": "pnpm --filter . run --parallel \"/^dev:.*/\"",
+    "dev:aliases": "tsc-alias --watch",
+    "dev:types": "tsc --watch --preserveWatchOutput",
+    "test": "pnpm build",
+    "verify:dist": "node scripts/verify-dist.mjs"
   },
   "dependencies": {
     "zod": "^4.2.0"

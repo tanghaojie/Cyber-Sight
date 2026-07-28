@@ -57,10 +57,13 @@ TypeScript 只能检查参与编译的源码，类型在运行时会被擦除。
 - Schema 和处理函数使用了不同类型：必须从共享 Schema 推导类型，不能手写近似类型。
 - 响应 Schema 缺字段：Fastify 序列化可能过滤未声明字段。路由测试必须断言完整响应。
 - 前端错误地把 HTTP 200 当成功：业务模块仍必须检查非零 `status`。
+- 开发 watch 只运行 `tsc`：源码别名会原样进入 `dist`，覆盖此前可运行的构建产物；TypeScript
+  与别名改写必须同时监听，正式构建必须扫描别名残留并导入包入口。
 
 ## 测试策略
 
-- 契约包通过 TypeScript 构建验证 Zod Schema 与推导类型，后端转换测试验证派生的 Draft 7 JSON Schema 有效。
+- 契约包通过 TypeScript 构建验证 Zod Schema 与推导类型，并扫描 `dist` 中的 `@/` 残留、使用
+  Node.js 导入包入口；后端转换测试验证派生的 Draft 7 JSON Schema 有效。
 - 后端使用 `Fastify.inject` 测试合法与非法输入、默认值、额外字段和响应序列化。
 - Swagger 测试只验证运行时路由确实暴露预期操作和关键约束，不再比较第二份 OpenAPI。
 - 前端通过 TypeScript 与生产构建验证契约消费可以解析；成功、业务失败和全局 HTTP 错误

@@ -18,8 +18,11 @@ TypeScript 编译后由 `tsc-alias` 把别名改写成可被 Node.js 执行的�
 另登记同一别名。`import.meta.glob` 使用 Vite 支持的 `@/` 别名。文件系统 URL 等不是模块
 导入的运行时相对路径不参与迁移。
 
-契约包的 `build` 与 `test` 都必须在 `tsc` 后执行 `tsc-alias`。根目录测试会构建契约包并
-运行后端测试，不包含前端；若契约测试只执行 `tsc`，就会用未改写的产物覆盖可运行的 `dist`。
+契约包的 `build` 与 `test` 都必须在 `tsc` 后执行 `tsc-alias`，`dev` 必须并行运行 TypeScript
+与 `tsc-alias` 的 watch 模式，避免源码变化后由单独的 `tsc --watch` 把未改写的别名重新写入
+`dist`。契约构建还必须扫描产物中的 `@/` 残留并实际导入包入口。根目录测试会构建契约包并
+运行后端测试，不包含前端；任何只执行 `tsc` 的契约脚本都会用未改写的产物覆盖可运行的
+`dist`。
 
 ## 代码格式
 
@@ -50,8 +53,8 @@ AI 修改代码时必须遵循根目录 `AGENTS.md`：生成内容直接服从�
   调用 `pnpm lint-staged`。
 - 编辑器格式与提交结果不同：检查是否安装推荐的 Prettier 扩展，以及是否启用
   `prettier.requireConfig`。
-- Node.js 产物仍包含 `@/`：构建脚本必须在 `tsc` 后执行 `tsc-alias`，并在生产构建后搜索
-  `dist` 验证没有残留源码别名。
+- Node.js 产物仍包含 `@/`：构建脚本必须在 `tsc` 后执行 `tsc-alias`，watch 模式必须同时运行
+  两个 watcher，并在生产构建后扫描 `dist` 和导入包入口验证没有残留源码别名。
 - 交付验证至少执行 `pnpm format:check` 和 `pnpm build`；涉及后端或契约时再执行相称的
   `pnpm test`，前端人工验收结果由维护者确认。
 
