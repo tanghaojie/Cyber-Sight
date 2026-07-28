@@ -54,4 +54,4 @@ Tailwind CSS 负责布局、间距、响应式和多数视觉样式；Element Pl
 - 桌面布局、移动抽屉、侧栏对比度和 Element Plus 视觉覆盖由维护者在浏览器中人工检查；
   AI 默认不运行浏览器测试。
 
-相关长期决策：[ADR-0008](../decisions/ADR-0008-tailwind-and-element-plus.md)、[ADR-0010](../decisions/ADR-0010-database-navigation-and-controlled-view-registry.md)、[ADR-0011](../decisions/ADR-0011-registered-application-http-error-handler.md)、[ADR-0012](../decisions/ADR-0012-module-view-registration-and-scss-layering.md)、[ADR-0018](../decisions/ADR-0018-vite-svg-icon-registry.md)、[ADR-0022](../decisions/ADR-0022-maintainer-owned-frontend-validation.md)。
+相关长期决策：[ADR-0008](../decisions/ADR-0008-tailwind-and-element-plus.md)、[ADR-0010](../decisions/ADR-0010-database-navigation-and-controlled-view-registry.md)、[ADR-0011](../decisions/ADR-0011-registered-applicationHttpError-handler.md)、[ADR-0012](../decisions/ADR-0012-module-view-registration-and-scss-layering.md)、[ADR-0018](../decisions/ADR-0018-vite-svg-icon-registry.md)、[ADR-0022](../decisions/ADR-0022-maintainer-owned-frontend-validation.md)。

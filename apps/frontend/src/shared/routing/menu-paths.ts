@@ -7,9 +7,15 @@ function normalizeAbsolutePath(path: string): string {
 
 export function resolveMenuPath(path: string, parentPath = ''): string {
   const value = path.trim()
-  if (!value) return parentPath
-  if (value.startsWith('/')) return normalizeAbsolutePath(value)
-  if (!parentPath.startsWith('/')) return ''
+  if (!value) {
+    return parentPath
+  }
+  if (value.startsWith('/')) {
+    return normalizeAbsolutePath(value)
+  }
+  if (!parentPath.startsWith('/')) {
+    return ''
+  }
   return normalizeAbsolutePath(`${parentPath}/${value}`)
 }
 
