@@ -10,10 +10,10 @@
         @click="toggle(item.id)"
       >
         <span class="sidebar-node-icon"><AppIcon :name="item.icon || 'layers'" /></span>
-        <span class="sidebar-node-copy"
-          ><b>{{ item.name }}</b
-          ><small>{{ item.children.length }} 个节点</small></span
-        >
+        <span class="sidebar-node-copy">
+          <b>{{ item.name }}</b>
+          <small>{{ item.children.length }} 个节点</small>
+        </span>
         <AppIcon
           name="chevron-down"
           class="directory-chevron"
@@ -28,10 +28,10 @@
         @click="$emit('navigate')"
       >
         <span class="sidebar-node-icon"><AppIcon :name="item.icon || 'menu'" /></span>
-        <span class="sidebar-node-copy"
-          ><b>{{ item.name }}</b
-          ><small>{{ item.code.replaceAll('_', ' ') }}</small></span
-        >
+        <span class="sidebar-node-copy">
+          <b>{{ item.name }}</b>
+          <small>{{ item.code.replaceAll('_', ' ') }}</small>
+        </span>
         <span class="node-arrow">›</span>
       </RouterLink>
       <a
@@ -39,15 +39,15 @@
         :href="item.externalUrl"
         target="_blank"
         rel="noopener noreferrer"
-        class="sidebar-link sidebar-link--external"
+        class="sidebar-link"
         :style="indentStyle"
         @click="$emit('navigate')"
       >
         <span class="sidebar-node-icon"><AppIcon :name="item.icon || 'external'" /></span>
-        <span class="sidebar-node-copy"
-          ><b>{{ item.name }}</b
-          ><small>EXTERNAL LINK</small></span
-        >
+        <span class="sidebar-node-copy">
+          <b>{{ item.name }}</b>
+          <small>EXTERNAL LINK</small>
+        </span>
         <AppIcon name="external" class="external-icon" />
       </a>
       <SidebarTree
@@ -67,8 +67,11 @@ import AppIcon from '../AppIcon.vue'
 
 const props = withDefaults(defineProps<{ items: NavigationMenu[]; depth?: number }>(), { depth: 0 })
 defineEmits<{ navigate: [] }>()
+
 const expanded = reactive<Record<number, boolean>>({})
+
 const indentStyle = computed(() => ({ paddingLeft: `${14 + props.depth * 14}px` }))
+
 function toggle(id: number): void {
   expanded[id] = expanded[id] === false
 }
