@@ -18,7 +18,7 @@ const menuCommonShape = {
 const directoryRequestSchema = z.strictObject({
   ...menuCommonShape,
   type: z.literal('directory'),
-  path: z.literal(''),
+  path: z.string().min(1).max(160),
   component: z.literal(''),
   layout: z.string().max(160),
   externalUrl: z.literal(''),
@@ -27,7 +27,7 @@ const directoryRequestSchema = z.strictObject({
 const pageMenuRequestSchema = z.strictObject({
   ...menuCommonShape,
   type: z.literal('menu'),
-  path: z.string().min(1).max(160).regex(/^\//),
+  path: z.string().min(1).max(160),
   component: z.string().min(1).max(160),
   layout: z.string().max(160),
   externalUrl: z.literal(''),
@@ -107,3 +107,11 @@ export type MenuListResponse = z.infer<typeof MenuListResponseSchema>
 export type NavigationMenuResponse = z.infer<
   typeof NavigationMenuResponseSchema
 >
+
+export function isValidMenuPath(
+  input: Pick<MenuRequest, 'parentId' | 'path' | 'type'>
+): boolean {
+  if (input.type === 'button') return true
+  const path = input.path.trim()
+  return path.length > 0 && (input.parentId > 0 || path.startsWith('/'))
+}

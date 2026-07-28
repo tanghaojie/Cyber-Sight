@@ -18,6 +18,9 @@ updated: 2026-07-28
 - `src/modules/**/view-registry.ts`：业务模块登记页面懒加载器。
 - `src/router/view-registry.ts`：构建期自动发现、唯一性校验和只读注册表。
 - `src/shared/routing/layout-registry.ts`：构建期发现 `src/layouts/*.vue`，生成受控布局注册表和菜单表单选项。
+- `src/assets/icons/*.svg`：独立 SVG 图标源；Vite 在构建期生成 sprite 和图标名称清单。
+- `src/shared/icons/icon-registry.ts`：把构建期图标名称转为只读名称和菜单表单选项。
+- `src/components/AppIcon.vue`：通过 SVG sprite 的 `<use>` 节点按稳定名称渲染图标。
 - `src/router/index.ts`：静态登录、404、默认应用壳，以及认证后动态布局与页面路由组装。
 
 页面通过模块注册文件进入 `RouterView`。应用壳不能按菜单名称写业务分支，数据库组件标识不能成为任意动态 import 路径。
@@ -27,11 +30,11 @@ updated: 2026-07-28
 1. 路由守卫恢复会话并请求 `GET /navigation/menus`。
 2. 后端按角色授权生成启用、未删除的菜单树并补齐祖先目录。
 3. 构建期注册表把稳定组件标识映射到源码懒加载器。
-4. 运行时递归解析布局：节点显式 `layout` 优先，否则继承最近的目录布局，最终回退到 `AdminLayout`。
-5. 只为布局和页面标识都能在构建期注册表中解析的 `menu` 节点注册路由；`directory` 只传递布局上下文，`button` 只打开 HTTP(S) 外链。
+4. 运行时递归解析路径和布局：相对路径拼接最近目录路径，以 `/` 开头的路径覆盖上级前缀；节点显式 `layout` 优先，否则继承最近的目录布局，最终回退到 `AdminLayout`。
+5. 只为完整路径、布局和页面标识都能解析的 `menu` 节点注册路由；`directory` 传递路径与布局上下文但不生成可点击路由，`button` 只打开 HTTP(S) 外链。
 6. 菜单刷新或 401 清会话时移除动态路由并清空导航状态。
 
-未知或空组件标识、未知显式布局标识不生成路由；空布局用于兼容旧数据并按继承/默认规则解析。无效旧菜单仍可在管理页面修正，但不能进入执行导航。首次直接访问动态 URL 时，启动兜底路由在菜单加载后重新匹配，仍未知才进入 404。
+未知或空组件标识、未知显式布局标识、无法解析为绝对地址的菜单路径不生成路由；空布局用于兼容旧数据并按继承/默认规则解析。存量空目录路径作为透明前缀兼容，新的目录写入必须提供路径。无效旧菜单仍可在管理页面修正，但不能进入执行导航。首次直接访问动态 URL 时，启动兜底路由在菜单加载后重新匹配，仍未知才进入 404。
 
 ## 布局与样式
 
@@ -50,4 +53,4 @@ Tailwind CSS 负责布局、间距、响应式和多数视觉样式；Element Pl
 - 组件测试覆盖三种菜单节点、桌面布局与移动抽屉事件。
 - 前端类型检查、Vitest、生产构建及桌面/窄屏浏览器检查通过。
 
-相关长期决策：[ADR-0008](../decisions/ADR-0008-tailwind-and-element-plus.md)、[ADR-0010](../decisions/ADR-0010-database-navigation-and-controlled-view-registry.md)、[ADR-0011](../decisions/ADR-0011-registered-application-http-error-handler.md)、[ADR-0012](../decisions/ADR-0012-module-view-registration-and-scss-layering.md)。
+相关长期决策：[ADR-0008](../decisions/ADR-0008-tailwind-and-element-plus.md)、[ADR-0010](../decisions/ADR-0010-database-navigation-and-controlled-view-registry.md)、[ADR-0011](../decisions/ADR-0011-registered-application-http-error-handler.md)、[ADR-0012](../decisions/ADR-0012-module-view-registration-and-scss-layering.md)、[ADR-0018](../decisions/ADR-0018-vite-svg-icon-registry.md)。

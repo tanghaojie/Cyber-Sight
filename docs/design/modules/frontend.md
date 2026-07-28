@@ -19,6 +19,7 @@
 - `src/modules/**/view-registry.ts`：模块拥有的动态页面注册清单。
 - `src/router/view-registry.ts`：构建期自动发现、冲突校验和只读注册表组装。
 - `src/shared/routing/layout-registry.ts`：自动发现 `src/layouts/*.vue` 并提供只读布局注册表与表单选项。
+- `src/assets/icons/*.svg`、`src/shared/icons/icon-registry.ts` 与 `src/components/AppIcon.vue`：由 Vite 构建期发现图标源、生成 sprite/只读选项，并通过稳定名称渲染。
 - `src/styles/main.scss`：只负责组合 Tailwind、基础样式、布局样式和按 Element Plus 组件拆分的 SCSS 覆盖。
 - `src/modules/users|roles|menus|dictionaries`：四个相互独立的管理页面和 API service。
 
@@ -28,7 +29,8 @@
 - 路由和应用壳只能从模块设计中登记的公共文件加载业务页面、状态或注册信息；禁止一个模块导入另一个模块未登记的组件、composable、service 或 store。
 - 当前公共文件包括：`auth/auth.store.ts`、`auth/auth.routes.ts`、`navigation/navigation.store.ts`、`errors/error.routes.ts`、各管理模块的 `*.api.ts`，以及由路由组合根按约定发现的 `view-registry.ts`。`menus/menu-options.ts` 是角色模块读取菜单选项的公共用例文件。
 - 需要被数据库菜单选择的模块页面必须在本模块 `view-registry.ts` 的 `registerViews()` 中显式登记稳定组件标识；路由组合根自动发现该约定文件，禁止中心注册表继续手工导入业务模块。组件标识必须非空且全局唯一。
-- 菜单可选择的布局由 `src/layouts/` 根目录中的 `.vue` 文件名提供稳定标识；动态路由只加载构建期注册的布局。菜单显式布局覆盖目录继承值，空值最终回退 `AdminLayout`。
+- 菜单可选择的布局由 `src/layouts/` 根目录中的 `.vue` 文件名提供稳定标识；动态路由只加载构建期注册的布局。菜单显式布局覆盖目录继承值，空值最终回退 `AdminLayout`。目录站内路径作为后代前缀，子节点相对路径在其下拼接，绝对路径覆盖该前缀。
+- 菜单可选择的图标只能来自 `src/assets/icons/*.svg` 的构建期名称清单；新增 SVG 文件即可进入选项，不在 Vue 组件中维护图形分支。
 - 跨模块状态和操作通过目标模块公开的只读查询、命令或事件协作。不得直接修改其他模块的 Pinia store；真正领域无关的 UI 与 Client 能力才进入共享目录。
 - Vue 组件负责展示和交互，不直接实现复杂业务规则。
 - 后端调用通过模块 composable 或 service 封装，不在多个组件中散落路径字符串。

@@ -17,7 +17,7 @@
         <RouterLink v-if="item.type === 'menu'" :to="item.path" class="module-card"
           ><span class="module-card__icon"><AppIcon :name="item.icon" /></span
           ><span class="module-card__arrow">↗</span><b>{{ item.name }}</b
-          ><small>{{ item.code.replaceAll('_', ' ') }}</small></RouterLink
+          ><small>{{ item.path }}</small></RouterLink
         >
         <a
           v-else

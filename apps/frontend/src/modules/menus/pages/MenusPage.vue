@@ -9,7 +9,7 @@
           v-model="keyword"
           clearable
           :prefix-icon="Search"
-          placeholder="搜索菜单名称或编码"
+          placeholder="搜索菜单名称"
           size="large"
           @keyup.enter="search"
           @clear="search"
@@ -37,10 +37,7 @@
           <template #default="{ row }">
             <div class="menu-name">
               <span class="menu-icon"><AppIcon :name="row.icon || fallbackIcon(row.type)" /></span>
-              <div>
-                <b>{{ row.name }}</b>
-                <small>{{ row.code }}</small>
-              </div>
+              <b>{{ row.name }}</b>
             </div>
           </template>
         </el-table-column>
@@ -62,7 +59,7 @@
               target="_blank"
               rel="noopener noreferrer"
               >{{ row.externalUrl }} ↗</a
-            ><span v-else class="table-muted">展开子节点</span></template
+            ><code v-else class="code-chip">{{ row.path || '待配置站内路由' }}</code></template
           ></el-table-column
         >
         <el-table-column prop="sortOrder" label="排序" width="80" />
@@ -110,9 +107,6 @@
           <el-form-item label="名称" required
             ><el-input v-model.trim="form.name" placeholder="例如 报表中心"
           /></el-form-item>
-          <el-form-item label="编码" required
-            ><el-input v-model.trim="form.code" placeholder="例如 REPORT_CENTER"
-          /></el-form-item>
           <el-form-item label="上级目录"
             ><el-select v-model="form.parentId" class="w-full"
               ><el-option label="根节点" :value="0" /><el-option
@@ -125,9 +119,27 @@
           <el-form-item label="节点类型" required
             ><el-segmented v-model="form.type" :options="typeOptions" class="w-full"
           /></el-form-item>
-          <el-form-item label="图标"
-            ><el-input v-model.trim="form.icon" placeholder="例如 menu、book、external"
-          /></el-form-item>
+          <el-form-item label="图标">
+            <el-select
+              v-model="form.icon"
+              class="w-full"
+              clearable
+              filterable
+              placeholder="选择图标"
+            >
+              <el-option
+                v-for="option in iconOptions"
+                :key="option.value"
+                :label="option.label"
+                :value="option.value"
+              >
+                <span class="icon-option">
+                  <AppIcon :name="option.value" />
+                  <span>{{ option.label }}</span>
+                </span>
+              </el-option>
+            </el-select>
+          </el-form-item>
           <el-form-item v-if="form.type !== 'button'" label="布局">
             <el-select v-model="form.layout" class="w-full" placeholder="选择布局">
               <el-option label="继承上级或使用默认布局" value="" />
@@ -142,10 +154,13 @@
           <el-form-item label="排序"
             ><el-input-number v-model="form.sortOrder" :min="0" :max="9999" class="!w-full"
           /></el-form-item>
+          <template v-if="form.type !== 'button'">
+            <el-form-item label="站内路由" required>
+              <el-input v-model.trim="form.path" :placeholder="routePlaceholder" />
+              <small class="route-hint">{{ routeHint }}</small>
+            </el-form-item>
+          </template>
           <template v-if="form.type === 'menu'">
-            <el-form-item label="站内路由" required
-              ><el-input v-model.trim="form.path" placeholder="例如 /reports"
-            /></el-form-item>
             <el-form-item label="页面组件" required
               ><el-select v-model="form.component" class="w-full" placeholder="选择已注册页面"
                 ><el-option
@@ -183,8 +198,10 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import type { MenuRequest, MenuSummary } from '@scaffold/api-contract'
 import AppIcon from '../../../components/AppIcon.vue'
 import { viewComponentOptions } from '../../../config/app.config.js'
+import { iconOptions } from '../../../shared/icons/icon-registry.js'
 import { layoutOptions } from '../../../shared/routing/layout-registry.js'
 import { useNavigationStore } from '../../navigation/navigation.store.js'
+import { createInternalMenuCode, menuPathError } from '../menu-form.js'
 import { buildMenuTree, type MenuTreeRecord } from '../menu-tree.js'
 import { createMenu, deleteMenu, listAllMenus, updateMenu } from '../menus.api.js'
 
@@ -192,7 +209,6 @@ type MenuType = MenuSummary['type']
 interface MenuForm {
   parentId: number
   name: string
-  code: string
   path: string
   component: string
   layout: string
@@ -212,11 +228,11 @@ const keyword = ref(''),
 const editingId = ref<number | null>(null),
   errorMessage = ref(''),
   formError = ref('')
+const internalCode = ref('')
 const navigation = useNavigationStore()
 const form = reactive<MenuForm>({
   parentId: 0,
   name: '',
-  code: '',
   path: '',
   component: '',
   layout: '',
@@ -237,8 +253,7 @@ const treeRecords = computed(() => {
   const byId = new Map(records.value.map((record) => [record.id, record]))
   const visibleIds = new Set<number>()
   for (const record of records.value) {
-    if (!record.name.toLowerCase().includes(query) && !record.code.toLowerCase().includes(query))
-      continue
+    if (!record.name.toLowerCase().includes(query)) continue
     visibleIds.add(record.id)
     let parentId = record.parentId
     while (parentId > 0 && !visibleIds.has(parentId)) {
@@ -250,6 +265,14 @@ const treeRecords = computed(() => {
 })
 const directoryOptions = computed(() =>
   records.value.filter((record) => record.type === 'directory'),
+)
+const routePlaceholder = computed(() =>
+  form.parentId === 0 ? '例如 /system' : '例如 users 或 /users',
+)
+const routeHint = computed(() =>
+  form.parentId === 0
+    ? '根节点必须以 / 开头'
+    : '相对路径会拼接上级目录；以 / 开头时使用绝对路径',
 )
 
 async function load(): Promise<void> {
@@ -268,10 +291,10 @@ async function load(): Promise<void> {
 }
 
 function resetForm(parentId = 0): void {
+  internalCode.value = createInternalMenuCode()
   Object.assign(form, {
     parentId,
     name: '',
-    code: '',
     path: '',
     component: '',
     layout: '',
@@ -290,10 +313,10 @@ function openCreate(parentId: number): void {
 }
 function openEdit(row: MenuTreeRecord): void {
   editingId.value = row.id
+  internalCode.value = row.code
   Object.assign(form, {
     parentId: row.parentId,
     name: row.name,
-    code: row.code,
     path: row.path,
     component: row.component,
     layout: row.layout,
@@ -314,7 +337,7 @@ function payload(): MenuRequest {
   const common = {
     parentId: form.parentId,
     name: form.name,
-    code: form.code,
+    code: internalCode.value,
     icon: form.icon,
     sortOrder: form.sortOrder,
     enabled: form.enabled,
@@ -323,7 +346,7 @@ function payload(): MenuRequest {
     return {
       ...common,
       type: 'directory',
-      path: '',
+      path: form.path,
       component: '',
       layout: form.layout,
       externalUrl: '',
@@ -351,10 +374,10 @@ async function submit(): Promise<void> {
   saving.value = true
   formError.value = ''
   try {
-    if (!form.name || !/^[A-Z0-9_]{2,80}$/.test(form.code))
-      throw new Error('请填写名称，编码仅使用大写字母、数字和下划线')
-    if (form.type === 'menu' && (!form.path.startsWith('/') || !form.component))
-      throw new Error('菜单必须配置以 / 开头的站内路由和页面组件')
+    if (!form.name) throw new Error('请填写名称')
+    const pathError = menuPathError(form.type, form.parentId, form.path)
+    if (pathError) throw new Error(pathError)
+    if (form.type === 'menu' && !form.component) throw new Error('菜单必须配置页面组件')
     if (form.type === 'button' && !/^https?:\/\//i.test(form.externalUrl))
       throw new Error('外链按钮必须配置 http 或 https 地址')
     const result = editingId.value
@@ -402,10 +425,11 @@ function fallbackIcon(type: MenuType): string {
 watch(
   () => form.type,
   function clearUnusedFields(type) {
-    if (type !== 'menu') {
+    if (type === 'button') {
       form.path = ''
       form.component = ''
     }
+    if (type === 'directory') form.component = ''
     if (type !== 'button') form.externalUrl = ''
     if (type === 'button') form.layout = ''
   },
@@ -434,13 +458,6 @@ onMounted(load)
   color: var(--ink);
   font-size: 13px;
 }
-.menu-name small {
-  display: block;
-  margin-top: 3px;
-  color: var(--muted);
-  font-size: 9px;
-  letter-spacing: 0.06em;
-}
 .menu-icon {
   display: grid;
   width: 34px;
@@ -458,5 +475,22 @@ onMounted(load)
   font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.icon-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.icon-option .icon {
+  width: 17px;
+  height: 17px;
+  color: var(--primary-deep);
+}
+.route-hint {
+  display: block;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
 }
 </style>

@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { NavigationMenu } from '@scaffold/api-contract'
+import { resolveNavigationPaths } from '../../shared/routing/menu-paths.js'
 import { fetchNavigation } from './navigation.api.js'
 
 function flattenTree(nodes: NavigationMenu[]): NavigationMenu[] {
@@ -19,7 +20,7 @@ export const useNavigationStore = defineStore('navigation', () => {
     loading.value = true
     error.value = ''
     try {
-      items.value = await fetchNavigation()
+      items.value = resolveNavigationPaths(await fetchNavigation())
       loaded.value = true
     } catch (cause) {
       items.value = []

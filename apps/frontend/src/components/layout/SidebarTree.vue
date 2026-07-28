@@ -30,7 +30,7 @@
         <span class="sidebar-node-icon"><AppIcon :name="item.icon || 'menu'" /></span>
         <span class="sidebar-node-copy">
           <b>{{ item.name }}</b>
-          <small>{{ item.code.replaceAll('_', ' ') }}</small>
+          <small>{{ item.path }}</small>
         </span>
         <span class="node-arrow">›</span>
       </RouterLink>

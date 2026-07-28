@@ -61,7 +61,7 @@ function hasParentCycle(
 function isUsableNavigationRow(row: NavigationRow): boolean {
   if (row.type === 'directory') return true
   if (row.type === 'menu') {
-    return row.path.startsWith('/') && row.component.trim().length > 0
+    return row.path.trim().length > 0 && row.component.trim().length > 0
   }
   return /^https?:\/\//i.test(row.externalUrl)
 }

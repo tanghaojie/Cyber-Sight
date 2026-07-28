@@ -52,7 +52,7 @@ const registries = {
 describe('database dynamic routes', () => {
   it('inherits directory layouts, allows menu overrides and falls back to the default', () => {
     const target = targetRouter()
-    const inheritedMenu = { ...menu(2, '/users', 'users'), parentId: 1 }
+    const inheritedMenu = { ...menu(2, 'users', 'users'), parentId: 1 }
     const overriddenMenu = { ...menu(3, '/custom', 'users', 'MenuLayout'), parentId: 1 }
     const nodes: NavigationMenu[] = [
       {
@@ -63,7 +63,7 @@ describe('database dynamic routes', () => {
         icon: 'layers',
         sortOrder: 1,
         type: 'directory',
-        path: '',
+        path: '/organization',
         component: '',
         layout: 'DirectoryLayout',
         externalUrl: '',
@@ -74,11 +74,54 @@ describe('database dynamic routes', () => {
     ]
 
     expect(installMenuRoutes(target, nodes, registries)).toBe(4)
-    expect(target.resolve('/users').matched[1].components?.default).toBe(directoryLayout)
+    expect(target.resolve('/organization/users').matched[1].components?.default).toBe(directoryLayout)
     expect(target.resolve('/custom').matched[1].components?.default).toBe(menuLayout)
     expect(target.resolve('/default').matched[1].components?.default).toBe(adminLayout)
     expect(target.resolve('/').name).toBe('menu-5')
-    expect(target.resolve('/users').name).toBe('menu-2')
+    expect(target.resolve('/organization/users').name).toBe('menu-2')
+    clearDynamicRoutes()
+  })
+
+  it('resolves nested directory paths and lets absolute descendants override the prefix', () => {
+    const target = targetRouter()
+    const nodes: NavigationMenu[] = [
+      {
+        id: 10,
+        parentId: 0,
+        name: '系统',
+        code: 'SYSTEM',
+        icon: 'layers',
+        sortOrder: 1,
+        type: 'directory',
+        path: '/system',
+        component: '',
+        layout: '',
+        externalUrl: '',
+        children: [
+          {
+            id: 11,
+            parentId: 10,
+            name: '设置',
+            code: 'SETTINGS',
+            icon: 'settings',
+            sortOrder: 1,
+            type: 'directory',
+            path: 'settings',
+            component: '',
+            layout: '',
+            externalUrl: '',
+            children: [
+              { ...menu(12, 'users', 'users'), parentId: 11 },
+              { ...menu(13, '/members', 'users'), parentId: 11 },
+            ],
+          },
+        ],
+      },
+    ]
+
+    expect(installMenuRoutes(target, nodes, registries)).toBe(2)
+    expect(target.resolve('/system/settings/users').name).toBe('menu-12')
+    expect(target.resolve('/members').name).toBe('menu-13')
     clearDynamicRoutes()
   })
 

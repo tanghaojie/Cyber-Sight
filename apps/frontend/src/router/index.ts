@@ -12,6 +12,7 @@ import { loginPage } from '../modules/auth/auth.routes.js'
 import { useAuthStore } from '../modules/auth/auth.store.js'
 import { notFoundPage } from '../modules/errors/error.routes.js'
 import { useNavigationStore } from '../modules/navigation/navigation.store.js'
+import { resolveMenuPath } from '../shared/routing/menu-paths.js'
 import {
   DEFAULT_LAYOUT,
   layoutRegistry,
@@ -40,22 +41,28 @@ export function installMenuRoutes(
   const views = registries.views ?? viewRegistry
   const seenPaths = new Set<string>()
 
-  function registerNodes(items: NavigationMenu[], inheritedLayout = ''): void {
+  function registerNodes(
+    items: NavigationMenu[],
+    inheritedLayout = '',
+    parentPath = '',
+    ancestorNames: string[] = [],
+  ): void {
     for (const node of items) {
       const selectedLayout = node.layout || inheritedLayout
+      const resolvedPath = resolveMenuPath(node.path, parentPath)
       if (node.type === 'directory') {
-        registerNodes(node.children, selectedLayout)
+        registerNodes(node.children, selectedLayout, resolvedPath, [...ancestorNames, node.name])
         continue
       }
-      if (node.type !== 'menu' || !node.path || seenPaths.has(node.path)) continue
+      if (node.type !== 'menu' || !resolvedPath || seenPaths.has(resolvedPath)) continue
 
       const component = views[node.component]
       const layout = layouts[selectedLayout || DEFAULT_LAYOUT]
       if (!component || !layout) continue
 
-      seenPaths.add(node.path)
+      seenPaths.add(resolvedPath)
       const route: RouteRecordRaw = {
-        path: childPath(node.path),
+        path: childPath(resolvedPath),
         name: `menu-layout-${node.id}`,
         component: layout,
         children: [
@@ -65,7 +72,7 @@ export function installMenuRoutes(
             component,
             meta: {
               title: node.name,
-              eyebrow: node.code.replaceAll('_', ' / '),
+              eyebrow: [...ancestorNames, node.name].join(' / '),
               menuId: node.id,
             },
           },

@@ -13,6 +13,7 @@ import {
   type IdParams,
   type ListQuery,
   type MenuRequest,
+  isValidMenuPath,
 } from '@scaffold/api-contract'
 import { requireCurrentUser } from '../auth/index.js'
 import { ErrorCode } from '../../shared/errors/error-codes.js'
@@ -76,6 +77,9 @@ export async function menuRoutes(app: FastifyInstance): Promise<void> {
     },
   }, async function createMenuHandler(request) {
     const actor = await requireCurrentUser(app, request)
+    if (!isValidMenuPath(request.body)) {
+      return failure(ErrorCode.INVALID_REQUEST, 'Root menu path must start with /')
+    }
     if (!(await validateMenuParent(app, request.body.parentId))) {
       return failure(ErrorCode.INVALID_REQUEST, 'Parent menu must be an existing directory')
     }
@@ -89,6 +93,9 @@ export async function menuRoutes(app: FastifyInstance): Promise<void> {
     },
   }, async function updateMenuHandler(request) {
     const actor = await requireCurrentUser(app, request)
+    if (!isValidMenuPath(request.body)) {
+      return failure(ErrorCode.INVALID_REQUEST, 'Root menu path must start with /')
+    }
     if (!(await validateMenuParent(app, request.body.parentId, request.params.id))) {
       return failure(ErrorCode.INVALID_REQUEST, 'Parent menu must be a directory outside the current subtree')
     }

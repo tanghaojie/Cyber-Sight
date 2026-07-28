@@ -47,5 +47,6 @@
 | 菜单编码唯一性 | [计划](plans/2026-07-27-menu-code-soft-delete-uniqueness.md) | [日志](ai-logs/2026/07/2026-07-27-menu-code-soft-delete-uniqueness.md) |
 | 统一软删除唯一性 | [计划](plans/2026-07-27-soft-delete-unique-constraints.md) | [日志](ai-logs/2026/07/2026-07-27-soft-delete-unique-constraints.md) |
 | 文档上下文压缩与统一归档 | [计划](plans/2026-07-28-documentation-context-compression.md) | [日志](ai-logs/2026/07/2026-07-28-documentation-context-compression.md) |
+| 菜单分层路由与 SVG 图标注册表 | [计划](plans/2026-07-28-menu-routing-svg-icons.md) | [日志](ai-logs/2026/07/2026-07-28-menu-routing-svg-icons.md) |
 
 归档内容不继续同步当前实现；发现冲突时以当前设计、现行 ADR、代码和测试为准。
