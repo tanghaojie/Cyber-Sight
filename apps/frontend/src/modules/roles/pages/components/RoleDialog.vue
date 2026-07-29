@@ -98,7 +98,9 @@ async function submit(): Promise<void> {
     }
     const payload: RoleRequest = { ...form, menuIds: [...form.menuIds] }
     const result = props.role ? await updateRole(props.role.id, payload) : await createRole(payload)
-    if (result.status !== 0) throw new Error(result.err || '角色保存失败')
+    if (result.status !== 0) {
+      throw new Error(result.err || '角色保存失败')
+    }
     dialogOpen.value = false
     ElMessage.success('角色已保存')
     emit('saved')
@@ -110,7 +112,9 @@ async function submit(): Promise<void> {
 }
 
 watch(dialogOpen, function initializeForm(open) {
-  if (open) resetForm()
+  if (open) {
+    resetForm()
+  }
 })
 
 onMounted(async function loadMenuOptions() {

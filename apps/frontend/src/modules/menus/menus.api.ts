@@ -19,8 +19,9 @@ export async function listMenus(pageNum: number, pageSize: number, keyword = '')
 export async function listAllMenus(): Promise<MenuSummary[]> {
   const { data, error } = await apiClient.GET<MenuListResponse>('/admin/menus/tree')
   const result = data ?? error
-  if (!result || result.status !== 0 || !('data' in result))
+  if (!result || result.status !== 0 || !('data' in result)) {
     throw new Error(result && 'err' in result ? result.err : '菜单选项加载失败')
+  }
   return result.data
 }
 

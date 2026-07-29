@@ -101,7 +101,9 @@ export function installMenuRoutes(
 }
 
 export function clearDynamicRoutes(): void {
-  for (const remove of dynamicRouteRemovers.splice(0)) remove()
+  for (const remove of dynamicRouteRemovers.splice(0)) {
+    remove()
+  }
   routesReady = false
 }
 

@@ -227,17 +227,25 @@ async function submit(): Promise<void> {
   saving.value = true
   formError.value = ''
   try {
-    if (!form.name) throw new Error('请填写名称')
+    if (!form.name) {
+      throw new Error('请填写名称')
+    }
     const pathError = menuPathError(form.type, form.parentId, form.path)
-    if (pathError) throw new Error(pathError)
-    if (form.type === 'menu' && !form.component) throw new Error('菜单必须配置页面组件')
+    if (pathError) {
+      throw new Error(pathError)
+    }
+    if (form.type === 'menu' && !form.component) {
+      throw new Error('菜单必须配置页面组件')
+    }
     if (form.type === 'button' && !/^https?:\/\//i.test(form.externalUrl)) {
       throw new Error('外链按钮必须配置 http 或 https 地址')
     }
     const result = props.menu
       ? await updateMenu(props.menu.id, payload())
       : await createMenu(payload())
-    if (result.status !== 0) throw new Error(result.err || '菜单保存失败')
+    if (result.status !== 0) {
+      throw new Error(result.err || '菜单保存失败')
+    }
     dialogOpen.value = false
     ElMessage.success('菜单节点已保存')
     emit('saved')
@@ -250,7 +258,9 @@ async function submit(): Promise<void> {
 }
 
 watch(dialogOpen, function initializeForm(open) {
-  if (open) resetForm()
+  if (open) {
+    resetForm()
+  }
 })
 
 watch(
@@ -260,9 +270,15 @@ watch(
       form.path = ''
       form.component = ''
     }
-    if (type === 'directory') form.component = ''
-    if (type !== 'button') form.externalUrl = ''
-    if (type === 'button') form.layout = ''
+    if (type === 'directory') {
+      form.component = ''
+    }
+    if (type !== 'button') {
+      form.externalUrl = ''
+    }
+    if (type === 'button') {
+      form.layout = ''
+    }
   },
 )
 </script>

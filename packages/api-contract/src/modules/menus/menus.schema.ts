@@ -110,7 +110,9 @@ export type MenuListResponse = z.infer<typeof MenuListResponseSchema>
 export type NavigationMenuResponse = z.infer<typeof NavigationMenuResponseSchema>
 
 export function isValidMenuPath(input: Pick<MenuRequest, 'parentId' | 'path' | 'type'>): boolean {
-  if (input.type === 'button') return true
+  if (input.type === 'button') {
+    return true
+  }
   const path = input.path.trim()
   return path.length > 0 && (input.parentId > 0 || path.startsWith('/'))
 }

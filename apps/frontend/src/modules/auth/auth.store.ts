@@ -11,8 +11,9 @@ import { clearAccessToken, getAccessToken, setAccessToken } from '@/shared/acces
 import { apiClient } from '@/api/client'
 
 function responseError(data: unknown, fallback: string): string {
-  if (typeof data === 'object' && data !== null && 'err' in data && typeof data.err === 'string')
+  if (typeof data === 'object' && data !== null && 'err' in data && typeof data.err === 'string') {
     return data.err
+  }
   return fallback
 }
 
@@ -54,7 +55,9 @@ export const useAuthStore = defineStore('auth', () => {
     }
     try {
       const { data } = await apiClient.GET<CurrentUserResponse>('/auth/me')
-      if (data?.status === 0 && data.data) user.value = data.data
+      if (data?.status === 0 && data.data) {
+        user.value = data.data
+      }
     } catch {
       user.value = null
     } finally {

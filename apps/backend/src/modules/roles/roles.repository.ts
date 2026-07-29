@@ -95,7 +95,9 @@ export async function updateRole(
     .set({ ...values, updatedAt: new Date(), updatedBy: actorId })
     .where(and(eq(roles.id, id), eq(roles.isDeleted, false)))
     .returning({ id: roles.id })
-  if (!updated.length) return false
+  if (!updated.length) {
+    return false
+  }
   await replaceRoleMenus(app, id, menuIds, actorId)
   return true
 }

@@ -28,7 +28,9 @@ describe('legacy menu response compatibility', () => {
 
     const parsed = MenuListResponseSchema.safeParse({ status: 0, data: [legacyButton] })
     expect(parsed.success).toBe(true)
-    if (parsed.success) expect(parsed.data.data?.[0].layout).toBe('')
+    if (parsed.success) {
+      expect(parsed.data.data?.[0].layout).toBe('')
+    }
     expect(MenuRequestSchema.safeParse(legacyButton).success).toBe(false)
   })
 

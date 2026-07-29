@@ -90,8 +90,9 @@ export async function userRoutes(app: FastifyInstance): Promise<void> {
         invalidateUserTokenCache(app, request.params.id)
         return success({ id: request.params.id })
       } catch (error) {
-        if (isUniqueViolation(error))
+        if (isUniqueViolation(error)) {
           return failure(ErrorCode.RESOURCE_CONFLICT, 'Resource already exists')
+        }
         throw error
       }
     },
@@ -112,8 +113,9 @@ export async function userRoutes(app: FastifyInstance): Promise<void> {
     },
     async function deleteUserHandler(request) {
       const actor = await requireCurrentUser(app, request)
-      if (actor.id === request.params.id)
+      if (actor.id === request.params.id) {
         throw app.httpErrors.forbidden('You cannot delete your own account')
+      }
       ensureUpdated(app, await softDeleteUser(app, request.params.id, actor.id))
       await revokeUserTokens(app, request.params.id, actor.id)
       return success()

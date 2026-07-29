@@ -96,7 +96,9 @@ async function load(): Promise<void> {
   errorMessage.value = ''
   try {
     const result = await listUsers(pageNum.value, pageSize, keyword.value)
-    if (result.status !== 0) throw new Error(result.err || '用户加载失败')
+    if (result.status !== 0) {
+      throw new Error(result.err || '用户加载失败')
+    }
     records.value = result.list
     total.value = result.total
   } catch (error) {
@@ -125,7 +127,9 @@ async function remove(user: UserSummary): Promise<void> {
       cancelButtonText: '取消',
     })
     const result = await deleteUser(user.id)
-    if (result.status !== 0) throw new Error('err' in result ? result.err : '删除失败')
+    if (result.status !== 0) {
+      throw new Error('err' in result ? result.err : '删除失败')
+    }
     ElMessage.success('用户已删除')
     await load()
   } catch (error) {

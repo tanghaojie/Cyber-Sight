@@ -16,7 +16,9 @@ export const useNavigationStore = defineStore('navigation', () => {
   const flatItems = computed(() => flattenTree(items.value))
 
   async function load(force = false): Promise<void> {
-    if ((loaded.value && !force) || loading.value) return
+    if ((loaded.value && !force) || loading.value) {
+      return
+    }
     loading.value = true
     error.value = ''
     try {

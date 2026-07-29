@@ -117,11 +117,15 @@ const errorMessage = ref('')
 const navigation = useNavigationStore()
 const treeRecords = computed(() => {
   const query = keyword.value.trim().toLowerCase()
-  if (!query) return buildMenuTree(records.value)
+  if (!query) {
+    return buildMenuTree(records.value)
+  }
   const byId = new Map(records.value.map((record) => [record.id, record]))
   const visibleIds = new Set<number>()
   for (const record of records.value) {
-    if (!record.name.toLowerCase().includes(query)) continue
+    if (!record.name.toLowerCase().includes(query)) {
+      continue
+    }
     visibleIds.add(record.id)
     let currentParentId = record.parentId
     while (currentParentId > 0 && !visibleIds.has(currentParentId)) {
@@ -154,7 +158,9 @@ async function remove(menu: MenuTreeRecord): Promise<void> {
       cancelButtonText: '取消',
     })
     const result = await deleteMenu(menu.id)
-    if (result.status !== 0) throw new Error('err' in result ? result.err : '删除失败')
+    if (result.status !== 0) {
+      throw new Error('err' in result ? result.err : '删除失败')
+    }
     ElMessage.success('菜单节点已删除')
     await load()
     await navigation.load(true)
@@ -166,8 +172,12 @@ async function remove(menu: MenuTreeRecord): Promise<void> {
 }
 
 function typeLabel(type: MenuType): string {
-  if (type === 'directory') return '目录'
-  if (type === 'button') return '外链'
+  if (type === 'directory') {
+    return '目录'
+  }
+  if (type === 'button') {
+    return '外链'
+  }
   return '菜单'
 }
 

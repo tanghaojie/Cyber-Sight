@@ -52,7 +52,9 @@ const pageEyebrow = computed(() =>
 watch(
   () => navigation.items,
   function refreshRoutes(items) {
-    if (navigation.loaded) installMenuRoutes(router, items)
+    if (navigation.loaded) {
+      installMenuRoutes(router, items)
+    }
   },
   { deep: true },
 )

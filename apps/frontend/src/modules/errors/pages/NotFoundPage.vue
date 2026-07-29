@@ -31,8 +31,11 @@ async function goHome(): Promise<void> {
   await router.push('/')
 }
 function goBack(): void {
-  if (window.history.length > 1) router.back()
-  else void router.push('/')
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    void router.push('/')
+  }
 }
 </script>
 

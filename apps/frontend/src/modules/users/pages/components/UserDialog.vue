@@ -129,7 +129,9 @@ async function submit(): Promise<void> {
           roleIds: form.roleIds,
           enabled: form.enabled,
         } satisfies UserCreate)
-    if (result.status !== 0) throw new Error(result.err || '用户保存失败')
+    if (result.status !== 0) {
+      throw new Error(result.err || '用户保存失败')
+    }
     dialogOpen.value = false
     ElMessage.success('用户已保存')
     emit('saved')
@@ -141,6 +143,8 @@ async function submit(): Promise<void> {
 }
 
 watch(dialogOpen, function initializeForm(open) {
-  if (open) resetForm()
+  if (open) {
+    resetForm()
+  }
 })
 </script>

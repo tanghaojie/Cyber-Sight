@@ -12,19 +12,28 @@
     "db:migrate": "pnpm --filter @scaffold/backend db:migrate",
     "format": "prettier --write . --ignore-unknown",
     "format:check": "prettier --check . --ignore-unknown",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "lint-staged": "lint-staged",
     "prepare": "simple-git-hooks",
     "preinstall": "npx only-allow pnpm"
   },
   "lint-staged": {
-    "*.{js,mjs,cjs,ts,mts,cts,tsx,vue,json,jsonc,md,yml,yaml,css,scss,html}": "prettier --write --ignore-unknown"
+    "*.{js,mjs,cjs,ts,mts,cts,tsx,vue}": [
+      "eslint --fix",
+      "prettier --write --ignore-unknown"
+    ],
+    "*.{json,jsonc,md,yml,yaml,css,scss,html}": "prettier --write --ignore-unknown"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged"
   },
   "devDependencies": {
+    "eslint": "^10.8.0",
+    "eslint-plugin-vue": "^10.10.0",
     "lint-staged": "^17.2.0",
     "prettier": "^3.9.6",
-    "simple-git-hooks": "^2.13.1"
+    "simple-git-hooks": "^2.13.1",
+    "typescript-eslint": "^8.65.0"
   }
 }

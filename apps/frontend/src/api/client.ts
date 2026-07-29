@@ -45,8 +45,12 @@ async function request<TResponse, TBody = never>(
 ): Promise<ApiResult<TResponse>> {
   const headers: Record<string, string> = {}
   const token = getAccessToken()
-  if (token) headers.authorization = `Bearer ${token}`
-  if (options.body !== undefined) headers['content-type'] = 'application/json'
+  if (token) {
+    headers.authorization = `Bearer ${token}`
+  }
+  if (options.body !== undefined) {
+    headers['content-type'] = 'application/json'
+  }
 
   const response = await fetch(requestUrl(path, options.query), {
     method,

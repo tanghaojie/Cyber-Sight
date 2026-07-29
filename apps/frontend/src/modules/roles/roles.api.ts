@@ -23,7 +23,9 @@ export async function listRoles(pageNum: number, pageSize: number, keyword = '')
 
 export async function listRoleOptions(): Promise<RoleOption[]> {
   const result = await listRoles(1, 100)
-  if (result.status !== 0) throw new Error(result.err || '角色选项加载失败')
+  if (result.status !== 0) {
+    throw new Error(result.err || '角色选项加载失败')
+  }
   return result.list
     .filter((role) => role.enabled)
     .map(({ id, name, code }) => ({ id, name, code }))

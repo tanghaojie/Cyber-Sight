@@ -92,7 +92,9 @@ async function load(): Promise<void> {
   errorMessage.value = ''
   try {
     const result = await listRoles(pageNum.value, pageSize, keyword.value)
-    if (result.status !== 0) throw new Error(result.err || '角色加载失败')
+    if (result.status !== 0) {
+      throw new Error(result.err || '角色加载失败')
+    }
     records.value = result.list
     total.value = result.total
   } catch (error) {
@@ -117,7 +119,9 @@ async function remove(role: RoleSummary): Promise<void> {
       cancelButtonText: '取消',
     })
     const result = await deleteRole(role.id)
-    if (result.status !== 0) throw new Error('err' in result ? result.err : '删除失败')
+    if (result.status !== 0) {
+      throw new Error('err' in result ? result.err : '删除失败')
+    }
     ElMessage.success('角色已删除')
     await load()
   } catch (error) {

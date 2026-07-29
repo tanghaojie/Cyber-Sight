@@ -88,7 +88,9 @@ async function submit(): Promise<void> {
     const result = props.dictionary
       ? await updateDictionary(props.dictionary.id, payload)
       : await createDictionary(payload)
-    if (result.status !== 0) throw new Error(result.err || '字典保存失败')
+    if (result.status !== 0) {
+      throw new Error(result.err || '字典保存失败')
+    }
     dialogOpen.value = false
     ElMessage.success('字典项已保存')
     emit('saved')
@@ -100,6 +102,8 @@ async function submit(): Promise<void> {
 }
 
 watch(dialogOpen, function initializeForm(open) {
-  if (open) resetForm()
+  if (open) {
+    resetForm()
+  }
 })
 </script>

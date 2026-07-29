@@ -13,7 +13,9 @@ let globalHttpErrorHandler: GlobalHttpErrorHandler | undefined
 export function installGlobalHttpErrorHandler(handler: GlobalHttpErrorHandler): () => void {
   globalHttpErrorHandler = handler
   return function uninstallHandler() {
-    if (globalHttpErrorHandler === handler) globalHttpErrorHandler = undefined
+    if (globalHttpErrorHandler === handler) {
+      globalHttpErrorHandler = undefined
+    }
   }
 }
 

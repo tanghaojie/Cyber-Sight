@@ -15,14 +15,18 @@ function migrationSqlFiles(): string[] {
 
 function migrationContaining(fragment: string): string {
   const migrationSql = migrationSqlFiles().find((sql) => sql.includes(fragment))
-  if (!migrationSql) throw new Error(`Migration not found: ${fragment}`)
+  if (!migrationSql) {
+    throw new Error(`Migration not found: ${fragment}`)
+  }
   return migrationSql
 }
 
 function latestMigrationSql(): string {
   const migrations = migrationSqlFiles()
   const latest = migrations.at(-1)
-  if (!latest) throw new Error('No migrations found')
+  if (!latest) {
+    throw new Error('No migrations found')
+  }
   return latest
 }
 

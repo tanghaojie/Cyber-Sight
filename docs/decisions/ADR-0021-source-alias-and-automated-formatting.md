@@ -32,16 +32,19 @@ date: 2026-07-28
 Vite 原生登记前端 alias；后端和契约包由 TypeScript `paths` 提供开发期类型解析，并在
 `tsc` 后运行 `tsc-alias` 生成 Node.js 可执行产物。运行时文件 URL 不伪装成模块 alias。
 
-根目录 Prettier 配置固定 `semi: false`、`singleQuote: true`、`printWidth: 100`。VS Code
-format-on-save 提供即时反馈，`lint-staged` 与 `simple-git-hooks` 在 pre-commit 只改写已暂存的
-受支持文件，`format:check` 是可在 AI 和未来 CI 中复用的只读门禁。仓库文本统一使用 LF，
-避免 Windows 的 Git 换行转换与 Prettier 互相覆盖。
+根目录 Prettier 配置固定 `semi: false`、`singleQuote: true`、`printWidth: 100`。根目录 ESLint
+flat config 对 JavaScript、TypeScript 和 Vue 脚本启用 `curly: ['error', 'all']`，所有控制语句
+都必须使用花括号，不允许单行无花括号写法。VS Code format-on-save 提供即时排版反馈，
+`lint-staged` 与 `simple-git-hooks` 在 pre-commit 对已暂存源码先执行 `eslint --fix`、再执行
+Prettier，其余受支持文件只执行 Prettier。`lint` 与 `format:check` 是可在 AI 和未来 CI 中复用
+的只读门禁。仓库文本统一使用 LF，避免 Windows 的 Git 换行转换与 Prettier 互相覆盖。
 
 ## 正面结果
 
 - 跨目录导入不再随调用文件深度变化，依赖目标更直观。
 - 编辑器、AI、命令行和 Git 使用同一格式来源。
 - 提交 hook 只处理暂存文件，保持任务边界清晰。
+- 无花括号控制语句会在本地验证和提交阶段被一致拦截或自动修复。
 - Node.js 发布产物仍使用标准相对 ESM specifier，不依赖自定义生产 loader。
 
 ## 负面结果与风险
@@ -49,12 +52,15 @@ format-on-save 提供即时反馈，`lint-staged` 与 `simple-git-hooks` 在 pre
 - 每个新 workspace 都需要登记自己的 `@` 解析方式。
 - 后端和契约构建增加 `tsc-alias` 步骤；遗漏会得到无法直接运行的产物。
 - pre-commit 会修改已暂存文件，提交前仍需查看 diff；跳过 hook 时必须靠 `format:check` 拦截。
+- ESLint 当前只承载明确登记的结构约束；新增其他规则时需要评估存量代码和 Prettier 冲突，
+  不能默认启用整套推荐规则。
 - `@` 只表示当前 workspace 的 `src`，不能用于跨 package 导入；跨 package 仍使用正式包名。
 
 ## 验证和复审条件
 
 - 搜索源码模块导入，不应存在以 `../` 开始的 specifier；运行时文件 URL 和测试数据字符串除外。
-- `pnpm format:check` 和 `pnpm build` 通过；`pnpm test` 只覆盖契约构建校验与后端测试。
+- `pnpm lint`、`pnpm format:check` 和 `pnpm build` 通过；`pnpm test` 只覆盖契约构建校验与后端
+  测试。
 - 后端与契约包构建产物不包含 `@/` specifier，后端启动入口可由 Node.js 解析。
 - 若未来统一切换到原生支持 import map 的运行时或构建器，复审 `tsc-alias`，不改变源码约定。
 

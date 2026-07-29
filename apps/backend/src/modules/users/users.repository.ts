@@ -123,7 +123,9 @@ export async function updateUser(
     })
     .where(and(eq(users.id, id), eq(users.isDeleted, false)))
     .returning({ id: users.id })
-  if (!updated.length) return false
+  if (!updated.length) {
+    return false
+  }
   await replaceUserRoles(app, id, input.roleIds, actorId)
   return true
 }

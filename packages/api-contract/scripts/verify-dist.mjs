@@ -14,10 +14,14 @@ async function findAliasReferences(directory) {
       references.push(...(await findAliasReferences(path)))
       continue
     }
-    if (!entry.name.endsWith('.js') && !entry.name.endsWith('.d.ts')) continue
+    if (!entry.name.endsWith('.js') && !entry.name.endsWith('.d.ts')) {
+      continue
+    }
 
     const content = await readFile(path, 'utf8')
-    if (content.includes('@/')) references.push(relative(distDirectory, path))
+    if (content.includes('@/')) {
+      references.push(relative(distDirectory, path))
+    }
   }
 
   return references

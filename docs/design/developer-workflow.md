@@ -28,7 +28,7 @@ TypeScript 编译后由 `tsc-alias` 把别名改写成可被 Node.js 执行的�
 导出和动态导入省略 `.js`、`.ts` 后缀；Vue 单文件组件保留 `.vue` 后缀。后端与契约包由
 Node.js 原生 ESM 执行编译产物，本地 TypeScript 源码引用继续书写运行时 `.js` 后缀。
 
-## 代码格式
+## 代码格式与静态约束
 
 根目录 `.prettierrc.json` 是仓库唯一格式配置，固定为无分号、单引号、每行最多 100 字符，
 与维护者当前 VS Code 习惯一致。`.gitattributes` 把文本文件统一为 LF，避免 Windows Git 的
@@ -37,19 +37,27 @@ Node.js 原生 ESM 执行编译产物，本地 TypeScript 源码引用继续书�
 - `pnpm format`：格式化仓库内受支持的源码和文档。
 - `pnpm format:check`：只检查格式，不修改文件，供 AI 和自动化验证使用。
 
+Prettier 只负责排版，不负责控制流结构。根目录 `eslint.config.mjs` 对 JavaScript、TypeScript
+和 Vue 单文件组件中的脚本启用 ESLint `curly: ['error', 'all']`：`if`、`else`、`for`、
+`while` 和 `do` 等控制语句即使只有一条语句也必须使用花括号。根目录命令如下：
+
+- `pnpm lint`：只检查控制流花括号约束，不修改文件。
+- `pnpm lint:fix`：自动补齐能够安全修复的花括号，再交由 Prettier 统一排版。
+
 `.vscode/settings.json` 让 Prettier 扩展在保存支持的文件时读取仓库配置并自动格式化；
 `.vscode/extensions.json` 推荐安装对应扩展。个人编辑器设置不是团队规范来源，后续格式变化
 应先修改仓库配置。
 
 ## Git 与 AI 门禁
 
-`simple-git-hooks` 安装执行 `pnpm lint-staged` 的 pre-commit hook，`lint-staged` 仅对本次已暂存、且属于支持类型的文件
-执行 Prettier，然后把格式化结果保留在本次提交中。这样不会顺带改写未暂存的历史文件，
-也不能替代构建和测试。
+`simple-git-hooks` 安装执行 `pnpm lint-staged` 的 pre-commit hook。`lint-staged` 对本次已暂存
+的 JavaScript、TypeScript 和 Vue 文件先执行 `eslint --fix`，再执行 Prettier；其余受支持
+文件只执行 Prettier。修复结果保留在本次提交中，不会顺带改写未暂存的历史文件，也不能
+替代构建和测试。
 
-AI 修改代码时必须遵循根目录 `AGENTS.md`：生成内容直接服从仓库 Prettier 配置，验证阶段
-执行 `pnpm format` 和 `pnpm format:check`。后端与契约变更运行相称的自动化测试；前端只
-执行类型检查和生产构建，功能与浏览器验收交给维护者。
+AI 修改代码时必须遵循根目录 `AGENTS.md`：生成内容直接服从仓库 Prettier 和 ESLint 配置，
+验证阶段执行 `pnpm format`、`pnpm lint` 和 `pnpm format:check`。后端与契约变更运行相称的
+自动化测试；前端只执行类型检查和生产构建，功能与浏览器验收交给维护者。
 
 ## 失败模式与验证
 
@@ -57,10 +65,12 @@ AI 修改代码时必须遵循根目录 `AGENTS.md`：生成内容直接服从�
   调用 `pnpm lint-staged`。
 - 编辑器格式与提交结果不同：检查是否安装推荐的 Prettier 扩展，以及是否启用
   `prettier.requireConfig`。
+- `pnpm lint` 报告 `curly`：为对应控制语句补齐花括号，或执行 `pnpm lint:fix` 后复查 diff；
+  不使用行内禁用注释绕过仓库级约束。
 - Node.js 产物仍包含 `@/`：构建脚本必须在 `tsc` 后执行 `tsc-alias`，watch 模式必须同时运行
   两个 watcher，并在生产构建后扫描 `dist` 和导入包入口验证没有残留源码别名。
-- 交付验证至少执行 `pnpm format:check` 和 `pnpm build`；涉及后端或契约时再执行相称的
-  `pnpm test`，前端人工验收结果由维护者确认。
+- 交付验证至少执行 `pnpm lint`、`pnpm format:check` 和 `pnpm build`；涉及后端或契约时再
+  执行相称的 `pnpm test`，前端人工验收结果由维护者确认。
 
 长期取舍见 [ADR-0021](../decisions/ADR-0021-source-alias-and-automated-formatting.md)和
 [ADR-0022](../decisions/ADR-0022-maintainer-owned-frontend-validation.md)。

@@ -38,7 +38,9 @@ function hasParentCycle(row: NavigationRow, rowsById: Map<number, NavigationRow>
   const visited = new Set([row.id])
   let parentId = row.parentId
   while (parentId > 0) {
-    if (visited.has(parentId)) return true
+    if (visited.has(parentId)) {
+      return true
+    }
     visited.add(parentId)
     parentId = rowsById.get(parentId)?.parentId ?? 0
   }
@@ -46,7 +48,9 @@ function hasParentCycle(row: NavigationRow, rowsById: Map<number, NavigationRow>
 }
 
 function isUsableNavigationRow(row: NavigationRow): boolean {
-  if (row.type === 'directory') return true
+  if (row.type === 'directory') {
+    return true
+  }
   if (row.type === 'menu') {
     return row.path.trim().length > 0 && row.component.trim().length > 0
   }
@@ -154,8 +158,12 @@ export async function validateMenuParent(
   parentId: number,
   currentId?: number,
 ): Promise<boolean> {
-  if (parentId === 0) return true
-  if (parentId === currentId) return false
+  if (parentId === 0) {
+    return true
+  }
+  if (parentId === currentId) {
+    return false
+  }
 
   const rows = await app.db
     .select({ id: menus.id, parentId: menus.parentId, type: menus.type })
@@ -163,15 +171,21 @@ export async function validateMenuParent(
     .where(eq(menus.isDeleted, false))
   const byId = new Map(rows.map((row) => [row.id, row]))
   const parent = byId.get(parentId)
-  if (!parent || parent.type !== 'directory') return false
+  if (!parent || parent.type !== 'directory') {
+    return false
+  }
 
   const visited = new Set<number>()
   let cursor = parent
   while (cursor.parentId > 0 && !visited.has(cursor.id)) {
-    if (cursor.parentId === currentId) return false
+    if (cursor.parentId === currentId) {
+      return false
+    }
     visited.add(cursor.id)
     const next = byId.get(cursor.parentId)
-    if (!next) break
+    if (!next) {
+      break
+    }
     cursor = next
   }
   return !visited.has(cursor.id)

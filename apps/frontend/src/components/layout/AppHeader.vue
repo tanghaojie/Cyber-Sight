@@ -59,7 +59,9 @@ const emit = defineEmits<{
 const initials = computed(() => props.displayName?.slice(0, 1).toUpperCase() ?? 'A')
 
 function handleCommand(command: string) {
-  if (command === 'logout') emit('logout')
+  if (command === 'logout') {
+    emit('logout')
+  }
 }
 </script>
 

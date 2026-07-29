@@ -18,8 +18,11 @@ export function buildMenuTree(records: MenuSummary[]): MenuTreeRecord[] {
   for (const record of ordered) {
     const node = nodes.get(record.id)!
     const parent = nodes.get(record.parentId)
-    if (parent && parent.type === 'directory' && parent.id !== node.id) parent.children.push(node)
-    else roots.push(node)
+    if (parent && parent.type === 'directory' && parent.id !== node.id) {
+      parent.children.push(node)
+    } else {
+      roots.push(node)
+    }
   }
   return roots
 }
