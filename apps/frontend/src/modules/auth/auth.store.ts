@@ -33,7 +33,7 @@ export const useAuthStore = defineStore('auth', () => {
       const response = data ?? error
       if (response && response.status === 0 && 'data' in response && response.data) {
         user.value = response.data.user
-        setAccessToken(response.data.token)
+        setAccessToken(response.data.issued.token, new Date(response.data.issued.expiresAt))
         checked.value = true
         return null
       }

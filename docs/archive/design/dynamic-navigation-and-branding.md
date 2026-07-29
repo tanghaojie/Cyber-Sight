@@ -24,7 +24,7 @@ replaced_by: docs/design/frontend-shell.md
 - `src/config/app.config.ts` 提供品牌名、品牌缩写、产品说明和主色等可修改配置；页面不得散落硬编码品牌名。
 - `menus` 模块拥有菜单 CRUD、当前用户导航树、树构造规则以及菜单数据契约。
 - 前端 `navigation` 模块获取导航树并维护加载状态；应用路由组合根根据树中 `menu` 节点动态注册子路由。
-- 各业务模块通过约定文件名 `src/modules/**/view-registry.ts` 公开 `registerViews()`，声明数据库组件标识到本模块页面懒加载器的映射；`src/router/view-registry.ts` 使用 Vite `import.meta.glob` 在构建期自动发现这些文件并生成唯一的只读受控映射。
+- 各业务模块通过约定文件名 `src/modules/**/view-registry.ts` 公开 `registerViews()`，声明数据库组件标识到本模块页面懒加载器的映射；`src/shared/routing/view-registry.ts` 使用 Vite `import.meta.glob` 在构建期自动发现这些文件并生成唯一的只读受控映射。
 - `AppSidebar` 只渲染传入的树：`directory` 展开/折叠，`menu` 使用站内路由，`button` 使用新窗口外链。
 - 用户、角色、菜单和字典页面分别由 `users`、`roles`、`menus`、`dictionaries` 模块拥有，不再复用配置驱动的业务 `ResourceView.vue`。
 - 共享 API Client 识别 HTTP 401/404/500，并调用应用在启动时注册的处理器；不再广播 DOM 事件。

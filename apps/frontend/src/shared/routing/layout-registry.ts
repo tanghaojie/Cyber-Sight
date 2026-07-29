@@ -1,4 +1,5 @@
 import type { RouteComponent } from 'vue-router'
+import { DEFAULT_LAYOUT_NOT_FOUND, DUPLICATE_LAYOUT_NAME, INVALID_LAYOUT_FILE } from '../errMsg'
 
 export const DEFAULT_LAYOUT = 'AdminLayout'
 
@@ -21,10 +22,10 @@ export function createLayoutRegistry(
   )) {
     const name = layoutName(modulePath)
     if (!name) {
-      throw new Error(`Invalid layout file "${modulePath}"`)
+      throw new Error(`${INVALID_LAYOUT_FILE} "${modulePath}"`)
     }
     if (Object.hasOwn(layouts, name)) {
-      throw new Error(`Duplicate layout name "${name}"`)
+      throw new Error(`${DUPLICATE_LAYOUT_NAME} "${name}"`)
     }
     layouts[name] = {
       label: name,
@@ -33,7 +34,7 @@ export function createLayoutRegistry(
   }
 
   if (!Object.hasOwn(layouts, DEFAULT_LAYOUT)) {
-    throw new Error(`Default layout "${DEFAULT_LAYOUT}" was not found`)
+    throw new Error(`${DEFAULT_LAYOUT_NOT_FOUND} "${DEFAULT_LAYOUT}"`)
   }
 
   return Object.freeze(layouts)

@@ -93,6 +93,9 @@ importers:
       element-plus:
         specifier: ^2.14.3
         version: 2.14.3(vue@3.5.35(typescript@5.9.3))
+      js-cookie:
+        specifier: ^3.0.8
+        version: 3.0.8
       pinia:
         specifier: ^2.2.0
         version: 2.3.1(typescript@5.9.3)(vue@3.5.35(typescript@5.9.3))
@@ -106,6 +109,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.3.3
         version: 4.3.3(vite@5.4.21(@types/node@22.19.19)(lightningcss@1.32.0)(sass@1.102.0))
+      '@types/js-cookie':
+        specifier: ^3.0.6
+        version: 3.0.6
       '@vitejs/plugin-vue':
         specifier: ^5.1.0
         version: 5.2.4(vite@5.4.21(@types/node@22.19.19)(lightningcss@1.32.0)(sass@1.102.0))(vue@3.5.35(typescript@5.9.3))
@@ -1239,6 +1245,9 @@ packages:
 
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
+
+  '@types/js-cookie@3.0.6':
+    resolution: {integrity: sha512-wkw9yd1kEXOPnvEeEV1Go1MmxtBJL0RR79aOTAApecWFVu7w0NNXNqhcWgvw2YgZDYadliXkl14pa3WXw5jlCQ==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -2592,6 +2601,9 @@ packages:
 
   js-base64@2.6.4:
     resolution: {integrity: sha512-pZe//GGmwJndub7ZghVHz7vjb2LgC1m8B07Au3eYqeqv9emhESByMXxaEgkUkEqJe87oBbSniGYoQNIBklc7IQ==}
+
+  js-cookie@3.0.8:
+    resolution: {integrity: sha512-yeJd4aNAdYZQjaon2bpD/Gb0B/omw7HQOsynXXcOiWVCacbBcPlgn8S/d1X6blFSaHao7ozqtW7NZW19xpCtIw==}
 
   js-tokens@9.0.1:
     resolution: {integrity: sha512-mxa9E9ITFOt0ban3j6L5MpjwegGz6lBQmM1IJkWeBZGcMxto50+eWdjC/52xDbS2vy0k7vIMK0Fe2wfL9OQSpQ==}
@@ -4603,6 +4615,8 @@ snapshots:
 
   '@types/estree@1.0.9': {}
 
+  '@types/js-cookie@3.0.6': {}
+
   '@types/json-schema@7.0.15': {}
 
   '@types/lodash-es@4.17.12':
@@ -6184,6 +6198,8 @@ snapshots:
 
   js-base64@2.6.4: {}
 
+  js-cookie@3.0.8: {}
+
   js-tokens@9.0.1: {}
 
   jsdom@25.0.1:
@@ -7465,7 +7481,7 @@ snapshots:
       eslint-visitor-keys: 5.0.1
       espree: 11.2.0
       esquery: 1.7.0
-      semver: 7.8.2
+      semver: 7.8.5
     transitivePeerDependencies:
       - supports-color
 

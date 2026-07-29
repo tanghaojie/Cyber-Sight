@@ -27,7 +27,6 @@ archived: 2026-07-28
 ## 方案和执行摘要
 
 - 将导航守卫从多次调用 `next()` 改为返回导航结果，公开页、未认证、首次动态路由安装、404 和正常放行分支各自只结束一次。
-- 保留 `constRoutes.ts` 与 `dynamicRoutes.ts` 的职责拆分；将页面登记协议和构造函数保留在 `shared`，把扫描业务模块的 `import.meta.glob` 恢复到 `router/view-registry.ts`。
 - 将存在双重拼写错误且反向依赖 Router/业务 store 的 API 文件替换为 `bootstrap/registerHttpErrorHandler.ts`，明确其应用组合职责。
 - `shared/genInitials.ts` 改为纯函数，品牌配置层负责组合 `brandInitials()`；访问令牌存储保留在领域无关 `shared` 适配器。
 - 恢复被当前源码命名误改的历史事件名、历史页面注册路径和 ADR 链接；更新现行前端设计以登记最终文件职责。

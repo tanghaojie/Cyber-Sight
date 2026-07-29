@@ -3,7 +3,7 @@ import type { CurrentUser } from '@scaffold/api-contract'
 import { SignJWT, jwtVerify } from 'jose'
 
 const DEFAULT_CAPACITY = 100
-const DEFAULT_TTL_MS = 8 * 60 * 60 * 1000
+const DEFAULT_TTL_MS = 7 * 24 * 60 * 60 * 1000
 const JWT_AUDIENCE = 'jtlab-api'
 const JWT_ISSUER = 'jtlab'
 

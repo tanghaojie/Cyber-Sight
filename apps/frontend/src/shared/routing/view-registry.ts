@@ -1,4 +1,9 @@
 import type { RouteComponent } from 'vue-router'
+import {
+  DUPLICATE_VIEW_KEY,
+  INVALID_VIEW_KEY,
+  REGISTER_VIEWS_MODULE_NOT_EXPORT_REGISTER_VIEWS,
+} from '../errMsg'
 
 export interface ViewRegistrar {
   register(key: string, label: string, component: RouteComponent): void
@@ -27,16 +32,16 @@ export function createViewRegistry(
     left.localeCompare(right),
   )) {
     if (!isViewRegistrationModule(registrationModule)) {
-      throw new Error(`View registry module "${modulePath}" must export registerViews()`)
+      throw new Error(`${REGISTER_VIEWS_MODULE_NOT_EXPORT_REGISTER_VIEWS} "${modulePath}"`)
     }
 
     registrationModule.registerViews({
       register(key, label, component) {
         if (!/^[a-z][a-z0-9-]*$/.test(key)) {
-          throw new Error(`Invalid view key "${key}" registered by "${modulePath}"`)
+          throw new Error(`${INVALID_VIEW_KEY} "${key}" registered by "${modulePath}"`)
         }
         if (Object.hasOwn(registeredViews, key)) {
-          throw new Error(`Duplicate view key "${key}" registered by "${modulePath}"`)
+          throw new Error(`${DUPLICATE_VIEW_KEY} "${key}" registered by "${modulePath}"`)
         }
         registeredViews[key] = {
           label,
@@ -48,3 +53,10 @@ export function createViewRegistry(
 
   return Object.freeze(registeredViews)
 }
+
+const viewRegistrationModules = import.meta.glob<ViewRegistrationModule>(
+  '@/modules/**/registerViews.ts',
+  { eager: true },
+)
+
+export const viewRegistry = createViewRegistry(viewRegistrationModules)

@@ -11,12 +11,14 @@
     "@element-plus/icons-vue": "^2.3.2",
     "@scaffold/api-contract": "workspace:*",
     "element-plus": "^2.14.3",
+    "js-cookie": "^3.0.8",
     "pinia": "^2.2.0",
     "vue": "^3.4.0",
     "vue-router": "^4.3.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@types/js-cookie": "^3.0.6",
     "@vitejs/plugin-vue": "^5.1.0",
     "fast-glob": "^3.3.3",
     "sass": "^1.102.0",

@@ -1,4 +1,6 @@
+import { BACKEND_RETURNED_AN_INVALID_RESPONSE } from '@/shared/errMsg'
 import type { ApiResponse, ErrorResponse, PaginatedResponse } from '@scaffold/api-contract'
+import { ElMessage } from 'element-plus'
 
 export function apiResult<T>(
   data: T | undefined,
@@ -10,7 +12,8 @@ export function apiResult<T>(
   if (error) {
     return error
   }
-  throw new Error('Backend returned an empty response')
+  ElMessage.error(BACKEND_RETURNED_AN_INVALID_RESPONSE)
+  throw new Error(BACKEND_RETURNED_AN_INVALID_RESPONSE)
 }
 
 export function pageResult<T>(
@@ -23,7 +26,8 @@ export function pageResult<T>(
   if (error) {
     return { ...error, list: [], total: 0 }
   }
-  throw new Error('Backend returned an empty response')
+  ElMessage.error(BACKEND_RETURNED_AN_INVALID_RESPONSE)
+  throw new Error(BACKEND_RETURNED_AN_INVALID_RESPONSE)
 }
 
 export type ApiMutationResult = ApiResponse<{ id: number }>

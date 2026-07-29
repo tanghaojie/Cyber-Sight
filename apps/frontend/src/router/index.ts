@@ -1,17 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { notFoundPage } from '@/modules/errors/error.routes'
 import constRoutes from './constRoutes'
-import { authenticationRouteGuard } from './dynamicRoutes'
+import { authenticationRouteGuard } from './routerGuard'
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     ...constRoutes,
-    { path: '/:pathMatch(.*)*', name: 'dynamic-fallback', component: notFoundPage },
+    { path: '/:pathMatch(.*)*', name: 'fallback-not-found', component: notFoundPage },
   ],
 })
 
-router.beforeEach(async function authenticationGuard(to) {
+router.beforeEach(async function guard(to, from) {
   return authenticationRouteGuard(to, router)
 })
 

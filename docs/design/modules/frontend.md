@@ -19,7 +19,7 @@
 - `src/modules/navigation`：当前用户数据库菜单树与加载状态。
 - `src/modules/**/view-registry.ts`：模块拥有的动态页面注册清单。
 - `src/shared/routing/view-registry.ts`：页面登记协议与只读注册表构造函数，不扫描或依赖业务模块。
-- `src/router/view-registry.ts`：构建期自动发现业务模块登记文件并组装只读页面注册表。
+- `src/shared/routing/view-registry.ts`：构建期自动发现业务模块登记文件并组装只读页面注册表。
 - `src/shared/routing/layout-registry.ts`：自动发现 `src/layouts/*.vue` 并提供只读布局注册表与表单选项。
 - `src/assets/icons/*.svg`、`src/shared/icons/icon-registry.ts` 与 `src/components/AppIcon.vue`：由 Vite 构建期发现图标源、生成 sprite/只读选项，并通过稳定名称渲染。
 - `src/styles/main.scss`：只负责组合 Tailwind、基础样式、布局样式和按 Element Plus 组件拆分的 SCSS 覆盖。

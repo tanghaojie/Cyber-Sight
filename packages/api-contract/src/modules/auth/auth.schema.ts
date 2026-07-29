@@ -15,7 +15,10 @@ export const CurrentUserSchema = z.strictObject({
 
 export const LoginDataSchema = z.strictObject({
   user: CurrentUserSchema,
-  token: z.string().min(1),
+  issued: z.strictObject({
+    token: z.string().min(1),
+    expiresAt: z.iso.datetime(),
+  }),
 })
 
 export const CurrentUserResponseSchema = apiResponseSchema(CurrentUserSchema)

@@ -114,7 +114,10 @@ export async function authenticateCredentials(
 
   return {
     user: currentUser,
-    token: issued.token,
+    issued: {
+      token: issued.token,
+      expiresAt: issued.expiresAt.toISOString(),
+    },
   }
 }
 

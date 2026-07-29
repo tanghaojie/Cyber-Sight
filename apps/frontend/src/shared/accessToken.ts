@@ -1,4 +1,7 @@
-const ACCESS_TOKEN_KEY = 'scaffold_access_token'
+import cookies from 'js-cookie'
+
+const USE_COOKIES = true
+const ACCESS_TOKEN_KEY = 'jtlib_access_token'
 
 function browserStorage(): Storage | null {
   if (typeof window === 'undefined') {
@@ -11,17 +14,21 @@ function browserStorage(): Storage | null {
   }
 }
 
-export function getAccessToken(): string | null {
+export function getAccessToken(): string | undefined {
   try {
-    return browserStorage()?.getItem(ACCESS_TOKEN_KEY) ?? null
+    return USE_COOKIES
+      ? cookies.get(ACCESS_TOKEN_KEY)
+      : (browserStorage()?.getItem(ACCESS_TOKEN_KEY) ?? undefined)
   } catch {
-    return null
+    return undefined
   }
 }
 
-export function setAccessToken(token: string): void {
+export function setAccessToken(token: string, expiresAt: Date): void {
   try {
-    browserStorage()?.setItem(ACCESS_TOKEN_KEY, token)
+    USE_COOKIES
+      ? cookies.set(ACCESS_TOKEN_KEY, token, { expires: expiresAt })
+      : browserStorage()?.setItem(ACCESS_TOKEN_KEY, token)
   } catch {
     // Storage can be unavailable in restricted browser contexts.
   }
@@ -29,6 +36,7 @@ export function setAccessToken(token: string): void {
 
 export function clearAccessToken(): void {
   try {
+    cookies.remove(ACCESS_TOKEN_KEY)
     browserStorage()?.removeItem(ACCESS_TOKEN_KEY)
   } catch {
     // Clearing an unavailable storage is already the desired outcome.

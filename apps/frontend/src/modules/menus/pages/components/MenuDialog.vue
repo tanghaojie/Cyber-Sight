@@ -92,7 +92,7 @@ import AppIcon from '@/components/AppIcon.vue'
 import { createInternalMenuCode, menuPathError } from '@/modules/menus/menu-form'
 import { createMenu, updateMenu } from '@/modules/menus/menus.api'
 import { useNavigationStore } from '@/modules/navigation/navigation.store'
-import { viewRegistry } from '@/router/view-registry'
+import { viewRegistry } from '@/shared/routing/view-registry'
 import { iconOptions } from '@/shared/icons/icon-registry'
 import { layoutRegistry } from '@/shared/routing/layout-registry'
 

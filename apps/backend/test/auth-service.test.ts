@@ -51,11 +51,11 @@ describe('authentication service persistence cache', () => {
       displayName: 'Operator',
       roles: ['USER'],
     })
-    expect(result?.token).toEqual(expect.any(String))
+    expect(result?.issued?.token).toEqual(expect.any(String))
     expect(insertValues).toHaveBeenCalledWith(
       expect.objectContaining({
         userId: 7,
-        tokenHash: hashSessionToken(result?.token ?? ''),
+        tokenHash: hashSessionToken(result?.issued?.token ?? ''),
         expiresAt: expect.any(Date),
       }),
     )

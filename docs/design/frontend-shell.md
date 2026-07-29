@@ -17,7 +17,7 @@ updated: 2026-07-28
 - `src/components/layout/`：侧栏、顶栏和嵌套路由出口。
 - `src/modules/navigation/navigation.store.ts`：当前用户菜单树缓存。
 - `src/modules/**/view-registry.ts`：业务模块登记页面懒加载器。
-- `src/router/view-registry.ts`：构建期自动发现、唯一性校验和只读注册表。
+- `src/shared/routing/view-registry.ts`：构建期自动发现、唯一性校验和只读注册表。
 - `src/shared/routing/layout-registry.ts`：构建期发现 `src/layouts/*.vue`，生成受控布局注册表和菜单表单选项。
 - `src/router/constRoutes.ts`：登录、404 和默认应用壳等静态路由。
 - `src/router/dynamicRoutes.ts`：认证守卫、动态菜单路由安装和移除。
