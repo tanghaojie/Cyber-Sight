@@ -2,7 +2,7 @@
   <ul class="sidebar-tree" :class="{ 'sidebar-tree--nested': depth > 0 }">
     <li v-for="item in items" :key="item.id">
       <button
-        v-if="item.type === 'directory'"
+        v-if="item.type === 'directory' && item.children.length"
         class="sidebar-directory"
         type="button"
         :style="indentStyle"
@@ -12,7 +12,7 @@
         <span class="sidebar-node-icon"><AppIcon :name="item.icon || 'layers'" /></span>
         <span class="sidebar-node-copy">
           <b>{{ item.name }}</b>
-          <small>{{ item.children.length }} 个节点</small>
+          <small>{{ item.children.length }} 个子菜单</small>
         </span>
         <AppIcon
           name="chevron-down"
@@ -32,10 +32,9 @@
           <b>{{ item.name }}</b>
           <small>{{ item.path }}</small>
         </span>
-        <span class="node-arrow">›</span>
       </RouterLink>
       <a
-        v-else
+        v-else-if="item.type === 'button'"
         :href="item.externalUrl"
         target="_blank"
         rel="noopener noreferrer"
