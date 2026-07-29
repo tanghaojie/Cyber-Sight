@@ -9,6 +9,7 @@ import type {
 } from '@scaffold/api-contract'
 import { clearAccessToken, getAccessToken, setAccessToken } from '@/shared/accessToken'
 import { apiClient } from '@/api/client'
+import { login as apiLogin, gerCurrentUser, logout as apiLogout } from './auth.api'
 
 function responseError(data: unknown, fallback: string): string {
   if (typeof data === 'object' && data !== null && 'err' in data && typeof data.err === 'string') {
@@ -26,17 +27,14 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(username: string, password: string): Promise<string | null> {
     busy.value = true
     try {
-      const { data, error } = await apiClient.POST<LoginSuccessResponse, LoginRequest>(
-        '/auth/login',
-        { body: { username, password } },
-      )
-      const response = data ?? error
-      if (response && response.status === 0 && 'data' in response && response.data) {
+      const response = await apiLogin(username, password)
+      if (response.status === 0 && response.data) {
         user.value = response.data.user
         setAccessToken(response.data.issued.token, new Date(response.data.issued.expiresAt))
         checked.value = true
         return null
       }
+
       return responseError(response, '登录失败，请稍后重试')
     } catch {
       return '无法连接到服务，请检查后端是否已启动'
@@ -54,9 +52,9 @@ export const useAuthStore = defineStore('auth', () => {
       return
     }
     try {
-      const { data } = await apiClient.GET<CurrentUserResponse>('/auth/me')
-      if (data?.status === 0 && data.data) {
-        user.value = data.data
+      const res = await gerCurrentUser()
+      if (res.status === 0 && res.data) {
+        user.value = res.data
       }
     } catch {
       user.value = null
@@ -73,7 +71,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function logout(): Promise<void> {
     try {
-      await apiClient.POST<EmptySuccessResponse>('/auth/logout')
+      await apiLogout()
     } finally {
       clearSession()
     }
