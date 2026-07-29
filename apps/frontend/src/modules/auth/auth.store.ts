@@ -1,15 +1,8 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import type {
-  CurrentUser,
-  CurrentUserResponse,
-  EmptySuccessResponse,
-  LoginRequest,
-  LoginSuccessResponse,
-} from '@scaffold/api-contract'
+import type { CurrentUser } from '@scaffold/api-contract'
 import { clearAccessToken, getAccessToken, setAccessToken } from '@/shared/accessToken'
-import { apiClient } from '@/api/client'
-import { login as apiLogin, gerCurrentUser, logout as apiLogout } from './auth.api'
+import { login as apiLogin, getCurrentUser, logout as apiLogout } from './auth.api'
 
 function responseError(data: unknown, fallback: string): string {
   if (typeof data === 'object' && data !== null && 'err' in data && typeof data.err === 'string') {
@@ -52,7 +45,7 @@ export const useAuthStore = defineStore('auth', () => {
       return
     }
     try {
-      const res = await gerCurrentUser()
+      const res = await getCurrentUser()
       if (res.status === 0 && res.data) {
         user.value = res.data
       }

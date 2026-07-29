@@ -18,7 +18,7 @@ export async function login(username: string, password: string): Promise<ApiResp
   return apiResult(data, error)
 }
 
-export async function gerCurrentUser(): Promise<ApiResponse<CurrentUser>> {
+export async function getCurrentUser(): Promise<ApiResponse<CurrentUser>> {
   const { data, error } = await apiClient.GET<CurrentUserResponse>('/auth/me')
 
   return apiResult(data, error)
