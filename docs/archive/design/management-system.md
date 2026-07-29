@@ -74,8 +74,8 @@ replaced_by: docs/design/README.md
 
 ## 相关 ADR、计划和 AI 日志
 
-- [ADR-0005：统一软删除与审计字段](../../decisions/ADR-0005-soft-delete-and-audit-fields.md)
+- [ADR-0005：统一软删除与审计字段](../decisions/ADR-0005-soft-delete-and-audit-fields.md)
 - [ADR-0014：软删除自然键使用部分唯一索引](../decisions/ADR-0014-soft-delete-natural-key-uniqueness.md)
-- [ADR-0015：统一软删除业务唯一性约束](../../decisions/ADR-0015-active-row-business-uniqueness.md)
+- [ADR-0015：统一软删除业务唯一性约束](../decisions/ADR-0015-active-row-business-uniqueness.md)
 - [实施计划](../plans/2026-07-22-management-system-foundation.md)
 - [AI 协作记录](../ai-logs/2026/07/2026-07-22-management-system-foundation.md)

@@ -67,7 +67,7 @@ ADR-0007 决定使用 Zod 4 作为唯一 Schema 编写源，通过原生 `z.toJS
 
 ## 相关设计、ADR 和 AI 日志
 
-- [ADR-0007](../../decisions/ADR-0007-zod-as-unified-schema-source.md)
+- [ADR-0007](../decisions/ADR-0007-zod-as-unified-schema-source.md)
 - [API 契约模块设计](../../design/modules/api-contract.md)
 - [AI 协作记录](../ai-logs/2026/07/2026-07-23-zod-schema-unification.md)
 - 关联提交：`refactor: unify runtime schemas on Zod`

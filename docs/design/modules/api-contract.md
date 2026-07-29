@@ -47,7 +47,7 @@ TypeScript 只能检查参与编译的源码，类型在运行时会被擦除。
 - 前端导入契约类型时优先使用 `import type`，不把运行时校验库打入无关业务代码。
 - HTTP 契约只使用可稳定转换为 JSON Schema 的 Zod 子集；`transform`、`Date`、集合和无法表达的自定义规则不进入传输 Schema。
 - Swagger/OpenAPI 由 Fastify 路由生成，禁止再提交手写 YAML 与运行时 Schema 双源。
-- 普通业务响应统一使用 `{ status: number, data?: T, err?: string }`；分页和 HTTP 状态策略沿用 ADR-0003、ADR-0004。
+- 普通业务响应统一使用 `{ status: number, data?: T, err?: string }`；分页响应统一使用 `{ status, list, total, err? }`。业务 API 仅把未认证、资源不存在和内部异常映射为 HTTP `401`、`404`、`500`，其他业务失败使用 HTTP `200` 和非零 `status`。
 - 未来 Java、外部 API 或 SDK 需求正式立项时，从 `/docs/json` 导出、审查并版本化 OpenAPI，再决定是否升级为发布契约。
 
 ## 失败模式
@@ -69,6 +69,6 @@ TypeScript 只能检查参与编译的源码，类型在运行时会被擦除。
 - 前端通过 TypeScript 与生产构建验证契约消费可以解析；成功、业务失败和全局 HTTP 错误
   行为由维护者人工验收。
 
-## 决策依据
+## 当前依据
 
-ADR-0006 取代 ADR-0001 和 ADR-0002，ADR-0007 进一步统一为 Zod 4 Schema 编写源。共享运行时 Schema 在不放弃安全边界的前提下消除结构重复，并保留按需生成 OpenAPI 的退出路径。
+共享 Zod 4 运行时 Schema 在不放弃安全边界的前提下消除结构重复，并保留按需生成 OpenAPI 的退出路径。初始版本形成过程中的契约 ADR 已归档，当前规则直接以本设计、共享 Schema 和转换测试为准。

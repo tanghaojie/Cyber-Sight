@@ -45,6 +45,6 @@ status: completed
 ## 相关设计、ADR、计划和提交
 
 - [管理系统基础能力设计](../../../design/management-system.md)
-- [ADR-0015](../../../../decisions/ADR-0015-active-row-business-uniqueness.md)
+- [ADR-0015](../../../decisions/ADR-0015-active-row-business-uniqueness.md)
 - [实施计划](../../../plans/2026-07-27-soft-delete-unique-constraints.md)
 - 关联提交：本记录所在的 `fix: align soft-delete unique constraints` 提交。

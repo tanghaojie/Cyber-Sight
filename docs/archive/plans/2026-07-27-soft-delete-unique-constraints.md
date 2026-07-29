@@ -15,7 +15,7 @@ updated: 2026-07-27
 ## 背景与设计依据
 
 用户确认其他表存在同类问题。依据
-[ADR-0015](../../decisions/ADR-0015-active-row-business-uniqueness.md)，业务自然键和关联组合
+[ADR-0015](../decisions/ADR-0015-active-row-business-uniqueness.md)，业务自然键和关联组合
 使用部分唯一索引，不可复用安全标识保持全表唯一。
 
 ## 范围
@@ -82,5 +82,5 @@ updated: 2026-07-27
 ## 相关设计、ADR 和 AI 日志
 
 - [管理系统基础能力设计](../design/management-system.md)
-- [ADR-0015](../../decisions/ADR-0015-active-row-business-uniqueness.md)
+- [ADR-0015](../decisions/ADR-0015-active-row-business-uniqueness.md)
 - [AI 协作记录](../ai-logs/2026/07/2026-07-27-soft-delete-unique-constraints.md)

@@ -59,8 +59,8 @@ ADR-0006 建立了共享运行时 Schema 契约，但实现同时使用 TypeBox 
 
 ## 相关设计和计划
 
-- [API 契约模块设计](../design/modules/api-contract.md)
-- [后端模块设计](../design/modules/backend.md)
-- [实施计划](../archive/plans/2026-07-23-zod-schema-unification.md)
+- [API 契约模块设计](../../design/modules/api-contract.md)
+- [后端模块设计](../../design/modules/backend.md)
+- [实施计划](../plans/2026-07-23-zod-schema-unification.md)
 - [Zod JSON Schema 文档](https://zod.dev/json-schema)
 - [Fastify Validation and Serialization](https://fastify.dev/docs/latest/Reference/Validation-and-Serialization/)

@@ -7,7 +7,7 @@ superseded_by: ADR-0015
 
 # ADR-0014：软删除自然键使用部分唯一索引
 
-本决策对菜单表的局部范围已由 [ADR-0015](../../decisions/ADR-0015-active-row-business-uniqueness.md)
+本决策对菜单表的局部范围已由 [ADR-0015](ADR-0015-active-row-business-uniqueness.md)
 扩展并取代；原始背景、取舍和菜单迁移记录保留用于历史追溯。
 
 ## 背景
@@ -59,6 +59,6 @@ Schema 测试校验索引的唯一性、列和条件；迁移 SQL 必须显式�
 
 ## 相关设计和计划
 
-- [ADR-0005：统一软删除与审计字段](../../decisions/ADR-0005-soft-delete-and-audit-fields.md)
+- [ADR-0005：统一软删除与审计字段](ADR-0005-soft-delete-and-audit-fields.md)
 - [菜单模块设计](../../design/modules/menus.md)
 - [实施计划](../plans/2026-07-27-menu-code-soft-delete-uniqueness.md)

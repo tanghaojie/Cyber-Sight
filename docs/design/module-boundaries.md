@@ -2,7 +2,7 @@
 title: 模块边界
 status: accepted
 owner: project maintainers
-updated: 2026-07-28
+updated: 2026-07-29
 ---
 
 # 模块边界
@@ -21,7 +21,7 @@ packages/api-contract/src/modules/<module>/
 
 ## 公共文件
 
-模块用表意文件公开稳定能力，例如 `<module>.routes.ts`、`<module>.store.ts`、`<module>.api.ts`、`<module>.schema.ts`、`view-registry.ts`。对应模块设计必须登记允许外部依赖的文件和符号；未登记文件都是内部实现。
+模块用表意文件公开稳定能力，例如 `<module>.routes.ts`、`<module>.store.ts`、`<module>.api.ts`、`<module>.schema.ts`、`registerViews.ts`。对应模块设计必须登记允许外部依赖的文件和符号；未登记文件都是内部实现。
 
 禁止模块级 `index.ts` 或同类无差别 barrel。包发布入口、框架固定入口等例外必须在设计中说明。其他模块不得：
 
@@ -67,4 +67,4 @@ packages/api-contract/src/modules/<module>/
 - 跨模块直连数据库：改用所有者接口并在边界鉴权、校验。
 - 伪模块目录：以实际所有权和依赖判断，不以目录名称判断。
 
-长期入口命名规则见 [ADR-0013](../decisions/ADR-0013-semantic-module-entry-files.md)。各模块的具体公共文件见[模块设计索引](README.md)。
+各模块的具体公共文件见[模块设计索引](README.md)。初始版本之前的入口命名取舍保留在[归档 ADR](../archive/README.md)，当前规则直接以本设计和 `AGENTS.md` 为准。

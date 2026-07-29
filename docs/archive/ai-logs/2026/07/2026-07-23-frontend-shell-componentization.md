@@ -40,6 +40,6 @@ status: completed
 ## 相关设计、ADR、计划和提交
 
 - [前端应用壳设计](../../../design/frontend-shell.md)
-- [ADR-0008](../../../../decisions/ADR-0008-tailwind-and-element-plus.md)
+- [ADR-0008](../../../decisions/ADR-0008-tailwind-and-element-plus.md)
 - [实施计划](../../../plans/2026-07-23-frontend-shell-componentization.md)
 - 本轮 Git 提交（见仓库历史）

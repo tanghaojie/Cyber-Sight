@@ -65,7 +65,7 @@ Tailwind CSS 负责布局、间距、响应式、颜色和大多数视觉样式�
 
 ## 相关决策与计划
 
-- [ADR-0008：前端采用 Tailwind CSS 与 Element Plus](../../decisions/ADR-0008-tailwind-and-element-plus.md)
+- [ADR-0008：前端采用 Tailwind CSS 与 Element Plus](../decisions/ADR-0008-tailwind-and-element-plus.md)
 - [实施计划](../plans/2026-07-23-frontend-shell-componentization.md)
 - [AI 协作记录](../ai-logs/2026/07/2026-07-23-frontend-shell-componentization.md)
 - [前端应用壳流式布局重构计划](../plans/2026-07-27-frontend-layout-refactor.md)

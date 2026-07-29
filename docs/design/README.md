@@ -9,11 +9,10 @@
 - [分层文档与历史归档](documentation-governance.md)：最小阅读协议和文档生命周期；文档治理任务必读。
 - [测试与验证策略](testing-strategy.md)：后端/契约自动化、数据库验证和前端人工验收边界。
 - [开发工作流](developer-workflow.md)：源码别名、项目格式配置、编辑器和 Git 自动格式化。
-- [前端应用壳](frontend-shell.md)：品牌、布局、数据库导航、页面注册和全局 HTTP 错误行为。
 
 ## Workspace 与模块
 
-- [API 契约](modules/api-contract.md) · [后端](modules/backend.md) · [前端](modules/frontend.md)
+- [API 契约](modules/api-contract.md) · [后端](modules/backend.md) · [前端应用与应用壳](modules/frontend.md)
 - [认证](modules/auth.md) · [用户](modules/users.md) · [角色](modules/roles.md)
 - [菜单](modules/menus.md) · [字典](modules/dictionaries.md)
 - [前端导航](modules/navigation.md) · [工作台](modules/home.md) · [错误页面](modules/errors.md)

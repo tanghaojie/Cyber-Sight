@@ -2,7 +2,7 @@
 title: 测试与验证策略
 status: accepted
 owner: project maintainers
-updated: 2026-07-28
+updated: 2026-07-29
 ---
 
 # 测试与验证策略
@@ -39,5 +39,6 @@ updated: 2026-07-28
 - 后端或契约变更仍应补充与改动相称的自动化测试；测试不得依赖执行顺序、外部网络或开发者
   个人数据。
 - 用户明确接管测试时，AI 不运行测试，并在实施计划和 AI 日志中记录实际验证边界。
+- 检查发现人类实现存在 bug、风险或与文档含义不明确的冲突时，AI 不自行修复；应保留实现、记录证据并询问维护者下一步。
 
-长期取舍见 [ADR-0022](../decisions/ADR-0022-maintainer-owned-frontend-validation.md)。
+当前边界同时受根目录 `AGENTS.md` 约束；初始版本之前的验证取舍见[归档索引](../archive/README.md)。

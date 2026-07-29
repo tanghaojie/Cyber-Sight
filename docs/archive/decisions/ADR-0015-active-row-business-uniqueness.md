@@ -68,7 +68,7 @@ Schema 测试逐项校验索引名称、列、唯一性和条件，并确认会�
 ## 相关设计和计划
 
 - [ADR-0005：统一软删除与审计字段](ADR-0005-soft-delete-and-audit-fields.md)
-- [ADR-0014：软删除自然键使用部分唯一索引](../archive/decisions/ADR-0014-soft-delete-natural-key-uniqueness.md)
-- [后端模块设计](../design/modules/backend.md)
+- [ADR-0014：软删除自然键使用部分唯一索引](ADR-0014-soft-delete-natural-key-uniqueness.md)
+- [后端模块设计](../../design/modules/backend.md)
 - [ADR-0020：持久化 JWT 会话并使用 LRU 读缓存](ADR-0020-persistent-jwt-session-cache.md)
-- [实施计划](../archive/plans/2026-07-27-soft-delete-unique-constraints.md)
+- [实施计划](../plans/2026-07-27-soft-delete-unique-constraints.md)

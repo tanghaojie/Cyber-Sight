@@ -2,7 +2,7 @@
 title: 用户模块
 status: active
 owner: maintainers
-updated: 2026-07-27
+updated: 2026-07-29
 ---
 
 # 用户模块
@@ -14,7 +14,7 @@ updated: 2026-07-27
 ## 公共接口
 
 - HTTP：`GET/POST /admin/users`、`PUT/DELETE /admin/users/{id}`。
-- 前端公共文件：`view-registry.ts` 登记用户管理页面；`users.api.ts` 暴露用户管理 API。
+- 前端公共文件：`registerViews.ts` 登记用户管理页面；`users.api.ts` 暴露用户管理 API。
 - 契约：`UserSummary`、`UserCreate`、`UserUpdate` 及分页响应。
 
 ## 依赖、数据流与失败模式
@@ -30,6 +30,4 @@ updated: 2026-07-27
 后端自动化测试覆盖分页、角色 ID、软删除、有效记录唯一索引和模块公共文件类型检查；前端
 表单转换与业务错误展示由维护者人工验收。
 
-## 相关 ADR、计划和 AI 日志
-
-- [ADR-0015：统一软删除业务唯一性约束](../../decisions/ADR-0015-active-row-business-uniqueness.md)
+初始版本之前的软删除唯一性取舍保留在[归档 ADR](../../archive/README.md)，当前语义以本设计、数据库 Schema 和后端测试为准。

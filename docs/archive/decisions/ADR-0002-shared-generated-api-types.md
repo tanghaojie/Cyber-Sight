@@ -6,7 +6,7 @@ date: 2026-07-22
 
 # ADR-0002：共享 OpenAPI 生成类型并以契约测试校验运行时接口
 
-> 已由 [ADR-0006](../../decisions/ADR-0006-runtime-schema-as-api-contract.md) 取代。该 ADR 定义的复审条件已经出现：OpenAPI、Fastify JSON Schema 和部分 Zod Schema 的重复维护成本超过了当前跨语言收益。
+> 已由 [ADR-0006](ADR-0006-runtime-schema-as-api-contract.md) 取代。该 ADR 定义的复审条件已经出现：OpenAPI、Fastify JSON Schema 和部分 Zod Schema 的重复维护成本超过了当前跨语言收益。
 
 ## 背景
 

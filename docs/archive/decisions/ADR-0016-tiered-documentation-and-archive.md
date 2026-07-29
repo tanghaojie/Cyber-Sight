@@ -49,5 +49,5 @@ AI 每次先读 `docs/README.md`、检查活动计划，再按任务选择相关
 
 ## 相关设计和计划
 
-- [分层文档与历史归档](../design/documentation-governance.md)
-- [实施计划](../archive/plans/2026-07-28-documentation-context-compression.md)
+- [分层文档与历史归档](../../design/documentation-governance.md)
+- [实施计划](../plans/2026-07-28-documentation-context-compression.md)

@@ -111,7 +111,7 @@ pnpm dev
 
 前端不能手写一份与后端相似的接口类型，应从 `@scaffold/api-contract` 获取。
 
-新业务页面、组件、composable、service 和局部 store 都归入对应 `src/modules/<module>/`，由 `view-registry.ts`、`*.routes.ts`、`*.store.ts` 等表意文件暴露路由或应用壳需要的能力。根级 `views`、`stores` 只保留存量或真正应用级能力；实质修改存量业务时应迁入模块目录。
+新业务页面、组件、composable、service 和局部 store 都归入对应 `src/modules/<module>/`，由 `registerViews.ts`、`*.routes.ts`、`*.store.ts` 等表意文件暴露路由或应用壳需要的能力。根级 `views`、`stores` 只保留存量或真正应用级能力；实质修改存量业务时应迁入模块目录。
 
 前端不维护单元、组件或端到端自动化测试。功能、交互、错误状态和浏览器适配由维护者人工
 验收；AI 默认只执行格式、TypeScript 检查和生产构建，不运行前端或浏览器测试。

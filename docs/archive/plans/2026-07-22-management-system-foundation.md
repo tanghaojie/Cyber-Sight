@@ -54,6 +54,6 @@ OpenAPI 契约、Drizzle Schema/迁移、认证与管理 API、Vue 管理端框�
 ## 相关设计、ADR 和 AI 日志
 
 - [管理系统基础能力设计](../design/management-system.md)
-- [ADR-0005](../../decisions/ADR-0005-soft-delete-and-audit-fields.md)
+- [ADR-0005](../decisions/ADR-0005-soft-delete-and-audit-fields.md)
 - [AI 协作记录](../ai-logs/2026/07/2026-07-22-management-system-foundation.md)
 - 提交：`feat: build management system foundation`

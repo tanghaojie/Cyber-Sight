@@ -61,7 +61,7 @@ TypeScript 类型本身不能替代服务端运行时校验。HTTP 请求来自�
 
 ## 相关设计和计划
 
-- [API 契约模块设计](../design/modules/api-contract.md)
-- [后端模块设计](../design/modules/backend.md)
-- [测试策略](../design/testing-strategy.md)
-- [实施计划](../archive/plans/2026-07-23-runtime-schema-contract.md)
+- [API 契约模块设计](../../design/modules/api-contract.md)
+- [后端模块设计](../../design/modules/backend.md)
+- [测试策略](../../design/testing-strategy.md)
+- [实施计划](../plans/2026-07-23-runtime-schema-contract.md)

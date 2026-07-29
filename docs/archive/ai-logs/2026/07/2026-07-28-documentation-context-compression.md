@@ -41,6 +41,6 @@ status: completed
 ## 相关设计、ADR、计划和提交
 
 - [分层文档与历史归档](../../../../design/documentation-governance.md)
-- [ADR-0016](../../../../decisions/ADR-0016-tiered-documentation-and-archive.md)
+- [ADR-0016](../../../decisions/ADR-0016-tiered-documentation-and-archive.md)
 - [实施计划](../../../plans/2026-07-28-documentation-context-compression.md)
 - 关联提交：本记录归档所在的最终提交。

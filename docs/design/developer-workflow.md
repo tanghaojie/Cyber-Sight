@@ -9,9 +9,9 @@ updated: 2026-07-29
 
 ## 源码导入
 
-`apps/frontend`、`apps/backend` 和 `packages/api-contract` 分别把 `@` 映射到本
-workspace 的 `src` 目录。导入当前目录或子目录文件时保留 `./` 相对路径；只要导入路径
-需要先返回上级目录，就从 `@/` 开始写完整的源码路径。
+根目录 `tsconfig.base.json` 统一使用 ES2022、`module: preserve`、Bundler 模块解析、严格模式和互操作配置。`apps/frontend`、`apps/backend` 和 `packages/api-contract` 分别继承该基线，并把 `@` 映射到本 workspace 的 `src` 目录。前端补充 DOM 库和 `noEmit`；后端与契约包分别声明编译输出目录。
+
+导入当前目录或子目录文件时保留 `./` 相对路径；只要导入路径需要先返回上级目录，就从 `@/` 开始写完整的源码路径。
 
 别名同时登记在 TypeScript 和实际执行工具中：前端由 Vite 解析，后端与契约包在
 TypeScript 编译后由 `tsc-alias` 把别名改写成可被 Node.js 执行的相对路径，后端 Vitest
@@ -59,6 +59,8 @@ AI 修改代码时必须遵循根目录 `AGENTS.md`：生成内容直接服从�
 验证阶段执行 `pnpm format`、`pnpm lint` 和 `pnpm format:check`。后端与契约变更运行相称的
 自动化测试；前端只执行类型检查和生产构建，功能与浏览器验收交给维护者。
 
+人类维护者的当前修改优先于 AI 推断、旧设计和归档记录。AI 可以执行维护者明确授权的仓库格式化，但不能借格式化改动逻辑；发现问题或无法确定如何同步时，必须保留人类内容并询问下一步。
+
 ## 失败模式与验证
 
 - hook 未安装：重新执行 `pnpm install` 或 `pnpm prepare`，并确认 `.git/hooks/pre-commit`
@@ -72,5 +74,4 @@ AI 修改代码时必须遵循根目录 `AGENTS.md`：生成内容直接服从�
 - 交付验证至少执行 `pnpm lint`、`pnpm format:check` 和 `pnpm build`；涉及后端或契约时再
   执行相称的 `pnpm test`，前端人工验收结果由维护者确认。
 
-长期取舍见 [ADR-0021](../decisions/ADR-0021-source-alias-and-automated-formatting.md)和
-[ADR-0022](../decisions/ADR-0022-maintainer-owned-frontend-validation.md)。
+初始版本之前的工程取舍见[归档索引](../archive/README.md)；当前工作流直接以本设计、根目录 `AGENTS.md` 和项目配置为准。

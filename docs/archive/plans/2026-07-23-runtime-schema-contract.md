@@ -68,7 +68,7 @@ updated: 2026-07-23
 
 ## 相关设计、ADR 和 AI 日志
 
-- [ADR-0006](../../decisions/ADR-0006-runtime-schema-as-api-contract.md)
+- [ADR-0006](../decisions/ADR-0006-runtime-schema-as-api-contract.md)
 - [API 契约模块设计](../../design/modules/api-contract.md)
 - [AI 协作记录](../ai-logs/2026/07/2026-07-23-runtime-schema-contract.md)
 - 关联提交：`refactor: replace OpenAPI-first with runtime schemas`

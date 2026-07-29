@@ -42,6 +42,6 @@ status: completed
 
 ## 相关设计、ADR、计划和提交
 
-- [ADR-0007](../../../../decisions/ADR-0007-zod-as-unified-schema-source.md)
+- [ADR-0007](../../../decisions/ADR-0007-zod-as-unified-schema-source.md)
 - [实施计划](../../../plans/2026-07-23-zod-schema-unification.md)
 - 关联提交：`refactor: unify runtime schemas on Zod`

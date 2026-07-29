@@ -41,6 +41,6 @@ status: completed
 
 ## 相关设计、ADR、计划和提交
 
-- [ADR-0006](../../../../decisions/ADR-0006-runtime-schema-as-api-contract.md)
+- [ADR-0006](../../../decisions/ADR-0006-runtime-schema-as-api-contract.md)
 - [实施计划](../../../plans/2026-07-23-runtime-schema-contract.md)
 - 关联提交：`refactor: replace OpenAPI-first with runtime schemas`

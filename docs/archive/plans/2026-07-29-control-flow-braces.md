@@ -16,7 +16,7 @@ updated: 2026-07-29
 
 Prettier 只统一排版，不改变控制流结构。依据
 [开发工作流](../../design/developer-workflow.md)和
-[ADR-0021](../../decisions/ADR-0021-source-alias-and-automated-formatting.md)，使用 ESLint flat
+[ADR-0021](../decisions/ADR-0021-source-alias-and-automated-formatting.md)，使用 ESLint flat
 config 承载此静态约束，并接入根命令和 pre-commit 暂存文件流程。
 
 ## 范围

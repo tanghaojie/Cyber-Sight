@@ -13,7 +13,7 @@ updated: 2026-07-28
 
 ## 背景与设计依据
 
-当前共有 79 份文档、约 5,438 行、255 KB。历史计划和 AI 日志占 35 份，4 份已取代 ADR 仍位于当前决策目录，部分系统设计与模块设计重复。实施依据[分层文档与历史归档](../../design/documentation-governance.md)和 [ADR-0016](../../decisions/ADR-0016-tiered-documentation-and-archive.md)。
+当前共有 79 份文档、约 5,438 行、255 KB。历史计划和 AI 日志占 35 份，4 份已取代 ADR 仍位于当前决策目录，部分系统设计与模块设计重复。实施依据[分层文档与历史归档](../../design/documentation-governance.md)和 [ADR-0016](../decisions/ADR-0016-tiered-documentation-and-archive.md)。
 
 ## 范围
 
@@ -67,5 +67,5 @@ updated: 2026-07-28
 ## 相关设计、ADR 和 AI 日志
 
 - [分层文档与历史归档](../../design/documentation-governance.md)
-- [ADR-0016](../../decisions/ADR-0016-tiered-documentation-and-archive.md)
+- [ADR-0016](../decisions/ADR-0016-tiered-documentation-and-archive.md)
 - [AI 协作记录](../ai-logs/2026/07/2026-07-28-documentation-context-compression.md)

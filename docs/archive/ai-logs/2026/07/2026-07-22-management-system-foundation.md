@@ -35,6 +35,6 @@ status: completed
 ## 相关设计、ADR、计划和提交
 
 - [设计](../../../design/management-system.md)
-- [ADR-0005](../../../../decisions/ADR-0005-soft-delete-and-audit-fields.md)
+- [ADR-0005](../../../decisions/ADR-0005-soft-delete-and-audit-fields.md)
 - [实施计划](../../../plans/2026-07-22-management-system-foundation.md)
 - 提交：`feat: build management system foundation`

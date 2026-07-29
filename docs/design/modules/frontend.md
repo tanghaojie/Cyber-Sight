@@ -1,64 +1,72 @@
-# 前端模块设计
+---
+title: 前端应用与应用壳
+status: active
+owner: maintainers
+updated: 2026-07-29
+---
 
-## 定位
+# 前端应用与应用壳
 
-`apps/frontend` 是 Vue 3 单页应用，通过共享契约包推导的 TypeScript 类型访问后端。前端只依赖 HTTP 路径和数据约定，不依赖 Fastify 路由实现。
+## 定位与边界
 
-## 当前结构
+`apps/frontend` 是 Vue 3 单页应用，通过 `@scaffold/api-contract` 推导的 TypeScript 类型访问后端。它拥有应用启动、认证状态、静态与动态路由、响应式管理端外壳和各前端业务模块；不依赖 Fastify 内部实现，也不把数据库字符串当作任意动态导入路径。
 
-- `src/modules/<module>/pages/`：各业务模块拥有的路由页面。
-- `src/modules/<module>/pages/components/`：仅供所属页面使用的列表、Dialog 等页面级组件。
-- `src/modules/<module>/`：模块 API、页面状态和按职责命名的公共文件。
-- `src/api/`：共享 API Client 和 HTTP 401/404/500 全局响应拦截器。
-- `@scaffold/api-contract`：由运行时 Schema 推导的请求和响应类型。
-- `src/router/`：路由配置。
-- Pinia 已初始化并用于认证 store。
-- `src/modules/auth/auth.store.ts`：跨页面登录态、当前用户、Bearer token 持久化、清会话和退出流程。
-- `src/layouts/AdminLayout.vue`：响应式应用壳编排。
-- `src/components/layout/`：侧栏、顶栏和动态内容承载区。
-- `src/modules/navigation`：当前用户数据库菜单树与加载状态。
-- `src/modules/**/view-registry.ts`：模块拥有的动态页面注册清单。
-- `src/shared/routing/view-registry.ts`：页面登记协议与只读注册表构造函数，不扫描或依赖业务模块。
-- `src/shared/routing/view-registry.ts`：构建期自动发现业务模块登记文件并组装只读页面注册表。
-- `src/shared/routing/layout-registry.ts`：自动发现 `src/layouts/*.vue` 并提供只读布局注册表与表单选项。
-- `src/assets/icons/*.svg`、`src/shared/icons/icon-registry.ts` 与 `src/components/AppIcon.vue`：由 Vite 构建期发现图标源、生成 sprite/只读选项，并通过稳定名称渲染。
-- `src/styles/main.scss`：只负责组合 Tailwind、基础样式、布局样式和按 Element Plus 组件拆分的 SCSS 覆盖。
-- `src/modules/users|roles|menus|dictionaries`：四个相互独立的管理页面和 API service。
-- users、roles、menus、dictionaries 的 `*Page.vue` 只负责页面级聚合；列表查询、展示与删除由
-  `*List.vue` 承担，新增/编辑表单和保存由 `*Dialog.vue` 承担。
+业务页面、API 和状态按 `src/modules/<module>/` 归属。`src/router/`、`src/layouts/`、`src/bootstrap/`、`src/api/` 和领域无关的 `src/shared/` 只承担应用组合或平台能力，不承载具体业务规则。
 
-## 约束
+## 当前结构与公共边界
 
-- 新业务能力必须建立 `src/modules/<module>/` 独立目录，并通过 `*.routes.ts`、`*.store.ts`、`*.api.ts`、`view-registry.ts` 等表意文件暴露公共能力，避免创建 `index.ts` 或无差别转发的 barrel。模块拥有自己的页面、组件、composable、service 和局部 store；`src/router/`、`src/views/` 与 `src/stores/` 中的存量业务代码在实质修改时迁入对应模块。
-- 路由和应用壳只能从模块设计中登记的公共文件加载业务页面、状态或注册信息；禁止一个模块导入另一个模块未登记的组件、composable、service 或 store。
-- 当前公共文件包括：`auth/auth.store.ts`、`auth/auth.routes.ts`、`navigation/navigation.store.ts`、`errors/error.routes.ts`、各管理模块的 `*.api.ts`，以及由路由组合根按约定发现的 `view-registry.ts`。`menus/menu-options.ts` 是角色模块读取菜单选项的公共用例文件。
-- 需要被数据库菜单选择的模块页面必须在本模块 `view-registry.ts` 的 `registerViews()` 中显式登记稳定组件标识；路由组合根自动发现该约定文件，禁止中心注册表继续手工导入业务模块。组件标识必须非空且全局唯一。
-- 菜单可选择的布局由 `src/layouts/` 根目录中的 `.vue` 文件名提供稳定标识；动态路由只加载构建期注册的布局。菜单显式布局覆盖目录继承值，空值最终回退 `AdminLayout`。目录站内路径作为后代前缀，子节点相对路径在其下拼接，绝对路径覆盖该前缀。
-- 菜单可选择的图标只能来自 `src/assets/icons/*.svg` 的构建期名称清单；新增 SVG 文件即可进入选项，不在 Vue 组件中维护图形分支。
-- 跨模块状态和操作通过目标模块公开的只读查询、命令或事件协作。不得直接修改其他模块的 Pinia store；真正领域无关的 UI 与 Client 能力才进入共享目录。
-- Vue 组件负责展示和交互，不直接实现复杂业务规则。
-- 后端调用通过模块 composable 或 service 封装，不在多个组件中散落路径字符串。
-- 共享 API Client 从领域无关的 access-token 存储读取 token，并为请求统一附加 `Authorization: Bearer <token>`；认证 store 负责在登录、退出和 HTTP 401 时写入或清除 token。
-- `src/router/constRoutes.ts` 声明静态路由，`src/router/dynamicRoutes.ts` 承担认证守卫和菜单路由生命周期；守卫每个分支只返回一次导航结果。
-- 应用级 HTTP 错误动作由 `src/bootstrap/registerHttpErrorHandler.ts` 在启动时组装，`src/api/` 不直接拥有 Router 或业务 store。
-- API 请求和响应类型来自共享运行时 Schema 的推导结果。
-- 页面必须明确处理 loading、empty、error 和 success 状态。
-- 列表 + 新增/编辑形态的管理页面应把内部组件放在本模块 `pages/components/`；Page 只组合
-  标题操作、列表和 Dialog，并协调保存后的列表刷新，不重复承载表格和完整表单实现。
-- 跨页面共享状态才进入 Pinia；局部状态保留在组件或 composable。
-- 新业务模块必须在设计或交付说明中列出维护者需要人工验收的成功、失败和关键交互场景。
-- 布局和视觉样式优先使用 Tailwind CSS；需要全局维护的样式使用 SCSS 并按基础样式、布局职责和第三方组件边界拆分。表格、表单、弹窗和反馈等通用交互优先使用 Element Plus；其全局变量与每类组件覆盖不得混放在 `main.scss`。
-- 共享响应拦截器统一识别 HTTP `401`、`404`、`500` 并调用应用启动时注册的处理器；401 清状态并跳登录、404 跳错误页、500 使用 ElMessage 显示 `err`。
-- 业务模块处理 HTTP `200` 响应中的非零业务 `status`；只有 `status === 0` 且存在预期数据时才进入成功状态。
-- 分页页面通过统一的 `pageNum`、`pageSize` 请求和 `list`、`total` 响应维护状态。
+- `src/modules/<module>/pages/`：模块路由页面；`pages/components/`：仅供所属页面使用的列表和 Dialog。
+- `src/modules/<module>/*.api.ts`：模块 HTTP 调用；`*.store.ts`：确需跨页面共享的 Pinia 状态。
+- `src/modules/**/registerViews.ts`：需要被数据库菜单选择的模块登记页面加载器。
+- `src/shared/routing/view-registry.ts`：构建期发现全部 `registerViews.ts`，校验稳定 key 并冻结页面注册表。
+- `src/shared/routing/layout-registry.ts`：发现 `src/layouts/*.vue`，以文件名建立只读布局注册表；`AdminLayout` 必须存在。
+- `src/router/constRoutes.ts`：登录、显式 404、根 `AdminLayout` 和默认工作台路由。
+- `src/router/routerGuard.ts`：认证恢复、导航加载和首次动态路由安装。
+- `src/router/dynamicRoutes.ts`：根据菜单树生成、注册和清理动态路由。
+- `src/router/index.ts`：创建 Router，组装静态路由、最终 404 和认证守卫。
+- `src/bootstrap/registerHttpErrorHandler.ts`：组装 Router、认证、导航和全局 HTTP 错误动作。
+- `src/components/layout/` 与 `src/layouts/AdminLayout.vue`：侧栏、顶栏、内容出口和移动抽屉。
+- `src/layouts/EmptyLayout.vue`：只提供一个 `<router-view>` 的可选布局。
+- `src/assets/icons/*.svg`、`src/shared/icons/icon-registry.ts` 与 `src/components/AppIcon.vue`：构建期 SVG sprite 和稳定图标名称。
 
-前端不维护 Vitest、Vue Test Utils、jsdom 或其他自动化测试环境。AI 可执行格式、类型检查和
-生产构建；页面的 loading、empty、error、success、表单交互和真实前后端流程由维护者人工
-验收。除非维护者在具体任务中明确要求，AI 不创建或运行前端测试及浏览器测试。
+模块外部只能依赖模块设计登记的表意公共文件。禁止新增无差别 `index.ts` barrel，禁止跨模块导入页面、私有 composable、内部状态或未登记 service。角色模块通过菜单模块的 `menu-options.ts` 读取授权选项；用户模块通过角色模块公开的 `roles.api.ts` 读取角色选项。
 
-## 当前缺口
+## 认证数据流
 
-- 已实现 HTTP 401 登录重定向、独立 404 页面和全局 500 提示；这些行为的回归风险由维护者
-  人工浏览器验收承担。
-- `useHealth` 成功重试时不会清理旧错误状态。
-- 已建立 Tailwind CSS、Element Plus 主题令牌和响应式样式基线；系统化可访问性审计和生产环境 API 地址策略仍待补齐。
+1. `auth.api.ts` 封装登录、当前用户和退出请求，`auth.store.ts` 只编排状态、错误文案和 token 生命周期。
+2. 登录成功数据为 `{ user, issued: { token, expiresAt } }`。store 通过 `shared/accessToken.ts` 把 token 写入 `jtlib_access_token` cookie，并使用服务端返回时间作为到期时间。
+3. 共享 API Client 从 token 适配器读取值并附加 `Authorization: Bearer <token>`。
+4. 退出或 HTTP 401 清除认证、导航和动态路由状态；token 适配器同时移除 cookie 与旧 `localStorage` 键。
+5. `api/result.ts` 在后端既没有合法成功响应也没有错误响应时显示统一消息并抛出异常；HTTP `200` 中的非零业务 `status` 仍由调用模块处理。
+
+cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie；其安全边界仍依赖同源 XSS 防护和 Bearer token 规则。
+
+## 导航与路由数据流
+
+1. `constRoutes.ts` 直接注册公开登录、公开 404，以及使用 `AdminLayout` 的 `/` 根路由和默认 `HomePage`。
+2. 非公开导航进入 `authenticationRouteGuard()`：恢复当前用户；未认证时跳转登录；首次认证成功时加载菜单树、安装动态路由并按原地址重新匹配。
+3. `navigation.store.ts` 通过 `navigation.api.ts` 获取 `GET /navigation/menus`，先把相对路径按目录层级解析为规范绝对路径，再缓存树和扁平列表。
+4. `dynamicRoutes.ts` 递归生成路由。`directory` 使用显式布局或 `RouterView` 并承载子路由；`menu` 使用已登记页面，显式布局存在时创建只有一个空路径子项的布局包装，否则直接加载页面；`button` 不注册站内路由。
+5. 每棵根菜单子树通过 `router.addRoute()` 注册。刷新菜单、退出或 401 时调用移除函数并重置 `routesReady`。
+6. `SidebarTree.vue` 只渲染有子项的目录、站内菜单和外链按钮；空目录不会显示。外链按钮仅打开 HTTP(S) 地址。
+
+目录层级通过嵌套路由自然传递上级布局：目录无显式布局时使用 `RouterView`，菜单无显式布局时直接使用页面。当前实现不会为所有动态根菜单自动包裹 `AdminLayout`；需要该布局时由菜单或祖先目录明确选择。未知页面 key、缺少组件名或未知菜单类型不会回退到任意导入；前两者记录控制台错误并跳过路由，未知类型抛出错误。
+
+## 页面注册、布局与样式
+
+`view-registry.ts` 通过 `import.meta.glob('@/modules/**/registerViews.ts', { eager: true })` 自动发现登记模块。登记 key 必须符合小写字母开头的 kebab-case 约束且全局唯一；缺少 `registerViews()`、非法 key 或重复 key 会在注册表构建时失败。
+
+布局注册表通过懒加载发现 `src/layouts/*.vue`。`AdminLayout` 是静态根壳和必备布局；`EmptyLayout` 可供菜单显式选择。Tailwind CSS 负责布局、间距、响应式和多数视觉样式，Element Plus 提供表单、表格、弹窗和反馈；全局 SCSS 按基础、管理布局、过渡和 Element Plus 组件覆盖拆分。
+
+## 全局 HTTP 错误
+
+共享 Client 只识别 HTTP `401`、`404`、`500` 并调用启动时注册的处理器：401 清状态并跳登录，404 跳错误页，500 使用安全消息提示。HTTP `200` 中的非零业务 `status` 由发起请求的模块处理。
+
+## 验证与已知边界
+
+- AI 执行格式、静态检查、TypeScript 检查和生产构建；不创建或运行前端自动化、端到端或浏览器测试。
+- 维护者人工验收登录恢复、cookie 到期、退出/401 清理、直接访问动态 URL、页面与布局发现、目录嵌套、空目录隐藏、三种菜单节点和响应式外壳。
+- 当前构建会提示 `AdminLayout.vue` 和 `HomePage.vue` 同时被静态与动态导入，因此不会拆入独立动态 chunk；这不阻止生产构建。
+- `useHealth` 成功重试时不会清理旧错误状态；系统化可访问性审计和生产环境 API 地址策略尚未补齐。
+
+初始版本之前的前端应用壳和注册表取舍保留在[归档索引](../../archive/README.md)，当前行为以本设计和维护者实现为准。

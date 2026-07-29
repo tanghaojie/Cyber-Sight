@@ -13,7 +13,7 @@ updated: 2026-07-23
 
 ## 背景与设计依据
 
-现有 `AdminLayout.vue` 同时承担导航、顶栏和内容区，页面样式主要由手写 CSS 构成。实现遵循[前端应用壳设计](../../design/frontend-shell.md)和 [ADR-0008](../../decisions/ADR-0008-tailwind-and-element-plus.md)。
+现有 `AdminLayout.vue` 同时承担导航、顶栏和内容区，页面样式主要由手写 CSS 构成。实现遵循[前端应用壳设计](../../design/modules/frontend.md)和 [ADR-0008](../decisions/ADR-0008-tailwind-and-element-plus.md)。
 
 ## 范围
 
@@ -60,6 +60,6 @@ updated: 2026-07-23
 
 ## 相关设计、ADR 和 AI 日志
 
-- [前端应用壳设计](../../design/frontend-shell.md)
-- [ADR-0008](../../decisions/ADR-0008-tailwind-and-element-plus.md)
+- [前端应用壳设计](../../design/modules/frontend.md)
+- [ADR-0008](../decisions/ADR-0008-tailwind-and-element-plus.md)
 - [AI 协作记录](../ai-logs/2026/07/2026-07-23-frontend-shell-componentization.md)
