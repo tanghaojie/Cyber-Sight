@@ -12,8 +12,8 @@
 <style lang="scss" scoped>
 .app-main {
   min-width: 0;
-  min-height: calc(100vh - 96px);
-  min-height: calc(100dvh - 96px);
+  min-height: calc(100vh - var(--app-shell-header-height) - var(--tag-view-height));
+  min-height: calc(100dvh - var(--app-shell-header-height) - var(--tag-view-height));
   overflow-x: clip;
   padding: 20px 16px;
 }

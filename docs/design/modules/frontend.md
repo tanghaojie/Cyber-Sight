@@ -26,6 +26,7 @@ updated: 2026-07-30
 - `src/router/index.ts`：创建 Router，组装静态路由、最终 404 和认证守卫。
 - `src/bootstrap/registerHttpErrorHandler.ts`：组装 Router、认证、导航和全局 HTTP 错误动作。
 - `src/components/layout/` 与 `src/layouts/AdminLayout.vue`：侧栏、顶栏、内容出口和移动抽屉。
+- `src/modules/system/tag-view/`：账号隔离的页面标签历史、浏览器持久化和标签控制界面。
 - `src/layouts/EmptyLayout.vue`：只提供一个 `<router-view>` 的可选布局。
 - `src/assets/icons/*.svg`、`src/shared/icons/icon-registry.ts` 与 `src/components/AppIcon.vue`：构建期 SVG sprite 和稳定图标名称。
 
@@ -49,12 +50,15 @@ cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie�
 4. `dynamicRoutes.ts` 递归生成路由。`directory` 使用显式布局或 `RouterView` 并承载子路由；`menu` 使用已登记页面，显式布局存在时创建只有一个空路径子项的布局包装，否则直接加载页面；`button` 不注册站内路由。菜单路由的 `meta.menuPath` 保存从根目录到当前页面的菜单名称路径，应用壳在原副标题位置展示该路径，不再使用抽象的 `eyebrow` 元数据。
 5. 每棵根菜单子树通过 `router.addRoute()` 注册。刷新菜单、退出或 401 时调用移除函数并重置 `routesReady`。
 6. `SidebarTree.vue` 只渲染有子项的目录、站内菜单和外链按钮；空目录不会显示。外链按钮仅打开 HTTP(S) 地址。
+7. `AdminLayout` 把已认证账号 ID、当前 `route.path` 和 `meta.title` 交给 `tag-view` 模块；模块按账号恢复并保存不含 query/hash 的页面历史。关闭当前标签时应用壳导航到相邻标签，无后备项或关闭全部时回首页。
 
 目录层级通过嵌套路由自然传递上级布局：目录无显式布局时使用 `RouterView`，菜单无显式布局时直接使用页面。当前实现不会为所有动态根菜单自动包裹 `AdminLayout`；需要该布局时由菜单或祖先目录明确选择。未知页面 key、缺少组件名或未知菜单类型不会回退到任意导入；前两者记录控制台错误并跳过路由，未知类型抛出错误。
 
 ## 页面注册、布局与样式
 
 `view-registry.ts` 通过两个 `import.meta.glob` 模式扫描 `@/modules/system/**/registerViews.ts` 与 `@/modules/biz/**/registerViews.ts`，自动发现两个分类下的登记模块。登记 key 必须符合小写字母开头的 kebab-case 约束且全局唯一；缺少 `registerViews()`、非法 key 或重复 key 会在注册表构建时失败。
+
+`tag-view` 位于 Header 与主内容之间，历史标签可横向滚动，操作入口提供关闭当前、关闭其他和关闭全部。其版本化 `localStorage` 数据按数字用户 ID 隔离；存储不可用或内容损坏时降级为内存状态，不影响 Router 导航。
 
 全局变量 `--app-shell-header-height` 定义应用壳顶部高度，当前值为 `72px`；`AppHeader` 与 `AppSidebar` 的 `sidebar-brand` 在桌面和移动端都引用该变量，使两栏顶部分隔线对齐。Header 保留粘性定位、菜单按钮、标题路径和用户菜单交互；紧凑高度不改变主内容与侧栏的布局职责。
 
@@ -67,7 +71,7 @@ cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie�
 ## 验证与已知边界
 
 - AI 执行格式、静态检查、TypeScript 检查和生产构建；不创建或运行前端自动化、端到端或浏览器测试。
-- 维护者人工验收登录恢复、cookie 到期、退出/401 清理、直接访问动态 URL、页面与布局发现、目录嵌套、权限菜单过滤、部门与三类主体策略弹窗和响应式外壳。
+- 维护者人工验收登录恢复、cookie 到期、退出/401 清理、直接访问动态 URL、页面与布局发现、目录嵌套、权限菜单过滤、标签历史恢复与关闭操作、部门与三类主体策略弹窗和响应式外壳。
 - 当前构建会提示 `AdminLayout.vue` 和 `HomePage.vue` 同时被静态与动态导入，因此不会拆入独立动态 chunk；这不阻止生产构建。
 - `useHealth` 成功重试时不会清理旧错误状态；系统化可访问性审计和生产环境 API 地址策略尚未补齐。
 
