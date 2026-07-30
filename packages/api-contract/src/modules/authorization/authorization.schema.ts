@@ -1,6 +1,10 @@
 import { z } from 'zod'
 import { apiResponseSchema, ErrorResponseSchema } from '@/shared/http.js'
 
+/**
+ * 授权模块契约同时描述功能权限和数据范围策略。
+ * 权限键使用“模块.动作”形式，便于菜单、路由和后端资源引用同一稳定标识。
+ */
 export const PermissionKeySchema = z
   .string()
   .min(3)
@@ -45,6 +49,7 @@ export const DataPolicyInputSchema = z
     includeDescendants: z.boolean(),
   })
   .superRefine(function validateCustomDepartments(policy, context) {
+    // 只有自定义部门范围携带部门 ID，避免无效参数造成授权含义不确定。
     if (policy.scopeType === 'custom_departments' && policy.departmentIds.length === 0) {
       context.addIssue({
         code: 'custom',

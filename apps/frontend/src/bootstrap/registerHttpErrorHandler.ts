@@ -7,6 +7,7 @@ import { useAuthStore } from '@/modules/auth/auth.store'
 import { useNavigationStore } from '@/modules/navigation/navigation.store'
 import { clearDynamicRoutes } from '@/router/dynamicRoutes'
 
+/** 把与框架无关的 HTTP 错误策略连接到 Router、Pinia 和 Element Plus。 */
 export function registerHttpErrorHandler(router: Router, pinia: Pinia): void {
   installGlobalHttpErrorHandler(
     createApplicationHttpErrorHandler({

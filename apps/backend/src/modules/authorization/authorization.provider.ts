@@ -6,6 +6,9 @@ import {
   type DataAccessPlan,
 } from './authorization.service.js'
 
+/**
+ * 授权决策端口。业务路由只依赖该接口，因此本地数据库实现可被外部策略服务替换。
+ */
 export interface AuthorizationProvider {
   effectivePermissionKeys(app: FastifyInstance, user: CurrentUser): Promise<string[]>
   resolveDataAccess(

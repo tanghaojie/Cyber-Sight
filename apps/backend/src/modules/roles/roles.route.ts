@@ -18,6 +18,7 @@ import { ensureUpdated, mutationResult, normalizedListQuery } from '@/shared/htt
 import { paginatedSuccess, success } from '@/shared/http/response.js'
 import { createRole, listRoles, softDeleteRole, updateRole } from './roles.repository.js'
 
+/** 角色管理路由；角色变更会影响有效权限，因此写操作后必须清空令牌身份缓存。 */
 export async function roleRoutes(app: FastifyInstance): Promise<void> {
   app.get<{ Querystring: ListQuery }>(
     '/admin/roles',
@@ -39,6 +40,7 @@ export async function roleRoutes(app: FastifyInstance): Promise<void> {
       },
     },
     async function listRoleHandler(request) {
+      // 用户编辑页也需要角色选项，因此 users.manage 可读取角色列表但不能写入。
       await requireCurrentUser(app, request)
       const page = await listRoles(app, normalizedListQuery(request.query))
       return paginatedSuccess(page.list, page.total)
@@ -85,6 +87,7 @@ export async function roleRoutes(app: FastifyInstance): Promise<void> {
     async function updateRoleHandler(request) {
       const actor = await requireCurrentUser(app, request)
       ensureUpdated(app, await updateRole(app, request.params.id, request.body, actor.id))
+      // 缓存中的 CurrentUser.roles 以及由角色派生的权限都需要重新加载。
       invalidateAllTokenCache(app)
       return success({ id: request.params.id })
     },

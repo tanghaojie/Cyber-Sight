@@ -7,6 +7,7 @@ const DEFAULT_TTL_MS = 7 * 24 * 60 * 60 * 1000
 const JWT_AUDIENCE = 'jtlab-api'
 const JWT_ISSUER = 'jtlab'
 
+/** 内存项以 JWT jti 为键，保存解析后的用户快照和最终有效期。 */
 interface TokenEntry {
   expiresAt: number
   user: CurrentUser
@@ -78,6 +79,7 @@ export class JwtTokenCache {
       .setExpirationTime(Math.floor(expiresAt / 1000))
       .sign(this.key)
 
+    // Map 的插入顺序充当 LRU 队列；签发前清理过期项，再限制最大容量。
     this.pruneExpired(issuedAt)
     this.entries.set(jti, { expiresAt, user })
     this.evictLeastRecentlyUsed()
@@ -85,6 +87,7 @@ export class JwtTokenCache {
   }
 
   async resolve(token: string, loadSession: TokenSessionLoader): Promise<CurrentUser | null> {
+    // 无论缓存是否命中都先验证签名、签发方、受众和过期时间，缓存不能绕过 JWT 校验。
     const verified = await this.verify(token)
     if (!verified) {
       return null
@@ -97,6 +100,7 @@ export class JwtTokenCache {
         return null
       }
 
+      // 删除再插入可把命中项移动到 Map 末尾，使其成为最近使用项。
       this.entries.delete(verified.jti)
       this.entries.set(verified.jti, entry)
       return entry.user
@@ -108,6 +112,7 @@ export class JwtTokenCache {
     }
 
     this.entries.set(verified.jti, {
+      // 数据库会话和 JWT 任一先过期都应立即失效。
       expiresAt: Math.min(loaded.expiresAt, verified.expiresAt),
       user: loaded.user,
     })
@@ -116,6 +121,7 @@ export class JwtTokenCache {
   }
 
   async revoke(token: string): Promise<boolean> {
+    // 持久会话撤销由服务层负责，此处只管理当前进程的热缓存。
     const verified = await this.verify(token)
     return verified ? this.entries.delete(verified.jti) : false
   }
@@ -170,6 +176,7 @@ export class JwtTokenCache {
         subject: payload.sub,
       }
     } catch {
+      // 外部令牌错误是正常认证失败，不把 jose 的细节暴露给路由层。
       return null
     }
   }

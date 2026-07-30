@@ -1,3 +1,4 @@
+// 契约包的发布入口：前后端只从这里消费稳定的运行时 Schema 与推导类型。
 export * from './shared/http.js'
 export * from './modules/health/index.js'
 export * from './modules/auth/auth.schema.js'

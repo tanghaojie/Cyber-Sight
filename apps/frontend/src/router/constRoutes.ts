@@ -4,6 +4,7 @@ import AdminLayout from '@/layouts/AdminLayout.vue'
 import { RouteRecordRaw, RouterView } from 'vue-router'
 import HomePage from '@/modules/home/pages/HomePage.vue'
 
+// 登录、首页和错误页是应用启动所需的最小静态路由，不依赖后端菜单配置。
 const routes: RouteRecordRaw[] = [
   { path: '/login', name: 'login', component: loginPage, meta: { public: true, title: '登录' } },
   {

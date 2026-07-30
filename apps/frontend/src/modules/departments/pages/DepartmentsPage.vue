@@ -5,6 +5,7 @@
         新增部门
       </el-button>
     </header>
+    <!-- 列表把最新全量记录回传给页面，弹窗据此生成父部门选项。 -->
     <DepartmentsList
       ref="departmentsList"
       @create="openCreate"
@@ -35,6 +36,7 @@ const parentId = ref(0)
 const dialogOpen = ref(false)
 
 function openCreate(selectedParentId: number): void {
+  // 从某行“新增子部门”进入时预选该行作为父节点；页头新增则传 0。
   editingDepartment.value = null
   parentId.value = selectedParentId
   dialogOpen.value = true

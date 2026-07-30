@@ -1,5 +1,6 @@
 <template>
   <div class="surface-card">
+    <!-- 列表组件拥有搜索、分页和删除确认状态。 -->
     <div class="resource-toolbar">
       <el-input
         v-model="keyword"
@@ -82,6 +83,7 @@ const loading = ref(false)
 const errorMessage = ref('')
 
 async function load(): Promise<void> {
+  // 请求失败时清空旧记录，避免用户把过期列表误当成本次搜索结果。
   loading.value = true
   errorMessage.value = ''
   try {
@@ -119,6 +121,7 @@ async function remove(role: RoleSummary): Promise<void> {
     ElMessage.success('角色已删除')
     await load()
   } catch (error) {
+    // 用户关闭确认框不是业务错误，不显示失败提示。
     if (error !== 'cancel' && error !== 'close') {
       errorMessage.value = error instanceof Error ? error.message : '删除失败'
     }
@@ -131,6 +134,7 @@ function formatDate(value: string): string {
   )
 }
 
+// 供父页面在弹窗保存后刷新列表。
 defineExpose({ reload: load })
 onMounted(load)
 </script>

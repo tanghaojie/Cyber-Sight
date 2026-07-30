@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { apiResponseSchema } from '@/shared/http.js'
 
+/** 健康检查只表达进程存活，不承诺数据库等下游依赖已经就绪。 */
 export const HealthDataSchema = z.strictObject({
   status: z.literal('ok'),
   timestamp: z.iso.datetime(),

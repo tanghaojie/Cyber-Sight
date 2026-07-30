@@ -23,6 +23,7 @@ import {
   updateDictionary,
 } from './dictionaries.repository.js'
 
+/** 字典管理路由复用通用分页、唯一冲突和软删除响应约定。 */
 export async function dictionaryRoutes(app: FastifyInstance): Promise<void> {
   app.get<{ Querystring: ListQuery }>(
     '/admin/dictionaries',

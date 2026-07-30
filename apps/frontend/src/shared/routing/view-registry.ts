@@ -22,10 +22,12 @@ function isViewRegistrationModule(value: unknown): value is ViewRegistrationModu
   )
 }
 
+/** 汇总各业务模块显式登记的页面组件，并在启动时阻止非法或重复的菜单组件键。 */
 export function createViewRegistry(
   modules: Readonly<Record<string, unknown>>,
 ): Readonly<Record<string, { label: string; component: RouteComponent }>> {
   const registeredViews: Record<string, { label: string; component: RouteComponent }> =
+    // 无原型对象避免诸如 toString 的键与 Object 原型属性冲突。
     Object.create(null)
 
   for (const [modulePath, registrationModule] of Object.entries(modules).sort(([left], [right]) =>
@@ -55,6 +57,7 @@ export function createViewRegistry(
 }
 
 const viewRegistrationModules = import.meta.glob<ViewRegistrationModule>(
+  // eager 让注册错误在应用启动阶段暴露，而不是首次访问菜单时才失败。
   '@/modules/**/registerViews.ts',
   { eager: true },
 )

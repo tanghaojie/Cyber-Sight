@@ -1,12 +1,14 @@
 import { z } from 'zod'
 import { AuditFieldsSchema, ErrorResponseSchema, paginatedResponseSchema } from '@/shared/http.js'
 
+/** 用户可关联多个角色和部门，但必须且只能从已关联部门中指定一个主部门。 */
 const integerArray = z.array(z.number().int().min(1))
 
 function validateDepartments(
   input: { departmentIds: number[]; primaryDepartmentId: number; roleIds: number[] },
   context: z.RefinementCtx,
 ): void {
+  // 该复合约束由创建和更新 Schema 共用，保证两个写入入口行为一致。
   if (!input.departmentIds.includes(input.primaryDepartmentId)) {
     context.addIssue({
       code: 'custom',

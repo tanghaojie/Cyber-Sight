@@ -1,5 +1,6 @@
 import { databaseClient } from './index.js'
 
+// 人工数据库检查同时验证连接、当前 Schema、业务表和迁移记录是否可见。
 try {
   const [connection] = await databaseClient<
     Array<{

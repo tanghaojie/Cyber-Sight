@@ -1,5 +1,6 @@
 import { genInitials } from '@/shared/genInitials'
 
+/** 环境变量为空或只有空白时回退到脚手架品牌默认值。 */
 function configuredValue(value: string | undefined, fallback: string): string {
   const normalized = value?.trim()
   return normalized || fallback

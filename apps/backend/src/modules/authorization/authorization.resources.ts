@@ -1,5 +1,6 @@
 import type { DataResourceDefinition, DataScopeType } from '@scaffold/api-contract'
 
+// 功能权限键的代码侧目录，路由和菜单都引用这些稳定值，避免散落字符串。
 export const authorizationPermissionKeys = {
   departmentsManage: 'departments.manage',
   dictionariesManage: 'dictionaries.manage',
@@ -17,6 +18,9 @@ export const dataResourceDefinitions: DataResourceDefinition[] = [
   },
 ]
 
+/**
+ * 校验数据策略是否属于已登记资源、动作和范围；创建操作不能使用仅表示已有记录的 self。
+ */
 export function isRegisteredDataPolicy(
   resourceKey: string,
   action: string,

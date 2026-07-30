@@ -30,6 +30,7 @@ const accessAdministrationPermissions = [
   authorizationPermissionKeys.menusManage,
 ]
 
+// 三类授权主体复用同一组 GET/PUT 路由，只在路径、权限键和操作名上区分。
 function subjectPath(subjectType: AuthorizationSubjectType): string {
   return `/admin/authorization/${subjectType}s/:id`
 }
@@ -100,6 +101,7 @@ function registerSubjectRoutes(app: FastifyInstance, subjectType: AuthorizationS
         return failure(ErrorCode.INVALID_REQUEST, 'Invalid permission or data policy')
       }
       if (subjectType === 'user') {
+        // 用户直接策略只影响本人；角色或部门策略可能影响多名用户，因此清空全部身份快照。
         invalidateUserTokenCache(app, request.params.id)
       } else {
         invalidateAllTokenCache(app)
@@ -110,6 +112,7 @@ function registerSubjectRoutes(app: FastifyInstance, subjectType: AuthorizationS
 }
 
 export async function authorizationRoutes(app: FastifyInstance): Promise<void> {
+  // 任一授权管理权限都可读取目录，编辑具体主体仍由其对应权限单独控制。
   app.get(
     '/admin/authorization/permissions',
     {

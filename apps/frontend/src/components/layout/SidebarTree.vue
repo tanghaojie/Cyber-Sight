@@ -1,5 +1,6 @@
 <template>
   <ul class="sidebar-tree" :class="{ 'sidebar-tree--nested': depth > 0 }">
+    <!-- 首页属于静态路由，只在根层额外插入一次。 -->
     <RouterLink
       v-if="depth === 0 && showHomeMenu"
       :to="homeRoute?.path || '/'"
@@ -64,6 +65,7 @@
         </span>
         <AppIcon name="external" class="external-icon" />
       </a>
+      <!-- 目录递归复用本组件，depth 同时驱动视觉缩进。 -->
       <SidebarTree
         v-if="item.type === 'directory' && item.children.length && expanded[item.id] !== false"
         :items="item.children"
@@ -87,6 +89,7 @@ defineEmits<{ navigate: [] }>()
 const homeRoute = computed(() => constRoutes.find((route: RouteRecordRaw) => route.path === '/'))
 
 const showHomeMenu = computed(() => {
+  // 根路由有空路径首页子项时显示首页；没有 children 时兼容简单静态根路由。
   if (!homeRoute.value) {
     return false
   }

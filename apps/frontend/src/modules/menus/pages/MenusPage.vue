@@ -4,6 +4,7 @@
       <el-button type="primary" :icon="Plus" size="large" @click="openCreate(0)"> 新增 </el-button>
     </header>
 
+    <!-- 列表回传全量菜单，弹窗用同一快照生成可选父目录。 -->
     <MenusList ref="menusList" @create="openCreate" @edit="openEdit" @loaded="records = $event" />
     <MenuDialog
       v-model="dialogOpen"
@@ -29,6 +30,7 @@ const parentId = ref(0)
 const dialogOpen = ref(false)
 
 function openCreate(selectedParentId: number): void {
+  // 从目录行新增时预选父目录，页头新增传入 0 创建根节点。
   editingMenu.value = null
   parentId.value = selectedParentId
   dialogOpen.value = true

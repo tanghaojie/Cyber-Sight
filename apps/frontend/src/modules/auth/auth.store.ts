@@ -11,6 +11,7 @@ function responseError(data: unknown, fallback: string): string {
   return fallback
 }
 
+/** 维护当前会话用户、令牌恢复状态和登录提交状态。 */
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<CurrentUser | null>(null)
   const checked = ref(false)
@@ -22,6 +23,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const response = await apiLogin(username, password)
       if (response.status === 0 && response.data) {
+        // 先保存身份和令牌，再标记检查完成，路由守卫可立即放行目标页面。
         user.value = response.data.user
         setAccessToken(response.data.issued.token, new Date(response.data.issued.expiresAt))
         checked.value = true
@@ -37,10 +39,12 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function fetchCurrentUser(): Promise<void> {
+    // checked 防止每次路由切换重复请求；刷新页面时仅恢复一次持久会话。
     if (checked.value) {
       return
     }
     if (!getAccessToken()) {
+      // 没有本地令牌即可确认未登录，无需发送必然返回 401 的请求。
       checked.value = true
       return
     }
@@ -66,6 +70,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       await apiLogout()
     } finally {
+      // 即使后端暂时不可用，也必须清除本地令牌，保证用户能够退出当前客户端。
       clearSession()
     }
   }

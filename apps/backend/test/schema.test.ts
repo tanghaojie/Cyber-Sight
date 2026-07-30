@@ -18,6 +18,7 @@ import {
   users,
 } from '@/db/schema.js'
 
+// 集中枚举业务表，确保新增表不会遗漏软删除与五项生命周期字段。
 const tables = [
   users,
   roles,
@@ -35,6 +36,7 @@ const tables = [
   authSessions,
 ]
 
+// 业务身份唯一性只约束有效记录，软删除后允许重新使用同一业务键。
 const activeBusinessIdentityIndexes: Array<{
   table: PgTable
   name: string

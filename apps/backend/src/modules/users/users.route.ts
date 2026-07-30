@@ -43,6 +43,7 @@ async function hasValidAssignments(
   roleIds: number[],
   departmentIds: number[],
 ): Promise<boolean> {
+  // 写入前确认所有关联目标仍启用且未删除，防止创建悬空或失效关系。
   const [validRoleIds, validDepartmentIds] = await Promise.all([
     enabledRoleIds(app, roleIds),
     enabledDepartmentIds(app, departmentIds),
@@ -53,6 +54,7 @@ async function hasValidAssignments(
 }
 
 export async function userRoutes(app: FastifyInstance): Promise<void> {
+  // 功能权限决定能否调用接口，数据访问计划进一步限制可见和可修改的用户记录。
   app.get<{ Querystring: ListQuery }>(
     '/admin/users',
     {
@@ -141,6 +143,7 @@ export async function userRoutes(app: FastifyInstance): Promise<void> {
       }
       try {
         ensureUpdated(app, await updateUser(app, request.params.id, request.body, actor.id, access))
+        // 用户状态、角色或密码变化后丢弃旧身份快照，下一次请求重新从持久会话加载。
         invalidateUserTokenCache(app, request.params.id)
         return success({ id: request.params.id })
       } catch (error) {
@@ -171,10 +174,12 @@ export async function userRoutes(app: FastifyInstance): Promise<void> {
     async function deleteUserHandler(request) {
       const actor = await requireCurrentUser(app, request)
       if (actor.id === request.params.id) {
+        // 禁止删除当前账户，避免管理员在当前会话中把自身置于不可恢复状态。
         throw app.httpErrors.forbidden('You cannot delete your own account')
       }
       const access = await app.authorization.resolveDataAccess(app, actor, 'users', 'delete')
       ensureUpdated(app, await softDeleteUser(app, request.params.id, actor.id, access))
+      // 软删除用户后撤销其所有会话，阻止已有令牌继续访问系统。
       await revokeUserTokens(app, request.params.id, actor.id)
       return success()
     },

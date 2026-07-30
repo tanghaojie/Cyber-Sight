@@ -7,6 +7,7 @@ import { ErrorCode } from '@/shared/errors/error-codes.js'
 let app: FastifyInstance
 
 beforeAll(async () => {
+  // 使用 inject 驱动完整应用，并注册仅测试用路由覆盖统一错误映射的各个来源状态。
   app = await buildApp({ logger: false })
   app.get('/test-error', async function throwTestError() {
     throw new Error('test-only failure')
@@ -47,6 +48,7 @@ afterAll(async () => {
   await app.close()
 })
 
+// 该集成套件保护存活检查、运行时 Schema、Swagger、认证和全局 HTTP 错误边界。
 describe('GET /health', () => {
   it('returns the service health status without opening a network port', async () => {
     const response = await app.inject({

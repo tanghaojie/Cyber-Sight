@@ -21,6 +21,9 @@ interface AppDependencies {
   authorizationProvider?: AuthorizationProvider
 }
 
+/**
+ * 创建完整 Fastify 应用的组合根。测试可注入密钥和授权提供器，生产入口则使用环境配置。
+ */
 export async function buildApp(
   options: FastifyServerOptions = {},
   dependencies: AppDependencies = {},
@@ -29,12 +32,14 @@ export async function buildApp(
     logger: true,
     ajv: {
       customOptions: {
+        // 非法字段必须由 strictObject Schema 明确拒绝，不能在校验时静默删除。
         removeAdditional: false,
       },
     },
     ...options,
   })
 
+  // 随机密钥只服务于未传依赖的隔离测试；生产 server.ts 始终传入环境密钥。
   const jwtSecret = dependencies.jwtSecret ?? randomBytes(32).toString('base64url')
   app.decorate('authTokens', new JwtTokenCache(jwtSecret))
 
@@ -43,6 +48,7 @@ export async function buildApp(
   await registerSwagger(app)
   app.register(dbPlugin)
   app.register(async function applicationRoutes(router) {
+    // 授权插件先于路由注册，保证每条后续路由都经过元数据门禁和请求前检查。
     await registerAuthorization(router, dependencies.authorizationProvider)
     router.register(healthRoutes)
     router.register(authRoutes)

@@ -6,6 +6,7 @@
       </el-button>
     </header>
 
+    <!-- 页面协调列表和弹窗，保存完成后由列表公开方法刷新当前分页。 -->
     <DictionariesList ref="dictionariesList" @edit="openEdit" />
     <DictionaryDialog v-model="dialogOpen" :dictionary="editingDictionary" @saved="refreshList" />
   </section>

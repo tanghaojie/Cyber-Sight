@@ -11,6 +11,7 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core'
 
+// 数据库枚举与共享契约保持同名同值，迁移负责把变化落到 PostgreSQL。
 export const menuType = pgEnum('menu_type', ['directory', 'menu', 'button'])
 export const authorizationSubjectType = pgEnum('authorization_subject_type', [
   'user',
@@ -25,6 +26,7 @@ export const dataScopeType = pgEnum('data_scope_type', [
   'all',
 ])
 
+/** 所有业务表复用软删除和五项生命周期审计字段。 */
 export function auditColumns() {
   return {
     isDeleted: boolean('is_deleted').default(false).notNull(),
@@ -48,6 +50,7 @@ export const users = pgTable(
     ...auditColumns(),
   },
   (table) => ({
+    // 部分唯一索引允许软删除后复用用户名和邮箱，同时保护全部有效记录。
     activeUsername: uniqueIndex('users_username_active_unique')
       .on(table.username)
       .where(sql`${table.isDeleted} = false`),
@@ -93,6 +96,7 @@ export const userRoles = pgTable(
   }),
 )
 
+// 部门邻接表保存直接父子关系，闭包表保存全部祖先路径以加速树范围查询。
 export const departments = pgTable(
   'departments',
   {
@@ -154,6 +158,7 @@ export const userDepartments = pgTable(
   }),
 )
 
+// 功能权限归授权模块所有，角色通过稳定 permissionKey 建立多对多关系。
 export const permissions = pgTable('permissions', {
   id: serial('id').primaryKey(),
   key: varchar('key', { length: 100 }).notNull().unique(),
@@ -201,6 +206,7 @@ export const menus = pgTable('menus', {
   ...auditColumns(),
 })
 
+// roleMenus 为后续按角色直接分配菜单保留；当前导航主要由菜单权限键过滤。
 export const roleMenus = pgTable(
   'role_menus',
   {
@@ -239,6 +245,7 @@ export const dictionaries = pgTable(
   }),
 )
 
+// 数据策略主表描述作用主体和范围类型，部门明细表只服务于 custom_departments。
 export const dataPolicyRules = pgTable(
   'data_policy_rules',
   {
@@ -279,6 +286,7 @@ export const dataPolicyDepartments = pgTable(
   }),
 )
 
+// 会话表只保存令牌摘要；JWT 原文仅返回调用方并短期驻留内存缓存。
 export const authSessions = pgTable('auth_sessions', {
   id: serial('id').primaryKey(),
   userId: integer('user_id')

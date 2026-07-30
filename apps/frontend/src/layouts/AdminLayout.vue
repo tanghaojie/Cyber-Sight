@@ -1,5 +1,6 @@
 <template>
   <div class="app-shell">
+    <!-- 窄屏时遮罩和侧栏共同形成抽屉；桌面端由 CSS 固定为双栏布局。 -->
     <button
       v-if="sidebarOpen"
       class="app-shell__scrim"
@@ -49,6 +50,7 @@ const pageMenuPath = computed(() => String(route.meta.menuPath ?? pageTitle.valu
 watch(
   () => navigation.items,
   function refreshRoutes(items) {
+    // 菜单被后台刷新后同步替换 Router 记录，不要求用户重新登录。
     if (navigation.loaded) {
       installMenuRoutes(router, items)
     }
@@ -57,6 +59,7 @@ watch(
 )
 
 async function handleLogout() {
+  // 退出顺序同时清理服务端会话、本地菜单和动态路由，再回到静态登录页。
   await auth.logout()
   navigation.clear()
   clearDynamicRoutes()

@@ -5,6 +5,7 @@ import { registerAuthorization } from '@/modules/authorization/authorization.plu
 import { buildApp } from '@/app.js'
 import { ErrorCode } from '@/shared/errors/error-codes.js'
 
+// 路由注册门禁必须拒绝缺少授权声明的接口，并接受三种显式授权模式。
 describe('authorization route declarations', () => {
   it('rejects a business route without explicit authorization metadata', async () => {
     const app = Fastify({ logger: false })
@@ -31,6 +32,7 @@ describe('authorization route declarations', () => {
   })
 })
 
+// 使用可替换提供器验证业务路由只依赖授权端口，不依赖本地策略表实现。
 describe('authorization provider boundary', () => {
   it('rejects an authenticated request when the provider grants no matching permission', async () => {
     const app = await buildApp(

@@ -2,6 +2,7 @@ import type { FastifyError, FastifyInstance, FastifyReply, FastifyRequest } from
 import { ErrorCode } from '@/shared/errors/error-codes.js'
 import { failure } from '@/shared/http/response.js'
 
+/** 把框架/HTTP 错误归一为前端可稳定处理的业务错误码。 */
 function errorCodeForHttpStatus(httpStatus: number): number {
   switch (httpStatus) {
     case 400:
@@ -31,6 +32,7 @@ function errorMessage(error: FastifyError, httpStatus: number): string {
   }
 
   if (errorCodeForHttpStatus(httpStatus) === ErrorCode.INTERNAL_ERROR) {
+    // 内部异常只写服务端日志，不向调用方泄露堆栈或基础设施细节。
     return 'Internal server error'
   }
 
@@ -38,6 +40,7 @@ function errorMessage(error: FastifyError, httpStatus: number): string {
 }
 
 function responseHttpStatus(sourceHttpStatus: number): number {
+  // 只有认证、资源不存在和内部异常保留 HTTP 状态，其余业务失败统一放在 200 响应体中。
   switch (sourceHttpStatus) {
     case 401:
     case 404:
@@ -60,6 +63,7 @@ async function handleError(
   const sourceHttpStatus = error.validation ? 400 : Math.max(400, error.statusCode ?? 500)
 
   if (sourceHttpStatus >= 500) {
+    // 预期业务错误不污染错误日志，服务端异常才记录完整错误对象。
     request.log.error(error)
   }
 

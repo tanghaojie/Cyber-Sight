@@ -68,6 +68,7 @@
           <el-switch v-model="form.enabled" active-text="启用" inactive-text="停用" />
         </el-form-item>
       </div>
+      <!-- 用户基本资料和直接数据策略分属两个后端写入，但在一个弹窗中连续提交。 -->
       <DataPolicyEditor v-model="access.dataPolicies" />
       <el-alert v-if="formError" :title="formError" type="error" show-icon :closable="false" />
       <div class="dialog-actions">
@@ -119,11 +120,13 @@ const form = reactive({
   enabled: true,
 })
 const access = reactive<SubjectAccessRequest>({ permissionKeys: [], dataPolicies: [] })
+// 主部门候选始终限制在已选所属部门内，避免构造契约不允许的组合。
 const selectedDepartments = computed(() =>
   props.departmentOptions.filter((department) => form.departmentIds.includes(department.id)),
 )
 
 function resetForm(): void {
+  // 每次打开都从 props 重新构造数组，避免编辑过程直接修改列表中的用户对象。
   Object.assign(
     form,
     props.user
@@ -193,6 +196,7 @@ async function submit(): Promise<void> {
     if (!userId) {
       throw new Error('用户已保存，但未返回用户标识，数据权限尚未保存')
     }
+    // 只有用户主记录保存成功后才有主体 ID，可继续整体替换其直接数据策略。
     const accessResult = await replaceSubjectAccess('user', userId, {
       permissionKeys: [],
       dataPolicies: access.dataPolicies.map((policy) => ({
@@ -217,6 +221,7 @@ watch(dialogOpen, async function initializeForm(open) {
   if (open) {
     resetForm()
     if (props.user) {
+      // 编辑模式必须等直接策略读取完成后才允许保存，防止空数组覆盖已有策略。
       accessReady.value = false
       try {
         const loaded = await getSubjectAccess('user', props.user.id)
@@ -238,6 +243,7 @@ watch(dialogOpen, async function initializeForm(open) {
 watch(
   () => form.departmentIds,
   function keepPrimaryDepartmentValid(departmentIds) {
+    // 删除当前主部门时自动选择剩余第一项；无所属部门则回到占位 0 等待校验。
     if (!departmentIds.includes(form.primaryDepartmentId)) {
       form.primaryDepartmentId = departmentIds[0] ?? 0
     }

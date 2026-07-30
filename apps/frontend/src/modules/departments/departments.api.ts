@@ -10,6 +10,7 @@ import type {
 import { apiClient } from '@/api/client'
 import { apiResult, type ApiMutationResult } from '@/api/result'
 
+// 部门模块的列表/选项接口必须返回 data，缺失时直接抛错交给页面空态处理。
 function dataOrThrow<T>(
   result: { status: number; data?: T; err?: string } | undefined,
   message: string,

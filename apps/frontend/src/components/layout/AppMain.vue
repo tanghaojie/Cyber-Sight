@@ -1,5 +1,6 @@
 <template>
   <main class="app-main">
+    <!-- 以 route.path 作为 key，切换地址时重建页面并播放离场/入场过渡。 -->
     <RouterView v-slot="{ Component, route }">
       <Transition name="page" mode="out-in">
         <component :is="Component" :key="route.path" />

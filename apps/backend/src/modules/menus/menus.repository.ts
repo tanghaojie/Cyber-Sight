@@ -35,6 +35,7 @@ function orderedRows(rows: NavigationRow[]): NavigationRow[] {
 }
 
 function hasParentCycle(row: NavigationRow, rowsById: Map<number, NavigationRow>): boolean {
+  // 对遗留或异常数据做防御性检测，构建导航时不让循环父链造成递归死循环。
   const visited = new Set([row.id])
   let parentId = row.parentId
   while (parentId > 0) {
@@ -61,6 +62,7 @@ export function buildNavigationTree(
   rows: NavigationRow[],
   allowedMenuIds?: ReadonlySet<number>,
 ): NavigationMenu[] {
+  // 先丢弃无法导航的残缺节点，再基于权限决定初始可见集合。
   const usableRows = rows.filter(isUsableNavigationRow)
   const allRowsById = new Map(usableRows.map((row) => [row.id, row]))
   const visibleIds = allowedMenuIds
@@ -68,6 +70,7 @@ export function buildNavigationTree(
     : new Set(usableRows.map((row) => row.id))
 
   if (allowedMenuIds) {
+    // 子菜单可见时补齐全部祖先目录，否则前端无法从根节点进入该菜单。
     for (const id of allowedMenuIds) {
       const visited = new Set<number>()
       let current = allRowsById.get(id)
@@ -92,6 +95,7 @@ export function buildNavigationTree(
     if (parent && parent.type === 'directory' && !hasParentCycle(row, visibleRowsById)) {
       parent.children.push(node)
     } else {
+      // 缺失父级、父级非目录或存在环的节点降级为根节点，保证其余导航仍可使用。
       roots.push(node)
     }
   }
@@ -137,6 +141,7 @@ export async function listNavigationMenus(
     .where(and(eq(menus.enabled, true), eq(menus.isDeleted, false)))
     .orderBy(menus.sortOrder, menus.id)
   const permissionKeys = new Set(await app.authorization.effectivePermissionKeys(app, user))
+  // 未绑定权限键的菜单对所有已认证用户可见，绑定后必须命中有效权限。
   const allowedMenuIds = new Set(
     rows
       .filter(
@@ -166,12 +171,14 @@ export async function validateMenuParent(
     .where(eq(menus.isDeleted, false))
   const byId = new Map(rows.map((row) => [row.id, row]))
   const parent = byId.get(parentId)
+  // 只有目录可以承载子节点，页面和外链按钮必须是叶子。
   if (!parent || parent.type !== 'directory') {
     return false
   }
 
   const visited = new Set<number>()
   let cursor = parent
+  // 从候选父级向上追溯，拒绝把当前节点或其后代放到自身下面。
   while (cursor.parentId > 0 && !visited.has(cursor.id)) {
     if (cursor.parentId === currentId) {
       return false

@@ -9,6 +9,7 @@ import type {
 import { apiClient } from '@/api/client'
 import { apiResult, type ApiMutationResult } from '@/api/result'
 
+// 授权 API 把权限/资源目录查询和三类主体的访问配置读写集中在同一公共文件。
 function responseData<T>(
   response: { status: number; data?: T; err?: string },
   fallback: string,
@@ -37,6 +38,7 @@ export async function getSubjectAccess(
   subjectType: AuthorizationSubjectType,
   id: number,
 ): Promise<SubjectAccessRequest> {
+  // subjectType 只来自共享枚举，可安全映射到后端约定的复数路径。
   const { data, error } = await apiClient.GET<SubjectAccessResponse>(
     `/admin/authorization/${subjectType}s/${id}`,
   )

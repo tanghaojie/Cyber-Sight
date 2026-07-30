@@ -4,6 +4,7 @@
       <el-button type="primary" :icon="Plus" size="large" @click="openCreate"> 新增用户 </el-button>
     </header>
 
+    <!-- 页面负责协调选项、列表和弹窗；分页与表单细节留在子组件内部。 -->
     <UsersList
       ref="usersList"
       :role-options="roleOptions"
@@ -50,6 +51,7 @@ async function refreshList(): Promise<void> {
 }
 
 onMounted(async function loadOptions() {
+  // 两组选项互不依赖，并行加载且允许其中一组失败后页面仍可展示用户列表。
   const [roles, departments] = await Promise.allSettled([
     listRoleOptions(),
     listDepartmentOptions(),

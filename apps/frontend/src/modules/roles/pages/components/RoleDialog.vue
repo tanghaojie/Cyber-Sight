@@ -38,6 +38,7 @@
           <el-switch v-model="form.enabled" active-text="启用" inactive-text="停用" />
         </el-form-item>
       </div>
+      <!-- 角色基本资料、功能权限和数据策略在一次用户操作中分两步写入后端。 -->
       <DataPolicyEditor v-model="access.dataPolicies" />
       <el-alert v-if="formError" :title="formError" type="error" show-icon :closable="false" />
       <div class="dialog-actions">
@@ -88,6 +89,7 @@ const form = reactive<RoleRequest>({
 const access = reactive<SubjectAccessRequest>({ permissionKeys: [], dataPolicies: [] })
 
 function resetForm(): void {
+  // 复制权限数组和策略对象，避免弹窗编辑过程污染列表或上次打开的状态。
   Object.assign(
     form,
     props.role
@@ -119,6 +121,7 @@ async function submit(): Promise<void> {
     if (!roleId) {
       throw new Error('角色已保存，但未返回角色标识，权限配置尚未保存')
     }
+    // 新建角色取得主体 ID 后，才能整体替换该角色的功能权限和数据策略。
     const accessResult = await replaceSubjectAccess('role', roleId, {
       permissionKeys: [...access.permissionKeys],
       dataPolicies: access.dataPolicies.map((policy) => ({
@@ -143,6 +146,7 @@ watch(dialogOpen, async function initializeForm(open) {
   if (open) {
     resetForm()
     if (props.role) {
+      // 加载完成前禁止保存，防止空权限覆盖服务端已有配置。
       accessReady.value = false
       try {
         const loaded = await getSubjectAccess('role', props.role.id)
@@ -164,6 +168,7 @@ watch(dialogOpen, async function initializeForm(open) {
 
 onMounted(async function loadPermissionOptions() {
   try {
+    // 权限目录是只读元数据；加载失败时保留空列表，错误会在保存或后续重试中体现。
     permissions.value = await listAuthorizationPermissions()
   } catch {
     permissions.value = []

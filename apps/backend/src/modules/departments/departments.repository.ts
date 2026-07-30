@@ -22,6 +22,7 @@ function departmentSummary(row: typeof departments.$inferSelect) {
 }
 
 async function rebuildDepartmentClosure(tx: Transaction, actorId: number): Promise<void> {
+  // 以邻接表为事实来源重建闭包：每个节点先记录到自身 depth=0，再沿父链记录全部祖先。
   const rows = await tx
     .select({ id: departments.id, parentId: departments.parentId })
     .from(departments)
@@ -34,6 +35,7 @@ async function rebuildDepartmentClosure(tx: Transaction, actorId: number): Promi
     let parentId = row.parentId
     let depth = 1
     while (parentId > 0) {
+      // 重建阶段再次保护环和缺失父节点，避免错误层级扩散成不可用的数据范围。
       if (visited.has(parentId)) {
         throw new Error('Department hierarchy contains a cycle')
       }
@@ -48,6 +50,7 @@ async function rebuildDepartmentClosure(tx: Transaction, actorId: number): Promi
     }
   }
   const now = new Date()
+  // 整体软删除旧闭包并插入新快照，调用方事务保证业务表和闭包表同时提交。
   await tx
     .update(departmentClosure)
     .set({ isDeleted: true, updatedAt: now, updatedBy: actorId })
@@ -111,6 +114,7 @@ export async function validateDepartmentParent(
     return false
   }
   if (currentId) {
+    // 当前节点的任一后代都不能成为新父节点，否则会形成环。
     const [descendant] = await app.db
       .select({ id: departmentClosure.id })
       .from(departmentClosure)
@@ -165,6 +169,7 @@ export async function updateDepartment(
 }
 
 export async function canDeleteDepartment(app: FastifyInstance, id: number): Promise<boolean> {
+  // 删除前同时保护树结构、用户归属和授权策略引用。
   const [child] = await app.db
     .select({ id: departments.id })
     .from(departments)
@@ -195,6 +200,7 @@ export async function softDeleteDepartment(
     if (!rows.length) {
       return false
     }
+    // 叶子节点删除后，仅需失效所有以其为祖先或后代的闭包路径。
     await tx
       .update(departmentClosure)
       .set({ isDeleted: true, updatedAt: now, updatedBy: actorId })

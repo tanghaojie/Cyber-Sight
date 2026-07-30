@@ -13,6 +13,7 @@ function user(id: number): CurrentUser {
   }
 }
 
+// 覆盖 JWT 验签、LRU 容量、过期/撤销，以及缓存失效与持久会话撤销的职责差异。
 describe('JWT LRU token cache', () => {
   it('limits the default cache to 100 entries without invalidating evicted tokens', async () => {
     const cache = new JwtTokenCache(SECRET)

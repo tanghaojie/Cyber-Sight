@@ -65,6 +65,7 @@ const records = ref<DepartmentSummary[]>([])
 const keyword = ref('')
 const loading = ref(false)
 const errorMessage = ref('')
+// 部门数量通常较小，当前在已加载的全量集合上执行即时前端过滤。
 const visibleRecords = computed(() => {
   const query = keyword.value.trim().toLowerCase()
   return query
@@ -90,6 +91,7 @@ async function load(): Promise<void> {
     errorMessage.value = error instanceof Error ? error.message : '部门加载失败'
   } finally {
     loading.value = false
+    // 无论成功或失败都同步父页面，避免弹窗继续使用上一次加载的父节点列表。
     emit('loaded', records.value)
   }
 }
@@ -108,12 +110,14 @@ async function remove(department: DepartmentSummary): Promise<void> {
     ElMessage.success('部门已删除')
     await load()
   } catch (error) {
+    // 取消或关闭确认框属于正常交互，不覆盖当前页面错误状态。
     if (error !== 'cancel' && error !== 'close') {
       errorMessage.value = error instanceof Error ? error.message : '删除失败'
     }
   }
 }
 
+// 供父页面在部门弹窗保存后刷新全量记录。
 defineExpose({ reload: load })
 onMounted(load)
 </script>

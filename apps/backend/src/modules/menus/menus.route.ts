@@ -32,6 +32,7 @@ import {
   validateMenuParent,
 } from './menus.repository.js'
 
+/** 菜单路由分别服务后台管理、角色选择树和当前用户导航树。 */
 export async function menuRoutes(app: FastifyInstance): Promise<void> {
   app.get<{ Querystring: ListQuery }>(
     '/admin/menus',
@@ -70,6 +71,7 @@ export async function menuRoutes(app: FastifyInstance): Promise<void> {
       },
     },
     async function currentNavigationHandler(request) {
+      // 导航接口按当前用户有效权限过滤，并自动补齐可见菜单的祖先目录。
       const user = await requireCurrentUser(app, request)
       return success(await listNavigationMenus(app, user))
     },
@@ -127,6 +129,7 @@ export async function menuRoutes(app: FastifyInstance): Promise<void> {
         request.body.requiredPermissionKey &&
         !(await activePermissionKeyExists(app, request.body.requiredPermissionKey))
       ) {
+        // 菜单只能引用当前有效权限键，避免生成永远不可达的导航节点。
         return failure(ErrorCode.INVALID_REQUEST, 'Permission key is not active')
       }
       return mutationResult(() => createMenu(app, request.body, actor.id))

@@ -10,6 +10,7 @@ import type {
 import { apiClient } from '@/api/client'
 import { apiResult } from '@/api/result'
 
+// 认证模块 API 负责把通用客户端结果恢复成共享契约响应，Store 再处理会话状态。
 export async function login(username: string, password: string): Promise<ApiResponse<LoginData>> {
   const { data, error } = await apiClient.POST<LoginSuccessResponse, LoginRequest>('/auth/login', {
     body: { username, password },

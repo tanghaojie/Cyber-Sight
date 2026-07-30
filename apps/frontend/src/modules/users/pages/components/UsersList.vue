@@ -1,5 +1,6 @@
 <template>
   <div class="surface-card">
+    <!-- 列表组件拥有搜索、分页、删除确认和重新加载状态。 -->
     <div class="resource-toolbar">
       <el-input
         v-model="keyword"
@@ -98,6 +99,7 @@ const loading = ref(false)
 const errorMessage = ref('')
 
 async function load(): Promise<void> {
+  // 每次请求先清空旧错误；失败时清空陈旧列表，避免把旧数据误认为最新结果。
   loading.value = true
   errorMessage.value = ''
   try {
@@ -143,6 +145,7 @@ async function remove(user: UserSummary): Promise<void> {
     ElMessage.success('用户已删除')
     await load()
   } catch (error) {
+    // Element Plus 用 cancel/close 字符串表示用户主动放弃，不应显示为删除错误。
     if (error !== 'cancel' && error !== 'close') {
       errorMessage.value = error instanceof Error ? error.message : '删除失败'
     }
@@ -155,6 +158,7 @@ function formatDate(value: string): string {
   )
 }
 
+// 父页面在弹窗保存后通过 reload 刷新当前页。
 defineExpose({ reload: load })
 onMounted(load)
 </script>

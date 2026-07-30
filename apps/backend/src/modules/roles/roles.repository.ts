@@ -4,6 +4,7 @@ import type { RoleRequest } from '@scaffold/api-contract'
 import { roles } from '@/db/schema.js'
 import { auditView, pageOffset, type RepositoryListQuery } from '@/shared/database/pagination.js'
 
+/** 角色仓储统一过滤软删除记录，并在写操作中维护操作者审计字段。 */
 export async function listRoles(app: FastifyInstance, query: RepositoryListQuery) {
   const keyword = query.keyword?.trim()
   const predicate = and(

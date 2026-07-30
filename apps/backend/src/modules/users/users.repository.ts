@@ -9,6 +9,7 @@ import { hashPassword } from '@/modules/auth/auth.security.js'
 
 type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0]
 
+/** 把授权模块给出的抽象访问计划转换成用户表及部门关联表的查询条件。 */
 function userAccessPredicate(plan: DataAccessPlan) {
   if (plan.unrestricted) {
     return undefined
@@ -27,6 +28,7 @@ function userAccessPredicate(plan: DataAccessPlan) {
         )`
       : undefined,
   ].filter((item) => item !== undefined)
+  // 没有任何允许范围时显式返回 false，绝不能因缺少谓词退化为查询全部用户。
   return predicates.length > 0 ? or(...predicates) : sql<boolean>`false`
 }
 
@@ -57,6 +59,7 @@ export async function listUsers(
   const [{ value: total }] = await app.db.select({ value: count() }).from(users).where(predicate)
 
   const ids = rows.map((row) => row.id)
+  // 当前页的角色和部门一次批量读取，避免为每个用户分别执行关联查询。
   const [roleAssignments, departmentAssignments] = ids.length
     ? await Promise.all([
         app.db
@@ -103,6 +106,7 @@ async function replaceUserDepartments(
   actorId: number,
 ): Promise<void> {
   const now = new Date()
+  // 先软删除旧集合，再恢复已有关系或新增关系，实现带审计历史的整体替换。
   await tx
     .update(userDepartments)
     .set({ isDeleted: true, updatedAt: now, updatedBy: actorId })
@@ -149,6 +153,7 @@ export async function canAssignUserDepartments(
   if (!targetUserId || !access.ownerUserIds.includes(targetUserId)) {
     return false
   }
+  // self 范围可以编辑本人，但不能借编辑操作把用户迁移到原本无权管理的部门。
   const rows = await app.db
     .select({ id: userDepartments.departmentId })
     .from(userDepartments)
@@ -164,6 +169,7 @@ async function replaceUserRoles(
   actorId: number,
 ): Promise<void> {
   const now = new Date()
+  // 与部门关系使用相同的软删除/恢复策略，防止重复关系并保留审计记录。
   await tx
     .update(userRoles)
     .set({ isDeleted: true, updatedAt: now, updatedBy: actorId })
@@ -196,6 +202,7 @@ export async function createUser(
   input: UserCreate,
   actorId: number,
 ): Promise<number> {
+  // 密码哈希在事务外完成，缩短数据库事务持锁时间。
   const passwordHash = await hashPassword(input.password)
   return app.db.transaction(async function create(tx) {
     const [created] = await tx
@@ -231,6 +238,7 @@ export async function updateUser(
 ): Promise<boolean> {
   const passwordHash = input.password ? await hashPassword(input.password) : undefined
   return app.db.transaction(async function update(tx) {
+    // 主记录更新先应用数据范围谓词；未获授权时不会继续改写角色和部门关系。
     const updated = await tx
       .update(users)
       .set({

@@ -40,6 +40,7 @@ const rows = [
   },
 ]
 
+// 菜单树测试同时保护稳定排序、权限祖先补齐、循环降级和遗留坏数据隔离。
 describe('navigation menu tree', () => {
   it('builds stable directory children in sort order', () => {
     const tree = buildNavigationTree(rows)

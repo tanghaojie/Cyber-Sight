@@ -5,6 +5,7 @@ import { authSessions, roles, userRoles, users } from '@/db/schema.js'
 import type { LoadedTokenSession, VerifiedJwt } from './auth-token-cache.js'
 import { hashSessionToken, verifyPassword } from './auth.security.js'
 
+/** 只接受标准的单个 Bearer Token，不容忍额外空白或其他认证方案。 */
 function bearerToken(request: FastifyRequest): string | null {
   const authorization = request.headers.authorization
   if (!authorization) {
@@ -15,6 +16,7 @@ function bearerToken(request: FastifyRequest): string | null {
 }
 
 async function rolesForUser(app: FastifyInstance, userId: number): Promise<string[]> {
+  // 会话身份只包含仍有效角色，禁用/软删除角色不会继续影响授权判定。
   const rows = await app.db
     .select({ code: roles.code })
     .from(userRoles)
@@ -56,6 +58,7 @@ async function loadPersistedSession(
     )
     .limit(1)
 
+  // 持久会话、用户状态或有效期任一不满足，都拒绝重新填充内存缓存。
   if (!row) {
     return null
   }
@@ -100,6 +103,7 @@ export async function authenticateCredentials(
   }
   const issued = await app.authTokens.issue(currentUser)
   try {
+    // 内存签发成功后必须落库，服务重启后才能恢复会话并支持持久撤销。
     await app.db.insert(authSessions).values({
       userId: user.id,
       tokenHash: hashSessionToken(issued.token),
@@ -108,6 +112,7 @@ export async function authenticateCredentials(
       updatedBy: user.id,
     })
   } catch (error) {
+    // 落库失败时撤销刚写入的缓存，避免产生仅当前进程承认的半成功会话。
     await app.authTokens.revoke(issued.token)
     throw error
   }
@@ -131,6 +136,7 @@ export async function currentUserFromRequest(
   }
 
   return app.authTokens.resolve(token, function loadSession(verified) {
+    // 缓存未命中时以令牌摘要查询持久会话，而不是仅凭有效 JWT 恢复身份。
     return loadPersistedSession(app, token, verified)
   })
 }
@@ -153,6 +159,7 @@ export async function revokeCurrentToken(
 ): Promise<void> {
   const token = bearerToken(request)
   if (token) {
+    // 先软删除持久会话，再清理本进程缓存，确保重启和其他实例也不能恢复该令牌。
     await app.db
       .update(authSessions)
       .set({ isDeleted: true, updatedAt: new Date(), updatedBy: actorId })
@@ -172,6 +179,7 @@ export async function revokeUserTokens(
   userId: number,
   actorId: number,
 ): Promise<void> {
+  // 用户禁用、删除或权限敏感变更时，同时撤销全部持久会话和内存快照。
   app.authTokens.invalidateUser(userId)
   await app.db
     .update(authSessions)

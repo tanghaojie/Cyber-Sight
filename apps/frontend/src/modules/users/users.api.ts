@@ -9,6 +9,7 @@ import type {
 import { apiClient } from '@/api/client'
 import { apiResult, pageResult, type ApiMutationResult } from '@/api/result'
 
+// 用户模块 API 只封装路径、契约类型和结果归一化，页面不直接调用通用 HTTP 客户端。
 export async function listUsers(pageNum: number, pageSize: number, keyword = '') {
   const { data, error } = await apiClient.GET<PaginatedResponse<UserSummary>>('/admin/users', {
     query: { pageNum, pageSize, ...(keyword ? { keyword } : {}) },

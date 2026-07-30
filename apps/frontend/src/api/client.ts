@@ -14,6 +14,7 @@ export interface ApiResult<TResponse> {
   error?: ErrorResponse
 }
 
+/** 只序列化已定义查询值，避免把 undefined 发送成字符串。 */
 function requestUrl(path: string, query: Record<string, QueryValue> | undefined): string {
   const search = new URLSearchParams()
   for (const [key, value] of Object.entries(query ?? {})) {
@@ -27,6 +28,7 @@ function requestUrl(path: string, query: Record<string, QueryValue> | undefined)
 }
 
 function isErrorResponse(value: unknown): value is ErrorResponse {
+  // HTTP 200 仍可能携带非零业务状态，因此需要在传回模块 API 前识别失败结构。
   return (
     typeof value === 'object' &&
     value !== null &&
@@ -58,6 +60,7 @@ async function request<TResponse, TBody = never>(
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
   })
 
+  // 401/404/500 先触发应用级导航和会话副作用；响应体仍继续解析给调用方。
   await handleGlobalHttpError(response)
   const payload: unknown = await response.json()
 

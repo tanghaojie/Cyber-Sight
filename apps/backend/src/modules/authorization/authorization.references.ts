@@ -2,6 +2,7 @@ import { and, eq } from 'drizzle-orm'
 import type { FastifyInstance } from 'fastify'
 import { dataPolicyDepartments, permissions } from '@/db/schema.js'
 
+// 面向其他模块公开最小引用查询，避免菜单或部门模块穿透授权内部表结构。
 export async function activePermissionKeyExists(
   app: FastifyInstance,
   permissionKey: string,

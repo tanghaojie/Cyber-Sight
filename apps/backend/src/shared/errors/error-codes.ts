@@ -1,3 +1,4 @@
+// 全局业务错误码的代码侧唯一清单；新增或变更时同步 docs/reference/error-codes.md。
 export const ErrorCode = {
   SUCCESS: 0,
   INVALID_REQUEST: 1000,

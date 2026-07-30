@@ -1,5 +1,6 @@
 <template>
   <main class="login-page">
+    <!-- 左侧只承载品牌氛围和产品说明，移动端会隐藏。 -->
     <section class="login-atmosphere" aria-hidden="true">
       <div class="lab-grid" />
       <div class="specimen-ring ring-one" />
@@ -25,6 +26,7 @@
         <small class="signature">{{ appConfig.tagline }} · 2026</small>
       </div>
     </section>
+    <!-- 右侧是实际登录交互区。 -->
     <section class="login-form-panel">
       <form class="login-card" @submit.prevent="handleSubmit">
         <div class="mobile-brand">
@@ -89,6 +91,7 @@ async function handleSubmit(): Promise<void> {
     error.value = message
     return
   }
+  // 守卫把原目标写入 redirect，登录成功后回到用户最初请求的页面。
   const destination = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
   await router.replace(destination)
 }

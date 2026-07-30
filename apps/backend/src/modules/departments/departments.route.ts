@@ -32,6 +32,7 @@ const departmentPermission = {
   },
 }
 
+/** 部门路由在仓储写入前验证父节点，防止环、失效父级和受引用节点被删除。 */
 export async function departmentRoutes(app: FastifyInstance): Promise<void> {
   app.get(
     '/admin/departments',
@@ -73,6 +74,7 @@ export async function departmentRoutes(app: FastifyInstance): Promise<void> {
       },
     },
     async function listDepartmentOptionHandler() {
+      // 用户和授权编辑器也需要有效部门选项，因此读取权限比部门写权限更宽。
       return success(await listDepartmentOptions(app))
     },
   )

@@ -7,6 +7,7 @@ import {
 } from '@/shared/http.js'
 import { PermissionKeySchema } from '@/modules/authorization/authorization.schema.js'
 
+/** 菜单三种节点共用的展示、排序和权限字段。 */
 const menuCommonShape = {
   parentId: z.number().int().min(0),
   name: z.string().min(1).max(80),
@@ -25,6 +26,7 @@ const directoryRequestSchema = z.strictObject({
   externalUrl: z.literal(''),
 })
 
+// 页面菜单必须映射到前端组件；目录只负责分组，外链按钮只负责打开 URL。
 const pageMenuRequestSchema = z.strictObject({
   ...menuCommonShape,
   type: z.literal('menu'),
@@ -90,6 +92,7 @@ export type NavigationMenu = NavigationMenuBase & {
   children: NavigationMenu[]
 }
 
+// 导航响应是递归树，z.lazy 用于延迟解析对自身 Schema 的引用。
 export const NavigationMenuSchema: z.ZodType<NavigationMenu> = z.lazy(() =>
   NavigationMenuBaseSchema.extend({
     children: z.array(NavigationMenuSchema),
@@ -105,6 +108,9 @@ export type MenuPageResult = z.infer<typeof MenuPageResultSchema>
 export type MenuListResponse = z.infer<typeof MenuListResponseSchema>
 export type NavigationMenuResponse = z.infer<typeof NavigationMenuResponseSchema>
 
+/**
+ * 校验菜单路径的层级约定：根节点使用绝对路径，子节点可使用相对路径；按钮不参与路由。
+ */
 export function isValidMenuPath(input: Pick<MenuRequest, 'parentId' | 'path' | 'type'>): boolean {
   if (input.type === 'button') {
     return true

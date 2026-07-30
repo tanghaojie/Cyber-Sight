@@ -2,6 +2,7 @@ import { and, eq, inArray } from 'drizzle-orm'
 import type { FastifyInstance } from 'fastify'
 import { departmentClosure, departments } from '@/db/schema.js'
 
+// 授权和用户模块通过这些只读函数消费部门状态与闭包关系，不直接拼接部门内部查询。
 export async function departmentExists(
   app: FastifyInstance,
   departmentId: number,
@@ -61,6 +62,7 @@ export async function descendantDepartmentIds(
     return []
   }
   const rows = await app.db
+    // 后代展开同时连接部门表，确保结果只包含当前有效部门。
     .select({ id: departmentClosure.descendantId })
     .from(departmentClosure)
     .innerJoin(

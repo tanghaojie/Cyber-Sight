@@ -8,6 +8,7 @@ declare module 'fastify' {
   }
 }
 
+// 数据库客户端与 Fastify 生命周期绑定，应用关闭时释放连接池。
 async function closeDatabase(): Promise<void> {
   await databaseClient.end()
 }

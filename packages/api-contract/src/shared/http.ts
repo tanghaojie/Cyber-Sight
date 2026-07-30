@@ -1,5 +1,9 @@
 import { z } from 'zod'
 
+/**
+ * 汇总所有业务模块共用的 HTTP 包装结构和基础 Schema。
+ * 业务模块只描述 data/list 中的领域数据，成功与失败外壳在这里保持一致。
+ */
 export type FastifyJsonSchema = Record<string, unknown>
 
 export interface ApiResponse<T = unknown> {
@@ -19,10 +23,12 @@ export function toFastifySchema(schema: z.ZodType): FastifyJsonSchema {
   const jsonSchema = z.toJSONSchema(schema, {
     target: 'draft-7',
   }) as FastifyJsonSchema
+  // Fastify 只需要可嵌入路由的 Schema；顶层方言声明交给 Swagger 文档统一管理。
   const { $schema: _dialect, ...fastifySchema } = jsonSchema
   return fastifySchema
 }
 
+// 分页默认值记录在 Schema 元数据中，实际补默认值由后端分页辅助函数完成。
 export const PaginationRequestSchema = z.strictObject({
   pageNum: z.number().int().min(1).optional().meta({ default: 1 }),
   pageSize: z.number().int().min(1).max(100).optional().meta({ default: 10 }),
@@ -64,6 +70,7 @@ export function paginatedResponseSchema<T extends z.ZodType>(item: T) {
   })
 }
 
+// 写操作既可能返回成功数据，也可能以 HTTP 200 返回非零业务错误。
 export const IdResponseSchema = apiResponseSchema(IdDataSchema)
 export const MutationResultSchema = z.union([IdResponseSchema, ErrorResponseSchema])
 export const EmptyResultSchema = z.union([EmptySuccessResponseSchema, ErrorResponseSchema])

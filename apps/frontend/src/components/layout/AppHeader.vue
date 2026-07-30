@@ -59,6 +59,7 @@ const emit = defineEmits<{
 const initials = computed(() => props.displayName?.slice(0, 1).toUpperCase() ?? 'A')
 
 function handleCommand(command: string) {
+  // 下拉菜单后续可扩展其他命令，当前只把退出动作转交应用壳处理。
   if (command === 'logout') {
     emit('logout')
   }

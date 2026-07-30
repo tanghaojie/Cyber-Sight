@@ -2,6 +2,7 @@ import { and, eq } from 'drizzle-orm'
 import type { FastifyInstance } from 'fastify'
 import { userDepartments, userRoles, users } from '@/db/schema.js'
 
+// 向授权等模块公开只读访问查询，调用方无需依赖用户模块的仓储实现细节。
 export async function userExists(app: FastifyInstance, userId: number): Promise<boolean> {
   const [row] = await app.db
     .select({ id: users.id })

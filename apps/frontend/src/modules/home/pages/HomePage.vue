@@ -41,6 +41,7 @@ import AppIcon from '@/components/AppIcon.vue'
 import { useNavigationStore } from '@/modules/navigation/navigation.store'
 
 const navigation = useNavigationStore()
+// 快捷入口取当前用户前四个可访问页面或外链，目录和首页自身不重复展示。
 const quickEntries = computed(() =>
   navigation.flatItems
     .filter((item) => (item.type === 'menu' && item.path !== '/') || item.type === 'button')

@@ -31,6 +31,7 @@
           <el-switch v-model="form.enabled" active-text="启用" inactive-text="停用" />
         </el-form-item>
       </div>
+      <!-- 部门策略允许向下级继承，基本资料保存成功后再整体替换策略。 -->
       <DataPolicyEditor v-model="access.dataPolicies" allow-inheritance />
       <el-alert v-if="formError" :title="formError" type="error" show-icon :closable="false" />
       <div class="dialog-actions">
@@ -73,6 +74,7 @@ const form = reactive<DepartmentRequest>({
   enabled: true,
 })
 const access = reactive<SubjectAccessRequest>({ permissionKeys: [], dataPolicies: [] })
+// 前端先排除当前节点；是否选择了后代节点形成环仍由后端闭包关系最终校验。
 const parentOptions = computed(() => props.records.filter((row) => row.id !== props.department?.id))
 
 function resetForm(): void {
@@ -109,6 +111,7 @@ async function submit(): Promise<void> {
     if (!departmentId) {
       throw new Error('部门已保存，但未返回部门标识，数据权限尚未保存')
     }
+    // 新建部门取得主体 ID 后，才能保存以该部门为授权主体的数据规则。
     const accessResult = await replaceSubjectAccess('department', departmentId, {
       permissionKeys: [],
       dataPolicies: access.dataPolicies.map((policy) => ({
@@ -135,6 +138,7 @@ watch(dialogOpen, async function initializeForm(open) {
   }
   resetForm()
   if (props.department) {
+    // 策略加载完成前禁止提交，避免空配置覆盖已有部门继承规则。
     accessReady.value = false
     try {
       const loaded = await getSubjectAccess('department', props.department.id)

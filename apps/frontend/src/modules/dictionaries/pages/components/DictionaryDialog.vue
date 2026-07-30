@@ -61,6 +61,7 @@ const form = reactive<DictionaryRequest>({
 })
 
 function resetForm(): void {
+  // 每次打开都从当前字典重新填充，新增模式则恢复完整默认值。
   Object.assign(
     form,
     props.dictionary
@@ -84,6 +85,7 @@ async function submit(): Promise<void> {
     if (!form.type || !form.label || !form.value) {
       throw new Error('请完整填写字典类型、显示名称和字典值')
     }
+    // 复制响应式对象为普通契约载荷，避免把 Vue 代理传到 API 层。
     const payload: DictionaryRequest = { ...form }
     const result = props.dictionary
       ? await updateDictionary(props.dictionary.id, payload)
@@ -102,6 +104,7 @@ async function submit(): Promise<void> {
 }
 
 watch(dialogOpen, function initializeForm(open) {
+  // 关闭时保留画面状态，只有再次打开才重置，避免关闭动画期间字段跳变。
   if (open) {
     resetForm()
   }

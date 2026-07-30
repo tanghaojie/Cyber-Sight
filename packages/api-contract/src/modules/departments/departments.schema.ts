@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { apiResponseSchema, AuditFieldsSchema, ErrorResponseSchema } from '@/shared/http.js'
 
+/** 部门契约以 parentId 表达树关系；0 是约定的虚拟根节点。 */
 export const DepartmentSummarySchema = AuditFieldsSchema.extend({
   id: z.number().int(),
   parentId: z.number().int().min(0),
@@ -29,6 +30,7 @@ export const DepartmentOptionSchema = z.strictObject({
   name: z.string(),
 })
 
+// 管理列表包含完整审计信息，下拉选项只暴露构建树选择器所需字段。
 export const DepartmentListResponseSchema = apiResponseSchema(z.array(DepartmentSummarySchema))
 export const DepartmentOptionListResponseSchema = apiResponseSchema(z.array(DepartmentOptionSchema))
 export const DepartmentListResultSchema = z.union([

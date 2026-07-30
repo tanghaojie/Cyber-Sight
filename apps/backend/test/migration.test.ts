@@ -6,6 +6,7 @@ interface MigrationJournal {
 }
 
 function migrationSqlFiles(): string[] {
+  // 以 Drizzle journal 的顺序读取迁移，避免文件系统排序与真实执行顺序不一致。
   const journalUrl = new URL('../drizzle/meta/_journal.json', import.meta.url)
   const journal = JSON.parse(readFileSync(journalUrl, 'utf8')) as MigrationJournal
   return journal.entries.map(({ tag }) =>
@@ -30,6 +31,7 @@ function latestMigrationSql(): string {
   return latest
 }
 
+// 静态检查关键兼容迁移确实存在，不连接本地数据库；真实连接由 test:db 单独验证。
 describe('database migrations', () => {
   it('restores the database-backed authentication session table', () => {
     const migrationSql = migrationContaining('CREATE TABLE IF NOT EXISTS "auth_sessions"')

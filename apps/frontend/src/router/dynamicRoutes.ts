@@ -5,11 +5,13 @@ import { viewRegistry } from '@/shared/routing/view-registry'
 
 const DYNAMIC_ROUTE_NAME_PREFIX = 'dynamic'
 
+// 守卫通过该标记判断本次会话的菜单路由是否已经安装。
 export let routesReady = false
 
 const dynamicRouteRemovers: Array<() => void> = []
 
 function normalizePath(path: string): string {
+  // 清理重复斜杠，同时保留相对路径和绝对路径的区别。
   if (!path.includes('/')) {
     return path
   }
@@ -18,6 +20,7 @@ function normalizePath(path: string): string {
 }
 
 export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[]): number {
+  // 每次以服务端最新菜单完整替换旧路由，避免刷新权限后残留不可见页面。
   clearDynamicRoutes()
   const layouts = layoutRegistry
   const views = viewRegistry
@@ -42,13 +45,14 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
     }
 
     if (layoutInfo) {
+      // 带布局的页面使用空路径子路由承载页面组件，布局只负责外壳和 RouterView。
       const route: RouteRecordRaw = {
         path: path,
         name: `${DYNAMIC_ROUTE_NAME_PREFIX}-menu-layout-${layoutName}-${item.id}`,
         component: layoutInfo.component,
         children: [
           {
-            path: '', // 有且只能有一个 children，且 path = ''
+            path: '', // 只能有一个空路径子路由，确保访问父路径时直接渲染目标页面。
             name: `${DYNAMIC_ROUTE_NAME_PREFIX}-menu-${compName}-${item.id}`,
             component: componentInfo.component,
             meta: {
@@ -93,6 +97,7 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
       path: path,
       name: `${DYNAMIC_ROUTE_NAME_PREFIX}-directory-layout-${layoutName ?? 'RouterView'}-${item.id}`,
       component: layoutInfo ? layoutInfo.component : RouterView,
+      // 目录没有页面组件时使用 RouterView 透传其子菜单。
       children: childrenRoute,
     }
     return route
@@ -103,6 +108,7 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
     ancestorNames: string[] = [],
   ): RouteRecordRaw | undefined {
     if (item.type == 'button') {
+      // 外链按钮由侧栏渲染为 <a>，不注册进 Vue Router。
       return
     }
 
@@ -127,6 +133,7 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
       if (!route) {
         continue
       }
+      // addRoute 返回对应卸载函数，退出登录或菜单刷新时统一调用。
       dynamicRouteRemovers.push(targetRouter.addRoute(route))
     }
   }

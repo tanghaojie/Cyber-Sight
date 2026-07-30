@@ -6,6 +6,7 @@ import { hashPassword, hashSessionToken } from '@/modules/auth/auth.security.js'
 
 const SECRET = 'test-only-jwt-secret-at-least-32-characters'
 
+// 验证登录签发必须落库，内存淘汰后仍可从有效持久会话恢复且只恢复一次。
 describe('authentication service persistence cache', () => {
   it('persists a one-way token hash when credentials are authenticated', async () => {
     const password = 'StrongPassword!123'

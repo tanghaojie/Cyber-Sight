@@ -8,6 +8,7 @@ import {
   success,
 } from '@/shared/http/response.js'
 
+// 锁定成功/失败外壳、分页空失败结构和直接函数调用时的分页参数保护。
 describe('HTTP response helpers', () => {
   it('creates a successful response', () => {
     expect(success({ id: 1 })).toEqual({

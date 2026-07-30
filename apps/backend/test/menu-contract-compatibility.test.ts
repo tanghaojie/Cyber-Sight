@@ -9,6 +9,7 @@ const auditFields = {
   updatedBy: 1,
 }
 
+// 读取契约兼容可修复的遗留记录，写入契约仍严格限制布局、外链和根路径。
 describe('legacy menu response compatibility', () => {
   it('reads an old invalid button so an administrator can repair it', () => {
     const legacyButton = {

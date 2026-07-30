@@ -1,5 +1,6 @@
 <template>
   <section class="policy-editor">
+    <!-- 每一行描述一个资源、动作和允许范围；同主体命中的规则由后端按并集合并。 -->
     <header>
       <div>
         <strong>数据权限</strong>
@@ -107,10 +108,12 @@ function actionsFor(resourceKey: string): string[] {
 
 function scopesFor(resourceKey: string, action: string): DataScopeType[] {
   const scopes = resources.value.find((resource) => resource.key === resourceKey)?.scopeTypes ?? []
+  // self 表示已有记录的所有者，创建新记录时没有可用于判定的目标所有者。
   return action === 'create' ? scopes.filter((scope) => scope !== 'self') : scopes
 }
 
 function normalizePolicy(policy: DataPolicyInput): void {
+  // 上游选择变化后立即修正下游动作、范围和部门字段，保持模型接近合法状态。
   const actions = actionsFor(policy.resourceKey)
   const scopes = scopesFor(policy.resourceKey, policy.action)
   if (!actions.includes(policy.action)) {
@@ -143,6 +146,7 @@ function removePolicy(index: number): void {
 
 onMounted(async function loadOptions() {
   try {
+    // 资源目录和部门选项互不依赖，但编辑器必须同时具备二者才能完整配置策略。
     const [resourceOptions, departmentOptions] = await Promise.all([
       listDataResources(),
       listDepartmentOptions(),

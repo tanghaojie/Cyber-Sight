@@ -12,12 +12,14 @@
       </button>
     </header>
     <nav class="sidebar-navigation" aria-label="主导航">
+      <!-- 菜单树来自当前用户导航 Store；空态区分正在请求和确实无可用菜单。 -->
       <SidebarTree v-if="items.length" :items="items" @navigate="$emit('navigate')" />
       <div v-else class="sidebar-empty">
         <span />{{ loading ? '正在装载导航…' : '暂无可用菜单' }}
       </div>
     </nav>
     <footer class="sidebar-status">
+      <!-- 健康状态独立于导航加载，用于提示后端进程是否仍可响应。 -->
       <span class="status-pulse" :class="status" />
       <div>
         <b v-if="status === 'ok'">系统运行正常</b>

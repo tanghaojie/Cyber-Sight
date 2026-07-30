@@ -14,10 +14,12 @@ import { authenticateCredentials, requireCurrentUser, revokeCurrentToken } from 
 
 const bearerSecurity = [{ bearerAuth: [] }]
 
+/** 注册登录、读取当前身份和登出三个认证边界；具体安全逻辑由 auth.service 承担。 */
 export async function authRoutes(app: FastifyInstance): Promise<void> {
   app.post<{ Body: LoginRequest }>(
     '/auth/login',
     {
+      // 登录是唯一公开认证路由，显式清空全局 Bearer 安全声明。
       config: { authorization: { mode: 'public' } },
       schema: {
         operationId: 'login',

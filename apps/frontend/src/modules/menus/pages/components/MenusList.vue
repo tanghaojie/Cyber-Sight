@@ -20,6 +20,7 @@
       show-icon
       :closable="false"
     />
+    <!-- Element Plus 直接消费 buildMenuTree 生成的 children 结构。 -->
     <el-table
       v-loading="loading"
       :data="treeRecords"
@@ -130,6 +131,7 @@ const treeRecords = computed(() => {
   }
   const byId = new Map(records.value.map((record) => [record.id, record]))
   const visibleIds = new Set<number>()
+  // 搜索命中子节点时补齐祖先目录，保持结果仍是一棵可理解的树。
   for (const record of records.value) {
     if (!record.name.toLowerCase().includes(query)) {
       continue
@@ -145,6 +147,7 @@ const treeRecords = computed(() => {
 })
 
 async function load(): Promise<void> {
+  // 管理树一次加载全部节点，避免分页切断父子关系。
   loading.value = true
   errorMessage.value = ''
   try {
@@ -154,6 +157,7 @@ async function load(): Promise<void> {
     errorMessage.value = error instanceof Error ? error.message : '菜单加载失败'
   } finally {
     loading.value = false
+    // 同步父页面的弹窗选项；失败时用空数组清除旧快照。
     emit('loaded', records.value)
   }
 }
@@ -171,6 +175,7 @@ async function remove(menu: MenuTreeRecord): Promise<void> {
     }
     ElMessage.success('菜单节点已删除')
     await load()
+    // 菜单写入后强制刷新当前用户导航，应用壳会据此替换动态路由。
     await navigation.load(true)
   } catch (error) {
     if (error !== 'cancel' && error !== 'close') {
@@ -197,6 +202,7 @@ function fallbackIcon(type: MenuType): string {
   return type === 'directory' ? 'layers' : type === 'button' ? 'external' : 'menu'
 }
 
+// 供父页面在菜单弹窗保存后刷新管理树。
 defineExpose({ reload: load })
 onMounted(load)
 </script>

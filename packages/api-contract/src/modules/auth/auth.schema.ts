@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { apiResponseSchema, ErrorResponseSchema } from '@/shared/http.js'
 
+/** 认证模块契约：登录签发令牌，并以同一用户结构返回当前会话身份。 */
 export const LoginRequestSchema = z.strictObject({
   username: z.string().min(2).max(50),
   password: z.string().min(8).max(128),
@@ -15,6 +16,7 @@ export const CurrentUserSchema = z.strictObject({
 
 export const LoginDataSchema = z.strictObject({
   user: CurrentUserSchema,
+  // 令牌和过期时间成对返回，前端据此决定持久化时限和会话恢复行为。
   issued: z.strictObject({
     token: z.string().min(1),
     expiresAt: z.iso.datetime(),

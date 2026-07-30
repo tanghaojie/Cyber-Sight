@@ -4,6 +4,7 @@
       <el-button type="primary" :icon="Plus" size="large" @click="openCreate"> 新增角色 </el-button>
     </header>
 
+    <!-- 页面只协调列表和弹窗；保存后通过公开 reload 刷新当前分页。 -->
     <RolesList ref="rolesList" @edit="openEdit" />
     <RoleDialog v-model="dialogOpen" :role="editingRole" @saved="refreshList" />
   </section>

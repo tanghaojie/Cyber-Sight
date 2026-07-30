@@ -6,6 +6,7 @@ import {
   paginatedResponseSchema,
 } from '@/shared/http.js'
 
+/** 角色契约：编码是跨模块引用的稳定标识，名称和描述用于管理界面展示。 */
 export const RoleSummarySchema = AuditFieldsSchema.extend({
   id: z.number().int(),
   name: z.string(),

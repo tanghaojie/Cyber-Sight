@@ -2,6 +2,7 @@ import { and, eq, inArray } from 'drizzle-orm'
 import type { FastifyInstance } from 'fastify'
 import { roles } from '@/db/schema.js'
 
+// 供用户分配和授权决策复用的最小角色查询，不公开角色管理仓储。
 export async function roleExists(app: FastifyInstance, roleId: number): Promise<boolean> {
   const [row] = await app.db
     .select({ id: roles.id })

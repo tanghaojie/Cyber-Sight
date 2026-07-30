@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import { z, type ZodIssue } from 'zod'
 
+// 启动时一次性校验全部必需配置，避免请求处理中才暴露缺失或非法环境变量。
 const envSchema = z.object({
   DATABASE_URL: z.url(),
   JWT_SECRET: z.string().min(32),

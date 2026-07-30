@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import type { Config } from 'drizzle-kit'
 
+// Drizzle Kit 命令直接读取开发环境连接；缺失时立即停止，避免生成到错误数据库。
 const databaseUrl = process.env.DATABASE_URL
 
 if (!databaseUrl) {

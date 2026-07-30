@@ -40,6 +40,7 @@
             </el-option>
           </el-select>
         </el-form-item>
+        <!-- 节点类型决定互斥字段：站内节点使用路由/布局，外链只使用 URL。 -->
         <el-form-item v-if="form.type !== 'button'" label="布局">
           <el-select v-model="form.layout" class="w-full" placeholder="选择布局">
             <el-option label="继承上级或使用默认布局" value="" />
@@ -159,6 +160,7 @@ const typeOptions = [
   { label: '菜单', value: 'menu' },
   { label: '外链按钮', value: 'button' },
 ]
+// 只有目录能成为父节点；当前节点先在前端禁用，后端再负责完整的环检测。
 const directoryOptions = computed(() =>
   props.records.filter((record) => record.type === 'directory'),
 )
@@ -170,6 +172,7 @@ const routeHint = computed(() =>
 )
 
 function resetForm(): void {
+  // 每次打开从传入菜单重建表单，避免类型切换留下上一次编辑的字段。
   if (props.menu) {
     Object.assign(form, {
       parentId: props.menu.parentId,
@@ -203,6 +206,7 @@ function resetForm(): void {
 }
 
 function payload(): MenuRequest {
+  // 按 discriminated union 只发送当前类型允许的字段，并显式清空互斥字段。
   const common = {
     parentId: form.parentId,
     name: form.name,
@@ -267,6 +271,7 @@ async function submit(): Promise<void> {
     dialogOpen.value = false
     ElMessage.success('菜单节点已保存')
     emit('saved')
+    // 刷新导航 Store，使新路径、权限键或启用状态立即反映到侧栏和动态路由。
     await navigation.load(true)
   } catch (error) {
     formError.value = error instanceof Error ? error.message : '菜单保存失败'
@@ -284,6 +289,7 @@ watch(dialogOpen, function initializeForm(open) {
 watch(
   () => form.type,
   function clearUnusedFields(type) {
+    // 类型切换时同步清理不可见字段，避免旧值被 payload() 意外带回。
     if (type === 'button') {
       form.path = ''
       form.component = ''
@@ -302,6 +308,7 @@ watch(
 
 onMounted(async function loadPermissionOptions() {
   try {
+    // 菜单权限选择只允许引用后端当前登记且启用的权限键。
     permissions.value = await listAuthorizationPermissions()
   } catch {
     permissions.value = []
