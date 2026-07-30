@@ -11,7 +11,7 @@
         <AppIcon name="panel" />
       </button>
       <div class="app-header__title-group">
-        <p class="app-header__eyebrow">{{ eyebrow }}</p>
+        <p class="app-header__menu-path">{{ menuPath }}</p>
         <h1 class="app-header__title">{{ title }}</h1>
       </div>
     </div>
@@ -46,7 +46,7 @@ import AppIcon from '@/components/AppIcon.vue'
 
 const props = defineProps<{
   title: string
-  eyebrow: string
+  menuPath: string
   displayName?: string
   role?: string
 }>()
@@ -124,14 +124,13 @@ function handleCommand(command: string) {
   min-width: 0;
 }
 
-.app-header__eyebrow {
+.app-header__menu-path {
   display: none;
   margin: 0 0 4px;
   color: #829087;
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.2em;
-  text-transform: uppercase;
 }
 
 .app-header__title {
@@ -240,7 +239,7 @@ function handleCommand(command: string) {
     padding-left: 32px;
   }
 
-  .app-header__eyebrow {
+  .app-header__menu-path {
     display: block;
   }
 

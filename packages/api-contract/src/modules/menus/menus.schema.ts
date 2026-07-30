@@ -9,11 +9,6 @@ import {
 const menuCommonShape = {
   parentId: z.number().int().min(0),
   name: z.string().min(1).max(80),
-  code: z
-    .string()
-    .min(2)
-    .max(80)
-    .regex(/^[A-Z0-9_]+$/),
   icon: z.string().max(50),
   sortOrder: z.number().int().min(0),
   enabled: z.boolean(),
@@ -60,7 +55,6 @@ export const MenuSummarySchema = AuditFieldsSchema.extend({
   id: z.number().int(),
   parentId: z.number().int().min(0),
   name: z.string().min(1).max(80),
-  code: z.string().min(2).max(80),
   path: z.string().max(160),
   component: z.string().max(160),
   layout: z.string().max(160).default(''),
@@ -79,7 +73,6 @@ const NavigationMenuBaseSchema = z.strictObject({
   id: z.number().int(),
   parentId: z.number().int().min(0),
   name: z.string(),
-  code: z.string(),
   icon: z.string(),
   sortOrder: z.number().int(),
   type: z.enum(['directory', 'menu', 'button']),

@@ -14,9 +14,3 @@ export function menuPathError(type: MenuType, parentId: number, path: string): s
   }
   return ''
 }
-
-export function createInternalMenuCode(): string {
-  const timestamp = Date.now().toString(36).toUpperCase()
-  const random = crypto.randomUUID().replaceAll('-', '').slice(0, 12).toUpperCase()
-  return `MENU_${timestamp}_${random}`
-}

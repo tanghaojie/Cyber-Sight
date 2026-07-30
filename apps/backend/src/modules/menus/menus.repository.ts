@@ -1,4 +1,4 @@
-import { and, count, eq, ilike, inArray, or } from 'drizzle-orm'
+import { and, count, eq, ilike, inArray } from 'drizzle-orm'
 import type { FastifyInstance } from 'fastify'
 import type { CurrentUser, MenuRequest, NavigationMenu } from '@scaffold/api-contract'
 import { menus, roleMenus, roles, userRoles } from '@/db/schema.js'
@@ -11,7 +11,6 @@ function navigationRow(row: typeof menus.$inferSelect): NavigationRow {
     id: row.id,
     parentId: row.parentId,
     name: row.name,
-    code: row.code,
     path: row.path,
     component: row.component,
     layout: row.layout,
@@ -102,7 +101,7 @@ export async function listMenus(app: FastifyInstance, query: RepositoryListQuery
   const keyword = query.keyword?.trim()
   const predicate = and(
     eq(menus.isDeleted, false),
-    keyword ? or(ilike(menus.name, `%${keyword}%`), ilike(menus.code, `%${keyword}%`)) : undefined,
+    keyword ? ilike(menus.name, `%${keyword}%`) : undefined,
   )
   const rows = await app.db
     .select()

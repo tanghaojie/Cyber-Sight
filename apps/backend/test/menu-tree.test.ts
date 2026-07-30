@@ -6,7 +6,6 @@ const rows = [
     id: 1,
     parentId: 0,
     name: '组织与权限',
-    code: 'ORGANIZATION',
     icon: 'layers',
     sortOrder: 10,
     type: 'directory' as const,
@@ -19,7 +18,6 @@ const rows = [
     id: 2,
     parentId: 1,
     name: '用户管理',
-    code: 'USERS',
     icon: 'users',
     sortOrder: 10,
     type: 'menu' as const,
@@ -32,7 +30,6 @@ const rows = [
     id: 3,
     parentId: 1,
     name: '文档',
-    code: 'DOCS',
     icon: 'external',
     sortOrder: 20,
     type: 'button' as const,
@@ -65,8 +62,8 @@ describe('navigation menu tree', () => {
   it('keeps legacy invalid records out of executable navigation', () => {
     const legacyRows = [
       ...rows,
-      { ...rows[1], id: 4, code: 'LEGACY_PAGE', component: '' },
-      { ...rows[2], id: 5, code: 'LEGACY_BUTTON', externalUrl: '' },
+      { ...rows[1], id: 4, component: '' },
+      { ...rows[2], id: 5, externalUrl: '' },
     ]
 
     const tree = buildNavigationTree(legacyRows)

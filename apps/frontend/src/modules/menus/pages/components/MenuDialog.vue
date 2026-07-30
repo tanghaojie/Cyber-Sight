@@ -89,7 +89,7 @@ import { computed, reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { MenuRequest, MenuSummary } from '@scaffold/api-contract'
 import AppIcon from '@/components/AppIcon.vue'
-import { createInternalMenuCode, menuPathError } from '@/modules/menus/menu-form'
+import { menuPathError } from '@/modules/menus/menu-form'
 import { createMenu, updateMenu } from '@/modules/menus/menus.api'
 import { useNavigationStore } from '@/modules/navigation/navigation.store'
 import { viewRegistry } from '@/shared/routing/view-registry'
@@ -122,7 +122,6 @@ const dialogOpen = defineModel<boolean>({ required: true })
 
 const saving = ref(false)
 const formError = ref('')
-const internalCode = ref('')
 const navigation = useNavigationStore()
 const form = reactive<MenuForm>({
   parentId: 0,
@@ -153,7 +152,6 @@ const routeHint = computed(() =>
 
 function resetForm(): void {
   if (props.menu) {
-    internalCode.value = props.menu.code
     Object.assign(form, {
       parentId: props.menu.parentId,
       name: props.menu.name,
@@ -167,7 +165,6 @@ function resetForm(): void {
       enabled: props.menu.enabled,
     })
   } else {
-    internalCode.value = createInternalMenuCode()
     Object.assign(form, {
       parentId: props.parentId,
       name: '',
@@ -188,7 +185,6 @@ function payload(): MenuRequest {
   const common = {
     parentId: form.parentId,
     name: form.name,
-    code: internalCode.value,
     icon: form.icon,
     sortOrder: form.sortOrder,
     enabled: form.enabled,

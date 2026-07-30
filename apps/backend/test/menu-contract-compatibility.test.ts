@@ -15,7 +15,6 @@ describe('legacy menu response compatibility', () => {
       id: 6,
       parentId: 0,
       name: 'test',
-      code: 'test',
       path: '/qqqq',
       component: '',
       externalUrl: '',
@@ -38,7 +37,6 @@ describe('legacy menu response compatibility', () => {
     const common = {
       parentId: 0,
       name: '测试',
-      code: 'TEST_MENU',
       icon: '',
       sortOrder: 0,
       enabled: true,
@@ -72,6 +70,17 @@ describe('legacy menu response compatibility', () => {
         component: '',
         layout: 'AdminLayout',
         externalUrl: 'https://example.com',
+      }).success,
+    ).toBe(false)
+    expect(
+      MenuRequestSchema.safeParse({
+        ...common,
+        code: 'REMOVED_CODE',
+        type: 'directory',
+        path: '/legacy-code',
+        component: '',
+        layout: '',
+        externalUrl: '',
       }).success,
     ).toBe(false)
   })

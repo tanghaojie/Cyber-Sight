@@ -2,7 +2,7 @@
 title: 前端应用与应用壳
 status: active
 owner: maintainers
-updated: 2026-07-29
+updated: 2026-07-30
 ---
 
 # 前端应用与应用壳
@@ -46,7 +46,7 @@ cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie�
 1. `constRoutes.ts` 直接注册公开登录、公开 404，以及使用 `AdminLayout` 的 `/` 根路由和默认 `HomePage`。
 2. 非公开导航进入 `authenticationRouteGuard()`：恢复当前用户；未认证时跳转登录；首次认证成功时加载菜单树、安装动态路由并按原地址重新匹配。
 3. `navigation.store.ts` 通过 `navigation.api.ts` 获取 `GET /navigation/menus`，先把相对路径按目录层级解析为规范绝对路径，再缓存树和扁平列表。
-4. `dynamicRoutes.ts` 递归生成路由。`directory` 使用显式布局或 `RouterView` 并承载子路由；`menu` 使用已登记页面，显式布局存在时创建只有一个空路径子项的布局包装，否则直接加载页面；`button` 不注册站内路由。
+4. `dynamicRoutes.ts` 递归生成路由。`directory` 使用显式布局或 `RouterView` 并承载子路由；`menu` 使用已登记页面，显式布局存在时创建只有一个空路径子项的布局包装，否则直接加载页面；`button` 不注册站内路由。菜单路由的 `meta.menuPath` 保存从根目录到当前页面的菜单名称路径，应用壳在原副标题位置展示该路径，不再使用抽象的 `eyebrow` 元数据。
 5. 每棵根菜单子树通过 `router.addRoute()` 注册。刷新菜单、退出或 401 时调用移除函数并重置 `routesReady`。
 6. `SidebarTree.vue` 只渲染有子项的目录、站内菜单和外链按钮；空目录不会显示。外链按钮仅打开 HTTP(S) 地址。
 
@@ -56,7 +56,7 @@ cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie�
 
 `view-registry.ts` 通过 `import.meta.glob('@/modules/**/registerViews.ts', { eager: true })` 自动发现登记模块。登记 key 必须符合小写字母开头的 kebab-case 约束且全局唯一；缺少 `registerViews()`、非法 key 或重复 key 会在注册表构建时失败。
 
-布局注册表通过懒加载发现 `src/layouts/*.vue`。`AdminLayout` 是静态根壳和必备布局；`EmptyLayout` 可供菜单显式选择。Tailwind CSS 负责布局、间距、响应式和多数视觉样式，Element Plus 提供表单、表格、弹窗和反馈；全局 SCSS 按基础、管理布局、过渡和 Element Plus 组件覆盖拆分。
+布局注册表通过懒加载发现 `src/layouts/*.vue`。`AdminLayout` 是静态根壳和必备布局；`EmptyLayout` 可供菜单显式选择。Tailwind CSS 负责布局、间距、响应式和多数视觉样式，Element Plus 提供表单、表格、弹窗和反馈；全局 SCSS 按基础、管理布局、过渡和 Element Plus 组件覆盖拆分。用户、角色、菜单和字典管理页面共用的内容容器最大宽度为 `1920px`，窄于该宽度时仍保持响应式占满可用空间。
 
 ## 全局 HTTP 错误
 

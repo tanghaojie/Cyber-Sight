@@ -32,7 +32,7 @@ function latestMigrationSql(): string {
 
 describe('database migrations', () => {
   it('restores the database-backed authentication session table', () => {
-    const migrationSql = latestMigrationSql()
+    const migrationSql = migrationContaining('CREATE TABLE IF NOT EXISTS "auth_sessions"')
 
     expect(migrationSql).toContain('CREATE TABLE IF NOT EXISTS "auth_sessions"')
     expect(migrationSql).toContain(
@@ -54,6 +54,13 @@ describe('database migrations', () => {
     expect(migrationSql).toContain('ALTER TABLE "menus" DROP CONSTRAINT "menus_code_unique"')
     expect(migrationSql).toContain('CREATE UNIQUE INDEX IF NOT EXISTS "menus_code_active_unique"')
     expect(migrationSql).toContain('("code") WHERE "menus"."is_deleted" = false')
+  })
+
+  it('drops the obsolete menu code index and column', () => {
+    const migrationSql = latestMigrationSql()
+
+    expect(migrationSql).toContain('DROP INDEX IF EXISTS "menus_code_active_unique"')
+    expect(migrationSql).toContain('ALTER TABLE "menus" DROP COLUMN IF EXISTS "code"')
   })
 
   it('replaces every other business identity constraint with active-row indexes', () => {

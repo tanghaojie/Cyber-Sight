@@ -22,7 +22,11 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
   const layouts = layoutRegistry
   const views = viewRegistry
 
-  function generateMenuRoute(path: string, item: NavigationMenu): RouteRecordRaw | undefined {
+  function generateMenuRoute(
+    path: string,
+    item: NavigationMenu,
+    menuPath: string,
+  ): RouteRecordRaw | undefined {
     const compName = item.component
     const layoutName = item.layout
     if (!compName) {
@@ -49,7 +53,7 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
             component: componentInfo.component,
             meta: {
               title: item.name,
-              eyebrow: ['准备删除'].join(' / '),
+              menuPath,
               menuId: item.id,
             },
           },
@@ -63,7 +67,7 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
         component: componentInfo.component,
         meta: {
           title: item.name,
-          eyebrow: ['准备删除'].join(' / '),
+          menuPath,
           menuId: item.id,
         },
       }
@@ -71,13 +75,17 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
     }
   }
 
-  function generateDirectoryRoute(path: string, item: NavigationMenu): RouteRecordRaw | undefined {
+  function generateDirectoryRoute(
+    path: string,
+    item: NavigationMenu,
+    menuPath: string[],
+  ): RouteRecordRaw | undefined {
     const layoutName = item.layout
     const layoutInfo = layoutName ? layouts?.[layoutName] : undefined
 
     const childrenRoute = (item.children ?? [])
       .map((child) => {
-        return generateRoute(child)
+        return generateRoute(child, menuPath)
       })
       .filter(Boolean) as RouteRecordRaw[]
 
@@ -90,7 +98,10 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
     return route
   }
 
-  function generateRoute(item: NavigationMenu): RouteRecordRaw | undefined {
+  function generateRoute(
+    item: NavigationMenu,
+    ancestorNames: string[] = [],
+  ): RouteRecordRaw | undefined {
     if (item.type == 'button') {
       return
     }
@@ -100,10 +111,11 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
       return
     }
 
+    const menuPath = [...ancestorNames, item.name]
     if (item.type === 'directory') {
-      return generateDirectoryRoute(path, item)
+      return generateDirectoryRoute(path, item, menuPath)
     } else if (item.type === 'menu') {
-      return generateMenuRoute(path, item)
+      return generateMenuRoute(path, item, menuPath.join(' / '))
     } else {
       throw new Error(`Unrecognized menu item type: ${item.type}`)
     }

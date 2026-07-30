@@ -17,7 +17,7 @@
     <section class="app-shell__content">
       <AppHeader
         :title="pageTitle"
-        :eyebrow="pageEyebrow"
+        :menu-path="pageMenuPath"
         :display-name="auth.user?.displayName"
         :role="auth.user?.roles[0] ?? '管理员'"
         @open-menu="sidebarOpen = true"
@@ -37,7 +37,6 @@ import AppSidebar from '@/components/layout/AppSidebar.vue'
 import { clearDynamicRoutes, installMenuRoutes } from '@/router/dynamicRoutes'
 import { useAuthStore } from '@/modules/auth/auth.store'
 import { useNavigationStore } from '@/modules/navigation/navigation.store'
-import { appConfig } from '@/config/app.config'
 
 const route = useRoute()
 const router = useRouter()
@@ -45,9 +44,7 @@ const auth = useAuthStore()
 const navigation = useNavigationStore()
 const sidebarOpen = ref(false)
 const pageTitle = computed(() => String(route.meta.title ?? '管理控制台'))
-const pageEyebrow = computed(() =>
-  String(route.meta.eyebrow ?? `${appConfig.name.toUpperCase()} / MANAGEMENT`),
-)
+const pageMenuPath = computed(() => String(route.meta.menuPath ?? pageTitle.value))
 
 watch(
   () => navigation.items,

@@ -21,7 +21,6 @@ const activeBusinessIdentityIndexes: Array<{
   { table: users, name: 'users_username_active_unique', columns: ['username'] },
   { table: users, name: 'users_email_active_unique', columns: ['email'] },
   { table: roles, name: 'roles_code_active_unique', columns: ['code'] },
-  { table: menus, name: 'menus_code_active_unique', columns: ['code'] },
   {
     table: userRoles,
     name: 'user_roles_user_role_active_unique',
@@ -57,6 +56,7 @@ describe('menu routing fields', () => {
     expect(columns).toHaveProperty('component')
     expect(columns).toHaveProperty('layout')
     expect(columns).toHaveProperty('externalUrl')
+    expect(columns).not.toHaveProperty('code')
   })
 })
 

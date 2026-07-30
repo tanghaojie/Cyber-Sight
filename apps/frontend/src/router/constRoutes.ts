@@ -20,7 +20,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         component: HomePage,
-        meta: { public: false, title: '首页' },
+        meta: { public: false, title: '首页', menuPath: '首页' },
       },
     ],
   },
