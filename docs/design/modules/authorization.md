@@ -64,7 +64,39 @@ authenticated
 permission(anyOf: [...])
 ```
 
-缺少声明会在应用组装时失败。功能权限不足使用现有 `FORBIDDEN` 业务错误；未认证仍返回 HTTP 401。
+缺少声明会在应用组装时失败。功能权限不足由响应处理器转换为 HTTP 200 的 `FORBIDDEN` 业务错误；未认证仍返回 HTTP 401。
+
+## 请求期授权调用流程
+
+`registerAuthorization()` 必须先于业务路由注册。它在路由注册期通过 `onRoute` 拒绝没有 `config.authorization` 的路由；在每个匹配请求的 `preHandler` 阶段执行以下流程：
+
+```mermaid
+flowchart TD
+    A[客户端请求业务接口] --> B[Fastify 匹配目标路由]
+    B --> C[preHandler: authorizeRequest]
+    C --> D[读取 routeOptions.config.authorization]
+    D --> E{授权模式}
+
+    E -->|public| F[直接放行]
+    F --> N[执行路由处理器]
+
+    E -->|authenticated| G[requireCurrentUser]
+    E -->|permission| G
+    G --> H{存在有效当前用户}
+    H -->|否| I[抛出 401: Authentication required]
+    H -->|是| J[写入 request.accessUser]
+
+    J --> K{是否为 permission 模式}
+    K -->|否: authenticated| N
+    K -->|是| L[provider.effectivePermissionKeys app, user]
+    L --> M{用户权限是否命中 anyOf 中任一键}
+    M -->|否| O[抛出 403: Permission required]
+    M -->|是| N
+    I --> P[响应处理器返回 HTTP 401]
+    O --> Q[响应处理器返回 HTTP 200<br/>status 为 FORBIDDEN]
+```
+
+`public` 不读取当前用户；`authenticated` 只要求登录；`permission` 在登录后通过 `AuthorizationProvider` 解析有效权限，且只要命中 `anyOf` 中任意一个权限键即可继续。通过认证的用户会缓存到当前请求的 `request.accessUser`，路由处理器无需再次解析会话。
 
 ## 数据策略与继承
 
