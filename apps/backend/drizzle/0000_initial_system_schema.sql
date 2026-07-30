@@ -351,9 +351,8 @@ ON CONFLICT DO NOTHING;--> statement-breakpoint
 INSERT INTO "sys_menus" (
 	"parent_id", "name", "path", "component", "layout", "external_url", "icon", "sort_order", "type", "enabled"
 ) VALUES
-	(0, '工作台', '', '', '', '', 'grid', 10, 'directory', true),
-	(0, '组织与权限', '', '', '', '', 'layers', 20, 'directory', true),
-	(0, '系统配置', '', '', '', '', 'settings', 30, 'directory', true);--> statement-breakpoint
+	(0, '组织与权限', '/sys', '', 'AdminLayout', '', 'layers', 20, 'directory', true),
+	(0, '系统配置', '/config', '', 'AdminLayout', '', 'settings', 30, 'directory', true);--> statement-breakpoint
 INSERT INTO "sys_menus" (
 	"parent_id", "name", "path", "component", "layout", "external_url", "icon", "sort_order", "type", "enabled", "required_permission_key"
 )
@@ -370,12 +369,11 @@ SELECT
 	true,
 	seed."required_permission_key"
 FROM (VALUES
-	('工作台', '首页', '/', 'home', 'home', 10, NULL),
-	('组织与权限', '用户管理', '/users', 'users', 'users', 20, 'users.manage'),
-	('组织与权限', '角色管理', '/roles', 'roles', 'shield', 30, 'roles.manage'),
+	('组织与权限', '用户管理', 'users', 'users', 'users', 20, 'users.manage'),
+	('组织与权限', '角色管理', 'roles', 'roles', 'shield', 30, 'roles.manage'),
 	('组织与权限', '部门管理', 'departments', 'departments', 'layers', 35, 'departments.manage'),
-	('组织与权限', '菜单管理', '/menus', 'menus', 'menu', 40, 'menus.manage'),
-	('系统配置', '字典管理', '/dictionaries', 'dictionaries', 'book', 50, 'dictionaries.manage')
+	('组织与权限', '菜单管理', 'menus', 'menus', 'menu', 40, 'menus.manage'),
+	('系统配置', '字典管理', 'dictionaries', 'dictionaries', 'book', 50, 'dictionaries.manage')
 ) AS seed("parent_name", "name", "path", "component", "icon", "sort_order", "required_permission_key")
 JOIN "sys_menus" parent
 	ON parent."name" = seed."parent_name"

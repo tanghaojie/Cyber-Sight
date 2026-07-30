@@ -88,7 +88,11 @@ describe('legacy menu response compatibility', () => {
 
   it('requires absolute root paths and allows relative descendant paths', () => {
     expect(isValidMenuPath({ type: 'directory', parentId: 0, path: '/system' })).toBe(true)
+    expect(isValidMenuPath({ type: 'directory', parentId: 0, path: 'system' })).toBe(false)
+    expect(isValidMenuPath({ type: 'directory', parentId: 0, path: '' })).toBe(false)
+    expect(isValidMenuPath({ type: 'menu', parentId: 0, path: '/users' })).toBe(true)
     expect(isValidMenuPath({ type: 'menu', parentId: 0, path: 'users' })).toBe(false)
+    expect(isValidMenuPath({ type: 'menu', parentId: 0, path: '' })).toBe(false)
     expect(isValidMenuPath({ type: 'menu', parentId: 1, path: 'users' })).toBe(true)
     expect(isValidMenuPath({ type: 'menu', parentId: 1, path: '/users' })).toBe(true)
     expect(isValidMenuPath({ type: 'button', parentId: 0, path: '' })).toBe(true)

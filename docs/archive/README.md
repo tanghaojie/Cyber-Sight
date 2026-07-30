@@ -35,6 +35,7 @@
 - 2026-07-30：[中文代码注释实施计划](plans/2026-07-30-chinese-code-comments.md)及其 [AI 协作记录](ai-logs/2026/07/2026-07-30-chinese-code-comments.md)。
 - 2026-07-30：[部门树形展示实施计划](plans/2026-07-30-department-tree-view.md)及其 [AI 协作记录](ai-logs/2026/07/2026-07-30-department-tree-view.md)。
 - 2026-07-30：[系统表前缀与迁移基线重构实施计划](plans/2026-07-30-system-table-prefix-and-migration-baseline.md)及其 [AI 协作记录](ai-logs/2026/07/2026-07-30-system-table-prefix-and-migration-baseline.md)。
+- 2026-07-30：[默认菜单迁移基线修正计划](plans/2026-07-30-default-menu-baseline.md)及其 [AI 协作记录](ai-logs/2026/07/2026-07-30-default-menu-baseline.md)。
 - 2026-06 的文件描述脚手架起点；2026-07-22 至 2026-07-23 主要记录管理基础、契约和测试；2026-07-27 至 2026-07-29 主要记录模块边界、动态导航、认证和工程治理；2026-07-30 起继续记录基线后的功能修正与模型精简。
 
 计划和日志只用于复盘实施过程，不用于定义当前行为。需要定位时先按日期或主题文件名搜索，最多打开与问题最相关的一至两份。

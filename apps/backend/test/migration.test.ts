@@ -104,4 +104,26 @@ describe('database migration baseline', () => {
     expect(migrationSql).toContain("'departments.manage'")
     expect(migrationSql).toContain("('read'), ('create'), ('update'), ('delete')")
   })
+
+  it('seeds only layout roots and relative management child paths', () => {
+    const migrationSql = baselineMigrationSql()
+
+    expect(migrationSql).toContain(
+      "(0, '组织与权限', '/sys', '', 'AdminLayout', '', 'layers', 20, 'directory', true)",
+    )
+    expect(migrationSql).toContain(
+      "(0, '系统配置', '/config', '', 'AdminLayout', '', 'settings', 30, 'directory', true)",
+    )
+    for (const [parentName, name, path, component] of [
+      ['组织与权限', '用户管理', 'users', 'users'],
+      ['组织与权限', '角色管理', 'roles', 'roles'],
+      ['组织与权限', '部门管理', 'departments', 'departments'],
+      ['组织与权限', '菜单管理', 'menus', 'menus'],
+      ['系统配置', '字典管理', 'dictionaries', 'dictionaries'],
+    ]) {
+      expect(migrationSql).toContain(`('${parentName}', '${name}', '${path}', '${component}'`)
+    }
+    expect(migrationSql).not.toContain("'工作台'")
+    expect(migrationSql).not.toContain("'首页'")
+  })
 })
