@@ -1,5 +1,20 @@
 <template>
   <ul class="sidebar-tree" :class="{ 'sidebar-tree--nested': depth > 0 }">
+    <RouterLink
+      v-if="depth === 0 && showHomeMenu"
+      :to="homeRoute?.path || '/'"
+      class="sidebar-link"
+      :style="indentStyle"
+      @click="$emit('navigate')"
+    >
+      <span class="sidebar-node-icon">
+        <AppIcon :name="(homeRoute?.meta?.icon as string | undefined) || 'home'" />
+      </span>
+      <span class="sidebar-node-copy">
+        <b>{{ homeRoute?.meta?.name ?? '首页' }}</b>
+        <small>{{ homeRoute?.path || '/' }}</small>
+      </span>
+    </RouterLink>
     <li v-for="item in items" :key="item.id">
       <button
         v-if="item.type === 'directory' && item.children.length"
@@ -63,9 +78,25 @@
 import { computed, reactive } from 'vue'
 import type { NavigationMenu } from '@scaffold/api-contract'
 import AppIcon from '@/components/AppIcon.vue'
+import constRoutes from '@/router/constRoutes'
+import { RouteRecordRaw } from 'vue-router'
 
 const props = withDefaults(defineProps<{ items: NavigationMenu[]; depth?: number }>(), { depth: 0 })
 defineEmits<{ navigate: [] }>()
+
+const homeRoute = computed(() => constRoutes.find((route: RouteRecordRaw) => route.path === '/'))
+
+const showHomeMenu = computed(() => {
+  if (!homeRoute.value) {
+    return false
+  }
+  if (!homeRoute.value.children || homeRoute.value.children.length <= 0) {
+    return true
+  }
+
+  const children = homeRoute.value.children
+  return !!children.find((c) => c.path === '')
+})
 
 const expanded = reactive<Record<number, boolean>>({})
 
