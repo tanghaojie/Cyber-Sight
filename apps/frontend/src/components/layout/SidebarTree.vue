@@ -119,16 +119,6 @@ function toggle(id: number): void {
 .sidebar-tree--nested {
   position: relative;
   margin: 3px 0 7px;
-
-  &::before {
-    position: absolute;
-    top: 3px;
-    bottom: 3px;
-    left: 27px;
-    width: 1px;
-    background: rgba(112, 207, 162, 0.22);
-    content: '';
-  }
 }
 
 .sidebar-directory,
