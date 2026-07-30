@@ -89,7 +89,8 @@ const { status, timestamp, error } = useHealth()
 .sidebar-brand {
   position: relative;
   display: flex;
-  min-height: 96px;
+  height: 72px;
+  flex: 0 0 72px;
   align-items: center;
   gap: 12px;
   padding: 0 24px;
