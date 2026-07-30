@@ -14,11 +14,11 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/',
-    name: 'admin-root',
     component: AdminLayout,
     children: [
       {
         path: '',
+        name: 'admin-root',
         component: HomePage,
         meta: { public: false, title: '首页', menuPath: '首页' },
       },
