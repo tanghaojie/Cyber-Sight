@@ -73,7 +73,7 @@ function handleCommand(command: string) {
   z-index: 20;
   display: flex;
   width: 100%;
-  height: 72px;
+  height: var(--app-shell-header-height);
   align-items: center;
   justify-content: space-between;
   gap: 20px;

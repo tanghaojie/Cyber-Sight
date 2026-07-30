@@ -56,7 +56,7 @@ cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie�
 
 `view-registry.ts` 通过两个 `import.meta.glob` 模式扫描 `@/modules/system/**/registerViews.ts` 与 `@/modules/biz/**/registerViews.ts`，自动发现两个分类下的登记模块。登记 key 必须符合小写字母开头的 kebab-case 约束且全局唯一；缺少 `registerViews()`、非法 key 或重复 key 会在注册表构建时失败。
 
-`AppHeader` 与 `AppSidebar` 的 `sidebar-brand` 在桌面和移动端统一使用 `72px` 高度，使两栏顶部分隔线对齐。Header 保留粘性定位、菜单按钮、标题路径和用户菜单交互；紧凑高度不改变主内容与侧栏的布局职责。
+全局变量 `--app-shell-header-height` 定义应用壳顶部高度，当前值为 `72px`；`AppHeader` 与 `AppSidebar` 的 `sidebar-brand` 在桌面和移动端都引用该变量，使两栏顶部分隔线对齐。Header 保留粘性定位、菜单按钮、标题路径和用户菜单交互；紧凑高度不改变主内容与侧栏的布局职责。
 
 布局注册表通过懒加载发现 `src/layouts/*.vue`。`AdminLayout` 是静态根壳和必备布局；`EmptyLayout` 可供菜单显式选择。Tailwind CSS 负责布局、间距、响应式和多数视觉样式，Element Plus 提供表单、表格、弹窗和反馈；全局 SCSS 按基础、管理布局、过渡和 Element Plus 组件覆盖拆分。用户、角色、部门、菜单和字典管理页面共用的内容容器最大宽度为 `1920px`，窄于该宽度时仍保持响应式占满可用空间。
 
