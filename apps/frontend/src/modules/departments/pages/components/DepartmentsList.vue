@@ -20,7 +20,14 @@
       show-icon
       :closable="false"
     />
-    <el-table v-loading="loading" :data="visibleRecords" row-key="id" empty-text="暂无部门">
+    <el-table
+      v-loading="loading"
+      :data="visibleTree"
+      row-key="id"
+      default-expand-all
+      :tree-props="{ children: 'children' }"
+      empty-text="暂无部门"
+    >
       <el-table-column prop="name" label="部门名称" min-width="180" />
       <el-table-column prop="code" label="部门编码" min-width="150">
         <template #default="{ row }"
@@ -55,6 +62,7 @@ import { Delete, EditPen, Plus, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { DepartmentSummary } from '@scaffold/api-contract'
 import { deleteDepartment, listDepartments } from '@/modules/departments/departments.api'
+import { buildDepartmentTree, filterDepartmentTree } from '../department-tree'
 
 const emit = defineEmits<{
   create: [parentId: number]
@@ -65,15 +73,9 @@ const records = ref<DepartmentSummary[]>([])
 const keyword = ref('')
 const loading = ref(false)
 const errorMessage = ref('')
-// 部门数量通常较小，当前在已加载的全量集合上执行即时前端过滤。
-const visibleRecords = computed(() => {
-  const query = keyword.value.trim().toLowerCase()
-  return query
-    ? records.value.filter(
-        (row) => row.name.toLowerCase().includes(query) || row.code.toLowerCase().includes(query),
-      )
-    : records.value
-})
+const departmentTree = computed(() => buildDepartmentTree(records.value))
+// 部门数量通常较小，搜索在完整树快照上即时执行并保留命中节点的层级上下文。
+const visibleTree = computed(() => filterDepartmentTree(departmentTree.value, keyword.value))
 
 function parentName(parentId: number): string {
   return parentId === 0

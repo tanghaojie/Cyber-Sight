@@ -14,15 +14,15 @@
           <el-input v-model.trim="form.code" placeholder="例如 EAST_SALES" />
         </el-form-item>
         <el-form-item label="上级部门">
-          <el-select v-model="form.parentId" class="w-full">
-            <el-option label="根部门" :value="0" />
-            <el-option
-              v-for="option in parentOptions"
-              :key="option.id"
-              :label="option.name"
-              :value="option.id"
-            />
-          </el-select>
+          <el-tree-select
+            v-model="form.parentId"
+            class="w-full"
+            :data="parentTreeOptions"
+            node-key="value"
+            check-strictly
+            default-expand-all
+            filterable
+          />
         </el-form-item>
         <el-form-item label="排序">
           <el-input-number v-model="form.sortOrder" :min="0" :max="9999" class="!w-full" />
@@ -55,6 +55,12 @@ import type {
 import DataPolicyEditor from '@/modules/authorization/components/DataPolicyEditor.vue'
 import { getSubjectAccess, replaceSubjectAccess } from '@/modules/authorization/authorization.api'
 import { createDepartment, updateDepartment } from '@/modules/departments/departments.api'
+import {
+  buildDepartmentTree,
+  collectDepartmentSubtreeIds,
+  toDepartmentTreeOptions,
+  type DepartmentTreeOption,
+} from '../department-tree'
 
 const props = defineProps<{
   department: DepartmentSummary | null
@@ -74,8 +80,13 @@ const form = reactive<DepartmentRequest>({
   enabled: true,
 })
 const access = reactive<SubjectAccessRequest>({ permissionKeys: [], dataPolicies: [] })
-// 前端先排除当前节点；是否选择了后代节点形成环仍由后端闭包关系最终校验。
-const parentOptions = computed(() => props.records.filter((row) => row.id !== props.department?.id))
+const parentTreeOptions = computed<DepartmentTreeOption[]>(() => {
+  const excludedIds = props.department
+    ? collectDepartmentSubtreeIds(props.records, props.department.id)
+    : new Set<number>()
+  const children = toDepartmentTreeOptions(buildDepartmentTree(props.records, excludedIds))
+  return [{ value: 0, label: '根部门', ...(children.length > 0 ? { children } : {}) }]
+})
 
 function resetForm(): void {
   Object.assign(

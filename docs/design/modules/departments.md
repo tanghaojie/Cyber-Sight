@@ -35,6 +35,10 @@ updated: 2026-07-30
 
 `department_closure` 保存 `(ancestor_id, descendant_id, depth)`，包含每个有效部门到自身的深度 0 记录。创建和移动部门在事务中重建有效闭包；软删除部门时同步软删除涉及该部门的闭包关系。
 
+管理列表接口保持返回带 `parentId` 的扁平数组，前端模块内部按 `parentId` 组装树节点；根节点和同级节点均按 `sortOrder`、`id` 稳定排序。部门表格默认展开树结构并允许逐级折叠，按名称或编码搜索时保留命中节点的祖先路径；父节点自身命中时保留其完整子树。
+
+父部门编辑器使用同一树结构展示虚拟根节点和可选部门。编辑已有部门时，当前部门及其全部后代不进入候选树，禁用部门保留层级上下文但不可选；后端闭包校验仍是防止环和无效父节点的最终边界。
+
 创建或更新拒绝自引用、父节点不存在、父节点禁用以及把部门移动到自己的后代。存在有效子部门、有效用户归属或自定义数据策略引用时禁止删除。
 
 ## 依赖关系
@@ -50,7 +54,7 @@ updated: 2026-07-30
 
 ## 测试与验证策略
 
-后端测试覆盖闭包构建、循环拒绝、软删除约束、有效编码唯一性和公共查询；前端树表格、父部门选择、策略弹窗和窄屏布局由维护者人工验收。
+后端测试覆盖闭包构建、循环拒绝、软删除约束、有效编码唯一性和公共查询；前端通过格式检查、TypeScript 检查和生产构建验证静态正确性，树表格的展开/折叠、搜索上下文、父部门树选择、策略弹窗和窄屏布局由维护者人工验收。
 
 ## 兼容性与迁移
 
@@ -64,5 +68,7 @@ updated: 2026-07-30
 
 - [ADR-0025](../../decisions/ADR-0025-pluggable-authorization-and-data-scope.md)
 - [授权模块](authorization.md)
-- [实施计划](../../archive/plans/2026-07-30-pluggable-authorization.md)
-- [AI 协作记录](../../archive/ai-logs/2026/07/2026-07-30-pluggable-authorization.md)
+- [授权与部门实施计划](../../archive/plans/2026-07-30-pluggable-authorization.md)
+- [部门树形展示实施计划](../../archive/plans/2026-07-30-department-tree-view.md)
+- [授权与部门 AI 协作记录](../../archive/ai-logs/2026/07/2026-07-30-pluggable-authorization.md)
+- [部门树形展示 AI 协作记录](../../archive/ai-logs/2026/07/2026-07-30-department-tree-view.md)
