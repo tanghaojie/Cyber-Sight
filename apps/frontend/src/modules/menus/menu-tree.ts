@@ -1,11 +1,6 @@
 import type { MenuSummary } from '@scaffold/api-contract'
 
 export type MenuTreeRecord = MenuSummary & { children: MenuTreeRecord[] }
-export interface MenuTreeOption {
-  value: number
-  label: string
-  children?: MenuTreeOption[]
-}
 
 export function buildMenuTree(records: MenuSummary[]): MenuTreeRecord[] {
   const ordered = [...records].sort(
@@ -25,16 +20,4 @@ export function buildMenuTree(records: MenuSummary[]): MenuTreeRecord[] {
     }
   }
   return roots
-}
-
-function toOption(node: MenuTreeRecord): MenuTreeOption {
-  return {
-    value: node.id,
-    label: node.name,
-    ...(node.children.length ? { children: node.children.map(toOption) } : {}),
-  }
-}
-
-export function buildMenuTreeOptions(records: MenuSummary[]): MenuTreeOption[] {
-  return buildMenuTree(records).map(toOption)
 }

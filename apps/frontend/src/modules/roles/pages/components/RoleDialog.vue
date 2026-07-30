@@ -2,7 +2,7 @@
   <el-dialog
     v-model="dialogOpen"
     :title="role ? '编辑角色' : '新增角色'"
-    width="min(660px, calc(100vw - 32px))"
+    width="min(920px, calc(100vw - 32px))"
     :close-on-click-modal="!saving"
   >
     <el-form label-position="top" @submit.prevent="submit">
@@ -21,27 +21,30 @@
             placeholder="说明该角色的责任范围"
           />
         </el-form-item>
-        <el-form-item label="菜单权限" class="sm:col-span-2">
-          <el-tree-select
-            v-model="form.menuIds"
-            class="w-full"
-            :data="menuTree"
-            multiple
-            show-checkbox
-            check-strictly
-            node-key="value"
-            :render-after-expand="false"
-            placeholder="选择目录、菜单或外链按钮"
-          />
+        <el-form-item label="功能权限" class="sm:col-span-2">
+          <el-checkbox-group v-model="access.permissionKeys" class="permission-grid">
+            <el-checkbox
+              v-for="permission in permissions"
+              :key="permission.key"
+              :value="permission.key"
+              border
+            >
+              <span>{{ permission.name }}</span>
+              <small>{{ permission.key }}</small>
+            </el-checkbox>
+          </el-checkbox-group>
         </el-form-item>
         <el-form-item label="角色状态" class="sm:col-span-2">
           <el-switch v-model="form.enabled" active-text="启用" inactive-text="停用" />
         </el-form-item>
       </div>
+      <DataPolicyEditor v-model="access.dataPolicies" />
       <el-alert v-if="formError" :title="formError" type="error" show-icon :closable="false" />
       <div class="dialog-actions">
         <el-button @click="dialogOpen = false">取消</el-button>
-        <el-button native-type="submit" type="primary" :loading="saving">保存角色</el-button>
+        <el-button native-type="submit" type="primary" :loading="saving" :disabled="!accessReady">
+          保存角色
+        </el-button>
       </div>
     </el-form>
   </el-dialog>
@@ -50,8 +53,18 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import type { RoleRequest, RoleSummary } from '@scaffold/api-contract'
-import { listMenuTreeOptions, type MenuTreeOption } from '@/modules/menus/menu-options'
+import type {
+  PermissionSummary,
+  RoleRequest,
+  RoleSummary,
+  SubjectAccessRequest,
+} from '@scaffold/api-contract'
+import DataPolicyEditor from '@/modules/authorization/components/DataPolicyEditor.vue'
+import {
+  getSubjectAccess,
+  listAuthorizationPermissions,
+  replaceSubjectAccess,
+} from '@/modules/authorization/authorization.api'
 import { createRole, updateRole } from '@/modules/roles/roles.api'
 
 const props = defineProps<{
@@ -62,16 +75,17 @@ const emit = defineEmits<{
 }>()
 const dialogOpen = defineModel<boolean>({ required: true })
 
-const menuTree = ref<MenuTreeOption[]>([])
+const permissions = ref<PermissionSummary[]>([])
 const saving = ref(false)
+const accessReady = ref(true)
 const formError = ref('')
 const form = reactive<RoleRequest>({
   name: '',
   code: '',
   description: '',
   enabled: true,
-  menuIds: [],
 })
+const access = reactive<SubjectAccessRequest>({ permissionKeys: [], dataPolicies: [] })
 
 function resetForm(): void {
   Object.assign(
@@ -82,10 +96,10 @@ function resetForm(): void {
           code: props.role.code,
           description: props.role.description,
           enabled: props.role.enabled,
-          menuIds: [...props.role.menuIds],
         }
-      : { name: '', code: '', description: '', enabled: true, menuIds: [] },
+      : { name: '', code: '', description: '', enabled: true },
   )
+  Object.assign(access, { permissionKeys: [], dataPolicies: [] })
   formError.value = ''
 }
 
@@ -96,10 +110,24 @@ async function submit(): Promise<void> {
     if (!form.name || !/^[A-Z0-9_]{2,50}$/.test(form.code)) {
       throw new Error('请填写角色名称，角色编码仅使用大写字母、数字和下划线')
     }
-    const payload: RoleRequest = { ...form, menuIds: [...form.menuIds] }
+    const payload: RoleRequest = { ...form }
     const result = props.role ? await updateRole(props.role.id, payload) : await createRole(payload)
     if (result.status !== 0) {
       throw new Error(result.err || '角色保存失败')
+    }
+    const roleId = props.role?.id ?? result.data?.id
+    if (!roleId) {
+      throw new Error('角色已保存，但未返回角色标识，权限配置尚未保存')
+    }
+    const accessResult = await replaceSubjectAccess('role', roleId, {
+      permissionKeys: [...access.permissionKeys],
+      dataPolicies: access.dataPolicies.map((policy) => ({
+        ...policy,
+        departmentIds: [...policy.departmentIds],
+      })),
+    })
+    if (accessResult.status !== 0) {
+      throw new Error(accessResult.err || '角色已保存，但权限配置保存失败')
     }
     dialogOpen.value = false
     ElMessage.success('角色已保存')
@@ -111,17 +139,61 @@ async function submit(): Promise<void> {
   }
 }
 
-watch(dialogOpen, function initializeForm(open) {
+watch(dialogOpen, async function initializeForm(open) {
   if (open) {
     resetForm()
+    if (props.role) {
+      accessReady.value = false
+      try {
+        const loaded = await getSubjectAccess('role', props.role.id)
+        access.permissionKeys = [...loaded.permissionKeys]
+        access.dataPolicies = loaded.dataPolicies.map((policy) => ({
+          ...policy,
+          departmentIds: [...policy.departmentIds],
+        }))
+      } catch (error) {
+        formError.value = error instanceof Error ? error.message : '权限配置加载失败'
+      } finally {
+        accessReady.value = !formError.value
+      }
+    } else {
+      accessReady.value = true
+    }
   }
 })
 
-onMounted(async function loadMenuOptions() {
+onMounted(async function loadPermissionOptions() {
   try {
-    menuTree.value = await listMenuTreeOptions()
+    permissions.value = await listAuthorizationPermissions()
   } catch {
-    menuTree.value = []
+    permissions.value = []
   }
 })
 </script>
+
+<style scoped lang="scss">
+.permission-grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.permission-grid .el-checkbox {
+  width: 100%;
+  height: auto;
+  margin: 0;
+  padding: 10px 12px;
+}
+
+.permission-grid span,
+.permission-grid small {
+  display: block;
+}
+
+.permission-grid small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-family: monospace;
+}
+</style>

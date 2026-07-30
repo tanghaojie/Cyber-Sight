@@ -54,6 +54,21 @@
         <el-form-item label="排序">
           <el-input-number v-model="form.sortOrder" :min="0" :max="9999" class="!w-full" />
         </el-form-item>
+        <el-form-item label="访问权限">
+          <el-select
+            v-model="form.requiredPermissionKey"
+            class="w-full"
+            clearable
+            placeholder="不限制（公共菜单）"
+          >
+            <el-option
+              v-for="permission in permissions"
+              :key="permission.key"
+              :label="`${permission.name} · ${permission.key}`"
+              :value="permission.key"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item v-if="form.type !== 'button'" label="站内路由" required>
           <el-input v-model.trim="form.path" :placeholder="routePlaceholder" />
           <small class="route-hint">{{ routeHint }}</small>
@@ -85,9 +100,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import type { MenuRequest, MenuSummary } from '@scaffold/api-contract'
+import type { MenuRequest, MenuSummary, PermissionSummary } from '@scaffold/api-contract'
+import { listAuthorizationPermissions } from '@/modules/authorization/authorization.api'
 import AppIcon from '@/components/AppIcon.vue'
 import { menuPathError } from '@/modules/menus/menu-form'
 import { createMenu, updateMenu } from '@/modules/menus/menus.api'
@@ -108,6 +124,7 @@ interface MenuForm {
   sortOrder: number
   type: MenuType
   enabled: boolean
+  requiredPermissionKey: string | null
 }
 
 const props = defineProps<{
@@ -123,6 +140,7 @@ const dialogOpen = defineModel<boolean>({ required: true })
 const saving = ref(false)
 const formError = ref('')
 const navigation = useNavigationStore()
+const permissions = ref<PermissionSummary[]>([])
 const form = reactive<MenuForm>({
   parentId: 0,
   name: '',
@@ -134,6 +152,7 @@ const form = reactive<MenuForm>({
   sortOrder: 0,
   type: 'menu',
   enabled: true,
+  requiredPermissionKey: null,
 })
 const typeOptions = [
   { label: '目录', value: 'directory' },
@@ -163,6 +182,7 @@ function resetForm(): void {
       sortOrder: props.menu.sortOrder,
       type: props.menu.type,
       enabled: props.menu.enabled,
+      requiredPermissionKey: props.menu.requiredPermissionKey ?? null,
     })
   } else {
     Object.assign(form, {
@@ -176,6 +196,7 @@ function resetForm(): void {
       sortOrder: 0,
       type: 'menu',
       enabled: true,
+      requiredPermissionKey: null,
     })
   }
   formError.value = ''
@@ -188,6 +209,7 @@ function payload(): MenuRequest {
     icon: form.icon,
     sortOrder: form.sortOrder,
     enabled: form.enabled,
+    requiredPermissionKey: form.requiredPermissionKey,
   }
   if (form.type === 'directory') {
     return {
@@ -277,6 +299,14 @@ watch(
     }
   },
 )
+
+onMounted(async function loadPermissionOptions() {
+  try {
+    permissions.value = await listAuthorizationPermissions()
+  } catch {
+    permissions.value = []
+  }
+})
 </script>
 
 <style lang="scss" scoped>

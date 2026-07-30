@@ -1,0 +1,154 @@
+<template>
+  <el-dialog
+    v-model="dialogOpen"
+    :title="department ? '编辑部门' : '新增部门'"
+    width="min(920px, calc(100vw - 32px))"
+    :close-on-click-modal="!saving"
+  >
+    <el-form label-position="top" @submit.prevent="submit">
+      <div class="form-columns">
+        <el-form-item label="部门名称" required>
+          <el-input v-model.trim="form.name" placeholder="例如 华东销售部" />
+        </el-form-item>
+        <el-form-item label="部门编码" required>
+          <el-input v-model.trim="form.code" placeholder="例如 EAST_SALES" />
+        </el-form-item>
+        <el-form-item label="上级部门">
+          <el-select v-model="form.parentId" class="w-full">
+            <el-option label="根部门" :value="0" />
+            <el-option
+              v-for="option in parentOptions"
+              :key="option.id"
+              :label="option.name"
+              :value="option.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="排序">
+          <el-input-number v-model="form.sortOrder" :min="0" :max="9999" class="!w-full" />
+        </el-form-item>
+        <el-form-item label="部门状态" class="sm:col-span-2">
+          <el-switch v-model="form.enabled" active-text="启用" inactive-text="停用" />
+        </el-form-item>
+      </div>
+      <DataPolicyEditor v-model="access.dataPolicies" allow-inheritance />
+      <el-alert v-if="formError" :title="formError" type="error" show-icon :closable="false" />
+      <div class="dialog-actions">
+        <el-button @click="dialogOpen = false">取消</el-button>
+        <el-button native-type="submit" type="primary" :loading="saving" :disabled="!accessReady">
+          保存部门
+        </el-button>
+      </div>
+    </el-form>
+  </el-dialog>
+</template>
+
+<script setup lang="ts">
+import { computed, reactive, ref, watch } from 'vue'
+import { ElMessage } from 'element-plus'
+import type {
+  DepartmentRequest,
+  DepartmentSummary,
+  SubjectAccessRequest,
+} from '@scaffold/api-contract'
+import DataPolicyEditor from '@/modules/authorization/components/DataPolicyEditor.vue'
+import { getSubjectAccess, replaceSubjectAccess } from '@/modules/authorization/authorization.api'
+import { createDepartment, updateDepartment } from '@/modules/departments/departments.api'
+
+const props = defineProps<{
+  department: DepartmentSummary | null
+  parentId: number
+  records: DepartmentSummary[]
+}>()
+const emit = defineEmits<{ saved: [] }>()
+const dialogOpen = defineModel<boolean>({ required: true })
+const saving = ref(false)
+const accessReady = ref(true)
+const formError = ref('')
+const form = reactive<DepartmentRequest>({
+  parentId: 0,
+  code: '',
+  name: '',
+  sortOrder: 0,
+  enabled: true,
+})
+const access = reactive<SubjectAccessRequest>({ permissionKeys: [], dataPolicies: [] })
+const parentOptions = computed(() => props.records.filter((row) => row.id !== props.department?.id))
+
+function resetForm(): void {
+  Object.assign(
+    form,
+    props.department
+      ? {
+          parentId: props.department.parentId,
+          code: props.department.code,
+          name: props.department.name,
+          sortOrder: props.department.sortOrder,
+          enabled: props.department.enabled,
+        }
+      : { parentId: props.parentId, code: '', name: '', sortOrder: 0, enabled: true },
+  )
+  Object.assign(access, { permissionKeys: [], dataPolicies: [] })
+  formError.value = ''
+}
+
+async function submit(): Promise<void> {
+  saving.value = true
+  formError.value = ''
+  try {
+    if (!form.name || !/^[A-Z0-9_]{2,50}$/.test(form.code)) {
+      throw new Error('请填写部门名称，部门编码仅使用大写字母、数字和下划线')
+    }
+    const result = props.department
+      ? await updateDepartment(props.department.id, { ...form })
+      : await createDepartment({ ...form })
+    if (result.status !== 0) {
+      throw new Error(result.err || '部门保存失败')
+    }
+    const departmentId = props.department?.id ?? result.data?.id
+    if (!departmentId) {
+      throw new Error('部门已保存，但未返回部门标识，数据权限尚未保存')
+    }
+    const accessResult = await replaceSubjectAccess('department', departmentId, {
+      permissionKeys: [],
+      dataPolicies: access.dataPolicies.map((policy) => ({
+        ...policy,
+        departmentIds: [...policy.departmentIds],
+      })),
+    })
+    if (accessResult.status !== 0) {
+      throw new Error(accessResult.err || '部门已保存，但数据权限保存失败')
+    }
+    dialogOpen.value = false
+    ElMessage.success('部门已保存')
+    emit('saved')
+  } catch (error) {
+    formError.value = error instanceof Error ? error.message : '部门保存失败'
+  } finally {
+    saving.value = false
+  }
+}
+
+watch(dialogOpen, async function initializeForm(open) {
+  if (!open) {
+    return
+  }
+  resetForm()
+  if (props.department) {
+    accessReady.value = false
+    try {
+      const loaded = await getSubjectAccess('department', props.department.id)
+      access.dataPolicies = loaded.dataPolicies.map((policy) => ({
+        ...policy,
+        departmentIds: [...policy.departmentIds],
+      }))
+    } catch (error) {
+      formError.value = error instanceof Error ? error.message : '数据权限加载失败'
+    } finally {
+      accessReady.value = !formError.value
+    }
+  } else {
+    accessReady.value = true
+  }
+})
+</script>

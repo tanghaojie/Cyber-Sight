@@ -1,14 +1,44 @@
-import { and, count, eq, ilike, inArray, or } from 'drizzle-orm'
+import { and, count, eq, ilike, inArray, or, sql } from 'drizzle-orm'
 import type { FastifyInstance } from 'fastify'
 import type { UserCreate, UserUpdate } from '@scaffold/api-contract'
-import { userRoles, users } from '@/db/schema.js'
+import type { Database } from '@/db/index.js'
+import { userDepartments, userRoles, users } from '@/db/schema.js'
+import type { DataAccessPlan } from '@/modules/authorization/authorization.service.js'
 import { auditView, pageOffset, type RepositoryListQuery } from '@/shared/database/pagination.js'
 import { hashPassword } from '@/modules/auth/auth.security.js'
 
-export async function listUsers(app: FastifyInstance, query: RepositoryListQuery) {
+type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0]
+
+function userAccessPredicate(plan: DataAccessPlan) {
+  if (plan.unrestricted) {
+    return undefined
+  }
+  const predicates = [
+    plan.ownerUserIds.length ? inArray(users.id, plan.ownerUserIds) : undefined,
+    plan.departmentIds.length
+      ? sql<boolean>`${users.id} IN (
+          SELECT ${userDepartments.userId}
+          FROM ${userDepartments}
+          WHERE ${userDepartments.departmentId} IN (${sql.join(
+            plan.departmentIds.map((id) => sql`${id}`),
+            sql`, `,
+          )})
+            AND ${userDepartments.isDeleted} = false
+        )`
+      : undefined,
+  ].filter((item) => item !== undefined)
+  return predicates.length > 0 ? or(...predicates) : sql<boolean>`false`
+}
+
+export async function listUsers(
+  app: FastifyInstance,
+  query: RepositoryListQuery,
+  access: DataAccessPlan,
+) {
   const keyword = query.keyword?.trim()
   const predicate = and(
     eq(users.isDeleted, false),
+    userAccessPredicate(access),
     keyword
       ? or(
           ilike(users.username, `%${keyword}%`),
@@ -27,12 +57,22 @@ export async function listUsers(app: FastifyInstance, query: RepositoryListQuery
   const [{ value: total }] = await app.db.select({ value: count() }).from(users).where(predicate)
 
   const ids = rows.map((row) => row.id)
-  const assignments = ids.length
-    ? await app.db
-        .select({ userId: userRoles.userId, roleId: userRoles.roleId })
-        .from(userRoles)
-        .where(and(inArray(userRoles.userId, ids), eq(userRoles.isDeleted, false)))
-    : []
+  const [roleAssignments, departmentAssignments] = ids.length
+    ? await Promise.all([
+        app.db
+          .select({ userId: userRoles.userId, roleId: userRoles.roleId })
+          .from(userRoles)
+          .where(and(inArray(userRoles.userId, ids), eq(userRoles.isDeleted, false))),
+        app.db
+          .select({
+            userId: userDepartments.userId,
+            departmentId: userDepartments.departmentId,
+            isPrimary: userDepartments.isPrimary,
+          })
+          .from(userDepartments)
+          .where(and(inArray(userDepartments.userId, ids), eq(userDepartments.isDeleted, false))),
+      ])
+    : [[], []]
 
   return {
     total,
@@ -42,38 +82,106 @@ export async function listUsers(app: FastifyInstance, query: RepositoryListQuery
       displayName: row.displayName,
       email: row.email,
       enabled: row.enabled,
-      roleIds: assignments.filter((item) => item.userId === row.id).map((item) => item.roleId),
+      roleIds: roleAssignments.filter((item) => item.userId === row.id).map((item) => item.roleId),
+      departmentIds: departmentAssignments
+        .filter((item) => item.userId === row.id)
+        .map((item) => item.departmentId),
+      primaryDepartmentId: departmentAssignments.find(
+        (item) => item.userId === row.id && item.isPrimary,
+      )!.departmentId,
       lastLoginAt: row.lastLoginAt?.toISOString() ?? null,
       ...auditView(row),
     })),
   }
 }
 
-async function replaceUserRoles(
+async function replaceUserDepartments(
+  tx: Transaction,
+  userId: number,
+  departmentIds: number[],
+  primaryDepartmentId: number,
+  actorId: number,
+): Promise<void> {
+  const now = new Date()
+  await tx
+    .update(userDepartments)
+    .set({ isDeleted: true, updatedAt: now, updatedBy: actorId })
+    .where(and(eq(userDepartments.userId, userId), eq(userDepartments.isDeleted, false)))
+  for (const departmentId of departmentIds) {
+    const [existing] = await tx
+      .select({ id: userDepartments.id })
+      .from(userDepartments)
+      .where(
+        and(eq(userDepartments.userId, userId), eq(userDepartments.departmentId, departmentId)),
+      )
+      .limit(1)
+    const isPrimary = departmentId === primaryDepartmentId
+    if (existing) {
+      await tx
+        .update(userDepartments)
+        .set({ isPrimary, isDeleted: false, updatedAt: now, updatedBy: actorId })
+        .where(eq(userDepartments.id, existing.id))
+    } else {
+      await tx.insert(userDepartments).values({
+        userId,
+        departmentId,
+        isPrimary,
+        createdBy: actorId,
+        updatedBy: actorId,
+      })
+    }
+  }
+}
+
+export async function canAssignUserDepartments(
   app: FastifyInstance,
+  departmentIds: number[],
+  access: DataAccessPlan,
+  targetUserId?: number,
+): Promise<boolean> {
+  if (access.unrestricted) {
+    return true
+  }
+  const allowed = new Set(access.departmentIds)
+  if (departmentIds.every((departmentId) => allowed.has(departmentId))) {
+    return true
+  }
+  if (!targetUserId || !access.ownerUserIds.includes(targetUserId)) {
+    return false
+  }
+  const rows = await app.db
+    .select({ id: userDepartments.departmentId })
+    .from(userDepartments)
+    .where(and(eq(userDepartments.userId, targetUserId), eq(userDepartments.isDeleted, false)))
+  const existing = new Set(rows.map((row) => row.id))
+  return existing.size === departmentIds.length && departmentIds.every((id) => existing.has(id))
+}
+
+async function replaceUserRoles(
+  tx: Transaction,
   userId: number,
   roleIds: number[],
   actorId: number,
 ): Promise<void> {
   const now = new Date()
-  await app.db
+  await tx
     .update(userRoles)
     .set({ isDeleted: true, updatedAt: now, updatedBy: actorId })
     .where(and(eq(userRoles.userId, userId), eq(userRoles.isDeleted, false)))
 
   for (const roleId of roleIds) {
-    const [existing] = await app.db
+    const [existing] = await tx
       .select({ id: userRoles.id })
       .from(userRoles)
       .where(and(eq(userRoles.userId, userId), eq(userRoles.roleId, roleId)))
       .limit(1)
     if (existing) {
-      await app.db
+      await tx
         .update(userRoles)
         .set({ isDeleted: false, updatedAt: now, updatedBy: actorId })
         .where(eq(userRoles.id, existing.id))
     } else {
-      await app.db.insert(userRoles).values({
+      await tx.insert(userRoles).values({
         userId,
         roleId,
         createdBy: actorId,
@@ -88,20 +196,30 @@ export async function createUser(
   input: UserCreate,
   actorId: number,
 ): Promise<number> {
-  const [created] = await app.db
-    .insert(users)
-    .values({
-      username: input.username,
-      displayName: input.displayName,
-      email: input.email,
-      passwordHash: await hashPassword(input.password),
-      enabled: input.enabled,
-      createdBy: actorId,
-      updatedBy: actorId,
-    })
-    .returning({ id: users.id })
-  await replaceUserRoles(app, created.id, input.roleIds, actorId)
-  return created.id
+  const passwordHash = await hashPassword(input.password)
+  return app.db.transaction(async function create(tx) {
+    const [created] = await tx
+      .insert(users)
+      .values({
+        username: input.username,
+        displayName: input.displayName,
+        email: input.email,
+        passwordHash,
+        enabled: input.enabled,
+        createdBy: actorId,
+        updatedBy: actorId,
+      })
+      .returning({ id: users.id })
+    await replaceUserRoles(tx, created.id, input.roleIds, actorId)
+    await replaceUserDepartments(
+      tx,
+      created.id,
+      input.departmentIds,
+      input.primaryDepartmentId,
+      actorId,
+    )
+    return created.id
+  })
 }
 
 export async function updateUser(
@@ -109,36 +227,41 @@ export async function updateUser(
   id: number,
   input: UserUpdate,
   actorId: number,
+  access: DataAccessPlan,
 ): Promise<boolean> {
   const passwordHash = input.password ? await hashPassword(input.password) : undefined
-  const updated = await app.db
-    .update(users)
-    .set({
-      displayName: input.displayName,
-      email: input.email,
-      enabled: input.enabled,
-      ...(passwordHash ? { passwordHash } : {}),
-      updatedAt: new Date(),
-      updatedBy: actorId,
-    })
-    .where(and(eq(users.id, id), eq(users.isDeleted, false)))
-    .returning({ id: users.id })
-  if (!updated.length) {
-    return false
-  }
-  await replaceUserRoles(app, id, input.roleIds, actorId)
-  return true
+  return app.db.transaction(async function update(tx) {
+    const updated = await tx
+      .update(users)
+      .set({
+        displayName: input.displayName,
+        email: input.email,
+        enabled: input.enabled,
+        ...(passwordHash ? { passwordHash } : {}),
+        updatedAt: new Date(),
+        updatedBy: actorId,
+      })
+      .where(and(eq(users.id, id), eq(users.isDeleted, false), userAccessPredicate(access)))
+      .returning({ id: users.id })
+    if (!updated.length) {
+      return false
+    }
+    await replaceUserRoles(tx, id, input.roleIds, actorId)
+    await replaceUserDepartments(tx, id, input.departmentIds, input.primaryDepartmentId, actorId)
+    return true
+  })
 }
 
 export async function softDeleteUser(
   app: FastifyInstance,
   id: number,
   actorId: number,
+  access: DataAccessPlan,
 ): Promise<boolean> {
   const result = await app.db
     .update(users)
     .set({ isDeleted: true, updatedAt: new Date(), updatedBy: actorId })
-    .where(and(eq(users.id, id), eq(users.isDeleted, false)))
+    .where(and(eq(users.id, id), eq(users.isDeleted, false), userAccessPredicate(access)))
     .returning({ id: users.id })
   return result.length > 0
 }

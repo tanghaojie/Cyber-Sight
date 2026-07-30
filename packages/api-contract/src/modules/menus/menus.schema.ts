@@ -5,6 +5,7 @@ import {
   ErrorResponseSchema,
   paginatedResponseSchema,
 } from '@/shared/http.js'
+import { PermissionKeySchema } from '@/modules/authorization/authorization.schema.js'
 
 const menuCommonShape = {
   parentId: z.number().int().min(0),
@@ -12,6 +13,7 @@ const menuCommonShape = {
   icon: z.string().max(50),
   sortOrder: z.number().int().min(0),
   enabled: z.boolean(),
+  requiredPermissionKey: PermissionKeySchema.nullable().optional(),
 }
 
 const directoryRequestSchema = z.strictObject({
@@ -63,6 +65,7 @@ export const MenuSummarySchema = AuditFieldsSchema.extend({
   sortOrder: z.number().int().min(0),
   type: z.enum(['directory', 'menu', 'button']),
   enabled: z.boolean(),
+  requiredPermissionKey: PermissionKeySchema.nullable().optional(),
 })
 
 export const MenuPageResponseSchema = paginatedResponseSchema(MenuSummarySchema)

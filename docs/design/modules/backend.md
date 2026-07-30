@@ -13,9 +13,13 @@
 - `src/db/`：Drizzle Schema 与数据库客户端。
 - `drizzle.config.ts`：数据库迁移生成配置。
 - `src/modules/auth/`：密码散列、JWT、数据库 token 会话、进程内 LRU 读缓存、登录/退出和当前用户解析。
-- `src/modules/users|roles|menus|dictionaries/`：四个独立管理 API 与 Drizzle 仓储；菜单模块额外提供当前用户导航树。
+- `src/modules/authorization/`：可注入 Provider、路由声明门禁、功能权限和数据范围解析。
+- `src/modules/departments/`：部门树、闭包关系、管理 API 和公共组织查询。
+- `src/modules/users|roles|menus|dictionaries/`：独立管理 API 与仓储；菜单模块额外提供按有效权限过滤的当前用户导航树。
 
 应用组装与网络监听必须分离，使测试可以通过 Fastify `inject` 验证路由而不占用端口。环境变量由集中配置模块加载和校验，数据库客户端在应用关闭时释放。
+
+业务路由在独立 Fastify 封装域中注册 authorization hook，必须显式声明 `public`、`authenticated` 或 `permission(anyOf)`；Swagger 自身路由位于该封装域之外。`buildApp()` 可注入其他 `AuthorizationProvider`，默认使用本地 PostgreSQL Provider。
 
 `src/shared/http/` 提供成功、失败、分页响应和分页默认值处理；`src/shared/errors/` 维护可执行的错误码常量。Fastify 全局错误处理器负责把校验失败、未找到路由和未捕获异常转换为统一错误响应。
 

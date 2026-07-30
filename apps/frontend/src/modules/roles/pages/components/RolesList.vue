@@ -30,12 +30,6 @@
         </template>
       </el-table-column>
       <el-table-column prop="description" label="职责说明" min-width="230" show-overflow-tooltip />
-      <el-table-column label="菜单范围" min-width="150">
-        <template #default="{ row }">
-          <span class="table-count">{{ row.menuIds.length }}</span>
-          <span class="table-muted ml-2">项权限</span>
-        </template>
-      </el-table-column>
       <el-table-column label="状态" width="100">
         <template #default="{ row }">
           <el-tag :type="row.enabled ? 'success' : 'info'" round>

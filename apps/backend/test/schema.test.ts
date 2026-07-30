@@ -3,15 +3,37 @@ import { getTableConfig, type PgTable } from 'drizzle-orm/pg-core'
 import { describe, expect, it } from 'vitest'
 import {
   authSessions,
+  dataPolicyDepartments,
+  dataPolicyRules,
+  departmentClosure,
+  departments,
   dictionaries,
   menus,
+  permissions,
   roleMenus,
+  rolePermissions,
   roles,
+  userDepartments,
   userRoles,
   users,
 } from '@/db/schema.js'
 
-const tables = [users, roles, userRoles, menus, roleMenus, dictionaries, authSessions]
+const tables = [
+  users,
+  roles,
+  userRoles,
+  departments,
+  departmentClosure,
+  userDepartments,
+  permissions,
+  rolePermissions,
+  menus,
+  roleMenus,
+  dictionaries,
+  dataPolicyRules,
+  dataPolicyDepartments,
+  authSessions,
+]
 
 const activeBusinessIdentityIndexes: Array<{
   table: PgTable
@@ -25,6 +47,41 @@ const activeBusinessIdentityIndexes: Array<{
     table: userRoles,
     name: 'user_roles_user_role_active_unique',
     columns: ['user_id', 'role_id'],
+  },
+  {
+    table: departments,
+    name: 'departments_code_active_unique',
+    columns: ['code'],
+  },
+  {
+    table: departmentClosure,
+    name: 'department_closure_path_active_unique',
+    columns: ['ancestor_id', 'descendant_id'],
+  },
+  {
+    table: userDepartments,
+    name: 'user_departments_user_department_active_unique',
+    columns: ['user_id', 'department_id'],
+  },
+  {
+    table: userDepartments,
+    name: 'user_departments_user_primary_active_unique',
+    columns: ['user_id'],
+  },
+  {
+    table: rolePermissions,
+    name: 'role_permissions_role_permission_active_unique',
+    columns: ['role_id', 'permission_key'],
+  },
+  {
+    table: dataPolicyRules,
+    name: 'data_policy_rules_identity_active_unique',
+    columns: ['subject_type', 'subject_id', 'resource_key', 'action', 'scope_type'],
+  },
+  {
+    table: dataPolicyDepartments,
+    name: 'data_policy_departments_rule_department_active_unique',
+    columns: ['rule_id', 'department_id'],
   },
   {
     table: roleMenus,
@@ -56,6 +113,7 @@ describe('menu routing fields', () => {
     expect(columns).toHaveProperty('component')
     expect(columns).toHaveProperty('layout')
     expect(columns).toHaveProperty('externalUrl')
+    expect(columns).toHaveProperty('requiredPermissionKey')
     expect(columns).not.toHaveProperty('code')
   })
 })

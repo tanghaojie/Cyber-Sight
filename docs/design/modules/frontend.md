@@ -29,7 +29,7 @@ updated: 2026-07-30
 - `src/layouts/EmptyLayout.vue`：只提供一个 `<router-view>` 的可选布局。
 - `src/assets/icons/*.svg`、`src/shared/icons/icon-registry.ts` 与 `src/components/AppIcon.vue`：构建期 SVG sprite 和稳定图标名称。
 
-模块外部只能依赖模块设计登记的表意公共文件。禁止新增无差别 `index.ts` barrel，禁止跨模块导入页面、私有 composable、内部状态或未登记 service。角色模块通过菜单模块的 `menu-options.ts` 读取授权选项；用户模块通过角色模块公开的 `roles.api.ts` 读取角色选项。
+模块外部只能依赖模块设计登记的表意公共文件。禁止新增无差别 `index.ts` barrel，禁止跨模块导入页面、私有 composable、内部状态或未登记 service。用户模块通过角色和部门 API 读取归属选项；用户、角色和部门弹窗复用 authorization 的 `DataPolicyEditor.vue` 与 API；菜单弹窗通过 authorization API 读取权限目录。
 
 ## 认证数据流
 
@@ -54,9 +54,9 @@ cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie�
 
 ## 页面注册、布局与样式
 
-`view-registry.ts` 通过 `import.meta.glob('@/modules/**/registerViews.ts', { eager: true })` 自动发现登记模块。登记 key 必须符合小写字母开头的 kebab-case 约束且全局唯一；缺少 `registerViews()`、非法 key 或重复 key 会在注册表构建时失败。
+`view-registry.ts` 通过 `import.meta.glob('@/modules/**/registerViews.ts', { eager: true })` 自动发现登记模块，包括新增的 `departments` 页面。登记 key 必须符合小写字母开头的 kebab-case 约束且全局唯一；缺少 `registerViews()`、非法 key 或重复 key 会在注册表构建时失败。
 
-布局注册表通过懒加载发现 `src/layouts/*.vue`。`AdminLayout` 是静态根壳和必备布局；`EmptyLayout` 可供菜单显式选择。Tailwind CSS 负责布局、间距、响应式和多数视觉样式，Element Plus 提供表单、表格、弹窗和反馈；全局 SCSS 按基础、管理布局、过渡和 Element Plus 组件覆盖拆分。用户、角色、菜单和字典管理页面共用的内容容器最大宽度为 `1920px`，窄于该宽度时仍保持响应式占满可用空间。
+布局注册表通过懒加载发现 `src/layouts/*.vue`。`AdminLayout` 是静态根壳和必备布局；`EmptyLayout` 可供菜单显式选择。Tailwind CSS 负责布局、间距、响应式和多数视觉样式，Element Plus 提供表单、表格、弹窗和反馈；全局 SCSS 按基础、管理布局、过渡和 Element Plus 组件覆盖拆分。用户、角色、部门、菜单和字典管理页面共用的内容容器最大宽度为 `1920px`，窄于该宽度时仍保持响应式占满可用空间。
 
 ## 全局 HTTP 错误
 
@@ -65,7 +65,7 @@ cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie�
 ## 验证与已知边界
 
 - AI 执行格式、静态检查、TypeScript 检查和生产构建；不创建或运行前端自动化、端到端或浏览器测试。
-- 维护者人工验收登录恢复、cookie 到期、退出/401 清理、直接访问动态 URL、页面与布局发现、目录嵌套、空目录隐藏、三种菜单节点和响应式外壳。
+- 维护者人工验收登录恢复、cookie 到期、退出/401 清理、直接访问动态 URL、页面与布局发现、目录嵌套、权限菜单过滤、部门与三类主体策略弹窗和响应式外壳。
 - 当前构建会提示 `AdminLayout.vue` 和 `HomePage.vue` 同时被静态与动态导入，因此不会拆入独立动态 chunk；这不阻止生产构建。
 - `useHealth` 成功重试时不会清理旧错误状态；系统化可访问性审计和生产环境 API 地址策略尚未补齐。
 

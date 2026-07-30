@@ -12,6 +12,18 @@ import {
 } from 'drizzle-orm/pg-core'
 
 export const menuType = pgEnum('menu_type', ['directory', 'menu', 'button'])
+export const authorizationSubjectType = pgEnum('authorization_subject_type', [
+  'user',
+  'role',
+  'department',
+])
+export const dataScopeType = pgEnum('data_scope_type', [
+  'self',
+  'own_department',
+  'own_department_tree',
+  'custom_departments',
+  'all',
+])
 
 export function auditColumns() {
   return {
@@ -81,6 +93,96 @@ export const userRoles = pgTable(
   }),
 )
 
+export const departments = pgTable(
+  'departments',
+  {
+    id: serial('id').primaryKey(),
+    parentId: integer('parent_id').default(0).notNull(),
+    code: varchar('code', { length: 50 }).notNull(),
+    name: varchar('name', { length: 80 }).notNull(),
+    sortOrder: integer('sort_order').default(0).notNull(),
+    enabled: boolean('enabled').default(true).notNull(),
+    ...auditColumns(),
+  },
+  (table) => ({
+    activeCode: uniqueIndex('departments_code_active_unique')
+      .on(table.code)
+      .where(sql`${table.isDeleted} = false`),
+  }),
+)
+
+export const departmentClosure = pgTable(
+  'department_closure',
+  {
+    id: serial('id').primaryKey(),
+    ancestorId: integer('ancestor_id')
+      .notNull()
+      .references(() => departments.id),
+    descendantId: integer('descendant_id')
+      .notNull()
+      .references(() => departments.id),
+    depth: integer('depth').notNull(),
+    ...auditColumns(),
+  },
+  (table) => ({
+    activePath: uniqueIndex('department_closure_path_active_unique')
+      .on(table.ancestorId, table.descendantId)
+      .where(sql`${table.isDeleted} = false`),
+  }),
+)
+
+export const userDepartments = pgTable(
+  'user_departments',
+  {
+    id: serial('id').primaryKey(),
+    userId: integer('user_id')
+      .notNull()
+      .references(() => users.id),
+    departmentId: integer('department_id')
+      .notNull()
+      .references(() => departments.id),
+    isPrimary: boolean('is_primary').default(false).notNull(),
+    ...auditColumns(),
+  },
+  (table) => ({
+    activeAssignment: uniqueIndex('user_departments_user_department_active_unique')
+      .on(table.userId, table.departmentId)
+      .where(sql`${table.isDeleted} = false`),
+    activePrimary: uniqueIndex('user_departments_user_primary_active_unique')
+      .on(table.userId)
+      .where(sql`${table.isDeleted} = false AND ${table.isPrimary} = true`),
+  }),
+)
+
+export const permissions = pgTable('permissions', {
+  id: serial('id').primaryKey(),
+  key: varchar('key', { length: 100 }).notNull().unique(),
+  module: varchar('module', { length: 80 }).notNull(),
+  name: varchar('name', { length: 80 }).notNull(),
+  description: varchar('description', { length: 200 }).default('').notNull(),
+  enabled: boolean('enabled').default(true).notNull(),
+  ...auditColumns(),
+})
+
+export const rolePermissions = pgTable(
+  'role_permissions',
+  {
+    id: serial('id').primaryKey(),
+    roleId: integer('role_id')
+      .notNull()
+      .references(() => roles.id),
+    permissionKey: varchar('permission_key', { length: 100 })
+      .notNull()
+      .references(() => permissions.key),
+    ...auditColumns(),
+  },
+  (table) => ({
+    activeAssignment: uniqueIndex('role_permissions_role_permission_active_unique')
+      .on(table.roleId, table.permissionKey)
+      .where(sql`${table.isDeleted} = false`),
+  }),
+)
+
 export const menus = pgTable('menus', {
   id: serial('id').primaryKey(),
   parentId: integer('parent_id').default(0).notNull(),
@@ -93,6 +195,9 @@ export const menus = pgTable('menus', {
   sortOrder: integer('sort_order').default(0).notNull(),
   type: menuType('type').default('menu').notNull(),
   enabled: boolean('enabled').default(true).notNull(),
+  requiredPermissionKey: varchar('required_permission_key', { length: 100 }).references(
+    () => permissions.key,
+  ),
   ...auditColumns(),
 })
 
@@ -130,6 +235,46 @@ export const dictionaries = pgTable(
   (table) => ({
     activeEntry: uniqueIndex('dictionaries_type_value_active_unique')
       .on(table.type, table.value)
+      .where(sql`${table.isDeleted} = false`),
+  }),
+)
+
+export const dataPolicyRules = pgTable(
+  'data_policy_rules',
+  {
+    id: serial('id').primaryKey(),
+    subjectType: authorizationSubjectType('subject_type').notNull(),
+    subjectId: integer('subject_id').notNull(),
+    resourceKey: varchar('resource_key', { length: 100 }).notNull(),
+    action: varchar('action', { length: 50 }).notNull(),
+    scopeType: dataScopeType('scope_type').notNull(),
+    inheritToChildren: boolean('inherit_to_children').default(false).notNull(),
+    enabled: boolean('enabled').default(true).notNull(),
+    ...auditColumns(),
+  },
+  (table) => ({
+    activeRule: uniqueIndex('data_policy_rules_identity_active_unique')
+      .on(table.subjectType, table.subjectId, table.resourceKey, table.action, table.scopeType)
+      .where(sql`${table.isDeleted} = false`),
+  }),
+)
+
+export const dataPolicyDepartments = pgTable(
+  'data_policy_departments',
+  {
+    id: serial('id').primaryKey(),
+    ruleId: integer('rule_id')
+      .notNull()
+      .references(() => dataPolicyRules.id),
+    departmentId: integer('department_id')
+      .notNull()
+      .references(() => departments.id),
+    includeDescendants: boolean('include_descendants').default(false).notNull(),
+    ...auditColumns(),
+  },
+  (table) => ({
+    activeAssignment: uniqueIndex('data_policy_departments_rule_department_active_unique')
+      .on(table.ruleId, table.departmentId)
       .where(sql`${table.isDeleted} = false`),
   }),
 )

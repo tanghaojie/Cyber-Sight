@@ -9,13 +9,13 @@ updated: 2026-07-30
 
 ## 职责与边界
 
-`menus` 是菜单记录、树结构、导航类型规则、布局标识和当前用户菜单树的数据所有者。它不拥有页面组件或布局实现；前端组合根仅使用菜单中的稳定 `component` 与 `layout` 标识查找构建期注册的加载器。
+`menus` 是菜单记录、树结构、导航类型规则、布局标识、可选访问权限键和当前用户菜单树的数据所有者。它不拥有权限授予、页面组件或布局实现；前端组合根仅使用菜单中的稳定 `component` 与 `layout` 标识查找构建期注册的加载器。
 
 ## 公共接口
 
 - 管理 HTTP：`GET/POST /admin/menus`、`PUT/DELETE /admin/menus/{id}`。
 - 导航 HTTP：`GET /navigation/menus`。
-- 前端公共文件：`registerViews.ts` 登记菜单管理页面；`menus.api.ts` 暴露菜单 API；`menu-options.ts` 暴露角色授权所需的 `listMenuTreeOptions` 与 `MenuTreeOption`。
+- 前端公共文件：`registerViews.ts` 登记菜单管理页面；`menus.api.ts` 暴露菜单 API。
 - 契约：`MenuSummary`、`MenuRequest`、`NavigationMenu`、导航树响应。
 
 ## 数据流、失败模式与测试
@@ -28,10 +28,12 @@ updated: 2026-07-30
 
 写入模型保持严格类型约束；读取摘要兼容旧版本的不规范字段组合，避免存量单条记录阻断整个管理列表。运行时导航会过滤缺少站内路径/组件标识的菜单和缺少 HTTP(S) 地址的外链按钮；存量空目录路径按透明前缀只读兼容，旧记录仍可在菜单管理中编辑修复。侧栏仅渲染包含子项的目录，因此空目录不显示；目录本身不提供点击导航。
 
+菜单可选保存 `required_permission_key`。导航只保留未限制或当前用户拥有相应有效权限的节点，并自动补齐可见节点的目录祖先；`SUPER_ADMIN` 不存在运行时硬编码绕过。菜单管理路由要求 `menus.manage`，导航接口只要求已认证。
+
 菜单记录不再包含 `code` 字段。名称、层级、类型、站内路径、组件、布局或外链已经能够完整表达菜单身份与行为；前端不生成内部编码，管理与导航契约也不返回该字段。菜单搜索只匹配名称。
 
 ## 兼容性与迁移
 
-数据库迁移先删除 `menus_code_active_unique` 索引，再删除 `menus.code` 列。该字段没有被角色授权或路由注册引用，删除不会改变现有菜单 ID、层级、授权关系和导航地址。
+历史迁移先删除 `menus_code_active_unique` 索引，再删除 `menus.code` 列。本次授权迁移增加 `required_permission_key`，按页面组件回填管理权限，并把旧 `role_menus` 授权转换为角色权限键；原关联表暂时保留但不再作为运行时权威来源。
 
 初始版本之前的菜单、布局和软删除唯一性取舍保留在[归档 ADR](../../archive/README.md)，当前语义以本设计、共享 Schema 和后端测试为准。

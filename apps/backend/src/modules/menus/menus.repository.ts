@@ -1,7 +1,7 @@
-import { and, count, eq, ilike, inArray } from 'drizzle-orm'
+import { and, count, eq, ilike } from 'drizzle-orm'
 import type { FastifyInstance } from 'fastify'
 import type { CurrentUser, MenuRequest, NavigationMenu } from '@scaffold/api-contract'
-import { menus, roleMenus, roles, userRoles } from '@/db/schema.js'
+import { menus } from '@/db/schema.js'
 import { auditView, pageOffset, type RepositoryListQuery } from '@/shared/database/pagination.js'
 
 type NavigationRow = Omit<NavigationMenu, 'children'>
@@ -25,6 +25,7 @@ function menuSummary(row: typeof menus.$inferSelect) {
   return {
     ...navigationRow(row),
     enabled: row.enabled,
+    requiredPermissionKey: row.requiredPermissionKey,
     ...auditView(row),
   }
 }
@@ -135,21 +136,16 @@ export async function listNavigationMenus(
     .from(menus)
     .where(and(eq(menus.enabled, true), eq(menus.isDeleted, false)))
     .orderBy(menus.sortOrder, menus.id)
-  const navigationRows = rows.map(navigationRow)
-  if (user.roles.includes('SUPER_ADMIN')) {
-    return buildNavigationTree(navigationRows)
-  }
-
-  const assignments = await app.db
-    .select({ menuId: roleMenus.menuId })
-    .from(userRoles)
-    .innerJoin(
-      roles,
-      and(eq(userRoles.roleId, roles.id), eq(roles.enabled, true), eq(roles.isDeleted, false)),
-    )
-    .innerJoin(roleMenus, and(eq(roleMenus.roleId, roles.id), eq(roleMenus.isDeleted, false)))
-    .where(and(eq(userRoles.userId, user.id), eq(userRoles.isDeleted, false)))
-  return buildNavigationTree(navigationRows, new Set(assignments.map((item) => item.menuId)))
+  const permissionKeys = new Set(await app.authorization.effectivePermissionKeys(app, user))
+  const allowedMenuIds = new Set(
+    rows
+      .filter(
+        (row) =>
+          row.requiredPermissionKey === null || permissionKeys.has(row.requiredPermissionKey),
+      )
+      .map((row) => row.id),
+  )
+  return buildNavigationTree(rows.map(navigationRow), allowedMenuIds)
 }
 
 export async function validateMenuParent(

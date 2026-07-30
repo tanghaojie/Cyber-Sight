@@ -19,6 +19,7 @@ import {
   requireCurrentUser,
   revokeUserTokens,
 } from '@/modules/auth/auth.service.js'
+import { authorizationPermissionKeys } from '@/modules/authorization/authorization.resources.js'
 import {
   ensureUpdated,
   isUniqueViolation,
@@ -26,13 +27,38 @@ import {
   normalizedListQuery,
 } from '@/shared/http/route-helpers.js'
 import { ErrorCode } from '@/shared/errors/error-codes.js'
+import { enabledDepartmentIds } from '@/modules/departments/departments.access.js'
+import { enabledRoleIds } from '@/modules/roles/roles.access.js'
 import { failure, paginatedSuccess, success } from '@/shared/http/response.js'
-import { createUser, listUsers, softDeleteUser, updateUser } from './users.repository.js'
+import {
+  canAssignUserDepartments,
+  createUser,
+  listUsers,
+  softDeleteUser,
+  updateUser,
+} from './users.repository.js'
+
+async function hasValidAssignments(
+  app: FastifyInstance,
+  roleIds: number[],
+  departmentIds: number[],
+): Promise<boolean> {
+  const [validRoleIds, validDepartmentIds] = await Promise.all([
+    enabledRoleIds(app, roleIds),
+    enabledDepartmentIds(app, departmentIds),
+  ])
+  return (
+    validRoleIds.length === roleIds.length && validDepartmentIds.length === departmentIds.length
+  )
+}
 
 export async function userRoutes(app: FastifyInstance): Promise<void> {
   app.get<{ Querystring: ListQuery }>(
     '/admin/users',
     {
+      config: {
+        authorization: { mode: 'permission', anyOf: [authorizationPermissionKeys.usersManage] },
+      },
       schema: {
         operationId: 'listUsers',
         tags: ['Users'],
@@ -44,8 +70,9 @@ export async function userRoutes(app: FastifyInstance): Promise<void> {
       },
     },
     async function listUserHandler(request) {
-      await requireCurrentUser(app, request)
-      const page = await listUsers(app, normalizedListQuery(request.query))
+      const actor = await requireCurrentUser(app, request)
+      const access = await app.authorization.resolveDataAccess(app, actor, 'users', 'read')
+      const page = await listUsers(app, normalizedListQuery(request.query), access)
       return paginatedSuccess(page.list, page.total)
     },
   )
@@ -53,6 +80,9 @@ export async function userRoutes(app: FastifyInstance): Promise<void> {
   app.post<{ Body: UserCreate }>(
     '/admin/users',
     {
+      config: {
+        authorization: { mode: 'permission', anyOf: [authorizationPermissionKeys.usersManage] },
+      },
       schema: {
         operationId: 'createUser',
         tags: ['Users'],
@@ -65,6 +95,13 @@ export async function userRoutes(app: FastifyInstance): Promise<void> {
     },
     async function createUserHandler(request) {
       const actor = await requireCurrentUser(app, request)
+      if (!(await hasValidAssignments(app, request.body.roleIds, request.body.departmentIds))) {
+        return failure(ErrorCode.INVALID_REQUEST, 'Invalid role or department assignment')
+      }
+      const access = await app.authorization.resolveDataAccess(app, actor, 'users', 'create')
+      if (!(await canAssignUserDepartments(app, request.body.departmentIds, access))) {
+        return failure(ErrorCode.FORBIDDEN, 'Data scope does not allow these departments')
+      }
       return mutationResult(() => createUser(app, request.body, actor.id))
     },
   )
@@ -72,6 +109,9 @@ export async function userRoutes(app: FastifyInstance): Promise<void> {
   app.put<{ Params: IdParams; Body: UserUpdate }>(
     '/admin/users/:id',
     {
+      config: {
+        authorization: { mode: 'permission', anyOf: [authorizationPermissionKeys.usersManage] },
+      },
       schema: {
         operationId: 'updateUser',
         tags: ['Users'],
@@ -85,8 +125,22 @@ export async function userRoutes(app: FastifyInstance): Promise<void> {
     },
     async function updateUserHandler(request) {
       const actor = await requireCurrentUser(app, request)
+      if (!(await hasValidAssignments(app, request.body.roleIds, request.body.departmentIds))) {
+        return failure(ErrorCode.INVALID_REQUEST, 'Invalid role or department assignment')
+      }
+      const access = await app.authorization.resolveDataAccess(app, actor, 'users', 'update')
+      if (
+        !(await canAssignUserDepartments(
+          app,
+          request.body.departmentIds,
+          access,
+          request.params.id,
+        ))
+      ) {
+        return failure(ErrorCode.FORBIDDEN, 'Data scope does not allow these departments')
+      }
       try {
-        ensureUpdated(app, await updateUser(app, request.params.id, request.body, actor.id))
+        ensureUpdated(app, await updateUser(app, request.params.id, request.body, actor.id, access))
         invalidateUserTokenCache(app, request.params.id)
         return success({ id: request.params.id })
       } catch (error) {
@@ -101,6 +155,9 @@ export async function userRoutes(app: FastifyInstance): Promise<void> {
   app.delete<{ Params: IdParams }>(
     '/admin/users/:id',
     {
+      config: {
+        authorization: { mode: 'permission', anyOf: [authorizationPermissionKeys.usersManage] },
+      },
       schema: {
         operationId: 'deleteUser',
         tags: ['Users'],
@@ -116,7 +173,8 @@ export async function userRoutes(app: FastifyInstance): Promise<void> {
       if (actor.id === request.params.id) {
         throw app.httpErrors.forbidden('You cannot delete your own account')
       }
-      ensureUpdated(app, await softDeleteUser(app, request.params.id, actor.id))
+      const access = await app.authorization.resolveDataAccess(app, actor, 'users', 'delete')
+      ensureUpdated(app, await softDeleteUser(app, request.params.id, actor.id, access))
       await revokeUserTokens(app, request.params.id, actor.id)
       return success()
     },

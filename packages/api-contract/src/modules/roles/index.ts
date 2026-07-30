@@ -6,15 +6,12 @@ import {
   paginatedResponseSchema,
 } from '@/shared/http.js'
 
-const integerArray = z.array(z.number().int())
-
 export const RoleSummarySchema = AuditFieldsSchema.extend({
   id: z.number().int(),
   name: z.string(),
   code: z.string(),
   description: z.string(),
   enabled: z.boolean(),
-  menuIds: integerArray,
 })
 
 export const RoleRequestSchema = z.strictObject({
@@ -26,7 +23,6 @@ export const RoleRequestSchema = z.strictObject({
     .regex(/^[A-Z0-9_]+$/),
   description: z.string().max(200),
   enabled: z.boolean(),
-  menuIds: integerArray,
 })
 
 export const RolePageResponseSchema = paginatedResponseSchema(RoleSummarySchema)

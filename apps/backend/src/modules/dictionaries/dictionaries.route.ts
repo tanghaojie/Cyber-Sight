@@ -13,6 +13,7 @@ import {
   type ListQuery,
 } from '@scaffold/api-contract'
 import { requireCurrentUser } from '@/modules/auth/auth.service.js'
+import { authorizationPermissionKeys } from '@/modules/authorization/authorization.resources.js'
 import { ensureUpdated, mutationResult, normalizedListQuery } from '@/shared/http/route-helpers.js'
 import { paginatedSuccess, success } from '@/shared/http/response.js'
 import {
@@ -26,6 +27,12 @@ export async function dictionaryRoutes(app: FastifyInstance): Promise<void> {
   app.get<{ Querystring: ListQuery }>(
     '/admin/dictionaries',
     {
+      config: {
+        authorization: {
+          mode: 'permission',
+          anyOf: [authorizationPermissionKeys.dictionariesManage],
+        },
+      },
       schema: {
         operationId: 'listDictionaries',
         tags: ['Dictionaries'],
@@ -45,6 +52,12 @@ export async function dictionaryRoutes(app: FastifyInstance): Promise<void> {
   app.post<{ Body: DictionaryRequest }>(
     '/admin/dictionaries',
     {
+      config: {
+        authorization: {
+          mode: 'permission',
+          anyOf: [authorizationPermissionKeys.dictionariesManage],
+        },
+      },
       schema: {
         operationId: 'createDictionary',
         tags: ['Dictionaries'],
@@ -63,6 +76,12 @@ export async function dictionaryRoutes(app: FastifyInstance): Promise<void> {
   app.put<{ Params: IdParams; Body: DictionaryRequest }>(
     '/admin/dictionaries/:id',
     {
+      config: {
+        authorization: {
+          mode: 'permission',
+          anyOf: [authorizationPermissionKeys.dictionariesManage],
+        },
+      },
       schema: {
         operationId: 'updateDictionary',
         tags: ['Dictionaries'],
@@ -83,6 +102,12 @@ export async function dictionaryRoutes(app: FastifyInstance): Promise<void> {
   app.delete<{ Params: IdParams }>(
     '/admin/dictionaries/:id',
     {
+      config: {
+        authorization: {
+          mode: 'permission',
+          anyOf: [authorizationPermissionKeys.dictionariesManage],
+        },
+      },
       schema: {
         operationId: 'deleteDictionary',
         tags: ['Dictionaries'],

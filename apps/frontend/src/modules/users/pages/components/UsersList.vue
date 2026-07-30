@@ -36,6 +36,11 @@
           </div>
         </template>
       </el-table-column>
+      <el-table-column label="主部门" min-width="150">
+        <template #default="{ row }">
+          {{ departmentName(row.primaryDepartmentId) }}
+        </template>
+      </el-table-column>
       <el-table-column label="状态" width="100">
         <template #default="{ row }">
           <el-tag :type="row.enabled ? 'success' : 'info'" round>
@@ -72,12 +77,13 @@
 import { onMounted, ref } from 'vue'
 import { Delete, EditPen, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { UserSummary } from '@scaffold/api-contract'
+import type { DepartmentOption, UserSummary } from '@scaffold/api-contract'
 import type { RoleOption } from '@/modules/roles/roles.api'
 import { deleteUser, listUsers } from '@/modules/users/users.api'
 
 const props = defineProps<{
   roleOptions: RoleOption[]
+  departmentOptions: DepartmentOption[]
 }>()
 const emit = defineEmits<{
   edit: [user: UserSummary]
@@ -117,6 +123,10 @@ function search(): void {
 
 function roleName(id: number): string {
   return props.roleOptions.find((role) => role.id === id)?.name ?? `角色 #${id}`
+}
+
+function departmentName(id: number): string {
+  return props.departmentOptions.find((department) => department.id === id)?.name ?? `部门 #${id}`
 }
 
 async function remove(user: UserSummary): Promise<void> {

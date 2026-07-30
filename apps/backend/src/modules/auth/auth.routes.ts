@@ -18,6 +18,7 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
   app.post<{ Body: LoginRequest }>(
     '/auth/login',
     {
+      config: { authorization: { mode: 'public' } },
       schema: {
         operationId: 'login',
         summary: 'Sign in with username and password',
@@ -46,6 +47,7 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
   app.get(
     '/auth/me',
     {
+      config: { authorization: { mode: 'authenticated' } },
       schema: {
         operationId: 'getCurrentUser',
         summary: 'Get the signed-in user',
@@ -65,6 +67,7 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
   app.post(
     '/auth/logout',
     {
+      config: { authorization: { mode: 'authenticated' } },
       schema: {
         operationId: 'logout',
         summary: 'Revoke the current token',

@@ -11,9 +11,14 @@ import { userRoutes } from './modules/users/index.js'
 import { roleRoutes } from './modules/roles/index.js'
 import { menuRoutes } from './modules/menus/menus.route.js'
 import { dictionaryRoutes } from './modules/dictionaries/index.js'
+import { authorizationRoutes } from './modules/authorization/authorization.route.js'
+import { registerAuthorization } from './modules/authorization/authorization.plugin.js'
+import type { AuthorizationProvider } from './modules/authorization/authorization.provider.js'
+import { departmentRoutes } from './modules/departments/departments.route.js'
 
 interface AppDependencies {
   jwtSecret?: string
+  authorizationProvider?: AuthorizationProvider
 }
 
 export async function buildApp(
@@ -37,12 +42,17 @@ export async function buildApp(
   await registerResponseHandling(app)
   await registerSwagger(app)
   app.register(dbPlugin)
-  app.register(healthRoutes)
-  app.register(authRoutes)
-  app.register(userRoutes)
-  app.register(roleRoutes)
-  app.register(menuRoutes)
-  app.register(dictionaryRoutes)
+  app.register(async function applicationRoutes(router) {
+    await registerAuthorization(router, dependencies.authorizationProvider)
+    router.register(healthRoutes)
+    router.register(authRoutes)
+    router.register(authorizationRoutes)
+    router.register(userRoutes)
+    router.register(roleRoutes)
+    router.register(departmentRoutes)
+    router.register(menuRoutes)
+    router.register(dictionaryRoutes)
+  })
 
   return app
 }

@@ -18,6 +18,7 @@ export async function healthRoutes(app: FastifyInstance): Promise<void> {
   app.get<{ Reply: HealthResponse }>(
     '/health',
     {
+      config: { authorization: { mode: 'public' } },
       schema: {
         operationId: 'getHealth',
         tags: ['Health'],

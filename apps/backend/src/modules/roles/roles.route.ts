@@ -13,6 +13,7 @@ import {
   type RoleRequest,
 } from '@scaffold/api-contract'
 import { invalidateAllTokenCache, requireCurrentUser } from '@/modules/auth/auth.service.js'
+import { authorizationPermissionKeys } from '@/modules/authorization/authorization.resources.js'
 import { ensureUpdated, mutationResult, normalizedListQuery } from '@/shared/http/route-helpers.js'
 import { paginatedSuccess, success } from '@/shared/http/response.js'
 import { createRole, listRoles, softDeleteRole, updateRole } from './roles.repository.js'
@@ -21,6 +22,12 @@ export async function roleRoutes(app: FastifyInstance): Promise<void> {
   app.get<{ Querystring: ListQuery }>(
     '/admin/roles',
     {
+      config: {
+        authorization: {
+          mode: 'permission',
+          anyOf: [authorizationPermissionKeys.rolesManage, authorizationPermissionKeys.usersManage],
+        },
+      },
       schema: {
         operationId: 'listRoles',
         tags: ['Roles'],
@@ -40,6 +47,9 @@ export async function roleRoutes(app: FastifyInstance): Promise<void> {
   app.post<{ Body: RoleRequest }>(
     '/admin/roles',
     {
+      config: {
+        authorization: { mode: 'permission', anyOf: [authorizationPermissionKeys.rolesManage] },
+      },
       schema: {
         operationId: 'createRole',
         tags: ['Roles'],
@@ -58,6 +68,9 @@ export async function roleRoutes(app: FastifyInstance): Promise<void> {
   app.put<{ Params: IdParams; Body: RoleRequest }>(
     '/admin/roles/:id',
     {
+      config: {
+        authorization: { mode: 'permission', anyOf: [authorizationPermissionKeys.rolesManage] },
+      },
       schema: {
         operationId: 'updateRole',
         tags: ['Roles'],
@@ -79,6 +92,9 @@ export async function roleRoutes(app: FastifyInstance): Promise<void> {
   app.delete<{ Params: IdParams }>(
     '/admin/roles/:id',
     {
+      config: {
+        authorization: { mode: 'permission', anyOf: [authorizationPermissionKeys.rolesManage] },
+      },
       schema: {
         operationId: 'deleteRole',
         tags: ['Roles'],

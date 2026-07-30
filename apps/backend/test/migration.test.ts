@@ -57,10 +57,33 @@ describe('database migrations', () => {
   })
 
   it('drops the obsolete menu code index and column', () => {
-    const migrationSql = latestMigrationSql()
+    const migrationSql = migrationContaining('DROP INDEX IF EXISTS "menus_code_active_unique"')
 
     expect(migrationSql).toContain('DROP INDEX IF EXISTS "menus_code_active_unique"')
     expect(migrationSql).toContain('ALTER TABLE "menus" DROP COLUMN IF EXISTS "code"')
+  })
+
+  it('adds authorization, department and data-scope storage with compatibility backfills', () => {
+    const migrationSql = latestMigrationSql()
+
+    for (const table of [
+      'permissions',
+      'role_permissions',
+      'departments',
+      'department_closure',
+      'user_departments',
+      'data_policy_rules',
+      'data_policy_departments',
+    ]) {
+      expect(migrationSql).toContain(`CREATE TABLE IF NOT EXISTS "${table}"`)
+    }
+    expect(migrationSql).toContain(
+      'ALTER TABLE "menus" ADD COLUMN "required_permission_key" varchar(100)',
+    )
+    expect(migrationSql).toContain('INSERT INTO "permissions"')
+    expect(migrationSql).toContain('INSERT INTO "role_permissions"')
+    expect(migrationSql).toContain('INSERT INTO "data_policy_rules"')
+    expect(migrationSql).toContain("'SUPER_ADMIN'")
   })
 
   it('replaces every other business identity constraint with active-row indexes', () => {

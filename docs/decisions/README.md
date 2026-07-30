@@ -5,5 +5,6 @@
 ## 当前决策
 
 - [ADR-0024](ADR-0024-human-authored-state-authority.md)：人类修改优先，初始版本实现与精简设计构成当前基线，发现冲突或问题时由人类决定下一步。
+- [ADR-0025](ADR-0025-pluggable-authorization-and-data-scope.md)：默认使用本地可插拔授权 Provider，以稳定权限键和查询计划实现功能与数据权限。
 
 新增 ADR 时使用 [ADR 模板](../templates/adr-template.md)和下一个连续编号。ADR 被取代或被后续基线吸收后更新替代关系并移入 `docs/archive/decisions/`，编号不得复用。

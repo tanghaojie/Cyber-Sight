@@ -63,6 +63,14 @@
         </template>
       </el-table-column>
       <el-table-column prop="sortOrder" label="排序" width="80" />
+      <el-table-column label="访问权限" min-width="170">
+        <template #default="{ row }">
+          <code v-if="row.requiredPermissionKey" class="code-chip">
+            {{ row.requiredPermissionKey }}
+          </code>
+          <span v-else class="table-muted">不限制</span>
+        </template>
+      </el-table-column>
       <el-table-column label="状态" width="90">
         <template #default="{ row }">
           <el-tag :type="row.enabled ? 'success' : 'info'" round>

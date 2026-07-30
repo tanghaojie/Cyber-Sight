@@ -60,7 +60,13 @@ describe('JWT LRU token cache', () => {
       now: () => now,
     })
     const issued = await cache.issue(user(1))
-    const tampered = `${issued.token.slice(0, -1)}${issued.token.endsWith('a') ? 'b' : 'a'}`
+    const tokenParts = issued.token.split('.')
+    const signature = tokenParts[2]
+    const tamperIndex = Math.floor(signature.length / 2)
+    tokenParts[2] = `${signature.slice(0, tamperIndex)}${
+      signature[tamperIndex] === 'a' ? 'b' : 'a'
+    }${signature.slice(tamperIndex + 1)}`
+    const tampered = tokenParts.join('.')
 
     await expect(
       cache.resolve(tampered, async () => ({

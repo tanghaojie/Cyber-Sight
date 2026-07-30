@@ -16,6 +16,8 @@ import {
   isValidMenuPath,
 } from '@scaffold/api-contract'
 import { requireCurrentUser } from '@/modules/auth/auth.service.js'
+import { authorizationPermissionKeys } from '@/modules/authorization/authorization.resources.js'
+import { activePermissionKeyExists } from '@/modules/authorization/authorization.references.js'
 import { ErrorCode } from '@/shared/errors/error-codes.js'
 import { ensureUpdated, mutationResult, normalizedListQuery } from '@/shared/http/route-helpers.js'
 import { failure, paginatedSuccess, success } from '@/shared/http/response.js'
@@ -34,6 +36,9 @@ export async function menuRoutes(app: FastifyInstance): Promise<void> {
   app.get<{ Querystring: ListQuery }>(
     '/admin/menus',
     {
+      config: {
+        authorization: { mode: 'permission', anyOf: [authorizationPermissionKeys.menusManage] },
+      },
       schema: {
         operationId: 'listMenus',
         tags: ['Menus'],
@@ -54,6 +59,7 @@ export async function menuRoutes(app: FastifyInstance): Promise<void> {
   app.get(
     '/navigation/menus',
     {
+      config: { authorization: { mode: 'authenticated' } },
       schema: {
         operationId: 'getCurrentNavigation',
         tags: ['Navigation'],
@@ -72,6 +78,12 @@ export async function menuRoutes(app: FastifyInstance): Promise<void> {
   app.get(
     '/admin/menus/tree',
     {
+      config: {
+        authorization: {
+          mode: 'permission',
+          anyOf: [authorizationPermissionKeys.menusManage, authorizationPermissionKeys.rolesManage],
+        },
+      },
       schema: {
         operationId: 'listMenuTree',
         tags: ['Menus'],
@@ -90,6 +102,9 @@ export async function menuRoutes(app: FastifyInstance): Promise<void> {
   app.post<{ Body: MenuRequest }>(
     '/admin/menus',
     {
+      config: {
+        authorization: { mode: 'permission', anyOf: [authorizationPermissionKeys.menusManage] },
+      },
       schema: {
         operationId: 'createMenu',
         tags: ['Menus'],
@@ -108,6 +123,12 @@ export async function menuRoutes(app: FastifyInstance): Promise<void> {
       if (!(await validateMenuParent(app, request.body.parentId))) {
         return failure(ErrorCode.INVALID_REQUEST, 'Parent menu must be an existing directory')
       }
+      if (
+        request.body.requiredPermissionKey &&
+        !(await activePermissionKeyExists(app, request.body.requiredPermissionKey))
+      ) {
+        return failure(ErrorCode.INVALID_REQUEST, 'Permission key is not active')
+      }
       return mutationResult(() => createMenu(app, request.body, actor.id))
     },
   )
@@ -115,6 +136,9 @@ export async function menuRoutes(app: FastifyInstance): Promise<void> {
   app.put<{ Params: IdParams; Body: MenuRequest }>(
     '/admin/menus/:id',
     {
+      config: {
+        authorization: { mode: 'permission', anyOf: [authorizationPermissionKeys.menusManage] },
+      },
       schema: {
         operationId: 'updateMenu',
         tags: ['Menus'],
@@ -137,6 +161,12 @@ export async function menuRoutes(app: FastifyInstance): Promise<void> {
           'Parent menu must be a directory outside the current subtree',
         )
       }
+      if (
+        request.body.requiredPermissionKey &&
+        !(await activePermissionKeyExists(app, request.body.requiredPermissionKey))
+      ) {
+        return failure(ErrorCode.INVALID_REQUEST, 'Permission key is not active')
+      }
       ensureUpdated(app, await updateMenu(app, request.params.id, request.body, actor.id))
       return success({ id: request.params.id })
     },
@@ -145,6 +175,9 @@ export async function menuRoutes(app: FastifyInstance): Promise<void> {
   app.delete<{ Params: IdParams }>(
     '/admin/menus/:id',
     {
+      config: {
+        authorization: { mode: 'permission', anyOf: [authorizationPermissionKeys.menusManage] },
+      },
       schema: {
         operationId: 'deleteMenu',
         tags: ['Menus'],
