@@ -23,8 +23,8 @@ updated: 2026-07-30
 
 - `auth` 只确认会话身份并提供当前用户，不把权限写入 JWT。
 - `roles` 拥有角色定义，`users` 拥有用户及角色/部门归属，`departments` 拥有组织树。
-- `authorization` 拥有 `permissions`、`role_permissions`、`data_policy_rules` 和 `data_policy_departments`，并读取有效角色和部门上下文完成决策。
-- `menus` 保存可选的 `required_permission_key`，导航通过本模块返回的有效权限过滤，不再把 `role_menus` 作为运行时授权来源。
+- `authorization` 拥有物理表 `sys_permissions`、`sys_role_permissions`、`sys_data_policy_rules` 和 `sys_data_policy_departments`，并读取有效角色和部门上下文完成决策。
+- `sys_menus` 保存可选的 `required_permission_key`，导航通过本模块返回的有效权限过滤，不再把 `sys_role_menus` 作为运行时授权来源。
 - 业务资源拥有自己的 Drizzle 表和数据范围编译器；本模块只返回受限的中立计划，不接收或保存原始 SQL。
 
 ## 公共接口
@@ -52,7 +52,7 @@ HTTP API：
 
 ## 功能权限模型
 
-模块在代码和迁移中登记稳定权限键，例如 `users.manage`、`roles.manage`、`departments.manage`、`menus.manage` 和 `dictionaries.manage`。`permissions.key` 全局唯一且不复用；角色通过 `role_permissions` 获得权限。
+模块在代码和迁移中登记稳定权限键，例如 `users.manage`、`roles.manage`、`departments.manage`、`menus.manage` 和 `dictionaries.manage`。`sys_permissions.key` 全局唯一且不复用；角色通过 `sys_role_permissions` 获得权限。
 
 菜单可引用一个权限键。当前用户拥有该权限时菜单节点可见，目录祖先仅作为结构节点自动补齐。没有权限键的菜单对所有已认证用户可见。管理接口使用与对应页面相同的模块级权限键；后续可增加 `users.read`、`users.delete` 等细分键而无需替换数据模型。
 
@@ -130,13 +130,13 @@ departmentIds
 
 ## 数据模型与迁移
 
-- `permissions`：稳定权限目录。
-- `role_permissions`：角色功能授权。
-- `data_policy_rules`：主体、资源、动作、范围和部门继承开关。
-- `data_policy_departments`：自定义部门范围。
-- `menus.required_permission_key`：导航与功能权限的关联。
+- `sys_permissions`：稳定权限目录。
+- `sys_role_permissions`：角色功能授权。
+- `sys_data_policy_rules`：主体、资源、动作、范围和部门继承开关。
+- `sys_data_policy_departments`：自定义部门范围。
+- `sys_menus.required_permission_key`：导航与功能权限的关联。
 
-迁移为存量菜单回填权限键，把 `role_menus` 中有效页面授权转换为 `role_permissions`；`SUPER_ADMIN` 获得所有登记权限及 `users` 所有动作的 `all` 数据策略。`role_menus` 暂时保留用于迁移回滚，但运行时不再读写。
+全新数据库基线直接创建权限菜单并为 `SUPER_ADMIN` 写入所有登记权限及 `users` 所有动作的 `all` 数据策略。`sys_role_menus` 同步写入初始兼容关系，但运行时不再将其作为授权来源。
 
 ## 失败模式与安全考虑
 
@@ -149,7 +149,7 @@ departmentIds
 
 ## 测试与验证策略
 
-- Schema 和迁移测试覆盖新表、审计字段、唯一性、回填与超级管理员种子。
+- Schema 和迁移测试覆盖系统表前缀、审计字段、唯一性、单一基线与超级管理员种子。
 - 纯函数测试覆盖 allow 并集、默认拒绝和 all 短路。
 - 路由测试覆盖未认证、功能权限不足以及全部路由存在声明。
 - 用户仓储通过同一谓词实现列表/count/更新/删除范围，创建和归属变更执行目标部门校验；数据库级集成验证留给独立环境。
@@ -157,7 +157,7 @@ departmentIds
 
 ## 兼容性与迁移
 
-启用路由门禁前必须先完成权限目录、角色授权和超级管理员策略回填，避免管理员被锁定。旧 `role_menus` 数据在当前迁移中保留但不再作为权威来源。前端角色弹窗从菜单 ID 改为权限目录复选项，并同时编辑角色数据策略。角色、用户和部门定义与授权配置使用连续两次 API 保存；若第二步失败，界面保留弹窗并明确提示主体已保存但授权未完成。
+单一基线在应用启动前一次性创建权限目录、角色授权和超级管理员策略，避免管理员被锁定。`sys_role_menus` 只保留兼容关系，不是权威来源。前端角色弹窗从菜单 ID 改为权限目录复选项，并同时编辑角色数据策略。角色、用户和部门定义与授权配置使用连续两次 API 保存；若第二步失败，界面保留弹窗并明确提示主体已保存但授权未完成。
 
 ## 未决问题
 

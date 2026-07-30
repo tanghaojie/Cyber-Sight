@@ -65,7 +65,9 @@ Java 引入不是简单代码生成，需要独立的设计、ADR、迁移计划
 - Drizzle 迁移文件进入版本控制，数据库结构变化通过迁移执行。
 - 默认单元和路由测试不得依赖本机数据库；数据库集成验证使用独立命令显式运行。
 - 所有业务表包含 `is_deleted`、`created_at`、`created_by`、`updated_at`、`updated_by`；仓储查询显式过滤软删除数据。
-- `auth_sessions` 由 auth 模块独占读写，但当前与其他存量表一起登记在 `src/db/schema.ts`；Drizzle Kit 0.23 无法在 NodeNext 源码中解析跨文件 `.js` Schema 依赖，后续升级工具链时再迁入模块目录。
+- 14 张脚手架表使用 `sys_` 物理前缀，映射和例外见[数据库 Schema 与迁移基线](../database-schema-and-migrations.md)。
+- 当前 `0000_initial_system_schema` 单一基线只面向全新空数据库；旧库数据保留或搬迁必须另写方案。
+- `sys_auth_sessions` 由 auth 模块独占读写，但当前与其他存量表一起登记在 `src/db/schema.ts`；Drizzle Kit 0.23 无法在 NodeNext 源码中解析跨文件 `.js` Schema 依赖，后续升级工具链时再迁入模块目录。
 
 ## 仍待解决
 

@@ -1,2 +1,0 @@
-ALTER TABLE "menus" DROP CONSTRAINT "menus_code_unique";--> statement-breakpoint
-CREATE UNIQUE INDEX IF NOT EXISTS "menus_code_active_unique" ON "menus" USING btree ("code") WHERE "menus"."is_deleted" = false;

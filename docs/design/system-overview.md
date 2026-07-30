@@ -28,7 +28,7 @@ Fastify 4 + Swagger + Drizzle
 - `apps/backend`：Fastify 服务、认证、管理 API、Drizzle 仓储和数据库迁移。
 - `packages/api-contract`：HTTP Zod Schema、推导类型与 `toFastifySchema()`。
 
-现有业务包括健康检查、会话认证、工作台、用户、角色、数据库动态菜单和字典。业务表统一使用软删除及五项生命周期审计字段。
+现有业务包括健康检查、会话认证、工作台、用户、角色、数据库动态菜单和字典。脚手架自带的 14 张 PostgreSQL 表统一使用 `sys_` 物理前缀、软删除及五项生命周期审计字段；当前单一迁移基线只面向全新数据库。
 
 ## 不可绕过的边界
 

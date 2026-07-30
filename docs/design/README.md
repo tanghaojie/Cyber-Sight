@@ -9,6 +9,7 @@
 - [分层文档与历史归档](documentation-governance.md)：最小阅读协议和文档生命周期；文档治理任务必读。
 - [测试与验证策略](testing-strategy.md)：后端/契约自动化、数据库验证和前端人工验收边界。
 - [开发工作流](developer-workflow.md)：源码别名、项目格式配置、编辑器和 Git 自动格式化。
+- [数据库 Schema 与迁移基线](database-schema-and-migrations.md)：`sys_` 系统表命名、单一初始迁移和全新数据库切换边界。
 
 ## Workspace 与模块
 

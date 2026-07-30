@@ -34,6 +34,6 @@ updated: 2026-07-30
 
 ## 兼容性与迁移
 
-历史迁移先删除 `menus_code_active_unique` 索引，再删除 `menus.code` 列。本次授权迁移增加 `required_permission_key`，按页面组件回填管理权限，并把旧 `role_menus` 授权转换为角色权限键；原关联表暂时保留但不再作为运行时权威来源。
+全新数据库基线直接创建不含 `code` 的最终 `sys_menus`，并为管理页面写入 `required_permission_key`。初始超级管理员同时获得权限键和 `sys_role_menus` 兼容关系；关联表不再作为运行时权威来源。
 
 初始版本之前的菜单、布局和软删除唯一性取舍保留在[归档 ADR](../../archive/README.md)，当前语义以本设计、共享 Schema 和后端测试为准。

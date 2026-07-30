@@ -17,8 +17,8 @@ updated: 2026-07-30
 
 ## 职责与边界
 
-- `departments` 拥有部门记录和 `department_closure`。
-- `users` 拥有用户与部门的归属关系 `user_departments`，并保证每个有效用户恰有一个主部门。
+- `departments` 拥有 `sys_departments` 部门记录和 `sys_department_closure`。
+- `users` 拥有用户与部门的归属关系 `sys_user_departments`，并保证每个有效用户恰有一个主部门。
 - `authorization` 只能通过本模块公开的部门上下文和后代查询消费组织关系，不修改部门树。
 - 部门管理页面编辑本模块数据，并通过 authorization 公共 API 编辑该部门作为授权主体的数据策略。
 
@@ -31,9 +31,9 @@ updated: 2026-07-30
 
 ## 数据模型与数据流
 
-`departments` 保存 `parent_id`、稳定编码、名称、排序、启用状态及生命周期字段。根节点使用 `parent_id = 0`。
+`sys_departments` 保存 `parent_id`、稳定编码、名称、排序、启用状态及生命周期字段。根节点使用 `parent_id = 0`。
 
-`department_closure` 保存 `(ancestor_id, descendant_id, depth)`，包含每个有效部门到自身的深度 0 记录。创建和移动部门在事务中重建有效闭包；软删除部门时同步软删除涉及该部门的闭包关系。
+`sys_department_closure` 保存 `(ancestor_id, descendant_id, depth)`，包含每个有效部门到自身的深度 0 记录。创建和移动部门在事务中重建有效闭包；软删除部门时同步软删除涉及该部门的闭包关系。
 
 管理列表接口保持返回带 `parentId` 的扁平数组，前端模块内部按 `parentId` 组装树节点；根节点和同级节点均按 `sortOrder`、`id` 稳定排序。部门表格默认展开树结构并允许逐级折叠，按名称或编码搜索时保留命中节点的祖先路径；父节点自身命中时保留其完整子树。
 
@@ -58,7 +58,7 @@ updated: 2026-07-30
 
 ## 兼容性与迁移
 
-迁移创建一个启用的“默认部门”根节点，为所有存量有效用户建立主部门归属和闭包自关系，保证启用数据权限时不存在无组织用户。
+全新数据库基线创建一个启用的“默认部门”根节点、闭包自关系以及初始管理员主部门归属；后续用户写入流程继续保证有效用户具有主部门。
 
 ## 未决问题
 

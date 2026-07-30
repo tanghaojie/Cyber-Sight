@@ -42,10 +42,12 @@ Vue 3 + fetch Client   Fastify 校验 + Swagger
 ```powershell
 pnpm install
 Copy-Item apps/backend/.env.example apps/backend/.env
-# 编辑 apps/backend/.env，填写本地 DATABASE_URL 和至少 32 个字符的 JWT_SECRET
+# 编辑 apps/backend/.env，填写全新空数据库的 DATABASE_URL 和至少 32 个字符的 JWT_SECRET
 pnpm db:migrate
 pnpm dev
 ```
+
+当前单一迁移基线不兼容旧数据库。已有旧迁移记录或未加 `sys_` 前缀表的数据库不能继续使用；切换步骤见[数据库基线重建指南](database-baseline-rebuild.md)。
 
 默认地址：
 
@@ -289,7 +291,7 @@ export const findUser = async (id: number) => {
 
 ### 9.1 Drizzle 是什么
 
-Drizzle 用 TypeScript 定义数据库结构，并根据 Schema 差异生成 SQL 迁移。`src/db/schema.ts` 描述目标模型，`drizzle/` 记录数据库如何一步步演进。
+Drizzle 用 TypeScript 定义数据库结构，并根据 Schema 差异生成 SQL 迁移。`src/db/schema.ts` 描述目标模型，`drizzle/` 记录数据库如何一步步演进。脚手架自带表的物理名称统一以 `sys_` 开头，TypeScript 表对象保留简洁的模块语义名。
 
 ### 9.2 修改表结构
 
@@ -307,13 +309,14 @@ Drizzle 用 TypeScript 定义数据库结构，并根据 Schema 差异生成 SQL
 - 任何 `DROP`、数据回填或不可逆类型转换都必须单独设计备份和回滚方案。
 - 不得用 `db:push` 代替团队迁移历史。
 - 默认测试不依赖真实数据库；数据库集成验证通过 `pnpm test:db` 或专用测试环境运行。
+- 当前 `0000_initial_system_schema` 是维护者明确批准的一次性历史重置，只能在全新空数据库执行；从该基线开始恢复“已执行迁移不可改写”的常规规则。
 
 ### 9.4 常用数据库命令
 
 ```powershell
 pnpm db:generate # 生成迁移
-pnpm db:migrate  # 应用尚未执行的迁移
-pnpm test:db     # 检查连接、版本、users 表和迁移表
+pnpm db:migrate  # 在全新空数据库应用尚未执行的迁移
+pnpm test:db     # 检查连接、版本、sys_users 表和迁移表
 ```
 
 ## 10. 测试与前端人工验收

@@ -1,121 +1,107 @@
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
 interface MigrationJournal {
   entries: Array<{ tag: string }>
 }
 
-function migrationSqlFiles(): string[] {
-  // 以 Drizzle journal 的顺序读取迁移，避免文件系统排序与真实执行顺序不一致。
+const legacyTableNames = [
+  'auth_sessions',
+  'data_policy_departments',
+  'data_policy_rules',
+  'department_closure',
+  'departments',
+  'dictionaries',
+  'menus',
+  'permissions',
+  'role_menus',
+  'role_permissions',
+  'roles',
+  'user_departments',
+  'user_roles',
+  'users',
+]
+const systemTableNames = legacyTableNames.map((name) => `sys_${name}`)
+
+function migrationJournal(): MigrationJournal {
   const journalUrl = new URL('../drizzle/meta/_journal.json', import.meta.url)
-  const journal = JSON.parse(readFileSync(journalUrl, 'utf8')) as MigrationJournal
-  return journal.entries.map(({ tag }) =>
-    readFileSync(new URL(`../drizzle/${tag}.sql`, import.meta.url), 'utf8'),
-  )
+  return JSON.parse(readFileSync(journalUrl, 'utf8')) as MigrationJournal
 }
 
-function migrationContaining(fragment: string): string {
-  const migrationSql = migrationSqlFiles().find((sql) => sql.includes(fragment))
-  if (!migrationSql) {
-    throw new Error(`Migration not found: ${fragment}`)
+function migrationFiles(): string[] {
+  return readdirSync(new URL('../drizzle/', import.meta.url))
+    .filter((name) => name.endsWith('.sql'))
+    .sort()
+}
+
+function snapshotFiles(): string[] {
+  return readdirSync(new URL('../drizzle/meta/', import.meta.url))
+    .filter((name) => name.endsWith('_snapshot.json'))
+    .sort()
+}
+
+function baselineMigrationSql(): string {
+  const [entry] = migrationJournal().entries
+  if (!entry) {
+    throw new Error('No baseline migration found')
   }
-  return migrationSql
+  return readFileSync(new URL(`../drizzle/${entry.tag}.sql`, import.meta.url), 'utf8')
 }
 
-function latestMigrationSql(): string {
-  const migrations = migrationSqlFiles()
-  const latest = migrations.at(-1)
-  if (!latest) {
-    throw new Error('No migrations found')
-  }
-  return latest
-}
+describe('database migration baseline', () => {
+  it('collapses SQL, snapshot and journal history into one initial migration', () => {
+    const journal = migrationJournal()
 
-// 静态检查关键兼容迁移确实存在，不连接本地数据库；真实连接由 test:db 单独验证。
-describe('database migrations', () => {
-  it('restores the database-backed authentication session table', () => {
-    const migrationSql = migrationContaining('CREATE TABLE IF NOT EXISTS "auth_sessions"')
-
-    expect(migrationSql).toContain('CREATE TABLE IF NOT EXISTS "auth_sessions"')
-    expect(migrationSql).toContain(
-      'CONSTRAINT "auth_sessions_token_hash_unique" UNIQUE("token_hash")',
-    )
+    expect(journal.entries).toHaveLength(1)
+    expect(journal.entries[0]?.tag).toBe('0000_initial_system_schema')
+    expect(migrationFiles()).toEqual(['0000_initial_system_schema.sql'])
+    expect(snapshotFiles()).toEqual(['0000_snapshot.json'])
   })
 
-  it('adds a backwards-compatible layout identifier to menus', () => {
-    const migrationSql = migrationContaining('ADD COLUMN "layout"')
+  it('creates every application table with the sys_ prefix', () => {
+    const migrationSql = baselineMigrationSql()
 
-    expect(migrationSql).toContain(
-      `ALTER TABLE "menus" ADD COLUMN "layout" varchar(160) DEFAULT '' NOT NULL`,
-    )
-  })
-
-  it('replaces the menu code constraint with an active-row unique index', () => {
-    const migrationSql = migrationContaining('menus_code_active_unique')
-
-    expect(migrationSql).toContain('ALTER TABLE "menus" DROP CONSTRAINT "menus_code_unique"')
-    expect(migrationSql).toContain('CREATE UNIQUE INDEX IF NOT EXISTS "menus_code_active_unique"')
-    expect(migrationSql).toContain('("code") WHERE "menus"."is_deleted" = false')
-  })
-
-  it('drops the obsolete menu code index and column', () => {
-    const migrationSql = migrationContaining('DROP INDEX IF EXISTS "menus_code_active_unique"')
-
-    expect(migrationSql).toContain('DROP INDEX IF EXISTS "menus_code_active_unique"')
-    expect(migrationSql).toContain('ALTER TABLE "menus" DROP COLUMN IF EXISTS "code"')
-  })
-
-  it('adds authorization, department and data-scope storage with compatibility backfills', () => {
-    const migrationSql = latestMigrationSql()
-
-    for (const table of [
-      'permissions',
-      'role_permissions',
-      'departments',
-      'department_closure',
-      'user_departments',
-      'data_policy_rules',
-      'data_policy_departments',
-    ]) {
-      expect(migrationSql).toContain(`CREATE TABLE IF NOT EXISTS "${table}"`)
+    for (const tableName of systemTableNames) {
+      expect(migrationSql).toContain(`CREATE TABLE IF NOT EXISTS "${tableName}"`)
     }
-    expect(migrationSql).toContain(
-      'ALTER TABLE "menus" ADD COLUMN "required_permission_key" varchar(100)',
-    )
-    expect(migrationSql).toContain('INSERT INTO "permissions"')
-    expect(migrationSql).toContain('INSERT INTO "role_permissions"')
-    expect(migrationSql).toContain('INSERT INTO "data_policy_rules"')
+    for (const tableName of legacyTableNames) {
+      expect(migrationSql).not.toContain(`"${tableName}"`)
+    }
+  })
+
+  it('contains the final menu and soft-delete uniqueness model directly', () => {
+    const migrationSql = baselineMigrationSql()
+
+    expect(migrationSql).toContain('"layout" varchar(160) DEFAULT \'\' NOT NULL')
+    expect(migrationSql).toContain('"required_permission_key" varchar(100)')
+    expect(migrationSql).not.toContain('"code" varchar(80)')
+    expect(migrationSql).toContain('"sys_auth_sessions_token_hash_unique"')
+    expect(migrationSql.match(/CREATE UNIQUE INDEX IF NOT EXISTS "sys_/g)).toHaveLength(13)
+    expect(migrationSql.match(/WHERE "sys_[^"]+"\."is_deleted" = false/g)).toHaveLength(13)
+  })
+
+  it('seeds the fresh database with framework administration data', () => {
+    const migrationSql = baselineMigrationSql()
+
+    for (const tableName of [
+      'sys_roles',
+      'sys_users',
+      'sys_user_roles',
+      'sys_permissions',
+      'sys_departments',
+      'sys_department_closure',
+      'sys_user_departments',
+      'sys_menus',
+      'sys_role_menus',
+      'sys_dictionaries',
+      'sys_role_permissions',
+      'sys_data_policy_rules',
+    ]) {
+      expect(migrationSql).toContain(`INSERT INTO "${tableName}"`)
+    }
     expect(migrationSql).toContain("'SUPER_ADMIN'")
-  })
-
-  it('replaces every other business identity constraint with active-row indexes', () => {
-    const migrationSql = migrationContaining('users_username_active_unique')
-
-    for (const oldConstraint of [
-      'roles_code_unique',
-      'users_username_unique',
-      'users_email_unique',
-    ]) {
-      expect(migrationSql).toContain(`DROP CONSTRAINT "${oldConstraint}"`)
-    }
-    for (const oldIndex of [
-      'dictionaries_type_value_unique',
-      'role_menus_role_menu_unique',
-      'user_roles_user_role_unique',
-    ]) {
-      expect(migrationSql).toContain(`DROP INDEX IF EXISTS "${oldIndex}"`)
-    }
-    for (const activeIndex of [
-      'dictionaries_type_value_active_unique',
-      'role_menus_role_menu_active_unique',
-      'roles_code_active_unique',
-      'user_roles_user_role_active_unique',
-      'users_username_active_unique',
-      'users_email_active_unique',
-    ]) {
-      expect(migrationSql).toContain(`CREATE UNIQUE INDEX IF NOT EXISTS "${activeIndex}"`)
-    }
-    expect(migrationSql.match(/WHERE \"[^\"]+\"\.\"is_deleted\" = false/g)).toHaveLength(6)
-    expect(migrationSql).not.toContain('auth_sessions_token_hash_unique')
+    expect(migrationSql).toContain("'admin'")
+    expect(migrationSql).toContain("'departments.manage'")
+    expect(migrationSql).toContain("('read'), ('create'), ('update'), ('delete')")
   })
 })

@@ -26,7 +26,7 @@ export const dataScopeType = pgEnum('data_scope_type', [
   'all',
 ])
 
-/** 所有业务表复用软删除和五项生命周期审计字段。 */
+/** 所有框架系统表复用软删除和五项生命周期审计字段。 */
 export function auditColumns() {
   return {
     isDeleted: boolean('is_deleted').default(false).notNull(),
@@ -38,7 +38,7 @@ export function auditColumns() {
 }
 
 export const users = pgTable(
-  'users',
+  'sys_users',
   {
     id: serial('id').primaryKey(),
     username: varchar('username', { length: 50 }).notNull(),
@@ -51,17 +51,17 @@ export const users = pgTable(
   },
   (table) => ({
     // 部分唯一索引允许软删除后复用用户名和邮箱，同时保护全部有效记录。
-    activeUsername: uniqueIndex('users_username_active_unique')
+    activeUsername: uniqueIndex('sys_users_username_active_unique')
       .on(table.username)
       .where(sql`${table.isDeleted} = false`),
-    activeEmail: uniqueIndex('users_email_active_unique')
+    activeEmail: uniqueIndex('sys_users_email_active_unique')
       .on(table.email)
       .where(sql`${table.isDeleted} = false`),
   }),
 )
 
 export const roles = pgTable(
-  'roles',
+  'sys_roles',
   {
     id: serial('id').primaryKey(),
     name: varchar('name', { length: 80 }).notNull(),
@@ -71,14 +71,14 @@ export const roles = pgTable(
     ...auditColumns(),
   },
   (table) => ({
-    activeCode: uniqueIndex('roles_code_active_unique')
+    activeCode: uniqueIndex('sys_roles_code_active_unique')
       .on(table.code)
       .where(sql`${table.isDeleted} = false`),
   }),
 )
 
 export const userRoles = pgTable(
-  'user_roles',
+  'sys_user_roles',
   {
     id: serial('id').primaryKey(),
     userId: integer('user_id')
@@ -90,7 +90,7 @@ export const userRoles = pgTable(
     ...auditColumns(),
   },
   (table) => ({
-    activeAssignment: uniqueIndex('user_roles_user_role_active_unique')
+    activeAssignment: uniqueIndex('sys_user_roles_user_role_active_unique')
       .on(table.userId, table.roleId)
       .where(sql`${table.isDeleted} = false`),
   }),
@@ -98,7 +98,7 @@ export const userRoles = pgTable(
 
 // 部门邻接表保存直接父子关系，闭包表保存全部祖先路径以加速树范围查询。
 export const departments = pgTable(
-  'departments',
+  'sys_departments',
   {
     id: serial('id').primaryKey(),
     parentId: integer('parent_id').default(0).notNull(),
@@ -109,14 +109,14 @@ export const departments = pgTable(
     ...auditColumns(),
   },
   (table) => ({
-    activeCode: uniqueIndex('departments_code_active_unique')
+    activeCode: uniqueIndex('sys_departments_code_active_unique')
       .on(table.code)
       .where(sql`${table.isDeleted} = false`),
   }),
 )
 
 export const departmentClosure = pgTable(
-  'department_closure',
+  'sys_department_closure',
   {
     id: serial('id').primaryKey(),
     ancestorId: integer('ancestor_id')
@@ -129,14 +129,14 @@ export const departmentClosure = pgTable(
     ...auditColumns(),
   },
   (table) => ({
-    activePath: uniqueIndex('department_closure_path_active_unique')
+    activePath: uniqueIndex('sys_department_closure_path_active_unique')
       .on(table.ancestorId, table.descendantId)
       .where(sql`${table.isDeleted} = false`),
   }),
 )
 
 export const userDepartments = pgTable(
-  'user_departments',
+  'sys_user_departments',
   {
     id: serial('id').primaryKey(),
     userId: integer('user_id')
@@ -149,17 +149,17 @@ export const userDepartments = pgTable(
     ...auditColumns(),
   },
   (table) => ({
-    activeAssignment: uniqueIndex('user_departments_user_department_active_unique')
+    activeAssignment: uniqueIndex('sys_user_departments_user_department_active_unique')
       .on(table.userId, table.departmentId)
       .where(sql`${table.isDeleted} = false`),
-    activePrimary: uniqueIndex('user_departments_user_primary_active_unique')
+    activePrimary: uniqueIndex('sys_user_departments_user_primary_active_unique')
       .on(table.userId)
       .where(sql`${table.isDeleted} = false AND ${table.isPrimary} = true`),
   }),
 )
 
 // 功能权限归授权模块所有，角色通过稳定 permissionKey 建立多对多关系。
-export const permissions = pgTable('permissions', {
+export const permissions = pgTable('sys_permissions', {
   id: serial('id').primaryKey(),
   key: varchar('key', { length: 100 }).notNull().unique(),
   module: varchar('module', { length: 80 }).notNull(),
@@ -170,7 +170,7 @@ export const permissions = pgTable('permissions', {
 })
 
 export const rolePermissions = pgTable(
-  'role_permissions',
+  'sys_role_permissions',
   {
     id: serial('id').primaryKey(),
     roleId: integer('role_id')
@@ -182,13 +182,13 @@ export const rolePermissions = pgTable(
     ...auditColumns(),
   },
   (table) => ({
-    activeAssignment: uniqueIndex('role_permissions_role_permission_active_unique')
+    activeAssignment: uniqueIndex('sys_role_permissions_role_permission_active_unique')
       .on(table.roleId, table.permissionKey)
       .where(sql`${table.isDeleted} = false`),
   }),
 )
 
-export const menus = pgTable('menus', {
+export const menus = pgTable('sys_menus', {
   id: serial('id').primaryKey(),
   parentId: integer('parent_id').default(0).notNull(),
   name: varchar('name', { length: 80 }).notNull(),
@@ -208,7 +208,7 @@ export const menus = pgTable('menus', {
 
 // roleMenus 为后续按角色直接分配菜单保留；当前导航主要由菜单权限键过滤。
 export const roleMenus = pgTable(
-  'role_menus',
+  'sys_role_menus',
   {
     id: serial('id').primaryKey(),
     roleId: integer('role_id')
@@ -220,14 +220,14 @@ export const roleMenus = pgTable(
     ...auditColumns(),
   },
   (table) => ({
-    activeAssignment: uniqueIndex('role_menus_role_menu_active_unique')
+    activeAssignment: uniqueIndex('sys_role_menus_role_menu_active_unique')
       .on(table.roleId, table.menuId)
       .where(sql`${table.isDeleted} = false`),
   }),
 )
 
 export const dictionaries = pgTable(
-  'dictionaries',
+  'sys_dictionaries',
   {
     id: serial('id').primaryKey(),
     type: varchar('type', { length: 80 }).notNull(),
@@ -239,7 +239,7 @@ export const dictionaries = pgTable(
     ...auditColumns(),
   },
   (table) => ({
-    activeEntry: uniqueIndex('dictionaries_type_value_active_unique')
+    activeEntry: uniqueIndex('sys_dictionaries_type_value_active_unique')
       .on(table.type, table.value)
       .where(sql`${table.isDeleted} = false`),
   }),
@@ -247,7 +247,7 @@ export const dictionaries = pgTable(
 
 // 数据策略主表描述作用主体和范围类型，部门明细表只服务于 custom_departments。
 export const dataPolicyRules = pgTable(
-  'data_policy_rules',
+  'sys_data_policy_rules',
   {
     id: serial('id').primaryKey(),
     subjectType: authorizationSubjectType('subject_type').notNull(),
@@ -260,14 +260,14 @@ export const dataPolicyRules = pgTable(
     ...auditColumns(),
   },
   (table) => ({
-    activeRule: uniqueIndex('data_policy_rules_identity_active_unique')
+    activeRule: uniqueIndex('sys_data_policy_rules_identity_active_unique')
       .on(table.subjectType, table.subjectId, table.resourceKey, table.action, table.scopeType)
       .where(sql`${table.isDeleted} = false`),
   }),
 )
 
 export const dataPolicyDepartments = pgTable(
-  'data_policy_departments',
+  'sys_data_policy_departments',
   {
     id: serial('id').primaryKey(),
     ruleId: integer('rule_id')
@@ -280,14 +280,14 @@ export const dataPolicyDepartments = pgTable(
     ...auditColumns(),
   },
   (table) => ({
-    activeAssignment: uniqueIndex('data_policy_departments_rule_department_active_unique')
+    activeAssignment: uniqueIndex('sys_data_policy_departments_rule_department_active_unique')
       .on(table.ruleId, table.departmentId)
       .where(sql`${table.isDeleted} = false`),
   }),
 )
 
 // 会话表只保存令牌摘要；JWT 原文仅返回调用方并短期驻留内存缓存。
-export const authSessions = pgTable('auth_sessions', {
+export const authSessions = pgTable('sys_auth_sessions', {
   id: serial('id').primaryKey(),
   userId: integer('user_id')
     .notNull()
