@@ -58,7 +58,7 @@ export function createViewRegistry(
 
 const viewRegistrationModules = import.meta.glob<ViewRegistrationModule>(
   // eager 让注册错误在应用启动阶段暴露，而不是首次访问菜单时才失败。
-  '@/modules/**/registerViews.ts',
+  ['@/modules/system/**/registerViews.ts', '@/modules/biz/**/registerViews.ts'],
   { eager: true },
 )
 

@@ -1,8 +1,11 @@
 import type { FastifyInstance, FastifyRequest } from 'fastify'
 import { describe, expect, it, vi } from 'vitest'
-import { authenticateCredentials, currentUserFromRequest } from '@/modules/auth/auth.service.js'
-import { JwtTokenCache } from '@/modules/auth/auth-token-cache.js'
-import { hashPassword, hashSessionToken } from '@/modules/auth/auth.security.js'
+import {
+  authenticateCredentials,
+  currentUserFromRequest,
+} from '@/modules/system/auth/auth.service.js'
+import { JwtTokenCache } from '@/modules/system/auth/auth-token-cache.js'
+import { hashPassword, hashSessionToken } from '@/modules/system/auth/auth.security.js'
 
 const SECRET = 'test-only-jwt-secret-at-least-32-characters'
 

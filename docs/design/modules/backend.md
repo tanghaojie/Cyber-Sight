@@ -9,13 +9,13 @@
 - `src/app.ts`：可测试的应用组装函数。
 - `src/server.ts`：进程启动、端口监听与启动失败处理。
 - `src/plugins/`：Swagger、数据库和通用 Fastify 插件。
-- `src/modules/`：按业务能力组织的路由模块。
+- `src/modules/system/`：脚手架内置系统能力；`src/modules/biz/`：后续产品业务能力。
 - `src/db/`：Drizzle Schema 与数据库客户端。
 - `drizzle.config.ts`：数据库迁移生成配置。
-- `src/modules/auth/`：密码散列、JWT、数据库 token 会话、进程内 LRU 读缓存、登录/退出和当前用户解析。
-- `src/modules/authorization/`：可注入 Provider、路由声明门禁、功能权限和数据范围解析。
-- `src/modules/departments/`：部门树、闭包关系、管理 API 和公共组织查询。
-- `src/modules/users|roles|menus|dictionaries/`：独立管理 API 与仓储；菜单模块额外提供按有效权限过滤的当前用户导航树。
+- `src/modules/system/auth/`：密码散列、JWT、数据库 token 会话、进程内 LRU 读缓存、登录/退出和当前用户解析。
+- `src/modules/system/authorization/`：可注入 Provider、路由声明门禁、功能权限和数据范围解析。
+- `src/modules/system/departments/`：部门树、闭包关系、管理 API 和公共组织查询。
+- `src/modules/system/users|roles|menus|dictionaries/`：独立管理 API 与仓储；菜单模块额外提供按有效权限过滤的当前用户导航树。
 
 应用组装与网络监听必须分离，使测试可以通过 Fastify `inject` 验证路由而不占用端口。环境变量由集中配置模块加载和校验，数据库客户端在应用关闭时释放。
 
@@ -27,7 +27,7 @@
 
 ## 模块边界
 
-每个业务能力必须建立 `src/modules/<module>/` 独立目录，并以 `<module>.routes.ts`、`<module>.service.ts` 等表意文件暴露注册函数、应用服务或公共类型，避免新增 `index.ts` barrel。应用组装只能从设计中登记的公共文件注册模块；模块之间禁止导入未登记的内部文件，也不能直接使用其他模块的仓储、数据库表或私有 Schema。存量入口在模块实质修改时逐步迁移。
+每个业务能力必须在 `src/modules/system/<module>/` 或 `src/modules/biz/<module>/` 建立独立目录，并以 `<module>.routes.ts`、`<module>.service.ts` 等表意文件暴露注册函数、应用服务或公共类型，避免新增 `index.ts` barrel。应用组装只能从设计中登记的公共文件注册模块；模块之间禁止导入未登记的内部文件，也不能直接使用其他模块的仓储、数据库表或私有 Schema。存量入口在模块实质修改时逐步迁移。
 
 随着业务增加，每个模块应在自己的目录内按需要分成：
 

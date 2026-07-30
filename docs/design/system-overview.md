@@ -2,7 +2,7 @@
 title: 系统概览
 status: accepted
 owner: project maintainers
-updated: 2026-07-29
+updated: 2026-07-30
 ---
 
 # 系统概览
@@ -33,7 +33,7 @@ Fastify 4 + Swagger + Drizzle
 ## 不可绕过的边界
 
 - HTTP 结构先写共享 Zod Schema；Fastify 在边界执行运行时校验。
-- 业务能力按 `src/modules/<module>/` 组织，跨模块只依赖已登记的表意公共文件。
+- 前后端内置系统能力按 `src/modules/system/<module>/` 组织，产品业务能力按 `src/modules/biz/<module>/` 组织；共享契约继续按 `src/modules/<module>/` 组织，跨模块只依赖已登记的表意公共文件。
 - Fastify 是当前唯一后端；没有现实跨语言需求时不维护手写 OpenAPI 或 Java 双实现。
 - PostgreSQL 专属 Schema、迁移和查询留在基础设施层，不能宣称只换 import 即可切库。
 - 非简单变更同步更新设计、计划、适用的测试或验收边界和 AI 协作记录。

@@ -1,7 +1,7 @@
 import { type RouteLocationNormalized, type Router } from 'vue-router'
 import { pinia } from '@/stores/pinia'
-import { useAuthStore } from '@/modules/auth/auth.store'
-import { useNavigationStore } from '@/modules/navigation/navigation.store'
+import { useAuthStore } from '@/modules/system/auth/auth.store'
+import { useNavigationStore } from '@/modules/system/navigation/navigation.store'
 import { installMenuRoutes, routesReady } from './dynamicRoutes'
 
 export async function authenticationRouteGuard(to: RouteLocationNormalized, router: Router) {

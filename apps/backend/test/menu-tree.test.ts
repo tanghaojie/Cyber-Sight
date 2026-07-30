@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildNavigationTree } from '@/modules/menus/menus.repository.js'
+import { buildNavigationTree } from '@/modules/system/menus/menus.repository.js'
 
 const rows = [
   {

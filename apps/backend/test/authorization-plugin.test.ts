@@ -1,7 +1,7 @@
 import Fastify from 'fastify'
 import sensible from '@fastify/sensible'
 import { describe, expect, it } from 'vitest'
-import { registerAuthorization } from '@/modules/authorization/authorization.plugin.js'
+import { registerAuthorization } from '@/modules/system/authorization/authorization.plugin.js'
 import { buildApp } from '@/app.js'
 import { ErrorCode } from '@/shared/errors/error-codes.js'
 

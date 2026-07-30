@@ -1,0 +1,213 @@
+<template>
+  <section class="policy-editor">
+    <!-- 每一行描述一个资源、动作和允许范围；同主体命中的规则由后端按并集合并。 -->
+    <header>
+      <div>
+        <strong>数据权限</strong>
+        <span>同一用户命中的规则按允许范围取并集；未配置时默认不可访问。</span>
+      </div>
+      <el-button size="small" :icon="Plus" @click="addPolicy">添加规则</el-button>
+    </header>
+    <el-alert v-if="loadError" :title="loadError" type="error" show-icon :closable="false" />
+
+    <el-empty v-if="!model.length" description="尚未配置数据规则" :image-size="52" />
+    <div v-for="(policy, index) in model" :key="index" class="policy-row">
+      <el-select
+        v-model="policy.resourceKey"
+        placeholder="数据资源"
+        @change="normalizePolicy(policy)"
+      >
+        <el-option
+          v-for="resource in resources"
+          :key="resource.key"
+          :label="resource.name"
+          :value="resource.key"
+        />
+      </el-select>
+      <el-select v-model="policy.action" placeholder="操作" @change="normalizePolicy(policy)">
+        <el-option
+          v-for="action in actionsFor(policy.resourceKey)"
+          :key="action"
+          :label="actionLabels[action] ?? action"
+          :value="action"
+        />
+      </el-select>
+      <el-select v-model="policy.scopeType" placeholder="范围" @change="normalizePolicy(policy)">
+        <el-option
+          v-for="scope in scopesFor(policy.resourceKey, policy.action)"
+          :key="scope"
+          :label="scopeLabels[scope]"
+          :value="scope"
+        />
+      </el-select>
+      <el-button text type="danger" :icon="Delete" @click="removePolicy(index)" />
+
+      <el-select
+        v-if="policy.scopeType === 'custom_departments'"
+        v-model="policy.departmentIds"
+        class="department-picker"
+        multiple
+        filterable
+        placeholder="选择部门"
+      >
+        <el-option
+          v-for="department in departments"
+          :key="department.id"
+          :label="department.name"
+          :value="department.id"
+        />
+      </el-select>
+      <el-checkbox
+        v-if="policy.scopeType === 'custom_departments'"
+        v-model="policy.includeDescendants"
+      >
+        包含所选部门的下级
+      </el-checkbox>
+      <el-checkbox v-if="allowInheritance" v-model="policy.inheritToChildren">
+        下级部门继承此规则
+      </el-checkbox>
+    </div>
+  </section>
+</template>
+
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { Delete, Plus } from '@element-plus/icons-vue'
+import type {
+  DataPolicyInput,
+  DataResourceDefinition,
+  DataScopeType,
+  DepartmentOption,
+} from '@scaffold/api-contract'
+import { listDataResources } from '@/modules/system/authorization/authorization.api'
+import { listDepartmentOptions } from '@/modules/system/departments/departments.api'
+
+defineProps<{ allowInheritance?: boolean }>()
+const model = defineModel<DataPolicyInput[]>({ required: true })
+const resources = ref<DataResourceDefinition[]>([])
+const departments = ref<DepartmentOption[]>([])
+const loadError = ref('')
+
+const actionLabels: Record<string, string> = {
+  read: '查看',
+  create: '新增',
+  update: '修改',
+  delete: '删除',
+}
+const scopeLabels: Record<DataScopeType, string> = {
+  self: '仅本人',
+  own_department: '本人所属部门',
+  own_department_tree: '本人部门及下级',
+  custom_departments: '指定部门',
+  all: '全部数据',
+}
+
+function actionsFor(resourceKey: string): string[] {
+  return resources.value.find((resource) => resource.key === resourceKey)?.actions ?? []
+}
+
+function scopesFor(resourceKey: string, action: string): DataScopeType[] {
+  const scopes = resources.value.find((resource) => resource.key === resourceKey)?.scopeTypes ?? []
+  // self 表示已有记录的所有者，创建新记录时没有可用于判定的目标所有者。
+  return action === 'create' ? scopes.filter((scope) => scope !== 'self') : scopes
+}
+
+function normalizePolicy(policy: DataPolicyInput): void {
+  // 上游选择变化后立即修正下游动作、范围和部门字段，保持模型接近合法状态。
+  const actions = actionsFor(policy.resourceKey)
+  const scopes = scopesFor(policy.resourceKey, policy.action)
+  if (!actions.includes(policy.action)) {
+    policy.action = actions[0] ?? 'read'
+  }
+  if (!scopes.includes(policy.scopeType)) {
+    policy.scopeType = scopes[0] ?? 'self'
+  }
+  if (policy.scopeType !== 'custom_departments') {
+    policy.departmentIds = []
+    policy.includeDescendants = false
+  }
+}
+
+function addPolicy(): void {
+  const resource = resources.value[0]
+  model.value.push({
+    resourceKey: resource?.key ?? 'users',
+    action: resource?.actions[0] ?? 'read',
+    scopeType: resource?.scopeTypes[0] ?? 'self',
+    inheritToChildren: false,
+    departmentIds: [],
+    includeDescendants: false,
+  })
+}
+
+function removePolicy(index: number): void {
+  model.value.splice(index, 1)
+}
+
+onMounted(async function loadOptions() {
+  try {
+    // 资源目录和部门选项互不依赖，但编辑器必须同时具备二者才能完整配置策略。
+    const [resourceOptions, departmentOptions] = await Promise.all([
+      listDataResources(),
+      listDepartmentOptions(),
+    ])
+    resources.value = resourceOptions
+    departments.value = departmentOptions
+  } catch (error) {
+    loadError.value = error instanceof Error ? error.message : '数据策略选项加载失败'
+  }
+})
+</script>
+
+<style scoped lang="scss">
+.policy-editor {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #f8fbf9;
+}
+
+.policy-editor header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.policy-editor header div {
+  display: grid;
+  gap: 4px;
+}
+
+.policy-editor header span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.policy-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) 100px minmax(150px, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #dfebe5;
+  border-radius: 12px;
+  background: white;
+}
+
+.department-picker {
+  grid-column: 1 / 4;
+}
+
+@media (max-width: 680px) {
+  .policy-row {
+    grid-template-columns: 1fr;
+  }
+
+  .department-picker {
+    grid-column: auto;
+  }
+}
+</style>

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { hashSessionToken, hashPassword, verifyPassword } from '@/modules/auth/auth.security.js'
+import {
+  hashSessionToken,
+  hashPassword,
+  verifyPassword,
+} from '@/modules/system/auth/auth.security.js'
 
 // 保护密码不落明文、哈希格式可验证，以及持久会话只保存稳定不可逆摘要。
 describe('authentication security helpers', () => {

@@ -2,7 +2,7 @@
 title: 模块边界
 status: accepted
 owner: project maintainers
-updated: 2026-07-29
+updated: 2026-07-30
 ---
 
 # 模块边界
@@ -12,12 +12,16 @@ updated: 2026-07-29
 业务能力是主要组织单元。前端、后端和契约使用一致的稳定模块名；没有某一层实现时不创建空目录。
 
 ```text
-apps/frontend/src/modules/<module>/
-apps/backend/src/modules/<module>/
+apps/frontend/src/modules/system/<module>/
+apps/frontend/src/modules/biz/<module>/
+apps/backend/src/modules/system/<module>/
+apps/backend/src/modules/biz/<module>/
 packages/api-contract/src/modules/<module>/
 ```
 
 页面、状态、用例、领域规则、仓储适配器和业务 Schema 由所属模块拥有。组合根只注册路由、插件和依赖；`shared` 只放领域无关的平台能力，不能成为业务代码兜底目录。
+
+`system` 保存脚手架内置的认证、授权、系统管理、导航、工作台、健康检查和错误处理能力；`biz` 预留给基于脚手架建设的产品业务。前后端 `src/modules/` 下只允许这两个分类目录，模块不得绕过分类直接放在根级。分类不改变稳定模块名或 HTTP 契约命名；`packages/api-contract` 继续保持 `src/modules/<module>/`，避免把应用源码的组织标签泄漏到公共契约入口。
 
 ## 公共文件
 
@@ -52,7 +56,7 @@ packages/api-contract/src/modules/<module>/
 
 新增模块或实质修改存量模块时确认：
 
-1. 职责、非目标、数据所有者和模块名明确。
+1. 职责、非目标、数据所有者、模块名和 `system`/`biz` 分类明确。
 2. 公共文件最小、表意且已在模块设计登记。
 3. 依赖单向，无跨模块深层导入和循环。
 4. 后端与契约模块用自动化测试覆盖规则和公共协作；前端模块记录维护者人工验收场景。

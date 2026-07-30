@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { notFoundPage } from '@/modules/errors/error.routes'
+import { notFoundPage } from '@/modules/system/errors/error.routes'
 import constRoutes from './constRoutes'
 import { authenticationRouteGuard } from './routerGuard'
 

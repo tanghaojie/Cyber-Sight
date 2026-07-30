@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { mergeDataAccessPlans } from '@/modules/authorization/authorization.service.js'
+import { mergeDataAccessPlans } from '@/modules/system/authorization/authorization.service.js'
 
 // 数据范围采用默认拒绝和允许并集语义；任一 all 规则会短路为无限制。
 describe('authorization data-scope union', () => {

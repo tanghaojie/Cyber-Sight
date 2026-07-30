@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { CurrentUser } from '@scaffold/api-contract'
-import { JwtTokenCache } from '@/modules/auth/auth-token-cache.js'
+import { JwtTokenCache } from '@/modules/system/auth/auth-token-cache.js'
 
 const SECRET = 'test-only-jwt-secret-at-least-32-characters'
 

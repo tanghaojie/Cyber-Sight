@@ -11,13 +11,13 @@ updated: 2026-07-30
 
 `apps/frontend` 是 Vue 3 单页应用，通过 `@scaffold/api-contract` 推导的 TypeScript 类型访问后端。它拥有应用启动、认证状态、静态与动态路由、响应式管理端外壳和各前端业务模块；不依赖 Fastify 内部实现，也不把数据库字符串当作任意动态导入路径。
 
-业务页面、API 和状态按 `src/modules/<module>/` 归属。`src/router/`、`src/layouts/`、`src/bootstrap/`、`src/api/` 和领域无关的 `src/shared/` 只承担应用组合或平台能力，不承载具体业务规则。
+业务页面、API 和状态按类别归属：脚手架内置能力位于 `src/modules/system/<module>/`，后续产品业务位于 `src/modules/biz/<module>/`。`src/router/`、`src/layouts/`、`src/bootstrap/`、`src/api/` 和领域无关的 `src/shared/` 只承担应用组合或平台能力，不承载具体业务规则。
 
 ## 当前结构与公共边界
 
-- `src/modules/<module>/pages/`：模块路由页面；`pages/components/`：仅供所属页面使用的列表和 Dialog。
-- `src/modules/<module>/*.api.ts`：模块 HTTP 调用；`*.store.ts`：确需跨页面共享的 Pinia 状态。
-- `src/modules/**/registerViews.ts`：需要被数据库菜单选择的模块登记页面加载器。
+- `src/modules/system/<module>/pages/`、`src/modules/biz/<module>/pages/`：模块路由页面；`pages/components/`：仅供所属页面使用的列表和 Dialog。
+- `src/modules/{system,biz}/<module>/*.api.ts`：模块 HTTP 调用；`*.store.ts`：确需跨页面共享的 Pinia 状态。
+- `src/modules/{system,biz}/**/registerViews.ts`：需要被数据库菜单选择的模块登记页面加载器。
 - `src/shared/routing/view-registry.ts`：构建期发现全部 `registerViews.ts`，校验稳定 key 并冻结页面注册表。
 - `src/shared/routing/layout-registry.ts`：发现 `src/layouts/*.vue`，以文件名建立只读布局注册表；`AdminLayout` 必须存在。
 - `src/router/constRoutes.ts`：登录、显式 404、根 `AdminLayout` 和默认工作台路由。
@@ -54,7 +54,9 @@ cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie�
 
 ## 页面注册、布局与样式
 
-`view-registry.ts` 通过 `import.meta.glob('@/modules/**/registerViews.ts', { eager: true })` 自动发现登记模块，包括新增的 `departments` 页面。登记 key 必须符合小写字母开头的 kebab-case 约束且全局唯一；缺少 `registerViews()`、非法 key 或重复 key 会在注册表构建时失败。
+`view-registry.ts` 通过两个 `import.meta.glob` 模式扫描 `@/modules/system/**/registerViews.ts` 与 `@/modules/biz/**/registerViews.ts`，自动发现两个分类下的登记模块。登记 key 必须符合小写字母开头的 kebab-case 约束且全局唯一；缺少 `registerViews()`、非法 key 或重复 key 会在注册表构建时失败。
+
+`AppHeader` 在桌面和移动端统一使用 `72px` 高度，保留粘性定位、菜单按钮、标题路径和用户菜单交互；该高度减少应用壳的纵向占用，不改变主内容与侧栏的布局职责。
 
 布局注册表通过懒加载发现 `src/layouts/*.vue`。`AdminLayout` 是静态根壳和必备布局；`EmptyLayout` 可供菜单显式选择。Tailwind CSS 负责布局、间距、响应式和多数视觉样式，Element Plus 提供表单、表格、弹窗和反馈；全局 SCSS 按基础、管理布局、过渡和 Element Plus 组件覆盖拆分。用户、角色、部门、菜单和字典管理页面共用的内容容器最大宽度为 `1920px`，窄于该宽度时仍保持响应式占满可用空间。
 

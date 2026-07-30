@@ -1,8 +1,8 @@
-import { loginPage } from '@/modules/auth/auth.routes'
-import { notFoundPage } from '@/modules/errors/error.routes'
+import { loginPage } from '@/modules/system/auth/auth.routes'
+import { notFoundPage } from '@/modules/system/errors/error.routes'
 import AdminLayout from '@/layouts/AdminLayout.vue'
 import { RouteRecordRaw, RouterView } from 'vue-router'
-import HomePage from '@/modules/home/pages/HomePage.vue'
+import HomePage from '@/modules/system/home/pages/HomePage.vue'
 
 // 登录、首页和错误页是应用启动所需的最小静态路由，不依赖后端菜单配置。
 const routes: RouteRecordRaw[] = [

@@ -82,38 +82,39 @@ pnpm dev
 
 ### 4.3 `apps/backend`
 
-| 路径                    | 作用                                                   |
-| ----------------------- | ------------------------------------------------------ |
-| `src/server.ts`         | 读取环境配置并监听端口，只负责进程启动                 |
-| `src/app.ts`            | 组装 Fastify 插件和业务模块，测试直接调用 `buildApp()` |
-| `src/config/env.ts`     | 加载和校验环境变量                                     |
-| `src/plugins/`          | Swagger、数据库、统一响应等横切能力                    |
-| `src/modules/<module>/` | 按业务能力组织的路由入口                               |
-| `src/shared/http/`      | 响应包装、分页默认值等公共 HTTP 规则                   |
-| `src/shared/errors/`    | 可执行错误码常量                                       |
-| `src/db/schema.ts`      | Drizzle 数据模型定义                                   |
-| `src/db/index.ts`       | PostgreSQL 客户端和 Drizzle 实例                       |
-| `drizzle/`              | 已生成并需要提交的 SQL 迁移和快照                      |
-| `test/`                 | Fastify 路由、契约和公共辅助函数测试                   |
+| 路径                           | 作用                                                   |
+| ------------------------------ | ------------------------------------------------------ |
+| `src/server.ts`                | 读取环境配置并监听端口，只负责进程启动                 |
+| `src/app.ts`                   | 组装 Fastify 插件和业务模块，测试直接调用 `buildApp()` |
+| `src/config/env.ts`            | 加载和校验环境变量                                     |
+| `src/plugins/`                 | Swagger、数据库、统一响应等横切能力                    |
+| `src/modules/system/<module>/` | 脚手架内置系统能力的路由入口                           |
+| `src/modules/biz/<module>/`    | 产品业务能力的路由入口                                 |
+| `src/shared/http/`             | 响应包装、分页默认值等公共 HTTP 规则                   |
+| `src/shared/errors/`           | 可执行错误码常量                                       |
+| `src/db/schema.ts`             | Drizzle 数据模型定义                                   |
+| `src/db/index.ts`              | PostgreSQL 客户端和 Drizzle 实例                       |
+| `drizzle/`                     | 已生成并需要提交的 SQL 迁移和快照                      |
+| `test/`                        | Fastify 路由、契约和公共辅助函数测试                   |
 
 `app.ts` 与 `server.ts` 必须保持分离。否则测试导入应用时会直接占用端口，无法使用 Fastify `inject` 进行快速测试。
 
-业务模块必须拥有独立的 `src/modules/<module>/` 目录，并以 `<module>.routes.ts`、`<module>.service.ts`、`<module>.api.ts` 等表意文件公开稳定能力，避免创建 `index.ts` barrel。路由、应用服务、领域规则、仓储和业务数据模型放在该模块目录内；`app.ts` 只从设计中登记的公共文件注册模块。不得导入其他模块未登记的内部文件，也不得直接访问其他模块的仓储或数据表。
+业务模块必须在所属类别下拥有独立的 `src/modules/system/<module>/` 或 `src/modules/biz/<module>/` 目录，并以 `<module>.routes.ts`、`<module>.service.ts`、`<module>.api.ts` 等表意文件公开稳定能力，避免创建 `index.ts` barrel。路由、应用服务、领域规则、仓储和业务数据模型放在该模块目录内；`app.ts` 只从设计中登记的公共文件注册模块。不得导入其他模块未登记的内部文件，也不得直接访问其他模块的仓储或数据表。
 
 ### 4.4 `apps/frontend`
 
-| 路径                                | 作用                                             |
-| ----------------------------------- | ------------------------------------------------ |
-| `src/api/client.ts`                 | 唯一共享的 fetch Client                          |
-| `src/modules/<module>/composables/` | 封装模块 API 调用和页面状态                      |
-| `src/modules/<module>/pages/`       | 模块拥有的路由页面，不直接堆积复杂业务和网络逻辑 |
-| `src/router/`                       | Vue Router 配置和页面懒加载                      |
-| `src/stores/`                       | 未来的跨页面 Pinia 状态；局部状态不要放入 store  |
-| `vite.config.mts`                   | Vite 构建、源码别名和 SVG 图标插件配置           |
+| 路径                                             | 作用                                             |
+| ------------------------------------------------ | ------------------------------------------------ |
+| `src/api/client.ts`                              | 唯一共享的 fetch Client                          |
+| `src/modules/{system,biz}/<module>/composables/` | 封装模块 API 调用和页面状态                      |
+| `src/modules/{system,biz}/<module>/pages/`       | 模块拥有的路由页面，不直接堆积复杂业务和网络逻辑 |
+| `src/router/`                                    | Vue Router 配置和页面懒加载                      |
+| `src/stores/`                                    | 未来的跨页面 Pinia 状态；局部状态不要放入 store  |
+| `vite.config.mts`                                | Vite 构建、源码别名和 SVG 图标插件配置           |
 
 前端不能手写一份与后端相似的接口类型，应从 `@scaffold/api-contract` 获取。
 
-新业务页面、组件、composable、service 和局部 store 都归入对应 `src/modules/<module>/`，由 `registerViews.ts`、`*.routes.ts`、`*.store.ts` 等表意文件暴露路由或应用壳需要的能力。根级 `views`、`stores` 只保留存量或真正应用级能力；实质修改存量业务时应迁入模块目录。
+新业务页面、组件、composable、service 和局部 store 都归入对应 `src/modules/system/<module>/` 或 `src/modules/biz/<module>/`，由 `registerViews.ts`、`*.routes.ts`、`*.store.ts` 等表意文件暴露路由或应用壳需要的能力。根级 `views`、`stores` 只保留存量或真正应用级能力；实质修改存量业务时应迁入模块目录。
 
 前端不维护单元、组件或端到端自动化测试。功能、交互、错误状态和浏览器适配由维护者人工
 验收；AI 默认只执行格式、TypeScript 检查和生产构建，不运行前端或浏览器测试。
@@ -249,7 +250,7 @@ interface PaginationRequest {
 
 1. 在 `docs/design/modules/` 更新用户模块设计。
 2. 在 `docs/plans/active/` 创建实施计划并建立 AI 日志。
-3. 确认前端、后端和契约分别使用 `src/modules/users/` 独立目录及其已登记的表意公共文件。
+3. 确认前端、后端分别使用 `src/modules/system/users/`，契约使用 `src/modules/users/`，并只依赖已登记的表意公共文件。
 4. 在 `@scaffold/api-contract` 的用户模块中定义请求、路径和响应 Schema，并从模块入口导出推导类型。
 5. 在后端用户模块中编写命名处理函数，使用 `success()` 或 `failure()`。
 6. 在 Fastify 路由中直接挂载共享运行时 Schema。

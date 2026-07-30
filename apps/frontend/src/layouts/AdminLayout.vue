@@ -36,8 +36,8 @@ import AppHeader from '@/components/layout/AppHeader.vue'
 import AppMain from '@/components/layout/AppMain.vue'
 import AppSidebar from '@/components/layout/AppSidebar.vue'
 import { clearDynamicRoutes, installMenuRoutes } from '@/router/dynamicRoutes'
-import { useAuthStore } from '@/modules/auth/auth.store'
-import { useNavigationStore } from '@/modules/navigation/navigation.store'
+import { useAuthStore } from '@/modules/system/auth/auth.store'
+import { useNavigationStore } from '@/modules/system/navigation/navigation.store'
 
 const route = useRoute()
 const router = useRouter()

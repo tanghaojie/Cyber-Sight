@@ -37,7 +37,7 @@ import type { NavigationMenu } from '@scaffold/api-contract'
 import { appConfig, brandInitials } from '@/config/app.config'
 import AppIcon from '@/components/AppIcon.vue'
 import SidebarTree from './SidebarTree.vue'
-import { useHealth } from '@/modules/health/composables/useHealth'
+import { useHealth } from '@/modules/system/health/composables/useHealth'
 
 defineProps<{ items: NavigationMenu[]; open: boolean; loading?: boolean }>()
 defineEmits<{ close: []; navigate: [] }>()
