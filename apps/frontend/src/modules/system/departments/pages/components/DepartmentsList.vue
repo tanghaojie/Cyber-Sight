@@ -39,7 +39,7 @@
       <el-table-column :label="t('departments.fields.status')" width="90">
         <template #default="{ row }">
           <el-tag :type="row.enabled ? 'success' : 'info'" round>
-            {{ row.enabled ? t('localization.state.enabled') : t('localization.state.disabled') }}
+            {{ row.enabled ? t('shared.state.enabled') : t('shared.state.disabled') }}
           </el-tag>
         </template>
       </el-table-column>
@@ -106,8 +106,8 @@ async function remove(department: DepartmentSummary): Promise<void> {
       t('departments.confirm.deleteTitle'),
       {
         type: 'warning',
-        confirmButtonText: t('localization.actions.delete'),
-        cancelButtonText: t('localization.actions.cancel'),
+        confirmButtonText: t('shared.actions.delete'),
+        cancelButtonText: t('shared.actions.cancel'),
       },
     )
     const result = await deleteDepartment(department.id)

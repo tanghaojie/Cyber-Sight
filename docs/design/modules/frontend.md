@@ -17,12 +17,14 @@ updated: 2026-07-31
 
 - `src/modules/system/<module>/pages/`、`src/modules/biz/<module>/pages/`：模块路由页面；`pages/components/`：仅供所属页面使用的列表和 Dialog。
 - `src/modules/{system,biz}/<module>/*.api.ts`：模块 HTTP 调用；`*.store.ts`：确需跨页面共享的 Pinia 状态。
-- `src/modules/{system,biz}/<module>/*.locales.ts`：所属模块的中英文运行时固定文案；由
-  localization 在构建期自动发现。
+- `src/modules/{system,biz}/<module>/*.locales.ts`：所属模块的中英文运行时固定领域文案；由
+  localization 在构建期自动发现。跨模块通用文案必须改用 `shared.*`，不得在模块资源中重复定义。
 - `src/modules/{system,biz}/**/registerViews.ts`：需要被数据库菜单选择的模块登记页面加载器。
 - `src/shared/routing/view-registry.ts`：构建期发现全部 `registerViews.ts`，校验稳定 key 并冻结页面注册表。
 - `src/shared/routing/layout-registry.ts`：发现 `src/layouts/*.vue`，以文件名建立只读布局注册表；`AdminLayout` 必须存在。
 - `src/shared/browserStorage.ts`：向前端模块公开 `browserStorage()`；在 SSR、隐私模式或浏览器策略禁用存储时返回 `null`，调用方保留各自的内存降级和错误处理语义。
+- `src/shared/localization/localization.resource.ts`：定义受支持语言、资源结构和中英文键集合校验；
+  `src/shared/localization/shared.locales.ts`：提供 `shared.*` 命名空间的领域无关界面文案。
 - `src/router/constRoutes.ts`：登录、显式 404、根 `AdminLayout` 和默认工作台路由。
 - `src/router/routerGuard.ts`：认证恢复、导航加载和首次动态路由安装。
 - `src/router/dynamicRoutes.ts`：根据菜单树生成、注册和清理动态路由。
@@ -30,7 +32,7 @@ updated: 2026-07-31
 - `src/bootstrap/registerHttpErrorHandler.ts`：组装 Router、认证、导航和全局 HTTP 错误动作。
 - `src/components/layout/` 与 `src/layouts/AdminLayout.vue`：侧栏、顶栏、内容出口和移动抽屉。
 - `src/modules/system/tag-view/`：账号隔离的页面标签历史、浏览器持久化和标签控制界面。
-- `src/modules/system/localization/`：默认中文的运行时语言状态、模块资源发现、Element Plus
+- `src/modules/system/localization/`：默认中文的运行时语言状态、模块和 shared 资源发现、Element Plus
   语言包、日期格式化和语言切换器。
 - `src/layouts/EmptyLayout.vue`：只提供一个 `<router-view>` 的可选布局。
 - `src/assets/icons/*.svg`、`src/shared/icons/icon-registry.ts` 与 `src/components/AppIcon.vue`：构建期 SVG sprite 和稳定图标名称；每个文件使用 kebab-case 名称、`0 0 24 24` viewBox 和无硬编码颜色的单色描边图形，文件名会自动成为菜单可选的图标名。

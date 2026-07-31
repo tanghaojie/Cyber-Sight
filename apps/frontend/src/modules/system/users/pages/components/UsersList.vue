@@ -47,7 +47,7 @@
       <el-table-column :label="t('users.fields.status')" width="100">
         <template #default="{ row }">
           <el-tag :type="row.enabled ? 'success' : 'info'" round>
-            {{ row.enabled ? t('localization.state.enabled') : t('localization.state.disabled') }}
+            {{ row.enabled ? t('shared.state.enabled') : t('shared.state.disabled') }}
           </el-tag>
         </template>
       </el-table-column>
@@ -147,8 +147,8 @@ async function remove(user: UserSummary): Promise<void> {
       t('users.confirm.deleteTitle'),
       {
         type: 'warning',
-        confirmButtonText: t('localization.actions.delete'),
-        cancelButtonText: t('localization.actions.cancel'),
+        confirmButtonText: t('shared.actions.delete'),
+        cancelButtonText: t('shared.actions.cancel'),
       },
     )
     const result = await deleteUser(user.id)

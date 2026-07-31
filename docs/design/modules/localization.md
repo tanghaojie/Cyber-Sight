@@ -35,21 +35,25 @@ Vue 应用提供统一的语言状态、文案解析、日期格式、Element Pl
 - 安装 Vue I18n，向调用方公开翻译、语言切换和本地化格式化能力；
 - 为 Element Plus 选择匹配语言包，并同步 `<html lang>`；
 - 提供登录页和应用 Header 可复用的语言切换组件；
-- 校验每个模块的中英文资源具有相同键集合。
+- 校验每个模块及 shared 资源的中英文资源具有相同键集合。
 
-各业务模块拥有自己的 `*.locales.ts` 资源和领域文案。`localization` 不集中拥有认证、用户、
-角色、菜单等业务模块的翻译，也不允许业务模块直接读写其内部语言状态。应用组合根发现并
-注册语言资源，其他模块只依赖 `localization.ts` 和 `LanguageSwitcher.vue` 等登记的公共文件。
+各业务模块拥有自己的 `*.locales.ts` 资源和领域文案。`src/shared/localization/shared.locales.ts`
+拥有新增、查看、删除等跨模块的领域无关界面文案，并以 `shared.*` 作为稳定命名空间；模块
+不得重复定义这些文案。`localization` 不集中拥有认证、用户、角色、菜单等业务模块的翻译，也
+不允许业务模块直接读写其内部语言状态。资源加载器发现并注册模块与 shared 的语言资源，其他
+模块只依赖登记的公共文件。
 
 ## 公共接口
 
-- `localization.resource.ts`：公开 `SupportedLocale`、资源结构和中英文键集合校验辅助函数。
+- `src/shared/localization/localization.resource.ts`：公开 `SupportedLocale`、资源结构和中英文键
+  集合校验辅助函数。
+- `src/shared/localization/shared.locales.ts`：公开通过资源校验的 `shared` 通用界面文案。
 - `localization.ts`：公开受支持语言元数据、Vue 插件实例、`useLocalization()`、
   `setLocale()`、`translate()`、本地化标签解析和日期格式化能力。
 - `LocalizationProvider.vue`：在应用根部连接当前语言与 Element Plus Config Provider。
 - `LanguageSwitcher.vue`：公开无账号依赖的中英文切换控件。
-- `*.locales.ts`：各模块公开的纯翻译资源文件；统一导出名为 `localizationResource`，只能
-  导出通过资源辅助函数校验的数据，不得产生业务副作用。
+- `*.locales.ts`：模块与 shared 公开的纯翻译资源文件；统一导出名为 `localizationResource`，
+  只能导出通过资源辅助函数校验的数据，不得产生业务副作用。
 
 模块外代码不得直接操作 Vue I18n 全局实例、Element Plus locale 或语言存储键。
 
@@ -69,7 +73,7 @@ SupportedLocale = 'zh-CN' | 'en-US'
 
 ```text
 应用启动
-    -> 发现 system/biz 模块的 *.locales.ts
+    -> 发现 system/biz 模块及 shared/localization 的 *.locales.ts
     -> 创建并安装 localization
     -> 恢复 cyber_locale:v1 或使用 zh-CN
     -> LocalizationProvider 选择 Element Plus locale
@@ -108,9 +112,10 @@ SupportedLocale = 'zh-CN' | 'en-US'
 main.ts + App.vue
     -> localization 公共入口
         -> Vue I18n + Element Plus locale + shared/browserStorage
+        -> shared/localization 资源定义与通用文案
 
 各业务模块
-    -> localization 公共组合式函数
+    -> localization 公共组合式函数 + shared.* 翻译键
     -> 自有 *.locales.ts
 
 AdminLayout + Router + navigation
@@ -168,3 +173,5 @@ TypeScript 检查和生产构建；维护者人工验收：
 - [完成计划](../../archive/plans/2026-07-31-runtime-localization.md)
 - [AI 协作记录](../../archive/ai-logs/2026/07/2026-07-31-runtime-localization.md)
 - [无效日期回归修复](../../archive/plans/2026-07-31-safe-localized-date-formatting.md)
+- [共享多语言资源提取](../../archive/plans/2026-07-31-shared-localization-resources.md)及其
+  [AI 协作记录](../../archive/ai-logs/2026/07/2026-07-31-shared-localization-resources.md)

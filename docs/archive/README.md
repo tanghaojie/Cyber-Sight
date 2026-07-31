@@ -32,6 +32,7 @@
 - `plans/`：按 `YYYY-MM-DD-<topic>.md` 保存完成、取消或被取代的实施计划。
 - `ai-logs/YYYY/MM/`：保存对应任务的结构化协作记录。
 - 2026-07-31：[前端浏览器存储访问能力提取计划](plans/2026-07-31-shared-browser-storage.md)及其 [AI 协作记录](ai-logs/2026/07/2026-07-31-shared-browser-storage.md)。
+- 2026-07-31：[共享多语言资源提取计划](plans/2026-07-31-shared-localization-resources.md)及其 [AI 协作记录](ai-logs/2026/07/2026-07-31-shared-localization-resources.md)。
 - 2026-07-31：[本地化日期无效值修复计划](plans/2026-07-31-safe-localized-date-formatting.md)及其 [AI 协作记录](ai-logs/2026/07/2026-07-31-safe-localized-date-formatting.md)。
 - 2026-07-31：[前端运行时中英文切换实施计划](plans/2026-07-31-runtime-localization.md)及其 [AI 协作记录](ai-logs/2026/07/2026-07-31-runtime-localization.md)。
 - 2026-07-31：[SVG 图标库扩充实施计划](plans/2026-07-31-expand-svg-icon-library.md)及其 [AI 协作记录](ai-logs/2026/07/2026-07-31-expand-svg-icon-library.md)。

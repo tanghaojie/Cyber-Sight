@@ -39,14 +39,14 @@
         <el-form-item :label="t('dictionaries.fields.status')" class="sm:col-span-2">
           <el-switch
             v-model="form.enabled"
-            :active-text="t('localization.state.enabled')"
-            :inactive-text="t('localization.state.disabled')"
+            :active-text="t('shared.state.enabled')"
+            :inactive-text="t('shared.state.disabled')"
           />
         </el-form-item>
       </div>
       <el-alert v-if="formError" :title="formError" type="error" show-icon :closable="false" />
       <div class="dialog-actions">
-        <el-button @click="dialogOpen = false">{{ t('localization.actions.cancel') }}</el-button>
+        <el-button @click="dialogOpen = false">{{ t('shared.actions.cancel') }}</el-button>
         <el-button native-type="submit" type="primary" :loading="saving">{{
           t('dictionaries.dialog.save')
         }}</el-button>

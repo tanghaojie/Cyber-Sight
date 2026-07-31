@@ -3,7 +3,7 @@ import { ElMessage } from 'element-plus'
 import { translate } from '@/modules/system/localization/localization'
 
 function invalidResponseMessage(): string {
-  return translate('localization.messages.invalidResponse')
+  return translate('shared.messages.invalidResponse')
 }
 
 /** 把 HTTP 客户端的 data/error 双通道还原为共享契约定义的单一业务响应。 */

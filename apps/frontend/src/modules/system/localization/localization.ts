@@ -5,7 +5,7 @@ import {
   supportedLocaleCodes,
   type LocalizationResource,
   type SupportedLocale,
-} from './localization.resource'
+} from '@/shared/localization/localization.resource'
 
 const DEFAULT_LOCALE: SupportedLocale = 'zh-CN'
 const STORAGE_KEY = 'cyber_locale:v1'
@@ -73,7 +73,11 @@ function collectMessages(): Record<SupportedLocale, Record<string, LocaleMessage
     'en-US': Object.create(null),
   }
   const resourceModules = import.meta.glob<LocalizationResourceModule>(
-    ['@/modules/system/**/*.locales.ts', '@/modules/biz/**/*.locales.ts'],
+    [
+      '@/modules/system/**/*.locales.ts',
+      '@/modules/biz/**/*.locales.ts',
+      '@/shared/localization/**/*.locales.ts',
+    ],
     { eager: true },
   )
   const namespaces = new Set<string>()
@@ -166,4 +170,4 @@ export function useLocalization() {
 
 synchronizeDocument(currentLocale.value)
 
-export type { SupportedLocale } from './localization.resource'
+export type { SupportedLocale } from '@/shared/localization/localization.resource'

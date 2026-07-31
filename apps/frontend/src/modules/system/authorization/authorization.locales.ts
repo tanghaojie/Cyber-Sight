@@ -1,4 +1,4 @@
-import { defineLocalizationResource } from '@/modules/system/localization/localization.resource'
+import { defineLocalizationResource } from '@/shared/localization/localization.resource'
 
 export const localizationResource = defineLocalizationResource('authorization', {
   'zh-CN': {

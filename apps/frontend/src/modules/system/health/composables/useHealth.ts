@@ -23,7 +23,7 @@ export function useHealth() {
     }
 
     if (!response || response.status !== 0 || !response.data) {
-      error.value = translate('localization.messages.invalidResponse')
+      error.value = translate('shared.messages.invalidResponse')
       status.value = 'error'
       timestamp.value = ''
       return
