@@ -60,22 +60,13 @@ export const users = pgTable(
   }),
 )
 
-export const roles = pgTable(
-  'sys_roles',
-  {
-    id: serial('id').primaryKey(),
-    name: varchar('name', { length: 80 }).notNull(),
-    code: varchar('code', { length: 50 }).notNull(),
-    description: varchar('description', { length: 200 }).default('').notNull(),
-    enabled: boolean('enabled').default(true).notNull(),
-    ...auditColumns(),
-  },
-  (table) => ({
-    activeCode: uniqueIndex('sys_roles_code_active_unique')
-      .on(table.code)
-      .where(sql`${table.isDeleted} = false`),
-  }),
-)
+export const roles = pgTable('sys_roles', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 80 }).notNull(),
+  description: varchar('description', { length: 200 }).default('').notNull(),
+  enabled: boolean('enabled').default(true).notNull(),
+  ...auditColumns(),
+})
 
 export const userRoles = pgTable(
   'sys_user_roles',

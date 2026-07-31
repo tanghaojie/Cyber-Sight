@@ -23,7 +23,7 @@
           <span class="app-header__avatar">{{ initials }}</span>
           <span class="app-header__user-copy">
             <b>{{ displayName }}</b>
-            <small>{{ role }}</small>
+            <small>{{ roleNames }}</small>
           </span>
           <ArrowDown class="app-header__user-arrow" />
         </button>
@@ -57,7 +57,7 @@ const props = defineProps<{
   title: string
   menuPath: string
   displayName?: string
-  role?: string
+  roles?: string[]
 }>()
 
 const emit = defineEmits<{
@@ -67,6 +67,9 @@ const emit = defineEmits<{
 
 const { t } = useLocalization()
 const initials = computed(() => props.displayName?.slice(0, 1).toUpperCase() ?? 'A')
+const roleNames = computed(
+  () => props.roles?.filter(Boolean).join('、') || t('navigation.shell.defaultRole'),
+)
 const settingsOpen = ref(false)
 
 function handleCommand(command: string) {

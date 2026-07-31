@@ -489,12 +489,6 @@
           "notNull": true,
           "default": 0
         },
-        "code": {
-          "name": "code",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true
-        },
         "name": {
           "name": "name",
           "type": "varchar(80)",
@@ -1216,24 +1210,7 @@
           "default": 0
         }
       },
-      "indexes": {
-        "sys_roles_code_active_unique": {
-          "name": "sys_roles_code_active_unique",
-          "columns": [
-            {
-              "expression": "code",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "where": "\"sys_roles\".\"is_deleted\" = false",
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}

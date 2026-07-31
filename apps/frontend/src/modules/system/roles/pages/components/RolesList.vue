@@ -23,11 +23,6 @@
     />
     <el-table v-loading="loading" :data="records" row-key="id" :empty-text="t('roles.list.empty')">
       <el-table-column prop="name" :label="t('roles.fields.name')" min-width="150" />
-      <el-table-column prop="code" :label="t('roles.fields.code')" min-width="170">
-        <template #default="{ row }">
-          <code class="code-chip">{{ row.code }}</code>
-        </template>
-      </el-table-column>
       <el-table-column
         prop="description"
         :label="t('roles.fields.description')"

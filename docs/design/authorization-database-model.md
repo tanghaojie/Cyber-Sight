@@ -51,7 +51,7 @@ erDiagram
 | 物理表               | 作用                       | 关键字段与约束                                                                                              |
 | -------------------- | -------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | sys_users            | 用户主体                   | id 为主键；enabled 决定用户是否可作为有效身份使用。                                                         |
-| sys_roles            | 角色定义                   | id 为主键；code 在未删除角色中唯一；enabled 可使角色整体失效。                                              |
+| sys_roles            | 角色定义                   | id 为主键，用于角色关联；name 为展示名称；enabled 可使角色整体失效。                                        |
 | sys_user_roles       | 用户与角色的多对多归属     | user_id 指向 sys_users.id，role_id 指向 sys_roles.id；有效的 (user_id, role_id) 唯一。                      |
 | sys_permissions      | 稳定功能权限目录           | key 全局唯一，例如 users.manage；另有 module、name、description 和 enabled。key 是不复用的对外稳定标识。    |
 | sys_role_permissions | 角色与权限的多对多授予     | role_id 指向 sys_roles.id，permission_key 指向 sys_permissions.key；有效的 (role_id, permission_key) 唯一。 |
@@ -84,7 +84,7 @@ WHERE ur.user_id = :current_user_id
 
 ### 初始数据
 
-唯一初始迁移 apps/backend/drizzle/0000_initial_system_schema.sql 会创建权限目录、超级管理员角色及归属，并授予 SUPER_ADMIN 全部已登记功能权限。超级管理员不依赖运行时用户 ID 或角色编码绕过；其能力同样来自上述关系表。
+唯一初始迁移 apps/backend/drizzle/0000_initial_system_schema.sql 会创建权限目录、超级管理员角色及归属，并授予该初始角色全部已登记功能权限。超级管理员不依赖运行时用户 ID 或角色编码绕过；其能力同样来自上述关系表。
 
 ## 数据权限
 

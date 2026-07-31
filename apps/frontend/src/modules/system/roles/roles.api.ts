@@ -13,7 +13,6 @@ import { translate } from '@/modules/system/localization/localization'
 export interface RoleOption {
   id: number
   name: string
-  code: string
 }
 
 export async function listRoles(pageNum: number, pageSize: number, keyword = '') {
@@ -29,9 +28,7 @@ export async function listRoleOptions(): Promise<RoleOption[]> {
   if (result.status !== 0) {
     throw new Error(translate('roles.errors.optionsLoadFailed'))
   }
-  return result.list
-    .filter((role) => role.enabled)
-    .map(({ id, name, code }) => ({ id, name, code }))
+  return result.list.filter((role) => role.enabled).map(({ id, name }) => ({ id, name }))
 }
 
 export async function createRole(payload: RoleRequest): Promise<ApiMutationResult> {

@@ -1,4 +1,4 @@
-import { and, count, eq, ilike, or } from 'drizzle-orm'
+import { and, count, eq, ilike } from 'drizzle-orm'
 import type { FastifyInstance } from 'fastify'
 import type { RoleRequest } from '@scaffold/api-contract'
 import { roles } from '@/db/schema.js'
@@ -9,7 +9,7 @@ export async function listRoles(app: FastifyInstance, query: RepositoryListQuery
   const keyword = query.keyword?.trim()
   const predicate = and(
     eq(roles.isDeleted, false),
-    keyword ? or(ilike(roles.name, `%${keyword}%`), ilike(roles.code, `%${keyword}%`)) : undefined,
+    keyword ? ilike(roles.name, `%${keyword}%`) : undefined,
   )
   const rows = await app.db
     .select()
@@ -24,7 +24,6 @@ export async function listRoles(app: FastifyInstance, query: RepositoryListQuery
     list: rows.map((row) => ({
       id: row.id,
       name: row.name,
-      code: row.code,
       description: row.description,
       enabled: row.enabled,
       ...auditView(row),

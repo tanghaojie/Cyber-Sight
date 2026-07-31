@@ -158,7 +158,6 @@ CREATE TABLE IF NOT EXISTS "sys_role_permissions" (
 CREATE TABLE IF NOT EXISTS "sys_roles" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" varchar(80) NOT NULL,
-	"code" varchar(50) NOT NULL,
 	"description" varchar(200) DEFAULT '' NOT NULL,
 	"enabled" boolean DEFAULT true NOT NULL,
 	"is_deleted" boolean DEFAULT false NOT NULL,
@@ -297,14 +296,13 @@ CREATE UNIQUE INDEX IF NOT EXISTS "sys_departments_code_active_unique" ON "sys_d
 CREATE UNIQUE INDEX IF NOT EXISTS "sys_dictionaries_type_value_active_unique" ON "sys_dictionaries" USING btree ("type","value") WHERE "sys_dictionaries"."is_deleted" = false;--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "sys_role_menus_role_menu_active_unique" ON "sys_role_menus" USING btree ("role_id","menu_id") WHERE "sys_role_menus"."is_deleted" = false;--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "sys_role_permissions_role_permission_active_unique" ON "sys_role_permissions" USING btree ("role_id","permission_key") WHERE "sys_role_permissions"."is_deleted" = false;--> statement-breakpoint
-CREATE UNIQUE INDEX IF NOT EXISTS "sys_roles_code_active_unique" ON "sys_roles" USING btree ("code") WHERE "sys_roles"."is_deleted" = false;--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "sys_user_departments_user_department_active_unique" ON "sys_user_departments" USING btree ("user_id","department_id") WHERE "sys_user_departments"."is_deleted" = false;--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "sys_user_departments_user_primary_active_unique" ON "sys_user_departments" USING btree ("user_id") WHERE "sys_user_departments"."is_deleted" = false AND "sys_user_departments"."is_primary" = true;--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "sys_user_roles_user_role_active_unique" ON "sys_user_roles" USING btree ("user_id","role_id") WHERE "sys_user_roles"."is_deleted" = false;--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "sys_users_username_active_unique" ON "sys_users" USING btree ("username") WHERE "sys_users"."is_deleted" = false;--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "sys_users_email_active_unique" ON "sys_users" USING btree ("email") WHERE "sys_users"."is_deleted" = false;--> statement-breakpoint
-INSERT INTO "sys_roles" ("name", "code", "description", "enabled")
-VALUES ('超级管理员', 'SUPER_ADMIN', '系统内置最高权限角色', true)
+INSERT INTO "sys_roles" ("name", "description", "enabled")
+VALUES ('超级管理员', '系统内置最高权限角色', true)
 ON CONFLICT DO NOTHING;--> statement-breakpoint
 INSERT INTO "sys_users" ("username", "display_name", "email", "password_hash", "enabled")
 VALUES ('admin', '系统管理员', 'admin@example.com', 'scrypt:a1b2c3d4e5f60718293a4b5c6d7e8f90:5e6d7168e2eba05ebfb78dd0543e3149a699cbfcf24b454deb8b5ef077758e537f864af23485148138854b2638dd5af33a0c2398da1a8510940739ed6c0cd9e8', true)
@@ -315,7 +313,7 @@ FROM "sys_users" u
 CROSS JOIN "sys_roles" r
 WHERE u."username" = 'admin'
 	AND u."is_deleted" = false
-	AND r."code" = 'SUPER_ADMIN'
+	AND r."name" = '超级管理员'
 	AND r."is_deleted" = false
 ON CONFLICT DO NOTHING;--> statement-breakpoint
 INSERT INTO "sys_permissions" ("key", "module", "name", "description", "enabled") VALUES
@@ -384,7 +382,7 @@ SELECT r."id", m."id", u."id", u."id"
 FROM "sys_roles" r
 CROSS JOIN "sys_menus" m
 CROSS JOIN "sys_users" u
-WHERE r."code" = 'SUPER_ADMIN'
+WHERE r."name" = '超级管理员'
 	AND r."is_deleted" = false
 	AND m."is_deleted" = false
 	AND u."username" = 'admin'
@@ -399,7 +397,7 @@ SELECT r."id", p."key", u."id", u."id"
 FROM "sys_roles" r
 CROSS JOIN "sys_permissions" p
 CROSS JOIN "sys_users" u
-WHERE r."code" = 'SUPER_ADMIN'
+WHERE r."name" = '超级管理员'
 	AND r."is_deleted" = false
 	AND p."enabled" = true
 	AND p."is_deleted" = false
@@ -413,7 +411,7 @@ SELECT 'role', r."id", 'users', actions."action", 'all', true, u."id", u."id"
 FROM "sys_roles" r
 CROSS JOIN (VALUES ('read'), ('create'), ('update'), ('delete')) AS actions("action")
 CROSS JOIN "sys_users" u
-WHERE r."code" = 'SUPER_ADMIN'
+WHERE r."name" = '超级管理员'
 	AND r."is_deleted" = false
 	AND u."username" = 'admin'
 	AND u."is_deleted" = false

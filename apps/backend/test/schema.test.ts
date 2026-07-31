@@ -44,7 +44,6 @@ const activeBusinessIdentityIndexes: Array<{
 }> = [
   { table: users, name: 'sys_users_username_active_unique', columns: ['username'] },
   { table: users, name: 'sys_users_email_active_unique', columns: ['email'] },
-  { table: roles, name: 'sys_roles_code_active_unique', columns: ['code'] },
   {
     table: userRoles,
     name: 'sys_user_roles_user_role_active_unique',
@@ -121,6 +120,16 @@ describe('menu routing fields', () => {
     expect(columns).toHaveProperty('layout')
     expect(columns).toHaveProperty('externalUrl')
     expect(columns).toHaveProperty('requiredPermissionKey')
+    expect(columns).not.toHaveProperty('code')
+  })
+})
+
+describe('role model fields', () => {
+  it('uses an internal ID and user-facing name without a role code', () => {
+    const columns = getTableColumns(roles)
+
+    expect(columns).toHaveProperty('id')
+    expect(columns).toHaveProperty('name')
     expect(columns).not.toHaveProperty('code')
   })
 })

@@ -11,7 +11,12 @@ export const CurrentUserSchema = z.strictObject({
   id: z.number().int(),
   username: z.string(),
   displayName: z.string(),
-  roles: z.array(z.string()),
+  roles: z.array(
+    z.strictObject({
+      id: z.number().int(),
+      name: z.string(),
+    }),
+  ),
 })
 
 export const LoginDataSchema = z.strictObject({

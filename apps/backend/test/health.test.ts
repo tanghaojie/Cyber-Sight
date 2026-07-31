@@ -163,7 +163,7 @@ describe('GET /health', () => {
       id: 1,
       username: 'admin',
       displayName: '系统管理员',
-      roles: ['SUPER_ADMIN'],
+      roles: [{ id: 1, name: '超级管理员' }],
     }
     const issued = await app.authTokens.issue(currentUser)
     const response = await app.inject({
@@ -192,7 +192,7 @@ describe('GET /health', () => {
       id: 2,
       username: 'operator',
       displayName: 'Operator',
-      roles: ['USER'],
+      roles: [{ id: 2, name: '用户' }],
     })
     const headers = { authorization: `Bearer ${issued.token}` }
     const originalDb = app.db

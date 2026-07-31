@@ -6,22 +6,16 @@ import {
   paginatedResponseSchema,
 } from '@/shared/http.js'
 
-/** 角色契约：编码是跨模块引用的稳定标识，名称和描述用于管理界面展示。 */
+/** 角色契约：角色 ID 用于内部关联，名称和描述用于管理界面展示。 */
 export const RoleSummarySchema = AuditFieldsSchema.extend({
   id: z.number().int(),
   name: z.string(),
-  code: z.string(),
   description: z.string(),
   enabled: z.boolean(),
 })
 
 export const RoleRequestSchema = z.strictObject({
   name: z.string().min(1).max(80),
-  code: z
-    .string()
-    .min(2)
-    .max(50)
-    .regex(/^[A-Z0-9_]+$/),
   description: z.string().max(200),
   enabled: z.boolean(),
 })

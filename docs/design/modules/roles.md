@@ -2,7 +2,7 @@
 title: 角色模块
 status: active
 owner: maintainers
-updated: 2026-07-30
+updated: 2026-07-31
 ---
 
 # 角色模块
@@ -22,7 +22,7 @@ updated: 2026-07-30
 
 `RolesPage.vue` 聚合 `pages/components/RolesList.vue` 与 `RoleDialog.vue`。列表组件拥有分页、搜索、错误和删除交互；Dialog 保存角色定义后，通过 authorization 公共 API 保存功能权限键和数据策略。新建时若第二步失败，会明确提示角色已保存但授权配置未完成，维护者可重新编辑补齐。
 
-角色编码只在未删除角色中唯一，数据库使用 `is_deleted = false` 部分唯一索引保证并发安全；软删除后允许新角色复用编码。所有角色管理写路由要求 `roles.manage`；角色选项读取同时允许 `users.manage`。`sys_role_menus` 仅保留兼容关系，不再由角色仓储读写。
+角色以数据库 ID 作为用户归属、权限授予和数据策略的内部关联标识，名称、职责说明和启用状态构成可维护的角色定义；角色编码不进入数据库、契约或界面。角色列表搜索只匹配名称。所有角色管理写路由要求 `roles.manage`；角色选项读取同时允许 `users.manage`。`sys_role_menus` 仅保留兼容关系，不再由角色仓储读写。
 
 ## 测试策略
 

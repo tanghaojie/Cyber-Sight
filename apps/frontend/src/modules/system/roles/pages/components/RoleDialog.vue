@@ -7,11 +7,8 @@
   >
     <el-form label-position="top" @submit.prevent="submit">
       <div class="form-columns">
-        <el-form-item :label="t('roles.fields.name')" required>
+        <el-form-item :label="t('roles.fields.name')" class="sm:col-span-2" required>
           <el-input v-model.trim="form.name" :placeholder="t('roles.dialog.namePlaceholder')" />
-        </el-form-item>
-        <el-form-item :label="t('roles.fields.code')" required>
-          <el-input v-model.trim="form.code" :placeholder="t('roles.dialog.codePlaceholder')" />
         </el-form-item>
         <el-form-item :label="t('roles.fields.description')" class="sm:col-span-2">
           <el-input
@@ -88,7 +85,6 @@ const formError = ref('')
 const { resolveLocalizedLabel, t } = useLocalization()
 const form = reactive<RoleRequest>({
   name: '',
-  code: '',
   description: '',
   enabled: true,
 })
@@ -108,11 +104,10 @@ function resetForm(): void {
     props.role
       ? {
           name: props.role.name,
-          code: props.role.code,
           description: props.role.description,
           enabled: props.role.enabled,
         }
-      : { name: '', code: '', description: '', enabled: true },
+      : { name: '', description: '', enabled: true },
   )
   Object.assign(access, { permissionKeys: [], dataPolicies: [] })
   formError.value = ''
@@ -122,7 +117,7 @@ async function submit(): Promise<void> {
   saving.value = true
   formError.value = ''
   try {
-    if (!form.name || !/^[A-Z0-9_]{2,50}$/.test(form.code)) {
+    if (!form.name) {
       throw new Error(t('roles.errors.invalidForm'))
     }
     const payload: RoleRequest = { ...form }

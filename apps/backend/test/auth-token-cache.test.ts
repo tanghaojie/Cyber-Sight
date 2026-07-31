@@ -10,7 +10,7 @@ function user(id: number): CurrentUser {
     id,
     username: `user-${id}`,
     displayName: `User ${id}`,
-    roles: ['USER'],
+    roles: [{ id: 1, name: '用户' }],
   }
 }
 

@@ -20,7 +20,7 @@
         :title="pageTitle"
         :menu-path="pageMenuPath"
         :display-name="auth.user?.displayName"
-        :role="auth.user?.roles[0] ?? t('navigation.shell.defaultRole')"
+        :roles="auth.user?.roles.map((role) => role.name)"
         @open-menu="sidebarOpen = true"
         @logout="handleLogout"
       />

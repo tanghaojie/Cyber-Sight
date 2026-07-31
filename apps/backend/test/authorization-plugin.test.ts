@@ -52,7 +52,7 @@ describe('authorization provider boundary', () => {
       id: 8,
       username: 'operator',
       displayName: 'Operator',
-      roles: ['OPERATOR'],
+      roles: [{ id: 2, name: '操作员' }],
     })
     const response = await app.inject({
       method: 'GET',

@@ -15,15 +15,16 @@ function bearerToken(request: FastifyRequest): string | null {
   return match?.[1] ?? null
 }
 
-async function rolesForUser(app: FastifyInstance, userId: number): Promise<string[]> {
+async function rolesForUser(app: FastifyInstance, userId: number): Promise<CurrentUser['roles']> {
   // 会话身份只包含仍有效角色，禁用/软删除角色不会继续影响授权判定。
   const rows = await app.db
-    .select({ code: roles.code })
+    .select({ id: roles.id, name: roles.name })
     .from(userRoles)
     .innerJoin(roles, and(eq(userRoles.roleId, roles.id), eq(roles.isDeleted, false)))
     .where(and(eq(userRoles.userId, userId), eq(userRoles.isDeleted, false)))
+    .orderBy(roles.id)
 
-  return rows.map((row) => row.code)
+  return rows
 }
 
 async function loadPersistedSession(

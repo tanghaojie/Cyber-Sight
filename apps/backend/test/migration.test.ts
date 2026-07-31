@@ -75,9 +75,10 @@ describe('database migration baseline', () => {
     expect(migrationSql).toContain('"layout" varchar(160) DEFAULT \'\' NOT NULL')
     expect(migrationSql).toContain('"required_permission_key" varchar(100)')
     expect(migrationSql).not.toContain('"code" varchar(80)')
+    expect(migrationSql).not.toContain('"sys_roles_code_active_unique"')
     expect(migrationSql).toContain('"sys_auth_sessions_token_hash_unique"')
-    expect(migrationSql.match(/CREATE UNIQUE INDEX IF NOT EXISTS "sys_/g)).toHaveLength(13)
-    expect(migrationSql.match(/WHERE "sys_[^"]+"\."is_deleted" = false/g)).toHaveLength(13)
+    expect(migrationSql.match(/CREATE UNIQUE INDEX IF NOT EXISTS "sys_/g)).toHaveLength(12)
+    expect(migrationSql.match(/WHERE "sys_[^"]+"\."is_deleted" = false/g)).toHaveLength(12)
   })
 
   it('seeds the fresh database with framework administration data', () => {
@@ -99,7 +100,7 @@ describe('database migration baseline', () => {
     ]) {
       expect(migrationSql).toContain(`INSERT INTO "${tableName}"`)
     }
-    expect(migrationSql).toContain("'SUPER_ADMIN'")
+    expect(migrationSql).not.toContain("'SUPER_ADMIN'")
     expect(migrationSql).toContain("'admin'")
     expect(migrationSql).toContain("'departments.manage'")
     expect(migrationSql).toContain("('read'), ('create'), ('update'), ('delete')")

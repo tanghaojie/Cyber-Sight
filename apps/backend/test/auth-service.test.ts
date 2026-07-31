@@ -31,7 +31,7 @@ describe('authentication service persistence cache', () => {
       .mockReturnValueOnce({
         from: vi.fn(() => ({
           innerJoin: vi.fn(() => ({
-            where: vi.fn().mockResolvedValue([{ code: 'USER' }]),
+            where: vi.fn(() => ({ orderBy: vi.fn().mockResolvedValue([{ id: 3, name: '用户' }]) })),
           })),
         })),
       })
@@ -53,7 +53,7 @@ describe('authentication service persistence cache', () => {
       id: 7,
       username: 'operator',
       displayName: 'Operator',
-      roles: ['USER'],
+      roles: [{ id: 3, name: '用户' }],
     })
     expect(result?.issued?.token).toEqual(expect.any(String))
     expect(insertValues).toHaveBeenCalledWith(
@@ -71,7 +71,7 @@ describe('authentication service persistence cache', () => {
       id: 9,
       username: 'cached-user',
       displayName: 'Cached User',
-      roles: ['ADMIN'],
+      roles: [{ id: 4, name: '管理员' }],
     }
     const cache = new JwtTokenCache(SECRET)
     const issued = await cache.issue(currentUser)
@@ -98,7 +98,9 @@ describe('authentication service persistence cache', () => {
       .mockReturnValueOnce({
         from: vi.fn(() => ({
           innerJoin: vi.fn(() => ({
-            where: vi.fn().mockResolvedValue([{ code: 'ADMIN' }]),
+            where: vi.fn(() => ({
+              orderBy: vi.fn().mockResolvedValue([{ id: 4, name: '管理员' }]),
+            })),
           })),
         })),
       })
