@@ -4,6 +4,7 @@
     class="system-settings-dialog"
     width="min(780px, calc(100vw - 32px))"
     align-center
+    append-to-body
     :close-on-click-modal="false"
   >
     <template #header>
