@@ -154,7 +154,11 @@ export function formatDateTime(
   value: string | number | Date,
   options: Intl.DateTimeFormatOptions = { dateStyle: 'medium', timeStyle: 'short' },
 ): string {
-  return new Intl.DateTimeFormat(currentLocale.value, options).format(new Date(value))
+  const date = value instanceof Date ? value : new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return ''
+  }
+  return new Intl.DateTimeFormat(currentLocale.value, options).format(date)
 }
 
 export function useLocalization() {

@@ -131,6 +131,7 @@ AdminLayout + Router + navigation
 
 - 翻译键缺失：开发阶段由 TypeScript 资源结构校验发现；运行时回退中文，不显示空白。
 - 持久化不可用或损坏：当前会话继续工作，下次启动回退中文。
+- 日期值为空或不可解析：格式化函数返回空字符串，调用方不因无效时间中断渲染。
 - 默认菜单被修改：指纹失配后显示用户录入名称，禁止用旧翻译覆盖。
 - 自定义菜单与默认路径接近：只有完整指纹匹配才翻译，避免误判。
 - 切换后标签仍显示旧语言：显示层从 Router 标签描述重新解析，不依赖持久化标题作为最终文案。
@@ -166,3 +167,4 @@ TypeScript 检查和生产构建；维护者人工验收：
 - [ADR-0029：采用前端模块化运行时本地化](../../decisions/ADR-0029-frontend-runtime-localization.md)
 - [完成计划](../../archive/plans/2026-07-31-runtime-localization.md)
 - [AI 协作记录](../../archive/ai-logs/2026/07/2026-07-31-runtime-localization.md)
+- [无效日期回归修复](../../archive/plans/2026-07-31-safe-localized-date-formatting.md)

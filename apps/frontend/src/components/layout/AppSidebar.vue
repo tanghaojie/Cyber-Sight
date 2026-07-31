@@ -29,7 +29,7 @@
         <b v-else-if="status === 'loading'">{{ t('navigation.shell.statusLoading') }}</b>
         <b v-else-if="status === 'error'">{{ error ?? t('navigation.shell.statusUnknown') }}</b>
         <b v-else>{{ t('navigation.shell.statusUnknown') }}</b>
-        <small>{{ formatDateTime(timestamp, { timeStyle: 'medium' }) }}</small>
+        <small v-if="timestamp">{{ formatDateTime(timestamp, { timeStyle: 'medium' }) }}</small>
       </div>
     </footer>
   </aside>
