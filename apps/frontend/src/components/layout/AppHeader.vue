@@ -29,23 +29,29 @@
         </button>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item command="logout">
-              <SwitchButton class="app-header__logout-icon" />
+            <el-dropdown-item command="settings">
+              <Setting class="app-header__dropdown-icon" />
+              {{ t('settings.dropdown.open') }}
+            </el-dropdown-item>
+            <el-dropdown-item divided command="logout">
+              <SwitchButton class="app-header__dropdown-icon" />
               {{ t('navigation.shell.logout') }}
             </el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
     </div>
+    <SettingsDialog v-model="settingsOpen" />
   </header>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { ArrowDown, SwitchButton } from '@element-plus/icons-vue'
+import { computed, ref } from 'vue'
+import { ArrowDown, Setting, SwitchButton } from '@element-plus/icons-vue'
 import AppIcon from '@/components/AppIcon.vue'
 import LanguageSwitcher from '@/modules/system/localization/LanguageSwitcher.vue'
 import { useLocalization } from '@/modules/system/localization/localization'
+import SettingsDialog from '@/modules/system/settings/SettingsDialog.vue'
 
 const props = defineProps<{
   title: string
@@ -61,10 +67,12 @@ const emit = defineEmits<{
 
 const { t } = useLocalization()
 const initials = computed(() => props.displayName?.slice(0, 1).toUpperCase() ?? 'A')
+const settingsOpen = ref(false)
 
 function handleCommand(command: string) {
-  // 下拉菜单后续可扩展其他命令，当前只把退出动作转交应用壳处理。
-  if (command === 'logout') {
+  if (command === 'settings') {
+    settingsOpen.value = true
+  } else if (command === 'logout') {
     emit('logout')
   }
 }
@@ -232,7 +240,7 @@ function handleCommand(command: string) {
   color: #829087;
 }
 
-.app-header__logout-icon {
+.app-header__dropdown-icon {
   width: 16px;
   height: 16px;
   margin-right: 8px;

@@ -32,6 +32,7 @@ updated: 2026-07-31
 - `src/bootstrap/registerHttpErrorHandler.ts`：组装 Router、认证、导航和全局 HTTP 错误动作。
 - `src/components/layout/` 与 `src/layouts/AdminLayout.vue`：侧栏、顶栏、内容出口和移动抽屉。
 - `src/modules/system/tag-view/`：账号隔离的页面标签历史、浏览器持久化和标签控制界面。
+- `src/modules/system/settings/`：设备级系统界面偏好、版本化浏览器持久化和设置 Dialog；实际功能按项后续接入。
 - `src/modules/system/localization/`：默认中文的运行时语言状态、模块和 shared 资源发现、Element Plus
   语言包、日期格式化和语言切换器。
 - `src/layouts/EmptyLayout.vue`：只提供一个 `<router-view>` 的可选布局。
@@ -72,7 +73,7 @@ Element Plus 提供当前语言包。登录页与 Header 共用 `LanguageSwitche
 更新固定文案、`<html lang>`、页面标题和本地日期格式，并写入 `cyber_locale:v1`。
 数据库与 API 契约不保存语言偏好。
 
-`tag-view` 位于 Header 与主内容之间，历史标签可横向滚动，操作入口提供关闭当前、关闭其他和关闭全部。其版本化 `localStorage` 数据按数字用户 ID 隔离；存储不可用或内容损坏时降级为内存状态，不影响 Router 导航。
+`tag-view` 位于 Header 与主内容之间，历史标签可横向滚动，操作入口提供关闭当前、关闭其他和关闭全部。其版本化 `localStorage` 数据按数字用户 ID 隔离；存储不可用或内容损坏时降级为内存状态，不影响 Router 导航。Header 用户下拉同时提供系统设置入口：该 Dialog 编辑并保存设备级的导航菜单风格、主题颜色、深色模式、Tags View、侧栏 Logo 和动态标题设置；当前只持久化状态，尚不改变应用壳行为。
 
 全局变量 `--app-shell-header-height` 定义应用壳顶部高度，当前值为 `72px`；`AppHeader` 与 `AppSidebar` 的 `sidebar-brand` 在桌面和移动端都引用该变量，使两栏顶部分隔线对齐。Header 保留粘性定位、菜单按钮、标题路径和用户菜单交互；紧凑高度不改变主内容与侧栏的布局职责。
 
