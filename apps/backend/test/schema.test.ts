@@ -50,11 +50,6 @@ const activeBusinessIdentityIndexes: Array<{
     columns: ['user_id', 'role_id'],
   },
   {
-    table: departments,
-    name: 'sys_departments_code_active_unique',
-    columns: ['code'],
-  },
-  {
     table: departmentClosure,
     name: 'sys_department_closure_path_active_unique',
     columns: ['ancestor_id', 'descendant_id'],
@@ -127,6 +122,16 @@ describe('menu routing fields', () => {
 describe('role model fields', () => {
   it('uses an internal ID and user-facing name without a role code', () => {
     const columns = getTableColumns(roles)
+
+    expect(columns).toHaveProperty('id')
+    expect(columns).toHaveProperty('name')
+    expect(columns).not.toHaveProperty('code')
+  })
+})
+
+describe('department model fields', () => {
+  it('uses an internal ID and user-facing name without a department code', () => {
+    const columns = getTableColumns(departments)
 
     expect(columns).toHaveProperty('id')
     expect(columns).toHaveProperty('name')

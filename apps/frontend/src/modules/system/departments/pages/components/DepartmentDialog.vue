@@ -13,12 +13,6 @@
             :placeholder="t('departments.dialog.namePlaceholder')"
           />
         </el-form-item>
-        <el-form-item :label="t('departments.fields.code')" required>
-          <el-input
-            v-model.trim="form.code"
-            :placeholder="t('departments.dialog.codePlaceholder')"
-          />
-        </el-form-item>
         <el-form-item :label="t('departments.fields.parent')">
           <el-tree-select
             v-model="form.parentId"
@@ -89,7 +83,6 @@ const formError = ref('')
 const { t } = useLocalization()
 const form = reactive<DepartmentRequest>({
   parentId: 0,
-  code: '',
   name: '',
   sortOrder: 0,
   enabled: true,
@@ -109,12 +102,11 @@ function resetForm(): void {
     props.department
       ? {
           parentId: props.department.parentId,
-          code: props.department.code,
           name: props.department.name,
           sortOrder: props.department.sortOrder,
           enabled: props.department.enabled,
         }
-      : { parentId: props.parentId, code: '', name: '', sortOrder: 0, enabled: true },
+      : { parentId: props.parentId, name: '', sortOrder: 0, enabled: true },
   )
   Object.assign(access, { permissionKeys: [], dataPolicies: [] })
   formError.value = ''
@@ -124,7 +116,7 @@ async function submit(): Promise<void> {
   saving.value = true
   formError.value = ''
   try {
-    if (!form.name || !/^[A-Z0-9_]{2,50}$/.test(form.code)) {
+    if (!form.name) {
       throw new Error(t('departments.errors.invalidForm'))
     }
     const result = props.department

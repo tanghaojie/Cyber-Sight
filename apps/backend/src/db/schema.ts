@@ -88,23 +88,14 @@ export const userRoles = pgTable(
 )
 
 // 部门邻接表保存直接父子关系，闭包表保存全部祖先路径以加速树范围查询。
-export const departments = pgTable(
-  'sys_departments',
-  {
-    id: serial('id').primaryKey(),
-    parentId: integer('parent_id').default(0).notNull(),
-    code: varchar('code', { length: 50 }).notNull(),
-    name: varchar('name', { length: 80 }).notNull(),
-    sortOrder: integer('sort_order').default(0).notNull(),
-    enabled: boolean('enabled').default(true).notNull(),
-    ...auditColumns(),
-  },
-  (table) => ({
-    activeCode: uniqueIndex('sys_departments_code_active_unique')
-      .on(table.code)
-      .where(sql`${table.isDeleted} = false`),
-  }),
-)
+export const departments = pgTable('sys_departments', {
+  id: serial('id').primaryKey(),
+  parentId: integer('parent_id').default(0).notNull(),
+  name: varchar('name', { length: 80 }).notNull(),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  enabled: boolean('enabled').default(true).notNull(),
+  ...auditColumns(),
+})
 
 export const departmentClosure = pgTable(
   'sys_department_closure',

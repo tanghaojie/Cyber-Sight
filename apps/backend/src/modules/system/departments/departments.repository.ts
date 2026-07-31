@@ -13,7 +13,6 @@ function departmentSummary(row: typeof departments.$inferSelect) {
   return {
     id: row.id,
     parentId: row.parentId,
-    code: row.code,
     name: row.name,
     sortOrder: row.sortOrder,
     enabled: row.enabled,
@@ -80,7 +79,6 @@ export async function listDepartmentOptions(app: FastifyInstance) {
     .select({
       id: departments.id,
       parentId: departments.parentId,
-      code: departments.code,
       name: departments.name,
     })
     .from(departments)

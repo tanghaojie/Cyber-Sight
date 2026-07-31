@@ -59,8 +59,7 @@ export function filterDepartmentTree(
 
   const filtered: DepartmentTreeNode[] = []
   for (const node of nodes) {
-    const selfMatches =
-      node.name.toLowerCase().includes(query) || node.code.toLowerCase().includes(query)
+    const selfMatches = node.name.toLowerCase().includes(query)
     if (selfMatches) {
       filtered.push(node)
       continue

@@ -94,7 +94,7 @@ WHERE ur.user_id = :current_user_id
 
 | 物理表                 | 作用                   | 关键字段与约束                                                                                                                 |
 | ---------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| sys_departments        | 部门邻接表             | parent_id 保存直接父部门，根部门为 0；code 在未删除记录中唯一；enabled 控制部门是否参与有效范围。                              |
+| sys_departments        | 部门邻接表             | id 用于部门关联；parent_id 保存直接父部门，根部门为 0；name 为展示名称；enabled 控制部门是否参与有效范围。                     |
 | sys_department_closure | 部门闭包表             | ancestor_id、descendant_id 均外键指向部门；depth = 0 表示本部门到自身；有效路径 (ancestor_id, descendant_id) 唯一。            |
 | sys_user_departments   | 用户与部门的多对多归属 | user_id、department_id 均为外键；is_primary 标记主部门。有效 (user_id, department_id) 唯一，且一个用户最多一条有效主部门记录。 |
 

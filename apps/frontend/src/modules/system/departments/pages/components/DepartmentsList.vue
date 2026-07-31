@@ -27,11 +27,6 @@
       :empty-text="t('departments.list.empty')"
     >
       <el-table-column prop="name" :label="t('departments.fields.name')" min-width="180" />
-      <el-table-column prop="code" :label="t('departments.fields.code')" min-width="150">
-        <template #default="{ row }"
-          ><code class="code-chip">{{ row.code }}</code></template
-        >
-      </el-table-column>
       <el-table-column :label="t('departments.fields.parent')" min-width="150">
         <template #default="{ row }">{{ parentName(row.parentId) }}</template>
       </el-table-column>

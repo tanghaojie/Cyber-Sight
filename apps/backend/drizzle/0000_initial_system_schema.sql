@@ -72,7 +72,6 @@ CREATE TABLE IF NOT EXISTS "sys_department_closure" (
 CREATE TABLE IF NOT EXISTS "sys_departments" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"parent_id" integer DEFAULT 0 NOT NULL,
-	"code" varchar(50) NOT NULL,
 	"name" varchar(80) NOT NULL,
 	"sort_order" integer DEFAULT 0 NOT NULL,
 	"enabled" boolean DEFAULT true NOT NULL,
@@ -292,7 +291,6 @@ END $$;
 CREATE UNIQUE INDEX IF NOT EXISTS "sys_data_policy_departments_rule_department_active_unique" ON "sys_data_policy_departments" USING btree ("rule_id","department_id") WHERE "sys_data_policy_departments"."is_deleted" = false;--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "sys_data_policy_rules_identity_active_unique" ON "sys_data_policy_rules" USING btree ("subject_type","subject_id","resource_key","action","scope_type") WHERE "sys_data_policy_rules"."is_deleted" = false;--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "sys_department_closure_path_active_unique" ON "sys_department_closure" USING btree ("ancestor_id","descendant_id") WHERE "sys_department_closure"."is_deleted" = false;--> statement-breakpoint
-CREATE UNIQUE INDEX IF NOT EXISTS "sys_departments_code_active_unique" ON "sys_departments" USING btree ("code") WHERE "sys_departments"."is_deleted" = false;--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "sys_dictionaries_type_value_active_unique" ON "sys_dictionaries" USING btree ("type","value") WHERE "sys_dictionaries"."is_deleted" = false;--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "sys_role_menus_role_menu_active_unique" ON "sys_role_menus" USING btree ("role_id","menu_id") WHERE "sys_role_menus"."is_deleted" = false;--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "sys_role_permissions_role_permission_active_unique" ON "sys_role_permissions" USING btree ("role_id","permission_key") WHERE "sys_role_permissions"."is_deleted" = false;--> statement-breakpoint
@@ -329,13 +327,13 @@ ON CONFLICT ("key") DO UPDATE SET
 	"enabled" = true,
 	"is_deleted" = false,
 	"updated_at" = now();--> statement-breakpoint
-INSERT INTO "sys_departments" ("parent_id", "code", "name", "sort_order", "enabled")
-VALUES (0, 'DEFAULT', '默认部门', 10, true)
+INSERT INTO "sys_departments" ("parent_id", "name", "sort_order", "enabled")
+VALUES (0, '默认部门', 10, true)
 ON CONFLICT DO NOTHING;--> statement-breakpoint
 INSERT INTO "sys_department_closure" ("ancestor_id", "descendant_id", "depth")
 SELECT d."id", d."id", 0
 FROM "sys_departments" d
-WHERE d."code" = 'DEFAULT' AND d."is_deleted" = false
+WHERE d."name" = '默认部门' AND d."is_deleted" = false
 ON CONFLICT DO NOTHING;--> statement-breakpoint
 INSERT INTO "sys_user_departments" ("user_id", "department_id", "is_primary", "created_by", "updated_by")
 SELECT u."id", d."id", true, u."id", u."id"
@@ -343,7 +341,7 @@ FROM "sys_users" u
 CROSS JOIN "sys_departments" d
 WHERE u."username" = 'admin'
 	AND u."is_deleted" = false
-	AND d."code" = 'DEFAULT'
+	AND d."name" = '默认部门'
 	AND d."is_deleted" = false
 ON CONFLICT DO NOTHING;--> statement-breakpoint
 INSERT INTO "sys_menus" (
