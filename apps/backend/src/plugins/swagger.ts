@@ -7,9 +7,9 @@ export async function registerSwagger(app: FastifyInstance) {
   await app.register(swagger, {
     openapi: {
       info: {
-        title: 'JTLab API',
+        title: 'Cyber Scaffold API',
         version: '0.1.0',
-        description: 'JTLab management platform — runtime-safe and modular',
+        description: 'CYBER management scaffold — runtime-safe, modular, and AI-native',
       },
       servers: [{ url: 'http://localhost:3000' }],
       security: [{ bearerAuth: [] }],

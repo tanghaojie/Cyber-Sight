@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { CurrentUser } from '@scaffold/api-contract'
+import { decodeJwt } from 'jose'
 import { JwtTokenCache } from '@/modules/system/auth/auth-token-cache.js'
 
 const SECRET = 'test-only-jwt-secret-at-least-32-characters'
@@ -15,6 +16,17 @@ function user(id: number): CurrentUser {
 
 // 覆盖 JWT 验签、LRU 容量、过期/撤销，以及缓存失效与持久会话撤销的职责差异。
 describe('JWT LRU token cache', () => {
+  it('issues tokens for the Cyber Scaffold issuer and API audience', async () => {
+    const cache = new JwtTokenCache(SECRET)
+    const issued = await cache.issue(user(1))
+
+    expect(decodeJwt(issued.token)).toMatchObject({
+      aud: 'cyber-scaffold-api',
+      iss: 'cyber-scaffold',
+      sub: '1',
+    })
+  })
+
   it('limits the default cache to 100 entries without invalidating evicted tokens', async () => {
     const cache = new JwtTokenCache(SECRET)
     const tokens: string[] = []

@@ -3,8 +3,8 @@
     <div class="not-found-grid" />
     <section>
       <div class="error-code"><span>4</span><i>○</i><span>4</span></div>
-      <p>SPECIMEN NOT FOUND</p>
-      <h1>这个页面不在当前实验记录里。</h1>
+      <p>NODE NOT FOUND</p>
+      <h1>这个节点不在当前系统图谱中。</h1>
       <span class="description">地址可能已被移动、停用，或数据库菜单尚未为你开放对应入口。</span>
       <code v-if="sourcePath">{{ sourcePath }}</code>
       <div class="actions">
@@ -13,8 +13,7 @@
       </div>
     </section>
     <div class="brand-corner">
-      <span class="brand-mark">{{ brandInitials() }}</span
-      ><b>{{ appConfig.name }}</b>
+      <CyberLogo :show-descriptor="false" tone="light" />
     </div>
   </main>
 </template>
@@ -22,7 +21,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { appConfig, brandInitials } from '@/config/app.config'
+import CyberLogo from '@/components/brand/CyberLogo.vue'
 
 const route = useRoute(),
   router = useRouter()
@@ -137,21 +136,10 @@ code {
   bottom: 24px;
   display: flex;
   align-items: center;
-  gap: 9px;
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 10px;
-  letter-spacing: 0.12em;
 }
-.brand-mark {
-  display: grid;
-  width: 30px;
-  height: 30px;
-  place-items: center;
-  border-radius: 10px;
-  color: #123c31;
-  background: var(--primary);
-  font-size: 9px;
-  font-weight: 900;
+.brand-corner :deep(.cyber-logo) {
+  --cyber-logo-mark-size: 34px;
+  --cyber-logo-wordmark-size: 11px;
 }
 @media (max-width: 540px) {
   .actions {

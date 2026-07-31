@@ -14,6 +14,6 @@ app.use(router)
 
 registerHttpErrorHandler(router, pinia)
 
-document.title = appConfig.name
+document.title = `${appConfig.name} · ${appConfig.productLabel}`
 
 app.mount('#app')

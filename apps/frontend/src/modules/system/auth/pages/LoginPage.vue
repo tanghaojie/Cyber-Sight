@@ -1,42 +1,41 @@
 <template>
   <main class="login-page">
-    <!-- 左侧只承载品牌氛围和产品说明，移动端会隐藏。 -->
-    <section class="login-atmosphere" aria-hidden="true">
-      <div class="lab-grid" />
-      <div class="specimen-ring ring-one" />
-      <div class="specimen-ring ring-two" />
+    <!-- 左侧承载 CYBER 品牌、系统定位和独立的创作者署名，移动端会隐藏。 -->
+    <section class="login-atmosphere" aria-label="CYBER 品牌介绍">
+      <div class="cyber-grid" />
+      <div class="signal-rail signal-rail--horizontal" />
+      <div class="signal-rail signal-rail--vertical" />
+      <div class="core-orbit orbit-one" />
+      <div class="core-orbit orbit-two" />
+      <span class="data-node" />
       <div class="atmosphere-content">
-        <div class="brand-lockup">
-          <span class="brand-mark">{{ brandInitials() }}</span>
-          <div>
-            <b>{{ appConfig.name }}</b
-            ><small>{{ appConfig.fullName }}</small>
-          </div>
-        </div>
+        <CyberLogo class="login-logo" tone="light" />
         <div class="manifesto">
-          <p>RESEARCH · BUILD · EVOLVE</p>
-          <h1>把复杂系统，<br /><em>做成清晰实验。</em></h1>
-          <span>身份、权限、导航与基础数据，在一套可追踪、可演进的工作台中有序发生。</span>
+          <p>BUILD · CONNECT · EVOLVE</p>
+          <h1>让复杂系统，<br /><em>清晰生长。</em></h1>
+          <span>身份、权限、导航与基础数据，在模块边界和运行时契约中稳定连接、持续演进。</span>
           <ol>
             <li><b>01</b>模块边界</li>
             <li><b>02</b>运行时契约</li>
-            <li><b>03</b>审计脉络</li>
+            <li><b>03</b>受控演进</li>
           </ol>
         </div>
-        <small class="signature">{{ appConfig.tagline }} · 2026</small>
+        <footer class="atmosphere-footer">
+          <small class="signature">{{ appConfig.tagline }}</small>
+          <CreatorCredit tone="light" />
+        </footer>
       </div>
     </section>
     <!-- 右侧是实际登录交互区。 -->
     <section class="login-form-panel">
       <form class="login-card" @submit.prevent="handleSubmit">
         <div class="mobile-brand">
-          <span class="brand-mark">{{ brandInitials() }}</span
-          ><b>{{ appConfig.name }}</b>
+          <CyberLogo :show-descriptor="false" tone="dark" />
         </div>
         <div class="form-head">
           <p>SECURE ENTRY</p>
-          <h2>欢迎回到实验室</h2>
-          <span>使用管理员身份进入 {{ appConfig.productLabel }}</span>
+          <h2>欢迎进入 {{ appConfig.name }}</h2>
+          <span>使用管理员身份登录 {{ appConfig.fullName }}</span>
         </div>
         <label class="login-field"
           ><span>用户名</span
@@ -67,6 +66,7 @@
         >
         <p class="login-hint">本地初始账号：<b>admin</b> / <b>Admin@123456</b></p>
       </form>
+      <CreatorCredit class="mobile-credit" tone="dark" />
     </section>
   </main>
 </template>
@@ -74,7 +74,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { appConfig, brandInitials } from '@/config/app.config'
+import CreatorCredit from '@/components/brand/CreatorCredit.vue'
+import CyberLogo from '@/components/brand/CyberLogo.vue'
+import { appConfig } from '@/config/app.config'
 import { useAuthStore } from '@/modules/system/auth/auth.store'
 
 const auth = useAuthStore()
@@ -102,27 +104,56 @@ async function handleSubmit(): Promise<void> {
   min-height: 100vh;
   display: grid;
   grid-template-columns: minmax(480px, 1.08fr) minmax(430px, 0.92fr);
-  background: var(--surface);
+  background: #f6f8f6;
 }
 .login-atmosphere {
   position: relative;
   overflow: hidden;
   min-height: 100vh;
-  color: #effbf5;
+  color: #f6f5ef;
   background:
-    radial-gradient(circle at 18% 12%, rgba(112, 207, 162, 0.24), transparent 31%),
-    radial-gradient(circle at 85% 76%, rgba(72, 159, 119, 0.18), transparent 28%),
-    linear-gradient(145deg, #143f34, #09261f 72%);
+    radial-gradient(circle at 15% 8%, rgba(112, 207, 162, 0.16), transparent 26%),
+    radial-gradient(circle at 80% 68%, rgba(139, 116, 246, 0.09), transparent 24%),
+    linear-gradient(145deg, #111614, #0b0e11 72%);
 }
-.lab-grid {
+.cyber-grid {
   position: absolute;
   inset: 0;
-  opacity: 0.13;
+  opacity: 0.24;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-  background-size: 62px 62px;
-  mask-image: linear-gradient(135deg, #000, transparent 80%);
+    linear-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(135deg, #000 18%, transparent 88%);
+}
+.signal-rail {
+  position: absolute;
+  opacity: 0.28;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+}
+.signal-rail--horizontal {
+  top: 34%;
+  right: 0;
+  width: 56%;
+  height: 1px;
+}
+.signal-rail--vertical {
+  right: 22%;
+  bottom: 0;
+  width: 1px;
+  height: 54%;
+  background: linear-gradient(transparent, var(--signal), transparent);
+}
+.data-node {
+  position: absolute;
+  top: calc(34% - 4px);
+  right: calc(22% - 4px);
+  width: 9px;
+  height: 9px;
+  border: 2px solid #151817;
+  border-radius: 2px;
+  background: var(--signal);
+  box-shadow: 0 0 24px rgba(139, 116, 246, 0.5);
 }
 .atmosphere-content {
   position: relative;
@@ -130,41 +161,12 @@ async function handleSubmit(): Promise<void> {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 52px 8.5%;
+  padding: 50px 8.5% 42px;
 }
-.brand-lockup,
-.mobile-brand {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-}
-.brand-mark {
-  display: grid;
-  width: 43px;
-  height: 43px;
-  place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 14px;
-  color: #123c31;
-  background: var(--primary);
-  box-shadow: 0 15px 34px rgba(3, 20, 15, 0.28);
-  font-family: var(--font-display);
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: -0.04em;
-}
-.brand-lockup b {
-  display: block;
-  font-family: var(--font-display);
-  font-size: 16px;
-  letter-spacing: 0.13em;
-}
-.brand-lockup small {
-  display: block;
-  margin-top: 4px;
-  color: rgba(255, 255, 255, 0.38);
-  font-size: 9px;
-  letter-spacing: 0.18em;
+.login-logo {
+  --cyber-logo-mark-size: 56px;
+  --cyber-logo-wordmark-size: 19px;
+  --cyber-logo-descriptor-size: 8px;
 }
 .manifesto {
   max-width: 650px;
@@ -216,39 +218,55 @@ async function handleSubmit(): Promise<void> {
   font-size: 9px;
   letter-spacing: 0.12em;
 }
-.signature {
-  color: rgba(255, 255, 255, 0.28);
-  font-size: 9px;
-  letter-spacing: 0.18em;
+.atmosphere-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
 }
-.specimen-ring {
+.signature {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.core-orbit {
   position: absolute;
-  border: 1px solid rgba(112, 207, 162, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 50%;
 }
-.ring-one {
+.orbit-one {
   top: 14%;
   right: -150px;
   width: 380px;
   height: 380px;
-  box-shadow: inset 0 0 90px rgba(112, 207, 162, 0.04);
+  box-shadow: inset 0 0 90px rgba(112, 207, 162, 0.03);
 }
-.ring-two {
+.orbit-two {
   bottom: -220px;
   left: 38%;
   width: 480px;
   height: 480px;
 }
 .login-form-panel {
+  position: relative;
   display: grid;
   place-items: center;
   padding: 60px 10%;
-  background: radial-gradient(circle at 92% 4%, var(--primary-mist), transparent 36%), #fbfdfb;
+  background:
+    radial-gradient(circle at 92% 4%, rgba(112, 207, 162, 0.13), transparent 34%), #f7f9f7;
 }
 .login-card {
   width: min(100%, 420px);
   display: grid;
   gap: 22px;
+  padding: 38px;
+  border: 1px solid rgba(24, 58, 48, 0.08);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 26px 80px rgba(18, 60, 49, 0.08);
+  backdrop-filter: blur(18px);
 }
 .form-head {
   margin-bottom: 12px;
@@ -305,7 +323,9 @@ async function handleSubmit(): Promise<void> {
 }
 .mobile-brand {
   display: none;
-  color: var(--ink);
+}
+.mobile-credit {
+  display: none;
 }
 @media (max-width: 900px) {
   .login-page {
@@ -316,17 +336,23 @@ async function handleSubmit(): Promise<void> {
   }
   .login-form-panel {
     min-height: 100vh;
+    align-content: center;
+    gap: 30px;
     padding: 44px 24px;
   }
+  .login-card {
+    padding: 30px 26px;
+  }
   .mobile-brand {
-    display: flex;
+    display: block;
     margin-bottom: 28px;
   }
-  .mobile-brand .brand-mark {
-    color: #123c31;
+  .mobile-brand :deep(.cyber-logo) {
+    --cyber-logo-mark-size: 42px;
+    --cyber-logo-wordmark-size: 15px;
   }
-  .mobile-brand b {
-    letter-spacing: 0.12em;
+  .mobile-credit {
+    display: inline-grid;
   }
 }
 </style>

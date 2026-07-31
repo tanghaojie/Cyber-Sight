@@ -3,9 +3,9 @@
     <article class="hero-panel">
       <div class="hero-mesh" />
       <div class="hero-copy">
-        <p>{{ todayLabel }} · LAB BRIEF</p>
+        <p>{{ todayLabel }} · SYSTEM BRIEF</p>
         <h2>让系统脉络可见，<br />让每次变更有据可循。</h2>
-        <span>{{ appConfig.fullName }} 的管理工作台已经连接数据库菜单、模块边界与统一契约。</span>
+        <span>{{ appConfig.fullName }} 已连接数据库菜单、模块边界与统一运行时契约。</span>
       </div>
       <div class="hero-index">
         <small>SYSTEM INDEX</small><b>{{ String(navigation.flatItems.length).padStart(2, '0') }}</b

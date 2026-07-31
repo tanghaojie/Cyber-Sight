@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 
-const STORAGE_KEY_PREFIX = 'jtlab_tag_view_history:v1:'
+const STORAGE_KEY_PREFIX = 'cyber_tag_view_history:v1:'
 
 export interface TagViewItem {
   path: string

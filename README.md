@@ -1,8 +1,10 @@
-# JTLab
+# CYBER
 
-JTLab（桀士实验室）是前后端分离的 pnpm monorepo 管理系统脚手架，以共享 Zod 运行时 Schema 约束前后端接口，内置登录、数据库动态菜单、管理后台框架和用户/角色/菜单/字典管理。
+**Cyber Scaffold** 是前后端分离的 pnpm monorepo 管理系统脚手架，以共享 Zod 运行时 Schema 约束前后端接口，内置登录、数据库动态菜单、管理后台框架和用户/角色/菜单/字典管理。
 
-前端默认主色为 `#70CFA2`。品牌配置位于 `apps/frontend/src/config/app.config.ts`，也可复制 `apps/frontend/.env.example` 后通过 `VITE_APP_NAME`、`VITE_APP_FULL_NAME`、`VITE_APP_TAGLINE` 和 `VITE_APP_PRODUCT_LABEL` 按部署环境覆盖。
+> Build clearly. Evolve safely. 让复杂系统清晰生长。
+
+CYBER 由 JTLab（桀士实验室）设计与维护；JTLab 是创作者品牌，不是框架名称。前端默认使用石墨黑、暖白、薄荷绿 `#70CFA2` 和电紫节点构成的品牌系统。文字配置位于 `apps/frontend/src/config/app.config.ts`，也可复制 `apps/frontend/.env.example` 后通过 `VITE_APP_NAME`、`VITE_APP_FULL_NAME`、`VITE_APP_TAGLINE` 和 `VITE_APP_PRODUCT_LABEL` 按部署环境覆盖。白标部署还应同步替换 `CyberLogo.vue` 和 `public/cyber-mark.svg`，避免名称与默认 C 形产品标不一致。
 
 ## 快速开始
 

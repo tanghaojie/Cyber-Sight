@@ -2,12 +2,12 @@
 title: 系统概览
 status: accepted
 owner: project maintainers
-updated: 2026-07-30
+updated: 2026-07-31
 ---
 
 # 系统概览
 
-JTLab（桀士实验室）是用于快速生成管理类业务模块的 pnpm 全栈脚手架，不是某个具体业务系统。它通过运行时契约、模块边界、后端与契约自动化测试、前端人工验收边界和文档门禁，让人和 AI 在明确约束内持续扩展。
+CYBER（正式名称 `Cyber Scaffold`）是用于快速生成管理类业务模块的 pnpm 全栈脚手架，不是某个具体业务系统。它通过运行时契约、模块边界、后端与契约自动化测试、前端人工验收边界和文档门禁，让人和 AI 在明确约束内持续扩展。产品与创作者品牌边界遵循 [CYBER 品牌与视觉系统](branding.md)和 [ADR-0028](../decisions/ADR-0028-product-and-creator-brand-separation.md)。
 
 ## 初始版本基线
 

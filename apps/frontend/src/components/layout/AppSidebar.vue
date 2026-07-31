@@ -2,11 +2,7 @@
   <aside id="app-sidebar" class="app-sidebar" :class="{ 'app-sidebar--open': open }">
     <div class="sidebar-atmosphere" />
     <header class="sidebar-brand">
-      <span class="brand-mark">{{ brandInitials() }}</span>
-      <div>
-        <strong>{{ appConfig.name }}</strong>
-        <small>{{ appConfig.productLabel }}</small>
-      </div>
+      <CyberLogo class="sidebar-logo" tone="light" />
       <button class="sidebar-close" type="button" aria-label="关闭菜单" @click="$emit('close')">
         <AppIcon name="close" />
       </button>
@@ -34,8 +30,8 @@
 
 <script setup lang="ts">
 import type { NavigationMenu } from '@scaffold/api-contract'
-import { appConfig, brandInitials } from '@/config/app.config'
 import AppIcon from '@/components/AppIcon.vue'
+import CyberLogo from '@/components/brand/CyberLogo.vue'
 import SidebarTree from './SidebarTree.vue'
 import { useHealth } from '@/modules/system/health/composables/useHealth'
 
@@ -96,36 +92,10 @@ const { status, timestamp, error } = useHealth()
   padding: 0 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
-  .brand-mark {
-    display: grid;
-    width: 43px;
-    height: 43px;
-    place-items: center;
-    border-radius: 14px;
-    color: #10241d;
-    background: var(--primary);
-    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.28);
-    font-family: var(--font-display);
-    font-size: 11px;
-    font-weight: 900;
-  }
-
-  strong {
-    display: block;
-    color: #fff;
-    font-family: var(--font-display);
-    font-size: 15px;
-    font-weight: 850;
-    letter-spacing: 0.14em;
-  }
-
-  small {
-    display: block;
-    margin-top: 4px;
-    color: rgba(255, 255, 255, 0.52);
-    font-size: 8px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
+  .sidebar-logo {
+    --cyber-logo-mark-size: 42px;
+    --cyber-logo-wordmark-size: 15px;
+    --cyber-logo-descriptor-size: 7px;
   }
 }
 

@@ -8,5 +8,6 @@
 - [ADR-0025](ADR-0025-pluggable-authorization-and-data-scope.md)：默认使用本地可插拔授权 Provider，以稳定权限键和查询计划实现功能与数据权限。
 - [ADR-0026](ADR-0026-system-table-prefix-and-fresh-baseline.md)：框架表统一使用 `sys_` 物理前缀，并以只面向全新数据库的单一迁移重置早期历史。
 - [ADR-0027](ADR-0027-system-and-business-module-classification.md)：前后端模块按 `system` 与 `biz` 分类，公共契约路径保持稳定。
+- [ADR-0028](ADR-0028-product-and-creator-brand-separation.md)：使用 CYBER 作为产品品牌，并把 JTLab 限定为明确、独立的创作者署名。
 
 新增 ADR 时使用 [ADR 模板](../templates/adr-template.md)和下一个连续编号。ADR 被取代或被后续基线吸收后更新替代关系并移入 `docs/archive/decisions/`，编号不得复用。
