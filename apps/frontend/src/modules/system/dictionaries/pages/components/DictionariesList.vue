@@ -6,14 +6,12 @@
         v-model="keyword"
         clearable
         :prefix-icon="Search"
-        placeholder="搜索类型、名称或字典值"
+        :placeholder="t('dictionaries.list.searchPlaceholder')"
         size="large"
         @keyup.enter="search"
         @clear="search"
       />
-      <span
-        >共 <strong>{{ total }}</strong> 个字典项</span
-      >
+      <span>{{ t('dictionaries.list.total', { count: total }) }}</span>
     </div>
     <el-alert
       v-if="errorMessage"
@@ -23,24 +21,34 @@
       show-icon
       :closable="false"
     />
-    <el-table v-loading="loading" :data="records" row-key="id" empty-text="暂无字典项">
-      <el-table-column prop="type" label="字典类型" min-width="180">
+    <el-table
+      v-loading="loading"
+      :data="records"
+      row-key="id"
+      :empty-text="t('dictionaries.list.empty')"
+    >
+      <el-table-column prop="type" :label="t('dictionaries.fields.type')" min-width="180">
         <template #default="{ row }">
           <code class="code-chip">{{ row.type }}</code>
         </template>
       </el-table-column>
-      <el-table-column prop="label" label="显示名称" min-width="150" />
-      <el-table-column prop="value" label="字典值" min-width="170" />
-      <el-table-column prop="remark" label="备注" min-width="220" show-overflow-tooltip />
-      <el-table-column prop="sortOrder" label="排序" width="80" />
-      <el-table-column label="状态" width="100">
+      <el-table-column prop="label" :label="t('dictionaries.fields.label')" min-width="150" />
+      <el-table-column prop="value" :label="t('dictionaries.fields.value')" min-width="170" />
+      <el-table-column
+        prop="remark"
+        :label="t('dictionaries.fields.remark')"
+        min-width="220"
+        show-overflow-tooltip
+      />
+      <el-table-column prop="sortOrder" :label="t('dictionaries.fields.order')" width="80" />
+      <el-table-column :label="t('dictionaries.fields.status')" width="100">
         <template #default="{ row }">
           <el-tag :type="row.enabled ? 'success' : 'info'" round>
-            {{ row.enabled ? '启用' : '停用' }}
+            {{ row.enabled ? t('localization.state.enabled') : t('localization.state.disabled') }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="112" fixed="right">
+      <el-table-column :label="t('dictionaries.fields.actions')" width="112" fixed="right">
         <template #default="{ row }">
           <el-button circle text :icon="EditPen" @click="emit('edit', row)" />
           <el-button circle text type="danger" :icon="Delete" @click="remove(row)" />
@@ -66,6 +74,7 @@ import { Delete, EditPen, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { DictionarySummary } from '@scaffold/api-contract'
 import { deleteDictionary, listDictionaries } from '@/modules/system/dictionaries/dictionaries.api'
+import { useLocalization } from '@/modules/system/localization/localization'
 
 const emit = defineEmits<{
   edit: [dictionary: DictionarySummary]
@@ -78,6 +87,7 @@ const pageSize = 10
 const keyword = ref('')
 const loading = ref(false)
 const errorMessage = ref('')
+const { t } = useLocalization()
 
 async function load(): Promise<void> {
   // 加载失败时清空旧页，避免用户把过期字典项误认为本次查询结果。
@@ -86,14 +96,15 @@ async function load(): Promise<void> {
   try {
     const result = await listDictionaries(pageNum.value, pageSize, keyword.value)
     if (result.status !== 0) {
-      throw new Error(result.err || '字典加载失败')
+      throw new Error(t('dictionaries.errors.loadFailed'))
     }
     records.value = result.list
     total.value = result.total
   } catch (error) {
     records.value = []
     total.value = 0
-    errorMessage.value = error instanceof Error ? error.message : '字典加载失败'
+    errorMessage.value =
+      error instanceof Error ? error.message : t('dictionaries.errors.loadFailed')
   } finally {
     loading.value = false
   }
@@ -106,21 +117,26 @@ function search(): void {
 
 async function remove(dictionary: DictionarySummary): Promise<void> {
   try {
-    await ElMessageBox.confirm(`确定删除字典项“${dictionary.label}”吗？`, '删除字典项', {
-      type: 'warning',
-      confirmButtonText: '删除',
-      cancelButtonText: '取消',
-    })
+    await ElMessageBox.confirm(
+      t('dictionaries.confirm.deleteMessage', { name: dictionary.label }),
+      t('dictionaries.confirm.deleteTitle'),
+      {
+        type: 'warning',
+        confirmButtonText: t('localization.actions.delete'),
+        cancelButtonText: t('localization.actions.cancel'),
+      },
+    )
     const result = await deleteDictionary(dictionary.id)
     if (result.status !== 0) {
-      throw new Error('err' in result ? result.err : '删除失败')
+      throw new Error(t('dictionaries.errors.deleteFailed'))
     }
-    ElMessage.success('字典项已删除')
+    ElMessage.success(t('dictionaries.messages.deleted'))
     await load()
   } catch (error) {
     // 用户主动关闭确认框不是删除失败。
     if (error !== 'cancel' && error !== 'close') {
-      errorMessage.value = error instanceof Error ? error.message : '删除失败'
+      errorMessage.value =
+        error instanceof Error ? error.message : t('dictionaries.errors.deleteFailed')
     }
   }
 }

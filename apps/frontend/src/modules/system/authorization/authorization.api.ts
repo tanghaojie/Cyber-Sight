@@ -8,6 +8,7 @@ import type {
 } from '@scaffold/api-contract'
 import { apiClient } from '@/api/client'
 import { apiResult, type ApiMutationResult } from '@/api/result'
+import { translate } from '@/modules/system/localization/localization'
 
 // 授权 API 把权限/资源目录查询和三类主体的访问配置读写集中在同一公共文件。
 function responseData<T>(
@@ -15,7 +16,7 @@ function responseData<T>(
   fallback: string,
 ): T {
   if (response.status !== 0 || response.data === undefined) {
-    throw new Error(response.err || fallback)
+    throw new Error(translate(fallback))
   }
   return response.data
 }
@@ -24,14 +25,14 @@ export async function listAuthorizationPermissions() {
   const { data, error } = await apiClient.GET<PermissionListResponse>(
     '/admin/authorization/permissions',
   )
-  return responseData(data ?? error ?? { status: -1 }, '权限选项加载失败')
+  return responseData(data ?? error ?? { status: -1 }, 'authorization.errors.permissionsLoadFailed')
 }
 
 export async function listDataResources() {
   const { data, error } = await apiClient.GET<DataResourceListResponse>(
     '/admin/authorization/data-resources',
   )
-  return responseData(data ?? error ?? { status: -1 }, '数据资源加载失败')
+  return responseData(data ?? error ?? { status: -1 }, 'authorization.errors.resourcesLoadFailed')
 }
 
 export async function getSubjectAccess(
@@ -42,7 +43,7 @@ export async function getSubjectAccess(
   const { data, error } = await apiClient.GET<SubjectAccessResponse>(
     `/admin/authorization/${subjectType}s/${id}`,
   )
-  return responseData(data ?? error ?? { status: -1 }, '权限配置加载失败')
+  return responseData(data ?? error ?? { status: -1 }, 'authorization.errors.accessLoadFailed')
 }
 
 export async function replaceSubjectAccess(

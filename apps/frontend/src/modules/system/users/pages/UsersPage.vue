@@ -1,7 +1,9 @@
 <template>
   <section class="management-page" aria-labelledby="users-title">
     <header class="page-intro">
-      <el-button type="primary" :icon="Plus" size="large" @click="openCreate"> 新增用户 </el-button>
+      <el-button type="primary" :icon="Plus" size="large" @click="openCreate">
+        {{ t('users.page.add') }}
+      </el-button>
     </header>
 
     <!-- 页面负责协调选项、列表和弹窗；分页与表单细节留在子组件内部。 -->
@@ -29,7 +31,9 @@ import { listDepartmentOptions } from '@/modules/system/departments/departments.
 import { listRoleOptions, type RoleOption } from '@/modules/system/roles/roles.api'
 import UserDialog from './components/UserDialog.vue'
 import UsersList from './components/UsersList.vue'
+import { useLocalization } from '@/modules/system/localization/localization'
 
+const { t } = useLocalization()
 const usersList = ref<InstanceType<typeof UsersList> | null>(null)
 const roleOptions = ref<RoleOption[]>([])
 const departmentOptions = ref<DepartmentOption[]>([])

@@ -1,7 +1,9 @@
 <template>
   <section class="management-page" aria-labelledby="roles-title">
     <header class="page-intro">
-      <el-button type="primary" :icon="Plus" size="large" @click="openCreate"> 新增角色 </el-button>
+      <el-button type="primary" :icon="Plus" size="large" @click="openCreate">
+        {{ t('roles.page.add') }}
+      </el-button>
     </header>
 
     <!-- 页面只协调列表和弹窗；保存后通过公开 reload 刷新当前分页。 -->
@@ -16,7 +18,9 @@ import { Plus } from '@element-plus/icons-vue'
 import type { RoleSummary } from '@scaffold/api-contract'
 import RoleDialog from './components/RoleDialog.vue'
 import RolesList from './components/RolesList.vue'
+import { useLocalization } from '@/modules/system/localization/localization'
 
+const { t } = useLocalization()
 const rolesList = ref<InstanceType<typeof RolesList> | null>(null)
 const editingRole = ref<RoleSummary | null>(null)
 const dialogOpen = ref(false)

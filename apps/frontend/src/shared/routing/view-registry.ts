@@ -5,8 +5,13 @@ import {
   REGISTER_VIEWS_MODULE_NOT_EXPORT_REGISTER_VIEWS,
 } from '../errMsg'
 
+export interface ViewLabel {
+  key?: string
+  fallback: string
+}
+
 export interface ViewRegistrar {
-  register(key: string, label: string, component: RouteComponent): void
+  register(key: string, label: ViewLabel, component: RouteComponent): void
 }
 
 export interface ViewRegistrationModule {
@@ -25,8 +30,8 @@ function isViewRegistrationModule(value: unknown): value is ViewRegistrationModu
 /** 汇总各业务模块显式登记的页面组件，并在启动时阻止非法或重复的菜单组件键。 */
 export function createViewRegistry(
   modules: Readonly<Record<string, unknown>>,
-): Readonly<Record<string, { label: string; component: RouteComponent }>> {
-  const registeredViews: Record<string, { label: string; component: RouteComponent }> =
+): Readonly<Record<string, { label: ViewLabel; component: RouteComponent }>> {
+  const registeredViews: Record<string, { label: ViewLabel; component: RouteComponent }> =
     // 无原型对象避免诸如 toString 的键与 Object 原型属性冲突。
     Object.create(null)
 

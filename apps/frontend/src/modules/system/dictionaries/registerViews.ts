@@ -5,5 +5,9 @@ const dictionariesPage: RouteComponent = () => import('./pages/DictionariesPage.
 
 // 向数据库菜单可选组件目录登记字典管理页面。
 export function registerViews(appViews: ViewRegistrar): void {
-  appViews.register('dictionaries', '字典管理', dictionariesPage)
+  appViews.register(
+    'dictionaries',
+    { key: 'dictionaries.views.dictionaries', fallback: '字典管理' },
+    dictionariesPage,
+  )
 }

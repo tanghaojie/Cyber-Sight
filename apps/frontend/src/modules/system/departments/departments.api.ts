@@ -9,6 +9,7 @@ import type {
 } from '@scaffold/api-contract'
 import { apiClient } from '@/api/client'
 import { apiResult, type ApiMutationResult } from '@/api/result'
+import { translate } from '@/modules/system/localization/localization'
 
 // 部门模块的列表/选项接口必须返回 data，缺失时直接抛错交给页面空态处理。
 function dataOrThrow<T>(
@@ -16,21 +17,21 @@ function dataOrThrow<T>(
   message: string,
 ): T {
   if (!result || result.status !== 0 || result.data === undefined) {
-    throw new Error(result?.err || message)
+    throw new Error(translate(message))
   }
   return result.data
 }
 
 export async function listDepartments(): Promise<DepartmentSummary[]> {
   const { data, error } = await apiClient.GET<DepartmentListResponse>('/admin/departments')
-  return dataOrThrow(data ?? error, '部门加载失败')
+  return dataOrThrow(data ?? error, 'departments.errors.loadFailed')
 }
 
 export async function listDepartmentOptions(): Promise<DepartmentOption[]> {
   const { data, error } = await apiClient.GET<DepartmentOptionListResponse>(
     '/admin/departments/options',
   )
-  return dataOrThrow(data ?? error, '部门选项加载失败')
+  return dataOrThrow(data ?? error, 'departments.errors.optionsLoadFailed')
 }
 
 export async function createDepartment(payload: DepartmentRequest): Promise<ApiMutationResult> {

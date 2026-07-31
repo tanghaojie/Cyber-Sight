@@ -2,6 +2,8 @@ import { RouterView, type RouteRecordRaw, type Router } from 'vue-router'
 import type { NavigationMenu } from '@scaffold/api-contract'
 import { layoutRegistry } from '@/shared/routing/layout-registry'
 import { viewRegistry } from '@/shared/routing/view-registry'
+import { navigationLabel } from '@/modules/system/navigation/navigation.labels'
+import type { LocalizedLabel } from '@/modules/system/localization/localization'
 
 const DYNAMIC_ROUTE_NAME_PREFIX = 'dynamic'
 
@@ -28,7 +30,7 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
   function generateMenuRoute(
     path: string,
     item: NavigationMenu,
-    menuPath: string,
+    menuPath: LocalizedLabel[],
   ): RouteRecordRaw | undefined {
     const compName = item.component
     const layoutName = item.layout
@@ -57,7 +59,9 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
             component: componentInfo.component,
             meta: {
               title: item.name,
-              menuPath,
+              menuPath: menuPath.map((label) => label.fallback).join(' / '),
+              localizedTitle: navigationLabel(item),
+              localizedMenuPath: menuPath,
               menuId: item.id,
             },
           },
@@ -71,7 +75,9 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
         component: componentInfo.component,
         meta: {
           title: item.name,
-          menuPath,
+          menuPath: menuPath.map((label) => label.fallback).join(' / '),
+          localizedTitle: navigationLabel(item),
+          localizedMenuPath: menuPath,
           menuId: item.id,
         },
       }
@@ -82,7 +88,7 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
   function generateDirectoryRoute(
     path: string,
     item: NavigationMenu,
-    menuPath: string[],
+    menuPath: LocalizedLabel[],
   ): RouteRecordRaw | undefined {
     const layoutName = item.layout
     const layoutInfo = layoutName ? layouts?.[layoutName] : undefined
@@ -105,7 +111,7 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
 
   function generateRoute(
     item: NavigationMenu,
-    ancestorNames: string[] = [],
+    ancestorNames: LocalizedLabel[] = [],
   ): RouteRecordRaw | undefined {
     if (item.type == 'button') {
       // 外链按钮由侧栏渲染为 <a>，不注册进 Vue Router。
@@ -117,11 +123,11 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
       return
     }
 
-    const menuPath = [...ancestorNames, item.name]
+    const menuPath = [...ancestorNames, navigationLabel(item)]
     if (item.type === 'directory') {
       return generateDirectoryRoute(path, item, menuPath)
     } else if (item.type === 'menu') {
-      return generateMenuRoute(path, item, menuPath.join(' / '))
+      return generateMenuRoute(path, item, menuPath)
     } else {
       throw new Error(`Unrecognized menu item type: ${item.type}`)
     }

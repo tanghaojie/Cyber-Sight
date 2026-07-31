@@ -1,35 +1,55 @@
 <template>
   <el-dialog
     v-model="dialogOpen"
-    :title="dictionary ? '编辑字典项' : '新增字典项'"
+    :title="dictionary ? t('dictionaries.dialog.editTitle') : t('dictionaries.dialog.createTitle')"
     width="min(640px, calc(100vw - 32px))"
     :close-on-click-modal="!saving"
   >
     <el-form label-position="top" @submit.prevent="submit">
       <div class="form-columns">
-        <el-form-item label="字典类型" required>
-          <el-input v-model.trim="form.type" placeholder="例如 ORDER_STATUS" />
+        <el-form-item :label="t('dictionaries.fields.type')" required>
+          <el-input
+            v-model.trim="form.type"
+            :placeholder="t('dictionaries.dialog.typePlaceholder')"
+          />
         </el-form-item>
-        <el-form-item label="显示名称" required>
-          <el-input v-model.trim="form.label" placeholder="例如 已支付" />
+        <el-form-item :label="t('dictionaries.fields.label')" required>
+          <el-input
+            v-model.trim="form.label"
+            :placeholder="t('dictionaries.dialog.labelPlaceholder')"
+          />
         </el-form-item>
-        <el-form-item label="字典值" required>
-          <el-input v-model.trim="form.value" placeholder="例如 PAID" />
+        <el-form-item :label="t('dictionaries.fields.value')" required>
+          <el-input
+            v-model.trim="form.value"
+            :placeholder="t('dictionaries.dialog.valuePlaceholder')"
+          />
         </el-form-item>
-        <el-form-item label="排序">
+        <el-form-item :label="t('dictionaries.fields.order')">
           <el-input-number v-model="form.sortOrder" :min="0" :max="9999" class="!w-full" />
         </el-form-item>
-        <el-form-item label="备注" class="sm:col-span-2">
-          <el-input v-model="form.remark" type="textarea" :rows="3" placeholder="可选说明" />
+        <el-form-item :label="t('dictionaries.fields.remark')" class="sm:col-span-2">
+          <el-input
+            v-model="form.remark"
+            type="textarea"
+            :rows="3"
+            :placeholder="t('dictionaries.dialog.remarkPlaceholder')"
+          />
         </el-form-item>
-        <el-form-item label="字典状态" class="sm:col-span-2">
-          <el-switch v-model="form.enabled" active-text="启用" inactive-text="停用" />
+        <el-form-item :label="t('dictionaries.fields.status')" class="sm:col-span-2">
+          <el-switch
+            v-model="form.enabled"
+            :active-text="t('localization.state.enabled')"
+            :inactive-text="t('localization.state.disabled')"
+          />
         </el-form-item>
       </div>
       <el-alert v-if="formError" :title="formError" type="error" show-icon :closable="false" />
       <div class="dialog-actions">
-        <el-button @click="dialogOpen = false">取消</el-button>
-        <el-button native-type="submit" type="primary" :loading="saving">保存字典项</el-button>
+        <el-button @click="dialogOpen = false">{{ t('localization.actions.cancel') }}</el-button>
+        <el-button native-type="submit" type="primary" :loading="saving">{{
+          t('dictionaries.dialog.save')
+        }}</el-button>
       </div>
     </el-form>
   </el-dialog>
@@ -40,6 +60,7 @@ import { reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { DictionaryRequest, DictionarySummary } from '@scaffold/api-contract'
 import { createDictionary, updateDictionary } from '@/modules/system/dictionaries/dictionaries.api'
+import { useLocalization } from '@/modules/system/localization/localization'
 
 const props = defineProps<{
   dictionary: DictionarySummary | null
@@ -51,6 +72,7 @@ const dialogOpen = defineModel<boolean>({ required: true })
 
 const saving = ref(false)
 const formError = ref('')
+const { t } = useLocalization()
 const form = reactive<DictionaryRequest>({
   type: '',
   label: '',
@@ -83,7 +105,7 @@ async function submit(): Promise<void> {
   formError.value = ''
   try {
     if (!form.type || !form.label || !form.value) {
-      throw new Error('请完整填写字典类型、显示名称和字典值')
+      throw new Error(t('dictionaries.errors.invalidForm'))
     }
     // 复制响应式对象为普通契约载荷，避免把 Vue 代理传到 API 层。
     const payload: DictionaryRequest = { ...form }
@@ -91,13 +113,13 @@ async function submit(): Promise<void> {
       ? await updateDictionary(props.dictionary.id, payload)
       : await createDictionary(payload)
     if (result.status !== 0) {
-      throw new Error(result.err || '字典保存失败')
+      throw new Error(t('dictionaries.errors.saveFailed'))
     }
     dialogOpen.value = false
-    ElMessage.success('字典项已保存')
+    ElMessage.success(t('dictionaries.messages.saved'))
     emit('saved')
   } catch (error) {
-    formError.value = error instanceof Error ? error.message : '字典保存失败'
+    formError.value = error instanceof Error ? error.message : t('dictionaries.errors.saveFailed')
   } finally {
     saving.value = false
   }

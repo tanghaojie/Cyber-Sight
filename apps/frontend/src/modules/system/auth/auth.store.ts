@@ -3,13 +3,7 @@ import { defineStore } from 'pinia'
 import type { CurrentUser } from '@scaffold/api-contract'
 import { clearAccessToken, getAccessToken, setAccessToken } from '@/shared/accessToken'
 import { login as apiLogin, getCurrentUser, logout as apiLogout } from './auth.api'
-
-function responseError(data: unknown, fallback: string): string {
-  if (typeof data === 'object' && data !== null && 'err' in data && typeof data.err === 'string') {
-    return data.err
-  }
-  return fallback
-}
+import { translate } from '@/modules/system/localization/localization'
 
 /** 维护当前会话用户、令牌恢复状态和登录提交状态。 */
 export const useAuthStore = defineStore('auth', () => {
@@ -30,9 +24,11 @@ export const useAuthStore = defineStore('auth', () => {
         return null
       }
 
-      return responseError(response, '登录失败，请稍后重试')
+      return response.status === 2000
+        ? translate('auth.errors.invalidCredentials')
+        : translate('auth.errors.loginFailed')
     } catch {
-      return '无法连接到服务，请检查后端是否已启动'
+      return translate('auth.errors.connectionFailed')
     } finally {
       busy.value = false
     }

@@ -5,12 +5,10 @@
         v-model="keyword"
         clearable
         :prefix-icon="Search"
-        placeholder="搜索菜单名称"
+        :placeholder="t('menus.list.searchPlaceholder')"
         size="large"
       />
-      <span
-        >共 <strong>{{ records.length }}</strong> 个节点</span
-      >
+      <span>{{ t('menus.list.total', { count: records.length }) }}</span>
     </div>
     <el-alert
       v-if="errorMessage"
@@ -27,9 +25,9 @@
       row-key="id"
       default-expand-all
       :tree-props="{ children: 'children' }"
-      empty-text="暂无菜单配置"
+      :empty-text="t('menus.list.empty')"
     >
-      <el-table-column label="名称" min-width="220">
+      <el-table-column :label="t('menus.fields.name')" min-width="220">
         <template #default="{ row }">
           <div class="menu-name">
             <span class="menu-icon">
@@ -39,14 +37,14 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="类型" width="110">
+      <el-table-column :label="t('menus.fields.type')" width="110">
         <template #default="{ row }">
           <el-tag :type="tagType(row.type)" effect="light" round>
             {{ typeLabel(row.type) }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="目标" min-width="230">
+      <el-table-column :label="t('menus.fields.target')" min-width="230">
         <template #default="{ row }">
           <code v-if="row.type === 'menu'" class="code-chip">
             {{ row.path }} · {{ row.component }}
@@ -60,26 +58,26 @@
           >
             {{ row.externalUrl }} ↗
           </a>
-          <code v-else class="code-chip">{{ row.path || '待配置站内路由' }}</code>
+          <code v-else class="code-chip">{{ row.path || t('menus.list.pendingRoute') }}</code>
         </template>
       </el-table-column>
-      <el-table-column prop="sortOrder" label="排序" width="80" />
-      <el-table-column label="访问权限" min-width="170">
+      <el-table-column prop="sortOrder" :label="t('menus.fields.order')" width="80" />
+      <el-table-column :label="t('menus.fields.permission')" min-width="170">
         <template #default="{ row }">
           <code v-if="row.requiredPermissionKey" class="code-chip">
             {{ row.requiredPermissionKey }}
           </code>
-          <span v-else class="table-muted">不限制</span>
+          <span v-else class="table-muted">{{ t('menus.list.unrestricted') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" width="90">
+      <el-table-column :label="t('menus.fields.status')" width="90">
         <template #default="{ row }">
           <el-tag :type="row.enabled ? 'success' : 'info'" round>
-            {{ row.enabled ? '启用' : '停用' }}
+            {{ row.enabled ? t('localization.state.enabled') : t('localization.state.disabled') }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="150" fixed="right">
+      <el-table-column :label="t('menus.fields.actions')" width="150" fixed="right">
         <template #default="{ row }">
           <el-button
             v-if="row.type === 'directory'"
@@ -87,7 +85,7 @@
             text
             type="primary"
             :icon="Plus"
-            title="添加子节点"
+            :title="t('menus.list.addChild')"
             @click="emit('create', row.id)"
           />
           <el-button circle text :icon="EditPen" @click="emit('edit', row)" />
@@ -96,7 +94,7 @@
       </el-table-column>
     </el-table>
     <footer class="resource-footer">
-      <span class="table-muted">树形菜单一次加载全部节点，排序按目录层级生效</span>
+      <span class="table-muted">{{ t('menus.list.footer') }}</span>
     </footer>
   </div>
 </template>
@@ -110,6 +108,7 @@ import AppIcon from '@/components/AppIcon.vue'
 import { useNavigationStore } from '@/modules/system/navigation/navigation.store'
 import { buildMenuTree, type MenuTreeRecord } from '@/modules/system/menus/menu-tree'
 import { deleteMenu, listAllMenus } from '@/modules/system/menus/menus.api'
+import { useLocalization } from '@/modules/system/localization/localization'
 
 type MenuType = MenuSummary['type']
 
@@ -124,6 +123,7 @@ const keyword = ref('')
 const loading = ref(false)
 const errorMessage = ref('')
 const navigation = useNavigationStore()
+const { t } = useLocalization()
 const treeRecords = computed(() => {
   const query = keyword.value.trim().toLowerCase()
   if (!query) {
@@ -154,7 +154,7 @@ async function load(): Promise<void> {
     records.value = await listAllMenus()
   } catch (error) {
     records.value = []
-    errorMessage.value = error instanceof Error ? error.message : '菜单加载失败'
+    errorMessage.value = error instanceof Error ? error.message : t('menus.errors.loadFailed')
   } finally {
     loading.value = false
     // 同步父页面的弹窗选项；失败时用空数组清除旧快照。
@@ -164,34 +164,38 @@ async function load(): Promise<void> {
 
 async function remove(menu: MenuTreeRecord): Promise<void> {
   try {
-    await ElMessageBox.confirm(`确定删除“${menu.name}”吗？目录必须先清空子节点。`, '删除菜单节点', {
-      type: 'warning',
-      confirmButtonText: '删除',
-      cancelButtonText: '取消',
-    })
+    await ElMessageBox.confirm(
+      t('menus.confirm.deleteMessage', { name: menu.name }),
+      t('menus.confirm.deleteTitle'),
+      {
+        type: 'warning',
+        confirmButtonText: t('localization.actions.delete'),
+        cancelButtonText: t('localization.actions.cancel'),
+      },
+    )
     const result = await deleteMenu(menu.id)
     if (result.status !== 0) {
-      throw new Error('err' in result ? result.err : '删除失败')
+      throw new Error(t('menus.errors.deleteFailed'))
     }
-    ElMessage.success('菜单节点已删除')
+    ElMessage.success(t('menus.messages.deleted'))
     await load()
     // 菜单写入后强制刷新当前用户导航，应用壳会据此替换动态路由。
     await navigation.load(true)
   } catch (error) {
     if (error !== 'cancel' && error !== 'close') {
-      errorMessage.value = error instanceof Error ? error.message : '删除失败'
+      errorMessage.value = error instanceof Error ? error.message : t('menus.errors.deleteFailed')
     }
   }
 }
 
 function typeLabel(type: MenuType): string {
   if (type === 'directory') {
-    return '目录'
+    return t('menus.types.directory')
   }
   if (type === 'button') {
-    return '外链'
+    return t('menus.types.external')
   }
-  return '菜单'
+  return t('menus.types.menu')
 }
 
 function tagType(type: MenuType): 'success' | 'warning' | 'info' {

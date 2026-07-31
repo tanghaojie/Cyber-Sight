@@ -2,7 +2,7 @@
   <section class="management-page" aria-labelledby="dictionaries-title">
     <header class="page-intro">
       <el-button type="primary" :icon="Plus" size="large" @click="openCreate">
-        新增字典项
+        {{ t('dictionaries.page.add') }}
       </el-button>
     </header>
 
@@ -18,7 +18,9 @@ import { Plus } from '@element-plus/icons-vue'
 import type { DictionarySummary } from '@scaffold/api-contract'
 import DictionariesList from './components/DictionariesList.vue'
 import DictionaryDialog from './components/DictionaryDialog.vue'
+import { useLocalization } from '@/modules/system/localization/localization'
 
+const { t } = useLocalization()
 const dictionariesList = ref<InstanceType<typeof DictionariesList> | null>(null)
 const editingDictionary = ref<DictionarySummary | null>(null)
 const dialogOpen = ref(false)

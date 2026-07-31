@@ -1,7 +1,9 @@
 <template>
   <section class="management-page" aria-labelledby="menus-title">
     <header class="page-intro">
-      <el-button type="primary" :icon="Plus" size="large" @click="openCreate(0)"> 新增 </el-button>
+      <el-button type="primary" :icon="Plus" size="large" @click="openCreate(0)">
+        {{ t('menus.page.add') }}
+      </el-button>
     </header>
 
     <!-- 列表回传全量菜单，弹窗用同一快照生成可选父目录。 -->
@@ -22,7 +24,9 @@ import { Plus } from '@element-plus/icons-vue'
 import type { MenuSummary } from '@scaffold/api-contract'
 import MenuDialog from './components/MenuDialog.vue'
 import MenusList from './components/MenusList.vue'
+import { useLocalization } from '@/modules/system/localization/localization'
 
+const { t } = useLocalization()
 const menusList = ref<InstanceType<typeof MenusList> | null>(null)
 const records = ref<MenuSummary[]>([])
 const editingMenu = ref<MenuSummary | null>(null)

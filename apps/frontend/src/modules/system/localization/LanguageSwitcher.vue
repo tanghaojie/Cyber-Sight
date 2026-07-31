@@ -1,0 +1,141 @@
+<template>
+  <div
+    class="language-switcher"
+    :class="[`language-switcher--${surface}`, { 'language-switcher--compact': compact }]"
+    role="group"
+    :aria-label="t('localization.switcher.label')"
+  >
+    <button
+      v-for="option in supportedLocales"
+      :key="option.code"
+      class="language-switcher__option"
+      type="button"
+      :class="{ 'language-switcher__option--active': option.code === currentLocale }"
+      :aria-label="t(`localization.switcher.${option.code}`)"
+      :aria-pressed="option.code === currentLocale"
+      @click="setLocale(option.code)"
+    >
+      <span class="language-switcher__short">{{ option.shortLabel }}</span>
+      <span class="language-switcher__name">{{ option.nativeLabel }}</span>
+    </button>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { useLocalization } from './localization'
+
+withDefaults(
+  defineProps<{
+    surface?: 'dark' | 'light'
+    compact?: boolean
+  }>(),
+  {
+    surface: 'light',
+    compact: false,
+  },
+)
+
+const { currentLocale, supportedLocales, setLocale, t } = useLocalization()
+</script>
+
+<style lang="scss" scoped>
+.language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24);
+}
+
+.language-switcher__option {
+  display: flex;
+  min-width: 62px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.025em;
+  transition:
+    color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+
+  &:hover {
+    color: var(--primary-dark);
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-deep);
+    outline-offset: 2px;
+  }
+}
+
+.language-switcher__option--active {
+  color: #102c23;
+  background: var(--primary);
+  box-shadow: 0 5px 14px rgba(36, 107, 81, 0.18);
+}
+
+.language-switcher__short {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.language-switcher__name {
+  white-space: nowrap;
+}
+
+.language-switcher--dark {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(10, 16, 14, 0.62);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+
+  .language-switcher__option {
+    color: rgba(255, 255, 255, 0.54);
+
+    &:hover {
+      color: #fff;
+    }
+  }
+
+  .language-switcher__option--active {
+    color: #102c23;
+  }
+}
+
+.language-switcher--compact {
+  .language-switcher__option {
+    min-width: 38px;
+    padding: 0 8px;
+  }
+
+  .language-switcher__name {
+    display: none;
+  }
+}
+
+@media (max-width: 479px) {
+  .language-switcher:not(.language-switcher--compact) {
+    .language-switcher__option {
+      min-width: 42px;
+    }
+
+    .language-switcher__name {
+      display: none;
+    }
+  }
+}
+</style>

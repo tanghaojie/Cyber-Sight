@@ -6,13 +6,13 @@
         v-model="keyword"
         clearable
         :prefix-icon="Search"
-        placeholder="搜索用户名、姓名或邮箱"
+        :placeholder="t('users.list.searchPlaceholder')"
         size="large"
         @keyup.enter="search"
         @clear="search"
       />
       <span>
-        共 <strong>{{ total }}</strong> 位用户
+        {{ t('users.list.total', { count: total }) }}
       </span>
     </div>
     <el-alert
@@ -23,38 +23,40 @@
       show-icon
       :closable="false"
     />
-    <el-table v-loading="loading" :data="records" row-key="id" empty-text="暂无用户">
-      <el-table-column prop="username" label="用户名" min-width="130" />
-      <el-table-column prop="displayName" label="姓名" min-width="130" />
-      <el-table-column prop="email" label="邮箱" min-width="210" />
-      <el-table-column label="角色" min-width="180">
+    <el-table v-loading="loading" :data="records" row-key="id" :empty-text="t('users.list.empty')">
+      <el-table-column prop="username" :label="t('users.fields.username')" min-width="130" />
+      <el-table-column prop="displayName" :label="t('users.fields.displayName')" min-width="130" />
+      <el-table-column prop="email" :label="t('users.fields.email')" min-width="210" />
+      <el-table-column :label="t('users.fields.roles')" min-width="180">
         <template #default="{ row }">
           <div class="flex flex-wrap gap-1.5">
             <el-tag v-for="roleId in row.roleIds" :key="roleId" effect="plain" round>
               {{ roleName(roleId) }}
             </el-tag>
-            <span v-if="!row.roleIds.length" class="table-muted">未分配</span>
+            <span v-if="!row.roleIds.length" class="table-muted">{{
+              t('users.list.unassigned')
+            }}</span>
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="主部门" min-width="150">
+      <el-table-column :label="t('users.fields.primaryDepartment')" min-width="150">
         <template #default="{ row }">
           {{ departmentName(row.primaryDepartmentId) }}
         </template>
       </el-table-column>
-      <el-table-column label="状态" width="100">
+      <el-table-column :label="t('users.fields.status')" width="100">
         <template #default="{ row }">
           <el-tag :type="row.enabled ? 'success' : 'info'" round>
-            {{ row.enabled ? '启用' : '停用' }}
+            {{ row.enabled ? t('localization.state.enabled') : t('localization.state.disabled') }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="更新时间" min-width="170">
+      <el-table-column :label="t('users.fields.updatedAt')" min-width="170">
         <template #default="{ row }">
           <span class="table-muted">{{ formatDate(row.updatedAt) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="112" fixed="right">
+      <el-table-column :label="t('users.fields.actions')" width="112" fixed="right">
         <template #default="{ row }">
           <el-button circle text :icon="EditPen" @click="emit('edit', row)" />
           <el-button circle text type="danger" :icon="Delete" @click="remove(row)" />
@@ -81,6 +83,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import type { DepartmentOption, UserSummary } from '@scaffold/api-contract'
 import type { RoleOption } from '@/modules/system/roles/roles.api'
 import { deleteUser, listUsers } from '@/modules/system/users/users.api'
+import { useLocalization } from '@/modules/system/localization/localization'
 
 const props = defineProps<{
   roleOptions: RoleOption[]
@@ -97,6 +100,7 @@ const pageSize = 10
 const keyword = ref('')
 const loading = ref(false)
 const errorMessage = ref('')
+const { formatDateTime, t } = useLocalization()
 
 async function load(): Promise<void> {
   // 每次请求先清空旧错误；失败时清空陈旧列表，避免把旧数据误认为最新结果。
@@ -105,14 +109,14 @@ async function load(): Promise<void> {
   try {
     const result = await listUsers(pageNum.value, pageSize, keyword.value)
     if (result.status !== 0) {
-      throw new Error(result.err || '用户加载失败')
+      throw new Error(t('users.errors.loadFailed'))
     }
     records.value = result.list
     total.value = result.total
   } catch (error) {
     records.value = []
     total.value = 0
-    errorMessage.value = error instanceof Error ? error.message : '用户加载失败'
+    errorMessage.value = error instanceof Error ? error.message : t('users.errors.loadFailed')
   } finally {
     loading.value = false
   }
@@ -124,38 +128,45 @@ function search(): void {
 }
 
 function roleName(id: number): string {
-  return props.roleOptions.find((role) => role.id === id)?.name ?? `角色 #${id}`
+  return (
+    props.roleOptions.find((role) => role.id === id)?.name ?? t('users.list.unknownRole', { id })
+  )
 }
 
 function departmentName(id: number): string {
-  return props.departmentOptions.find((department) => department.id === id)?.name ?? `部门 #${id}`
+  return (
+    props.departmentOptions.find((department) => department.id === id)?.name ??
+    t('users.list.unknownDepartment', { id })
+  )
 }
 
 async function remove(user: UserSummary): Promise<void> {
   try {
-    await ElMessageBox.confirm(`确定删除用户“${user.displayName}”吗？`, '删除用户', {
-      type: 'warning',
-      confirmButtonText: '删除',
-      cancelButtonText: '取消',
-    })
+    await ElMessageBox.confirm(
+      t('users.confirm.deleteMessage', { name: user.displayName }),
+      t('users.confirm.deleteTitle'),
+      {
+        type: 'warning',
+        confirmButtonText: t('localization.actions.delete'),
+        cancelButtonText: t('localization.actions.cancel'),
+      },
+    )
     const result = await deleteUser(user.id)
     if (result.status !== 0) {
-      throw new Error('err' in result ? result.err : '删除失败')
+      throw new Error(t('users.errors.deleteFailed'))
     }
-    ElMessage.success('用户已删除')
+    ElMessage.success(t('users.messages.deleted'))
     await load()
   } catch (error) {
     // Element Plus 用 cancel/close 字符串表示用户主动放弃，不应显示为删除错误。
     if (error !== 'cancel' && error !== 'close') {
-      errorMessage.value = error instanceof Error ? error.message : '删除失败'
+      errorMessage.value = error instanceof Error ? error.message : t('users.errors.deleteFailed')
     }
   }
 }
 
 function formatDate(value: string): string {
-  return new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short' }).format(
-    new Date(value),
-  )
+  return formatDateTime(value)
 }
 
 // 父页面在弹窗保存后通过 reload 刷新当前页。

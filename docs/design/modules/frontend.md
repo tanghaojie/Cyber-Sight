@@ -17,6 +17,8 @@ updated: 2026-07-31
 
 - `src/modules/system/<module>/pages/`、`src/modules/biz/<module>/pages/`：模块路由页面；`pages/components/`：仅供所属页面使用的列表和 Dialog。
 - `src/modules/{system,biz}/<module>/*.api.ts`：模块 HTTP 调用；`*.store.ts`：确需跨页面共享的 Pinia 状态。
+- `src/modules/{system,biz}/<module>/*.locales.ts`：所属模块的中英文运行时固定文案；由
+  localization 在构建期自动发现。
 - `src/modules/{system,biz}/**/registerViews.ts`：需要被数据库菜单选择的模块登记页面加载器。
 - `src/shared/routing/view-registry.ts`：构建期发现全部 `registerViews.ts`，校验稳定 key 并冻结页面注册表。
 - `src/shared/routing/layout-registry.ts`：发现 `src/layouts/*.vue`，以文件名建立只读布局注册表；`AdminLayout` 必须存在。
@@ -27,6 +29,8 @@ updated: 2026-07-31
 - `src/bootstrap/registerHttpErrorHandler.ts`：组装 Router、认证、导航和全局 HTTP 错误动作。
 - `src/components/layout/` 与 `src/layouts/AdminLayout.vue`：侧栏、顶栏、内容出口和移动抽屉。
 - `src/modules/system/tag-view/`：账号隔离的页面标签历史、浏览器持久化和标签控制界面。
+- `src/modules/system/localization/`：默认中文的运行时语言状态、模块资源发现、Element Plus
+  语言包、日期格式化和语言切换器。
 - `src/layouts/EmptyLayout.vue`：只提供一个 `<router-view>` 的可选布局。
 - `src/assets/icons/*.svg`、`src/shared/icons/icon-registry.ts` 与 `src/components/AppIcon.vue`：构建期 SVG sprite 和稳定图标名称；每个文件使用 kebab-case 名称、`0 0 24 24` viewBox 和无硬编码颜色的单色描边图形，文件名会自动成为菜单可选的图标名。
 
@@ -47,7 +51,7 @@ cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie�
 1. `constRoutes.ts` 直接注册公开登录、公开 404，以及使用 `AdminLayout` 的 `/` 根路由和默认 `HomePage`。
 2. 非公开导航进入 `authenticationRouteGuard()`：恢复当前用户；未认证时跳转登录；首次认证成功时加载菜单树、安装动态路由并按原地址重新匹配。
 3. `navigation.store.ts` 通过 `navigation.api.ts` 获取 `GET /navigation/menus`，先把相对路径按目录层级解析为规范绝对路径，再缓存树和扁平列表。
-4. `dynamicRoutes.ts` 递归生成路由。`directory` 使用显式布局或 `RouterView` 并承载子路由；`menu` 使用已登记页面，显式布局存在时创建只有一个空路径子项的布局包装，否则直接加载页面；`button` 不注册站内路由。菜单路由的 `meta.menuPath` 保存从根目录到当前页面的菜单名称路径，应用壳在原副标题位置展示该路径，不再使用抽象的 `eyebrow` 元数据。
+4. `dynamicRoutes.ts` 递归生成路由。`directory` 使用显式布局或 `RouterView` 并承载子路由；`menu` 使用已登记页面，显式布局存在时创建只有一个空路径子项的布局包装，否则直接加载页面；`button` 不注册站内路由。菜单路由保留原始 `meta.title` 和 `meta.menuPath`，并额外保存可响应语言切换的 `localizedTitle` 与 `localizedMenuPath` 标签描述；应用壳解析后展示当前语言标题路径。
 5. 每棵根菜单子树通过 `router.addRoute()` 注册。刷新菜单、退出或 401 时调用移除函数并重置 `routesReady`。
 6. `SidebarTree.vue` 只渲染有子项的目录、站内菜单和外链按钮；空目录不会显示。外链按钮仅打开 HTTP(S) 地址。
 7. `AdminLayout` 把已认证账号 ID、当前 `route.path` 和 `meta.title` 交给 `tag-view` 模块；模块按账号恢复并保存不含 query/hash 的页面历史。关闭当前标签时应用壳导航到相邻标签，无后备项或关闭全部时回首页。
@@ -56,9 +60,14 @@ cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie�
 
 ## 页面注册、布局与样式
 
-`view-registry.ts` 通过两个 `import.meta.glob` 模式扫描 `@/modules/system/**/registerViews.ts` 与 `@/modules/biz/**/registerViews.ts`，自动发现两个分类下的登记模块。登记 key 必须符合小写字母开头的 kebab-case 约束且全局唯一；缺少 `registerViews()`、非法 key 或重复 key 会在注册表构建时失败。
+`view-registry.ts` 通过两个 `import.meta.glob` 模式扫描 `@/modules/system/**/registerViews.ts` 与 `@/modules/biz/**/registerViews.ts`，自动发现两个分类下的登记模块。登记 key 必须符合小写字母开头的 kebab-case 约束且全局唯一；页面标签使用 `{ key?, fallback }` 描述，供菜单编辑器按当前语言解析，未提供或找不到翻译 key 时保留回退文案。缺少 `registerViews()`、非法 key 或重复 key 会在注册表构建时失败。
 
-默认产品品牌为 `CYBER / Cyber Scaffold`。`components/brand/CyberLogo.vue` 以可缩放 SVG 实现连续双层 C 和数据节点，供登录页、侧栏和 404 复用；`public/cyber-mark.svg` 提供 favicon。`CreatorCredit.vue` 只在登录页以明确 `CREATED BY` 标签展示 JTLab / 桀士实验室，不进入产品 Logo 或应用壳。完整边界见[CYBER 品牌与视觉系统](../branding.md)。
+默认产品品牌为 `CYBER / Cyber Scaffold`。`components/brand/CyberLogo.vue` 以可缩放 SVG 实现连续双层 C 和数据节点，供登录页、侧栏和 404 复用；`public/cyber-mark.svg` 提供 favicon。`CreatorCredit.vue` 只在登录页以当前语言的创作者标签展示 JTLab / 桀士实验室，不进入产品 Logo 或应用壳。完整边界见[CYBER 品牌与视觉系统](../branding.md)。
+
+`main.ts` 安装 localization 后再安装 Router；`App.vue` 通过 `LocalizationProvider.vue` 为
+Element Plus 提供当前语言包。登录页与 Header 共用 `LanguageSwitcher.vue`，语言切换立即
+更新固定文案、`<html lang>`、页面标题和本地日期格式，并写入 `cyber_locale:v1`。
+数据库与 API 契约不保存语言偏好。
 
 `tag-view` 位于 Header 与主内容之间，历史标签可横向滚动，操作入口提供关闭当前、关闭其他和关闭全部。其版本化 `localStorage` 数据按数字用户 ID 隔离；存储不可用或内容损坏时降级为内存状态，不影响 Router 导航。
 

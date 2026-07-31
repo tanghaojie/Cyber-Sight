@@ -1,6 +1,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import type { HealthResponse } from '@scaffold/api-contract'
 import { apiClient } from '@/api/client'
+import { translate } from '@/modules/system/localization/localization'
 
 /** 在使用组件存活期间每六秒轮询进程健康状态，并在卸载时释放定时器。 */
 export function useHealth() {
@@ -15,14 +16,14 @@ export function useHealth() {
     const { data: response, error: responseError } = await apiClient.GET<HealthResponse>('/health')
 
     if (responseError) {
-      error.value = responseError.err ?? 'Failed to reach backend'
+      error.value = translate('health.errors.unreachable')
       status.value = 'error'
       timestamp.value = ''
       return
     }
 
     if (!response || response.status !== 0 || !response.data) {
-      error.value = 'Backend returned an invalid response'
+      error.value = translate('localization.messages.invalidResponse')
       status.value = 'error'
       timestamp.value = ''
       return

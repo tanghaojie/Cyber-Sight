@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import type { NavigationMenu } from '@scaffold/api-contract'
 import { resolveNavigationPaths } from '@/shared/routing/menu-paths'
 import { fetchNavigation } from './navigation.api'
+import { translate } from '@/modules/system/localization/localization'
 
 /** 递归扁平化供面包屑或按 ID 查找使用，原树仍用于侧栏和动态路由。 */
 function flattenTree(nodes: NavigationMenu[]): NavigationMenu[] {
@@ -30,7 +31,8 @@ export const useNavigationStore = defineStore('navigation', () => {
     } catch (cause) {
       items.value = []
       loaded.value = false
-      error.value = cause instanceof Error ? cause.message : '导航配置加载失败'
+      error.value =
+        cause instanceof Error ? cause.message : translate('navigation.errors.loadFailed')
       throw cause
     } finally {
       loading.value = false

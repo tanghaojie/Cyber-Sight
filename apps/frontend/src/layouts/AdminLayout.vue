@@ -5,7 +5,7 @@
       v-if="sidebarOpen"
       class="app-shell__scrim"
       type="button"
-      aria-label="关闭菜单"
+      :aria-label="t('navigation.shell.closeMenu')"
       @click="sidebarOpen = false"
     />
     <AppSidebar
@@ -20,12 +20,12 @@
         :title="pageTitle"
         :menu-path="pageMenuPath"
         :display-name="auth.user?.displayName"
-        :role="auth.user?.roles[0] ?? '管理员'"
+        :role="auth.user?.roles[0] ?? t('navigation.shell.defaultRole')"
         @open-menu="sidebarOpen = true"
         @logout="handleLogout"
       />
       <TagView
-        :tags="tagView.tags"
+        :tags="localizedTags"
         :active-path="route.path"
         @navigate="handleTagNavigation"
         @close="handleCloseTag"
@@ -49,15 +49,40 @@ import { clearDynamicRoutes, installMenuRoutes } from '@/router/dynamicRoutes'
 import { useAuthStore } from '@/modules/system/auth/auth.store'
 import { useNavigationStore } from '@/modules/system/navigation/navigation.store'
 import { useTagViewStore } from '@/modules/system/tag-view/tag-view.store'
+import {
+  resolveLocalizedLabel,
+  useLocalization,
+  type LocalizedLabel,
+} from '@/modules/system/localization/localization'
 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const navigation = useNavigationStore()
 const tagView = useTagViewStore()
+const { t } = useLocalization()
 const sidebarOpen = ref(false)
-const pageTitle = computed(() => String(route.meta.title ?? '管理控制台'))
-const pageMenuPath = computed(() => String(route.meta.menuPath ?? pageTitle.value))
+const pageTitle = computed(() =>
+  resolveLocalizedLabel(
+    (route.meta.localizedTitle as LocalizedLabel | undefined) ?? {
+      fallback: String(route.meta.title ?? t('navigation.shell.defaultTitle')),
+    },
+  ),
+)
+const pageMenuPath = computed(() => {
+  const localizedPath = route.meta.localizedMenuPath as LocalizedLabel[] | undefined
+  return localizedPath?.map(resolveLocalizedLabel).join(' / ') ?? pageTitle.value
+})
+const localizedTags = computed(() =>
+  tagView.tags.map((tag) => {
+    const localizedTitle = router.resolve(tag.path).meta.localizedTitle as
+      LocalizedLabel | undefined
+    return {
+      ...tag,
+      title: localizedTitle ? resolveLocalizedLabel(localizedTitle) : tag.title,
+    }
+  }),
+)
 
 watch(
   () => navigation.items,

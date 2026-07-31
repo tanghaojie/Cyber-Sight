@@ -8,6 +8,7 @@ import type {
 } from '@scaffold/api-contract'
 import { apiClient } from '@/api/client'
 import { apiResult, pageResult, type ApiMutationResult } from '@/api/result'
+import { translate } from '@/modules/system/localization/localization'
 
 // 菜单管理页使用全量树接口；分页接口保留给普通管理列表或后续搜索场景。
 export async function listMenus(pageNum: number, pageSize: number, keyword = '') {
@@ -22,7 +23,7 @@ export async function listAllMenus(): Promise<MenuSummary[]> {
   const { data, error } = await apiClient.GET<MenuListResponse>('/admin/menus/tree')
   const result = data ?? error
   if (!result || result.status !== 0 || !('data' in result)) {
-    throw new Error(result && 'err' in result ? result.err : '菜单选项加载失败')
+    throw new Error(translate('menus.errors.optionsLoadFailed'))
   }
   return result.data
 }

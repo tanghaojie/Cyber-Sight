@@ -2,7 +2,7 @@
   <section class="management-page" aria-labelledby="departments-title">
     <header class="page-intro">
       <el-button type="primary" :icon="Plus" size="large" @click="openCreate(0)">
-        新增部门
+        {{ t('departments.page.add') }}
       </el-button>
     </header>
     <!-- 列表把最新全量记录回传给页面，弹窗据此生成父部门选项。 -->
@@ -28,7 +28,9 @@ import { Plus } from '@element-plus/icons-vue'
 import type { DepartmentSummary } from '@scaffold/api-contract'
 import DepartmentDialog from './components/DepartmentDialog.vue'
 import DepartmentsList from './components/DepartmentsList.vue'
+import { useLocalization } from '@/modules/system/localization/localization'
 
+const { t } = useLocalization()
 const departmentsList = ref<InstanceType<typeof DepartmentsList> | null>(null)
 const records = ref<DepartmentSummary[]>([])
 const editingDepartment = ref<DepartmentSummary | null>(null)

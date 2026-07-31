@@ -5,5 +5,9 @@ const departmentsPage: RouteComponent = () => import('./pages/DepartmentsPage.vu
 
 // 向数据库菜单可选组件目录登记部门管理页面。
 export function registerViews(appViews: ViewRegistrar): void {
-  appViews.register('departments', '部门管理', departmentsPage)
+  appViews.register(
+    'departments',
+    { key: 'departments.views.departments', fallback: '部门管理' },
+    departmentsPage,
+  )
 }

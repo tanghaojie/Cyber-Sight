@@ -3,26 +3,33 @@
     <div class="sidebar-atmosphere" />
     <header class="sidebar-brand">
       <CyberLogo class="sidebar-logo" tone="light" />
-      <button class="sidebar-close" type="button" aria-label="关闭菜单" @click="$emit('close')">
+      <button
+        class="sidebar-close"
+        type="button"
+        :aria-label="t('navigation.shell.closeMenu')"
+        @click="$emit('close')"
+      >
         <AppIcon name="close" />
       </button>
     </header>
-    <nav class="sidebar-navigation" aria-label="主导航">
+    <nav class="sidebar-navigation" :aria-label="t('navigation.shell.mainNavigation')">
       <!-- 菜单树来自当前用户导航 Store；空态区分正在请求和确实无可用菜单。 -->
       <SidebarTree v-if="items.length" :items="items" @navigate="$emit('navigate')" />
       <div v-else class="sidebar-empty">
-        <span />{{ loading ? '正在装载导航…' : '暂无可用菜单' }}
+        <span />{{
+          loading ? t('navigation.shell.loadingNavigation') : t('navigation.shell.emptyNavigation')
+        }}
       </div>
     </nav>
     <footer class="sidebar-status">
       <!-- 健康状态独立于导航加载，用于提示后端进程是否仍可响应。 -->
       <span class="status-pulse" :class="status" />
       <div>
-        <b v-if="status === 'ok'">系统运行正常</b>
-        <b v-else-if="status === 'loading'">加载中</b>
-        <b v-else-if="status === 'error'">{{ error ?? '未知错误' }}</b>
-        <b v-else>未知错误</b>
-        <small>{{ new Date(timestamp).toLocaleTimeString() }}</small>
+        <b v-if="status === 'ok'">{{ t('navigation.shell.statusOk') }}</b>
+        <b v-else-if="status === 'loading'">{{ t('navigation.shell.statusLoading') }}</b>
+        <b v-else-if="status === 'error'">{{ error ?? t('navigation.shell.statusUnknown') }}</b>
+        <b v-else>{{ t('navigation.shell.statusUnknown') }}</b>
+        <small>{{ formatDateTime(timestamp, { timeStyle: 'medium' }) }}</small>
       </div>
     </footer>
   </aside>
@@ -34,11 +41,13 @@ import AppIcon from '@/components/AppIcon.vue'
 import CyberLogo from '@/components/brand/CyberLogo.vue'
 import SidebarTree from './SidebarTree.vue'
 import { useHealth } from '@/modules/system/health/composables/useHealth'
+import { useLocalization } from '@/modules/system/localization/localization'
 
 defineProps<{ items: NavigationMenu[]; open: boolean; loading?: boolean }>()
 defineEmits<{ close: []; navigate: [] }>()
 
 const { status, timestamp, error } = useHealth()
+const { formatDateTime, t } = useLocalization()
 </script>
 
 <style lang="scss" scoped>

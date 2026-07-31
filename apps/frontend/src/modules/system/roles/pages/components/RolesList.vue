@@ -6,14 +6,12 @@
         v-model="keyword"
         clearable
         :prefix-icon="Search"
-        placeholder="搜索角色名称或编码"
+        :placeholder="t('roles.list.searchPlaceholder')"
         size="large"
         @keyup.enter="search"
         @clear="search"
       />
-      <span
-        >共 <strong>{{ total }}</strong> 个角色</span
-      >
+      <span>{{ t('roles.list.total', { count: total }) }}</span>
     </div>
     <el-alert
       v-if="errorMessage"
@@ -23,27 +21,32 @@
       show-icon
       :closable="false"
     />
-    <el-table v-loading="loading" :data="records" row-key="id" empty-text="暂无角色">
-      <el-table-column prop="name" label="角色名称" min-width="150" />
-      <el-table-column prop="code" label="角色编码" min-width="170">
+    <el-table v-loading="loading" :data="records" row-key="id" :empty-text="t('roles.list.empty')">
+      <el-table-column prop="name" :label="t('roles.fields.name')" min-width="150" />
+      <el-table-column prop="code" :label="t('roles.fields.code')" min-width="170">
         <template #default="{ row }">
           <code class="code-chip">{{ row.code }}</code>
         </template>
       </el-table-column>
-      <el-table-column prop="description" label="职责说明" min-width="230" show-overflow-tooltip />
-      <el-table-column label="状态" width="100">
+      <el-table-column
+        prop="description"
+        :label="t('roles.fields.description')"
+        min-width="230"
+        show-overflow-tooltip
+      />
+      <el-table-column :label="t('roles.fields.status')" width="100">
         <template #default="{ row }">
           <el-tag :type="row.enabled ? 'success' : 'info'" round>
-            {{ row.enabled ? '启用' : '停用' }}
+            {{ row.enabled ? t('localization.state.enabled') : t('localization.state.disabled') }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="更新时间" min-width="170">
+      <el-table-column :label="t('roles.fields.updatedAt')" min-width="170">
         <template #default="{ row }">
           <span class="table-muted">{{ formatDate(row.updatedAt) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="112" fixed="right">
+      <el-table-column :label="t('roles.fields.actions')" width="112" fixed="right">
         <template #default="{ row }">
           <el-button circle text :icon="EditPen" @click="emit('edit', row)" />
           <el-button circle text type="danger" :icon="Delete" @click="remove(row)" />
@@ -69,6 +72,7 @@ import { Delete, EditPen, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { RoleSummary } from '@scaffold/api-contract'
 import { deleteRole, listRoles } from '@/modules/system/roles/roles.api'
+import { useLocalization } from '@/modules/system/localization/localization'
 
 const emit = defineEmits<{
   edit: [role: RoleSummary]
@@ -81,6 +85,7 @@ const pageSize = 10
 const keyword = ref('')
 const loading = ref(false)
 const errorMessage = ref('')
+const { formatDateTime, t } = useLocalization()
 
 async function load(): Promise<void> {
   // 请求失败时清空旧记录，避免用户把过期列表误当成本次搜索结果。
@@ -89,14 +94,14 @@ async function load(): Promise<void> {
   try {
     const result = await listRoles(pageNum.value, pageSize, keyword.value)
     if (result.status !== 0) {
-      throw new Error(result.err || '角色加载失败')
+      throw new Error(t('roles.errors.loadFailed'))
     }
     records.value = result.list
     total.value = result.total
   } catch (error) {
     records.value = []
     total.value = 0
-    errorMessage.value = error instanceof Error ? error.message : '角色加载失败'
+    errorMessage.value = error instanceof Error ? error.message : t('roles.errors.loadFailed')
   } finally {
     loading.value = false
   }
@@ -109,29 +114,31 @@ function search(): void {
 
 async function remove(role: RoleSummary): Promise<void> {
   try {
-    await ElMessageBox.confirm(`确定删除角色“${role.name}”吗？`, '删除角色', {
-      type: 'warning',
-      confirmButtonText: '删除',
-      cancelButtonText: '取消',
-    })
+    await ElMessageBox.confirm(
+      t('roles.confirm.deleteMessage', { name: role.name }),
+      t('roles.confirm.deleteTitle'),
+      {
+        type: 'warning',
+        confirmButtonText: t('localization.actions.delete'),
+        cancelButtonText: t('localization.actions.cancel'),
+      },
+    )
     const result = await deleteRole(role.id)
     if (result.status !== 0) {
-      throw new Error('err' in result ? result.err : '删除失败')
+      throw new Error(t('roles.errors.deleteFailed'))
     }
-    ElMessage.success('角色已删除')
+    ElMessage.success(t('roles.messages.deleted'))
     await load()
   } catch (error) {
     // 用户关闭确认框不是业务错误，不显示失败提示。
     if (error !== 'cancel' && error !== 'close') {
-      errorMessage.value = error instanceof Error ? error.message : '删除失败'
+      errorMessage.value = error instanceof Error ? error.message : t('roles.errors.deleteFailed')
     }
   }
 }
 
 function formatDate(value: string): string {
-  return new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short' }).format(
-    new Date(value),
-  )
+  return formatDateTime(value)
 }
 
 // 供父页面在弹窗保存后刷新列表。

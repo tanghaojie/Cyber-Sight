@@ -12,7 +12,7 @@
         <AppIcon :name="(homeRoute?.meta?.icon as string | undefined) || 'home'" />
       </span>
       <span class="sidebar-node-copy">
-        <b>{{ homeRoute?.meta?.name ?? '首页' }}</b>
+        <b>{{ t('navigation.routes.home') }}</b>
         <small>{{ homeRoute?.path || '/' }}</small>
       </span>
     </RouterLink>
@@ -27,8 +27,8 @@
       >
         <span class="sidebar-node-icon"><AppIcon :name="item.icon || 'layers'" /></span>
         <span class="sidebar-node-copy">
-          <b>{{ item.name }}</b>
-          <small>{{ item.children.length }} 个子菜单</small>
+          <b>{{ resolveLocalizedLabel(navigationLabel(item)) }}</b>
+          <small>{{ t('navigation.shell.childCount', { count: item.children.length }) }}</small>
         </span>
         <AppIcon
           name="chevron-down"
@@ -45,7 +45,7 @@
       >
         <span class="sidebar-node-icon"><AppIcon :name="item.icon || 'menu'" /></span>
         <span class="sidebar-node-copy">
-          <b>{{ item.name }}</b>
+          <b>{{ resolveLocalizedLabel(navigationLabel(item)) }}</b>
           <small>{{ item.path }}</small>
         </span>
       </RouterLink>
@@ -60,8 +60,8 @@
       >
         <span class="sidebar-node-icon"><AppIcon :name="item.icon || 'external'" /></span>
         <span class="sidebar-node-copy">
-          <b>{{ item.name }}</b>
-          <small>EXTERNAL LINK</small>
+          <b>{{ resolveLocalizedLabel(navigationLabel(item)) }}</b>
+          <small>{{ t('navigation.shell.externalLink') }}</small>
         </span>
         <AppIcon name="external" class="external-icon" />
       </a>
@@ -82,10 +82,13 @@ import type { NavigationMenu } from '@scaffold/api-contract'
 import AppIcon from '@/components/AppIcon.vue'
 import constRoutes from '@/router/constRoutes'
 import { RouteRecordRaw } from 'vue-router'
+import { navigationLabel } from '@/modules/system/navigation/navigation.labels'
+import { useLocalization } from '@/modules/system/localization/localization'
 
 const props = withDefaults(defineProps<{ items: NavigationMenu[]; depth?: number }>(), { depth: 0 })
 defineEmits<{ navigate: [] }>()
 
+const { resolveLocalizedLabel, t } = useLocalization()
 const homeRoute = computed(() => constRoutes.find((route: RouteRecordRaw) => route.path === '/'))
 
 const showHomeMenu = computed(() => {

@@ -2,9 +2,9 @@
   <div
     class="creator-credit"
     :class="`creator-credit--${tone}`"
-    aria-label="Created by JTLab 桀士实验室"
+    :aria-label="`${t('localization.creator.createdBy')} ${appConfig.creatorName} ${appConfig.creatorFullName}`"
   >
-    <span>CREATED BY</span>
+    <span>{{ t('localization.creator.createdBy') }}</span>
     <i aria-hidden="true" />
     <div>
       <strong>{{ appConfig.creatorName }}</strong>
@@ -15,8 +15,11 @@
 
 <script setup lang="ts">
 import { appConfig } from '@/config/app.config'
+import { useLocalization } from '@/modules/system/localization/localization'
 
 withDefaults(defineProps<{ tone?: 'dark' | 'light' }>(), { tone: 'light' })
+
+const { t } = useLocalization()
 </script>
 
 <style scoped>

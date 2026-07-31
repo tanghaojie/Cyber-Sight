@@ -1,17 +1,18 @@
 import { isValidMenuPath, type MenuSummary } from '@scaffold/api-contract'
+import { translate } from '@/modules/system/localization/localization'
 
 type MenuType = MenuSummary['type']
 
-/** 与共享契约复用路径层级规则，并把失败原因转换为表单可读中文。 */
+/** 与共享契约复用路径层级规则，并把失败原因转换为当前语言的表单提示。 */
 export function menuPathError(type: MenuType, parentId: number, path: string): string {
   if (type === 'button') {
     return ''
   }
   if (!path.trim()) {
-    return '目录和菜单必须配置站内路由'
+    return translate('menus.errors.routeRequired')
   }
   if (!isValidMenuPath({ type, parentId, path })) {
-    return '根节点的站内路由必须以 / 开头'
+    return translate('menus.errors.rootRouteInvalid')
   }
   return ''
 }

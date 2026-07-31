@@ -4,7 +4,7 @@
       <button
         class="app-header__menu-button"
         type="button"
-        aria-label="打开菜单"
+        :aria-label="t('navigation.shell.openMenu')"
         aria-controls="app-sidebar"
         @click="$emit('open-menu')"
       >
@@ -17,6 +17,7 @@
     </div>
 
     <div class="app-header__actions">
+      <LanguageSwitcher compact />
       <el-dropdown trigger="click" @command="handleCommand">
         <button class="app-header__user" type="button">
           <span class="app-header__avatar">{{ initials }}</span>
@@ -30,7 +31,7 @@
           <el-dropdown-menu>
             <el-dropdown-item command="logout">
               <SwitchButton class="app-header__logout-icon" />
-              退出登录
+              {{ t('navigation.shell.logout') }}
             </el-dropdown-item>
           </el-dropdown-menu>
         </template>
@@ -43,6 +44,8 @@
 import { computed } from 'vue'
 import { ArrowDown, SwitchButton } from '@element-plus/icons-vue'
 import AppIcon from '@/components/AppIcon.vue'
+import LanguageSwitcher from '@/modules/system/localization/LanguageSwitcher.vue'
+import { useLocalization } from '@/modules/system/localization/localization'
 
 const props = defineProps<{
   title: string
@@ -56,6 +59,7 @@ const emit = defineEmits<{
   logout: []
 }>()
 
+const { t } = useLocalization()
 const initials = computed(() => props.displayName?.slice(0, 1).toUpperCase() ?? 'A')
 
 function handleCommand(command: string) {

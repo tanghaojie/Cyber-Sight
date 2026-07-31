@@ -1,35 +1,50 @@
 <template>
   <el-dialog
     v-model="dialogOpen"
-    :title="user ? '编辑用户' : '新增用户'"
+    :title="user ? t('users.dialog.editTitle') : t('users.dialog.createTitle')"
     width="min(920px, calc(100vw - 32px))"
     :close-on-click-modal="!saving"
   >
     <el-form label-position="top" @submit.prevent="submit">
       <div class="form-columns">
-        <el-form-item label="用户名" required>
+        <el-form-item :label="t('users.fields.username')" required>
           <el-input
             v-model.trim="form.username"
             :disabled="Boolean(user)"
-            placeholder="例如 zhangsan"
+            :placeholder="t('users.dialog.usernamePlaceholder')"
           />
         </el-form-item>
-        <el-form-item label="姓名" required>
-          <el-input v-model.trim="form.displayName" placeholder="请输入姓名" />
+        <el-form-item :label="t('users.fields.displayName')" required>
+          <el-input
+            v-model.trim="form.displayName"
+            :placeholder="t('users.dialog.displayNamePlaceholder')"
+          />
         </el-form-item>
-        <el-form-item label="邮箱" required>
-          <el-input v-model.trim="form.email" type="email" placeholder="name@example.com" />
+        <el-form-item :label="t('users.fields.email')" required>
+          <el-input
+            v-model.trim="form.email"
+            type="email"
+            :placeholder="t('users.dialog.emailPlaceholder')"
+          />
         </el-form-item>
-        <el-form-item :label="user ? '新密码（可选）' : '密码'" :required="!user">
+        <el-form-item
+          :label="user ? t('users.fields.newPassword') : t('users.fields.password')"
+          :required="!user"
+        >
           <el-input
             v-model="form.password"
             type="password"
             show-password
-            placeholder="至少 8 个字符"
+            :placeholder="t('users.dialog.passwordPlaceholder')"
           />
         </el-form-item>
-        <el-form-item label="角色" class="sm:col-span-2">
-          <el-select v-model="form.roleIds" multiple class="w-full" placeholder="选择角色">
+        <el-form-item :label="t('users.fields.roles')" class="sm:col-span-2">
+          <el-select
+            v-model="form.roleIds"
+            multiple
+            class="w-full"
+            :placeholder="t('users.dialog.rolesPlaceholder')"
+          >
             <el-option
               v-for="role in roleOptions"
               :key="role.id"
@@ -38,13 +53,13 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="所属部门" class="sm:col-span-2" required>
+        <el-form-item :label="t('users.fields.departments')" class="sm:col-span-2" required>
           <el-select
             v-model="form.departmentIds"
             multiple
             filterable
             class="w-full"
-            placeholder="至少选择一个部门"
+            :placeholder="t('users.dialog.departmentsPlaceholder')"
           >
             <el-option
               v-for="department in departmentOptions"
@@ -54,8 +69,12 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="主部门" class="sm:col-span-2" required>
-          <el-select v-model="form.primaryDepartmentId" class="w-full" placeholder="选择主部门">
+        <el-form-item :label="t('users.fields.primaryDepartment')" class="sm:col-span-2" required>
+          <el-select
+            v-model="form.primaryDepartmentId"
+            class="w-full"
+            :placeholder="t('users.dialog.primaryDepartmentPlaceholder')"
+          >
             <el-option
               v-for="department in selectedDepartments"
               :key="department.id"
@@ -64,17 +83,21 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="账号状态" class="sm:col-span-2">
-          <el-switch v-model="form.enabled" active-text="启用" inactive-text="停用" />
+        <el-form-item :label="t('users.fields.status')" class="sm:col-span-2">
+          <el-switch
+            v-model="form.enabled"
+            :active-text="t('localization.state.enabled')"
+            :inactive-text="t('localization.state.disabled')"
+          />
         </el-form-item>
       </div>
       <!-- 用户基本资料和直接数据策略分属两个后端写入，但在一个弹窗中连续提交。 -->
       <DataPolicyEditor v-model="access.dataPolicies" />
       <el-alert v-if="formError" :title="formError" type="error" show-icon :closable="false" />
       <div class="dialog-actions">
-        <el-button @click="dialogOpen = false">取消</el-button>
+        <el-button @click="dialogOpen = false">{{ t('localization.actions.cancel') }}</el-button>
         <el-button native-type="submit" type="primary" :loading="saving" :disabled="!accessReady">
-          保存用户
+          {{ t('users.dialog.save') }}
         </el-button>
       </div>
     </el-form>
@@ -98,6 +121,7 @@ import {
 } from '@/modules/system/authorization/authorization.api'
 import type { RoleOption } from '@/modules/system/roles/roles.api'
 import { createUser, updateUser } from '@/modules/system/users/users.api'
+import { useLocalization } from '@/modules/system/localization/localization'
 
 const props = defineProps<{
   user: UserSummary | null
@@ -112,6 +136,7 @@ const dialogOpen = defineModel<boolean>({ required: true })
 const saving = ref(false)
 const accessReady = ref(true)
 const formError = ref('')
+const { t } = useLocalization()
 const form = reactive({
   username: '',
   displayName: '',
@@ -167,10 +192,10 @@ async function submit(): Promise<void> {
       !form.email ||
       (!props.user && (!form.username || form.password.length < 8))
     ) {
-      throw new Error('请完整填写必填项，密码至少 8 个字符')
+      throw new Error(t('users.errors.invalidForm'))
     }
     if (form.departmentIds.length === 0 || !form.departmentIds.includes(form.primaryDepartmentId)) {
-      throw new Error('请至少选择一个所属部门，并从中指定主部门')
+      throw new Error(t('users.errors.invalidDepartment'))
     }
     const result = props.user
       ? await updateUser(props.user.id, {
@@ -193,11 +218,11 @@ async function submit(): Promise<void> {
           enabled: form.enabled,
         } satisfies UserCreate)
     if (result.status !== 0) {
-      throw new Error(result.err || '用户保存失败')
+      throw new Error(t('users.errors.saveFailed'))
     }
     const userId = props.user?.id ?? result.data?.id
     if (!userId) {
-      throw new Error('用户已保存，但未返回用户标识，数据权限尚未保存')
+      throw new Error(t('users.errors.missingId'))
     }
     // 只有用户主记录保存成功后才有主体 ID，可继续整体替换其直接数据策略。
     const accessResult = await replaceSubjectAccess('user', userId, {
@@ -208,13 +233,13 @@ async function submit(): Promise<void> {
       })),
     })
     if (accessResult.status !== 0) {
-      throw new Error(accessResult.err || '用户已保存，但直接数据权限保存失败')
+      throw new Error(t('users.errors.accessSaveFailed'))
     }
     dialogOpen.value = false
-    ElMessage.success('用户已保存')
+    ElMessage.success(t('users.messages.saved'))
     emit('saved')
   } catch (error) {
-    formError.value = error instanceof Error ? error.message : '用户保存失败'
+    formError.value = error instanceof Error ? error.message : t('users.errors.saveFailed')
   } finally {
     saving.value = false
   }
@@ -233,7 +258,8 @@ watch(dialogOpen, async function initializeForm(open) {
           departmentIds: [...policy.departmentIds],
         }))
       } catch (error) {
-        formError.value = error instanceof Error ? error.message : '数据权限加载失败'
+        formError.value =
+          error instanceof Error ? error.message : t('users.errors.accessLoadFailed')
       } finally {
         accessReady.value = !formError.value
       }

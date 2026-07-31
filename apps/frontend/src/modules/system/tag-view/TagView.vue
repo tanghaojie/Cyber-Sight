@@ -1,5 +1,5 @@
 <template>
-  <nav class="tag-view" aria-label="页面标签历史">
+  <nav class="tag-view" :aria-label="t('tag-view.history.label')">
     <div ref="historyRef" class="tag-view__history">
       <div
         v-for="tag in tags"
@@ -20,7 +20,7 @@
         <button
           class="tag-view__close"
           type="button"
-          :aria-label="`关闭${tag.title}`"
+          :aria-label="t('tag-view.close.label', { title: tag.title })"
           @click="$emit('close', tag.path)"
         >
           <Close />
@@ -30,20 +30,24 @@
 
     <div class="tag-view__actions">
       <el-dropdown trigger="click" @command="handleCommand">
-        <button class="tag-view__action-button" type="button" aria-label="标签操作">
-          <span>标签操作</span>
+        <button
+          class="tag-view__action-button"
+          type="button"
+          :aria-label="t('tag-view.actions.label')"
+        >
+          <span>{{ t('tag-view.actions.label') }}</span>
           <ArrowDown />
         </button>
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item command="close-current" :disabled="!hasCurrent">
-              关闭当前
+              {{ t('tag-view.actions.closeCurrent') }}
             </el-dropdown-item>
             <el-dropdown-item command="close-others" :disabled="!hasCurrent || tags.length <= 1">
-              关闭其他
+              {{ t('tag-view.actions.closeOthers') }}
             </el-dropdown-item>
             <el-dropdown-item command="close-all" :disabled="tags.length === 0">
-              关闭全部
+              {{ t('tag-view.actions.closeAll') }}
             </el-dropdown-item>
           </el-dropdown-menu>
         </template>
@@ -56,6 +60,7 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import { ArrowDown, Close } from '@element-plus/icons-vue'
 import type { TagViewItem } from './tag-view.store'
+import { useLocalization } from '@/modules/system/localization/localization'
 
 const props = defineProps<{
   tags: readonly TagViewItem[]
@@ -71,6 +76,7 @@ const emit = defineEmits<{
 }>()
 
 const historyRef = ref<HTMLElement>()
+const { t } = useLocalization()
 const hasCurrent = computed(() => props.tags.some((tag) => tag.path === props.activePath))
 
 watch(

@@ -3,40 +3,54 @@
     <!-- 每一行描述一个资源、动作和允许范围；同主体命中的规则由后端按并集合并。 -->
     <header>
       <div>
-        <strong>数据权限</strong>
-        <span>同一用户命中的规则按允许范围取并集；未配置时默认不可访问。</span>
+        <strong>{{ t('authorization.editor.title') }}</strong>
+        <span>{{ t('authorization.editor.description') }}</span>
       </div>
-      <el-button size="small" :icon="Plus" @click="addPolicy">添加规则</el-button>
+      <el-button size="small" :icon="Plus" @click="addPolicy">{{
+        t('authorization.editor.addRule')
+      }}</el-button>
     </header>
     <el-alert v-if="loadError" :title="loadError" type="error" show-icon :closable="false" />
 
-    <el-empty v-if="!model.length" description="尚未配置数据规则" :image-size="52" />
+    <el-empty
+      v-if="!model.length"
+      :description="t('authorization.editor.empty')"
+      :image-size="52"
+    />
     <div v-for="(policy, index) in model" :key="index" class="policy-row">
       <el-select
         v-model="policy.resourceKey"
-        placeholder="数据资源"
+        :placeholder="t('authorization.editor.resource')"
         @change="normalizePolicy(policy)"
       >
         <el-option
           v-for="resource in resources"
           :key="resource.key"
-          :label="resource.name"
+          :label="resourceLabel(resource)"
           :value="resource.key"
         />
       </el-select>
-      <el-select v-model="policy.action" placeholder="操作" @change="normalizePolicy(policy)">
+      <el-select
+        v-model="policy.action"
+        :placeholder="t('authorization.editor.action')"
+        @change="normalizePolicy(policy)"
+      >
         <el-option
           v-for="action in actionsFor(policy.resourceKey)"
           :key="action"
-          :label="actionLabels[action] ?? action"
+          :label="actionLabel(action)"
           :value="action"
         />
       </el-select>
-      <el-select v-model="policy.scopeType" placeholder="范围" @change="normalizePolicy(policy)">
+      <el-select
+        v-model="policy.scopeType"
+        :placeholder="t('authorization.editor.scope')"
+        @change="normalizePolicy(policy)"
+      >
         <el-option
           v-for="scope in scopesFor(policy.resourceKey, policy.action)"
           :key="scope"
-          :label="scopeLabels[scope]"
+          :label="scopeLabel(scope)"
           :value="scope"
         />
       </el-select>
@@ -48,7 +62,7 @@
         class="department-picker"
         multiple
         filterable
-        placeholder="选择部门"
+        :placeholder="t('authorization.editor.department')"
       >
         <el-option
           v-for="department in departments"
@@ -61,10 +75,10 @@
         v-if="policy.scopeType === 'custom_departments'"
         v-model="policy.includeDescendants"
       >
-        包含所选部门的下级
+        {{ t('authorization.editor.includeDescendants') }}
       </el-checkbox>
       <el-checkbox v-if="allowInheritance" v-model="policy.inheritToChildren">
-        下级部门继承此规则
+        {{ t('authorization.editor.inheritToChildren') }}
       </el-checkbox>
     </div>
   </section>
@@ -81,25 +95,28 @@ import type {
 } from '@scaffold/api-contract'
 import { listDataResources } from '@/modules/system/authorization/authorization.api'
 import { listDepartmentOptions } from '@/modules/system/departments/departments.api'
+import { useLocalization } from '@/modules/system/localization/localization'
 
 defineProps<{ allowInheritance?: boolean }>()
 const model = defineModel<DataPolicyInput[]>({ required: true })
 const resources = ref<DataResourceDefinition[]>([])
 const departments = ref<DepartmentOption[]>([])
 const loadError = ref('')
+const { resolveLocalizedLabel, t } = useLocalization()
 
-const actionLabels: Record<string, string> = {
-  read: '查看',
-  create: '新增',
-  update: '修改',
-  delete: '删除',
+function actionLabel(action: string): string {
+  return t(`authorization.actions.${action}`)
 }
-const scopeLabels: Record<DataScopeType, string> = {
-  self: '仅本人',
-  own_department: '本人所属部门',
-  own_department_tree: '本人部门及下级',
-  custom_departments: '指定部门',
-  all: '全部数据',
+
+function scopeLabel(scope: DataScopeType): string {
+  return t(`authorization.scopes.${scope}`)
+}
+
+function resourceLabel(resource: DataResourceDefinition): string {
+  return resolveLocalizedLabel({
+    key: `authorization.resources.${resource.key}`,
+    fallback: resource.name,
+  })
 }
 
 function actionsFor(resourceKey: string): string[] {
@@ -154,7 +171,8 @@ onMounted(async function loadOptions() {
     resources.value = resourceOptions
     departments.value = departmentOptions
   } catch (error) {
-    loadError.value = error instanceof Error ? error.message : '数据策略选项加载失败'
+    loadError.value =
+      error instanceof Error ? error.message : t('authorization.errors.policyOptionsLoadFailed')
   }
 })
 </script>

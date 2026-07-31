@@ -3,13 +3,15 @@
     <div class="not-found-grid" />
     <section>
       <div class="error-code"><span>4</span><i>○</i><span>4</span></div>
-      <p>NODE NOT FOUND</p>
-      <h1>这个节点不在当前系统图谱中。</h1>
-      <span class="description">地址可能已被移动、停用，或数据库菜单尚未为你开放对应入口。</span>
+      <p>{{ t('errors.notFound.kicker') }}</p>
+      <h1>{{ t('errors.notFound.title') }}</h1>
+      <span class="description">{{ t('errors.notFound.description') }}</span>
       <code v-if="sourcePath">{{ sourcePath }}</code>
       <div class="actions">
-        <el-button type="primary" size="large" @click="goHome">返回工作台</el-button
-        ><el-button size="large" @click="goBack">返回上一页</el-button>
+        <el-button type="primary" size="large" @click="goHome">{{
+          t('errors.notFound.home')
+        }}</el-button
+        ><el-button size="large" @click="goBack">{{ t('errors.notFound.back') }}</el-button>
       </div>
     </section>
     <div class="brand-corner">
@@ -22,9 +24,11 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import CyberLogo from '@/components/brand/CyberLogo.vue'
+import { useLocalization } from '@/modules/system/localization/localization'
 
 const route = useRoute(),
   router = useRouter()
+const { t } = useLocalization()
 const sourcePath = computed(() => (typeof route.query.from === 'string' ? route.query.from : ''))
 async function goHome(): Promise<void> {
   await router.push('/')

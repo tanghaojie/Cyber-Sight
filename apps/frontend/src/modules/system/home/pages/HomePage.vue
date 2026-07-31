@@ -1,22 +1,24 @@
 <template>
-  <section class="home-grid" aria-label="工作台总览">
+  <section class="home-grid" :aria-label="t('home.overview.label')">
     <article class="hero-panel">
       <div class="hero-mesh" />
       <div class="hero-copy">
-        <p>{{ todayLabel }} · SYSTEM BRIEF</p>
-        <h2>让系统脉络可见，<br />让每次变更有据可循。</h2>
-        <span>{{ appConfig.fullName }} 已连接数据库菜单、模块边界与统一运行时契约。</span>
+        <p>{{ todayLabel }} · {{ t('home.hero.kicker') }}</p>
+        <h2>{{ t('home.hero.lineOne') }}<br />{{ t('home.hero.lineTwo') }}</h2>
+        <span>{{ t('home.hero.description', { name: appConfig.fullName }) }}</span>
       </div>
       <div class="hero-index">
-        <small>SYSTEM INDEX</small><b>{{ String(navigation.flatItems.length).padStart(2, '0') }}</b
-        ><span>ACTIVE NODES</span>
+        <small>{{ t('home.hero.systemIndex') }}</small
+        ><b>{{ String(navigation.flatItems.length).padStart(2, '0') }}</b
+        ><span>{{ t('home.hero.activeNodes') }}</span>
       </div>
     </article>
     <div class="module-grid">
       <template v-for="item in quickEntries" :key="item.id">
         <RouterLink v-if="item.type === 'menu'" :to="item.path" class="module-card"
           ><span class="module-card__icon"><AppIcon :name="item.icon" /></span
-          ><span class="module-card__arrow">↗</span><b>{{ item.name }}</b
+          ><span class="module-card__arrow">↗</span
+          ><b>{{ resolveLocalizedLabel(navigationLabel(item)) }}</b
           ><small>{{ item.path }}</small></RouterLink
         >
         <a
@@ -26,8 +28,9 @@
           rel="noopener noreferrer"
           class="module-card"
           ><span class="module-card__icon"><AppIcon :name="item.icon || 'external'" /></span
-          ><span class="module-card__arrow">↗</span><b>{{ item.name }}</b
-          ><small>EXTERNAL RESOURCE</small></a
+          ><span class="module-card__arrow">↗</span
+          ><b>{{ resolveLocalizedLabel(navigationLabel(item)) }}</b
+          ><small>{{ t('home.cards.externalResource') }}</small></a
         >
       </template>
     </div>
@@ -39,21 +42,24 @@ import { computed } from 'vue'
 import { appConfig } from '@/config/app.config'
 import AppIcon from '@/components/AppIcon.vue'
 import { useNavigationStore } from '@/modules/system/navigation/navigation.store'
+import { navigationLabel } from '@/modules/system/navigation/navigation.labels'
+import { useLocalization } from '@/modules/system/localization/localization'
 
 const navigation = useNavigationStore()
+const { formatDateTime, resolveLocalizedLabel, t } = useLocalization()
 // 快捷入口取当前用户前四个可访问页面或外链，目录和首页自身不重复展示。
 const quickEntries = computed(() =>
   navigation.flatItems
     .filter((item) => (item.type === 'menu' && item.path !== '/') || item.type === 'button')
     .slice(0, 4),
 )
-const todayLabel = new Intl.DateTimeFormat('en-SG', {
-  weekday: 'long',
-  month: 'short',
-  day: '2-digit',
-})
-  .format(new Date())
-  .toUpperCase()
+const todayLabel = computed(() =>
+  formatDateTime(new Date(), {
+    weekday: 'long',
+    month: 'short',
+    day: '2-digit',
+  }).toUpperCase(),
+)
 </script>
 
 <style scoped>

@@ -1,4 +1,5 @@
 import type { GlobalHttpErrorDetail, GlobalHttpErrorHandler } from './globalHttpError'
+import { translate } from '@/modules/system/localization/localization'
 
 export interface ApplicationHttpErrorActions {
   currentRoute(): { name?: string; fullPath: string }
@@ -32,6 +33,6 @@ export function createApplicationHttpErrorHandler(
       return
     }
     // 500 不切换路由，保留用户当前上下文并给出一次全局提示。
-    actions.showError(detail.err || '服务暂时不可用，请稍后重试')
+    actions.showError(translate('navigation.errors.serviceUnavailable'))
   }
 }

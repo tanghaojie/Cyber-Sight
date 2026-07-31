@@ -7,6 +7,7 @@ import type {
 } from '@scaffold/api-contract'
 import { apiClient } from '@/api/client'
 import { apiResult, pageResult, type ApiMutationResult } from '@/api/result'
+import { translate } from '@/modules/system/localization/localization'
 
 // 角色模块同时提供管理分页和用户表单所需的轻量选项映射。
 export interface RoleOption {
@@ -26,7 +27,7 @@ export async function listRoleOptions(): Promise<RoleOption[]> {
   // 后端分页上限为 100，当前脚手架用首批有效角色作为选择项。
   const result = await listRoles(1, 100)
   if (result.status !== 0) {
-    throw new Error(result.err || '角色选项加载失败')
+    throw new Error(translate('roles.errors.optionsLoadFailed'))
   }
   return result.list
     .filter((role) => role.enabled)

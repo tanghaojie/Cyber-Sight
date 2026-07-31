@@ -1,7 +1,7 @@
 <template>
   <main class="login-page">
     <!-- 左侧承载 CYBER 品牌、系统定位和独立的创作者署名，移动端会隐藏。 -->
-    <section class="login-atmosphere" aria-label="CYBER 品牌介绍">
+    <section class="login-atmosphere" :aria-label="t('auth.brand.ariaLabel')">
       <div class="cyber-grid" />
       <div class="signal-rail signal-rail--horizontal" />
       <div class="signal-rail signal-rail--vertical" />
@@ -11,13 +11,15 @@
       <div class="atmosphere-content">
         <CyberLogo class="login-logo" tone="light" />
         <div class="manifesto">
-          <p>BUILD · CONNECT · EVOLVE</p>
-          <h1>让复杂系统，<br /><em>清晰生长。</em></h1>
-          <span>身份、权限、导航与基础数据，在模块边界和运行时契约中稳定连接、持续演进。</span>
+          <p>{{ t('auth.manifesto.kicker') }}</p>
+          <h1>
+            {{ t('auth.manifesto.lineOne') }}<br /><em>{{ t('auth.manifesto.lineTwo') }}</em>
+          </h1>
+          <span>{{ t('auth.manifesto.description') }}</span>
           <ol>
-            <li><b>01</b>模块边界</li>
-            <li><b>02</b>运行时契约</li>
-            <li><b>03</b>受控演进</li>
+            <li><b>01</b>{{ t('auth.manifesto.moduleBoundary') }}</li>
+            <li><b>02</b>{{ t('auth.manifesto.runtimeContract') }}</li>
+            <li><b>03</b>{{ t('auth.manifesto.controlledEvolution') }}</li>
           </ol>
         </div>
         <footer class="atmosphere-footer">
@@ -28,32 +30,34 @@
     </section>
     <!-- 右侧是实际登录交互区。 -->
     <section class="login-form-panel">
+      <LanguageSwitcher class="login-language" />
       <form class="login-card" @submit.prevent="handleSubmit">
         <div class="mobile-brand">
           <CyberLogo :show-descriptor="false" tone="dark" />
         </div>
         <div class="form-head">
-          <p>SECURE ENTRY</p>
-          <h2>欢迎进入 {{ appConfig.name }}</h2>
-          <span>使用管理员身份登录 {{ appConfig.fullName }}</span>
+          <p>{{ t('auth.login.kicker') }}</p>
+          <h2>{{ t('auth.login.title', { name: appConfig.name }) }}</h2>
+          <span>{{ t('auth.login.subtitle', { name: appConfig.fullName }) }}</span>
         </div>
         <label class="login-field"
-          ><span>用户名</span
+          ><span>{{ t('auth.login.username') }}</span
           ><el-input
             v-model.trim="username"
             size="large"
             autocomplete="username"
-            placeholder="请输入用户名"
+            :placeholder="t('auth.login.usernamePlaceholder')"
         /></label>
         <label class="login-field"
-          ><span>密码 <small>至少 8 个字符</small></span
+          ><span
+            >{{ t('auth.login.password') }} <small>{{ t('auth.login.passwordHint') }}</small></span
           ><el-input
             v-model="password"
             size="large"
             type="password"
             show-password
             autocomplete="current-password"
-            placeholder="请输入密码"
+            :placeholder="t('auth.login.passwordPlaceholder')"
         /></label>
         <el-alert v-if="error" :title="error" type="error" show-icon :closable="false" />
         <el-button
@@ -62,9 +66,11 @@
           size="large"
           :loading="auth.busy"
           class="login-submit"
-          >进入控制台 <span aria-hidden="true">→</span></el-button
+          >{{ t('auth.login.submit') }} <span aria-hidden="true">→</span></el-button
         >
-        <p class="login-hint">本地初始账号：<b>admin</b> / <b>Admin@123456</b></p>
+        <p class="login-hint">
+          {{ t('auth.login.initialAccount') }} <b>admin</b> / <b>Admin@123456</b>
+        </p>
       </form>
       <CreatorCredit class="mobile-credit" tone="dark" />
     </section>
@@ -78,10 +84,13 @@ import CreatorCredit from '@/components/brand/CreatorCredit.vue'
 import CyberLogo from '@/components/brand/CyberLogo.vue'
 import { appConfig } from '@/config/app.config'
 import { useAuthStore } from '@/modules/system/auth/auth.store'
+import LanguageSwitcher from '@/modules/system/localization/LanguageSwitcher.vue'
+import { useLocalization } from '@/modules/system/localization/localization'
 
 const auth = useAuthStore()
 const route = useRoute()
 const router = useRouter()
+const { t } = useLocalization()
 const username = ref('admin')
 const password = ref('Admin@123456')
 const error = ref('')
@@ -257,6 +266,11 @@ async function handleSubmit(): Promise<void> {
   background:
     radial-gradient(circle at 92% 4%, rgba(112, 207, 162, 0.13), transparent 34%), #f7f9f7;
 }
+.login-language {
+  position: absolute;
+  top: 28px;
+  right: 32px;
+}
 .login-card {
   width: min(100%, 420px);
   display: grid;
@@ -339,6 +353,10 @@ async function handleSubmit(): Promise<void> {
     align-content: center;
     gap: 30px;
     padding: 44px 24px;
+  }
+  .login-language {
+    top: 20px;
+    right: 20px;
   }
   .login-card {
     padding: 30px 26px;
