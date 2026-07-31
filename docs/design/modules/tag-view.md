@@ -53,7 +53,7 @@ updated: 2026-07-31
 AdminLayout + Vue Router + auth.user.id
     -> TagView.vue
     -> tag-view.store.ts
-        -> Pinia + Vue + browser localStorage
+        -> Pinia + Vue + shared/browserStorage
 ```
 
 依赖保持从应用组合根指向模块公共文件。`tag-view` 不反向读取认证 Store 或 Router，也不跨模块访问导航内部状态。

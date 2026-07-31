@@ -107,7 +107,7 @@ SupportedLocale = 'zh-CN' | 'en-US'
 ```text
 main.ts + App.vue
     -> localization 公共入口
-        -> Vue I18n + Element Plus locale + browser localStorage
+        -> Vue I18n + Element Plus locale + shared/browserStorage
 
 各业务模块
     -> localization 公共组合式函数

@@ -1,5 +1,6 @@
 import { computed } from 'vue'
 import { createI18n, useI18n } from 'vue-i18n'
+import { browserStorage } from '@/shared/browserStorage'
 import {
   supportedLocaleCodes,
   type LocalizationResource,
@@ -32,17 +33,6 @@ function isSupportedLocale(value: unknown): value is SupportedLocale {
     typeof value === 'string' &&
     supportedLocaleCodes.includes(value as (typeof supportedLocaleCodes)[number])
   )
-}
-
-function browserStorage(): Storage | null {
-  if (typeof window === 'undefined') {
-    return null
-  }
-  try {
-    return window.localStorage
-  } catch {
-    return null
-  }
 }
 
 function initialLocale(): SupportedLocale {

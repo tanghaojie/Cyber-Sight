@@ -22,6 +22,7 @@ updated: 2026-07-31
 - `src/modules/{system,biz}/**/registerViews.ts`：需要被数据库菜单选择的模块登记页面加载器。
 - `src/shared/routing/view-registry.ts`：构建期发现全部 `registerViews.ts`，校验稳定 key 并冻结页面注册表。
 - `src/shared/routing/layout-registry.ts`：发现 `src/layouts/*.vue`，以文件名建立只读布局注册表；`AdminLayout` 必须存在。
+- `src/shared/browserStorage.ts`：向前端模块公开 `browserStorage()`；在 SSR、隐私模式或浏览器策略禁用存储时返回 `null`，调用方保留各自的内存降级和错误处理语义。
 - `src/router/constRoutes.ts`：登录、显式 404、根 `AdminLayout` 和默认工作台路由。
 - `src/router/routerGuard.ts`：认证恢复、导航加载和首次动态路由安装。
 - `src/router/dynamicRoutes.ts`：根据菜单树生成、注册和清理动态路由。

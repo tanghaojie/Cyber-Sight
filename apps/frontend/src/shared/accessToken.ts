@@ -1,20 +1,9 @@
 import cookies from 'js-cookie'
+import { browserStorage } from './browserStorage'
 
 const USE_COOKIES = true
 const ACCESS_TOKEN_KEY = 'cyber_access_token'
 const LEGACY_ACCESS_TOKEN_KEYS = ['jtlib_access_token'] as const
-
-// 集中封装浏览器持久化，受限上下文或 SSR 中不可用时安全降级为无会话。
-function browserStorage(): Storage | null {
-  if (typeof window === 'undefined') {
-    return null
-  }
-  try {
-    return window.localStorage
-  } catch {
-    return null
-  }
-}
 
 export function getAccessToken(): string | undefined {
   try {
