@@ -28,7 +28,7 @@ updated: 2026-07-31
 - `src/components/layout/` 与 `src/layouts/AdminLayout.vue`：侧栏、顶栏、内容出口和移动抽屉。
 - `src/modules/system/tag-view/`：账号隔离的页面标签历史、浏览器持久化和标签控制界面。
 - `src/layouts/EmptyLayout.vue`：只提供一个 `<router-view>` 的可选布局。
-- `src/assets/icons/*.svg`、`src/shared/icons/icon-registry.ts` 与 `src/components/AppIcon.vue`：构建期 SVG sprite 和稳定图标名称。
+- `src/assets/icons/*.svg`、`src/shared/icons/icon-registry.ts` 与 `src/components/AppIcon.vue`：构建期 SVG sprite 和稳定图标名称；每个文件使用 kebab-case 名称、`0 0 24 24` viewBox 和无硬编码颜色的单色描边图形，文件名会自动成为菜单可选的图标名。
 
 模块外部只能依赖模块设计登记的表意公共文件。禁止新增无差别 `index.ts` barrel，禁止跨模块导入页面、私有 composable、内部状态或未登记 service。用户模块通过角色和部门 API 读取归属选项；用户、角色和部门弹窗复用 authorization 的 `DataPolicyEditor.vue` 与 API；菜单弹窗通过 authorization API 读取权限目录。
 

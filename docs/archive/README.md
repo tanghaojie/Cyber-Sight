@@ -31,6 +31,7 @@
 
 - `plans/`：按 `YYYY-MM-DD-<topic>.md` 保存完成、取消或被取代的实施计划。
 - `ai-logs/YYYY/MM/`：保存对应任务的结构化协作记录。
+- 2026-07-31：[SVG 图标库扩充实施计划](plans/2026-07-31-expand-svg-icon-library.md)及其 [AI 协作记录](ai-logs/2026/07/2026-07-31-expand-svg-icon-library.md)。
 - 2026-07-31：[CYBER 框架重品牌实施计划](plans/2026-07-31-cyber-branding.md)及其 [AI 协作记录](ai-logs/2026/07/2026-07-31-cyber-branding.md)。
 - 2026-07-30：[可插拔授权与部门实施计划](plans/2026-07-30-pluggable-authorization.md)及其 [AI 协作记录](ai-logs/2026/07/2026-07-30-pluggable-authorization.md)。
 - 2026-07-30：[中文代码注释实施计划](plans/2026-07-30-chinese-code-comments.md)及其 [AI 协作记录](ai-logs/2026/07/2026-07-30-chinese-code-comments.md)。
