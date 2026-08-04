@@ -29,6 +29,7 @@
 
 ## 完成计划与 AI 协作记录
 
+- 2026-08-05：[统一 Element Plus 弹窗顶部间距计划](plans/2026-08-05-dialog-top-margin.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-05-dialog-top-margin.md)。
 - 2026-08-05：[系统设置剩余项接入计划](plans/2026-08-05-settings-shell-preferences.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-05-settings-shell-preferences.md)。
 - 2026-08-05：[主题视觉回归修复计划](plans/2026-08-05-theme-visual-regression.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-05-theme-visual-regression.md)。
 - 2026-08-04：[主题颜色与深色模式实施计划](plans/2026-08-04-theme-and-dark-mode.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-04-theme-and-dark-mode.md)。

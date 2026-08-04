@@ -77,7 +77,7 @@ Element Plus 提供当前语言包。登录页与 Header 共用 `LanguageSwitche
 
 全局变量 `--app-shell-header-height` 定义应用壳顶部高度，当前值为 `72px`。顶部模式的桌面应用壳为单列布局，粘性 Header 保留一级菜单、标题路径和用户菜单；下拉菜单在 Header 层级内显示，避免被内容区裁切。侧边模式的桌面应用壳固定为双列布局，Header 仍保留侧栏开关。窄屏由 `matchMedia('(max-width: 1023px)')` 强制使用抽屉式侧边导航，窗口恢复后重用保存的桌面偏好。菜单打开按钮不按断点隐藏；抽屉打开时侧栏中的关闭按钮与遮罩可关闭它。
 
-布局注册表通过懒加载发现 `src/layouts/*.vue`。`AdminLayout` 是静态根壳和必备布局；`EmptyLayout` 可供菜单显式选择。Tailwind CSS 负责布局、间距、响应式和多数视觉样式，Element Plus 提供表单、表格、弹窗和反馈；全局 SCSS 按基础、管理布局、过渡和 Element Plus 组件覆盖拆分。六套主题通过语义 CSS 令牌同时驱动应用表面、Element Plus、首页 Hero、登录页、侧栏品牌区和健康状态；组件只保留与语义状态相关的成功、警告和错误颜色。用户、角色、部门、菜单和字典管理页面共用的内容容器最大宽度为 `1920px`，窄于该宽度时仍保持响应式占满可用空间。
+布局注册表通过懒加载发现 `src/layouts/*.vue`。`AdminLayout` 是静态根壳和必备布局；`EmptyLayout` 可供菜单显式选择。Tailwind CSS 负责布局、间距、响应式和多数视觉样式，Element Plus 提供表单、表格、弹窗和反馈；全局 SCSS 按基础、管理布局、过渡和 Element Plus 组件覆盖拆分。其中 `styles/element-plus/el-dialog-override.scss` 将 `--el-dialog-margin-top` 统一设为 `5vh`，适用于所有未自行覆盖该变量的 `el-dialog`。六套主题通过语义 CSS 令牌同时驱动应用表面、Element Plus、首页 Hero、登录页、侧栏品牌区和健康状态；组件只保留与语义状态相关的成功、警告和错误颜色。用户、角色、部门、菜单和字典管理页面共用的内容容器最大宽度为 `1920px`，窄于该宽度时仍保持响应式占满可用空间。
 
 ## 全局 HTTP 错误
 

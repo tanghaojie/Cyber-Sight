@@ -1,4 +1,6 @@
 html body .el-dialog {
+  --el-dialog-margin-top: 5vh;
+
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 22px;
