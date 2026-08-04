@@ -51,9 +51,14 @@ function goBack(): void {
   place-items: center;
   overflow: hidden;
   padding: 30px;
-  color: #edf9f3;
+  color: var(--hero-foreground);
   background:
-    radial-gradient(circle at 50% 42%, rgba(112, 207, 162, 0.17), transparent 28%), #0d3027;
+    radial-gradient(
+      circle at 50% 42%,
+      color-mix(in srgb, var(--brand-accent), transparent 80%),
+      transparent 28%
+    ),
+    var(--hero-end);
 }
 .not-found-grid {
   position: absolute;
@@ -87,16 +92,16 @@ section {
   height: 0.62em;
   place-items: center;
   margin: 0 0.07em;
-  border: 1px solid rgba(112, 207, 162, 0.48);
+  border: 1px solid color-mix(in srgb, var(--brand-accent), transparent 52%);
   border-radius: 50%;
-  color: var(--primary);
+  color: var(--brand-accent);
   font-size: 0.48em;
   font-style: normal;
-  box-shadow: inset 0 0 40px rgba(112, 207, 162, 0.12);
+  box-shadow: inset 0 0 40px color-mix(in srgb, var(--brand-accent), transparent 88%);
 }
 section > p {
   margin: 36px 0 12px;
-  color: var(--primary);
+  color: var(--brand-accent);
   font-size: 9px;
   font-weight: 900;
   letter-spacing: 0.25em;
@@ -111,7 +116,7 @@ h1 {
   display: block;
   max-width: 540px;
   margin: 18px auto 0;
-  color: rgba(237, 249, 243, 0.48);
+  color: var(--hero-muted);
   font-size: 13px;
   line-height: 1.8;
 }

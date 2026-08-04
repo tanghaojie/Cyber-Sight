@@ -85,7 +85,10 @@
               >
                 <span
                   class="settings-theme-option__swatch"
-                  :style="{ '--theme-swatch': option.color }"
+                  :style="{
+                    '--theme-swatch': option.color,
+                    '--theme-swatch-dark': option.darkColor,
+                  }"
                 />
                 <span>{{ option.label }}</span>
               </button>
@@ -161,6 +164,7 @@ interface ThemeColorOption {
   value: ThemeColor
   label: string
   color: string
+  darkColor: string
 }
 
 type SwitchSettingKey = 'darkMode' | 'tagsView' | 'sidebarLogo' | 'dynamicTitle'
@@ -531,13 +535,22 @@ function restoreDefaults(): void {
 }
 
 .settings-theme-option__swatch {
+  position: relative;
   width: 18px;
   height: 18px;
   flex: 0 0 auto;
+  overflow: hidden;
   border: 2px solid var(--surface);
   border-radius: 50%;
   background: var(--theme-swatch);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--theme-swatch), var(--ink) 20%);
+
+  &::after {
+    position: absolute;
+    inset: 0 0 0 50%;
+    background: var(--theme-swatch-dark);
+    content: '';
+  }
 }
 
 .settings-switch-list {

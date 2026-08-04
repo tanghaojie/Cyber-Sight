@@ -78,16 +78,20 @@ const todayLabel = computed(() =>
   overflow: hidden;
   padding: 38px;
   border-radius: 32px;
-  color: #effbf5;
-  background: linear-gradient(135deg, #174c3e, #0d3027 75%);
-  box-shadow: 0 25px 70px rgba(16, 60, 48, 0.18);
+  color: var(--hero-foreground);
+  background: linear-gradient(135deg, var(--hero-start), var(--hero-end) 76%);
+  box-shadow: 0 25px 70px color-mix(in srgb, var(--hero-start), transparent 68%);
 }
 .hero-mesh {
   position: absolute;
   inset: 0;
   opacity: 0.75;
   background-image:
-    radial-gradient(circle at 79% 14%, rgba(112, 207, 162, 0.42), transparent 24%),
+    radial-gradient(
+      circle at 79% 14%,
+      color-mix(in srgb, var(--brand-accent), transparent 58%),
+      transparent 24%
+    ),
     linear-gradient(116deg, transparent 58%, rgba(255, 255, 255, 0.045) 58%);
 }
 .hero-copy,
@@ -99,7 +103,7 @@ const todayLabel = computed(() =>
 }
 .hero-copy p {
   margin: 0 0 22px;
-  color: var(--primary);
+  color: var(--brand-accent);
   font-size: 9px;
   font-weight: 900;
   letter-spacing: 0.23em;
@@ -115,7 +119,7 @@ const todayLabel = computed(() =>
   display: block;
   max-width: 620px;
   margin-top: 20px;
-  color: rgba(236, 250, 243, 0.55);
+  color: var(--hero-muted);
   font-size: 13px;
   line-height: 1.8;
 }
@@ -126,7 +130,7 @@ const todayLabel = computed(() =>
 }
 .hero-index small,
 .hero-index span {
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--hero-meta);
   font-size: 8px;
   letter-spacing: 0.18em;
 }
@@ -148,14 +152,14 @@ const todayLabel = computed(() =>
   padding: 20px;
   border: 1px solid var(--line);
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: 0 15px 40px rgba(18, 60, 49, 0.04);
+  background: color-mix(in srgb, var(--surface), transparent 12%);
+  box-shadow: 0 15px 40px color-mix(in srgb, var(--ink), transparent 96%);
   transition: 0.2s;
 }
 .module-card:hover {
   transform: translateY(-4px);
   border-color: var(--primary);
-  box-shadow: 0 20px 50px rgba(18, 60, 49, 0.1);
+  box-shadow: 0 20px 50px color-mix(in srgb, var(--primary), transparent 88%);
 }
 .module-card__icon {
   display: grid;
@@ -242,9 +246,9 @@ const todayLabel = computed(() =>
   justify-content: space-between;
   padding: 25px;
   border-radius: 25px;
-  color: #123c31;
-  background: linear-gradient(145deg, #a6e4c6, var(--primary));
-  box-shadow: 0 18px 44px rgba(71, 159, 119, 0.16);
+  color: var(--brand-accent-foreground);
+  background: linear-gradient(145deg, var(--brand-accent), var(--primary));
+  box-shadow: 0 18px 44px color-mix(in srgb, var(--primary), transparent 84%);
 }
 .pulse-card > div {
   font-size: 8px;
@@ -257,8 +261,8 @@ const todayLabel = computed(() =>
   height: 7px;
   margin-right: 7px;
   border-radius: 50%;
-  background: #123c31;
-  box-shadow: 0 0 0 6px rgba(18, 60, 49, 0.1);
+  background: var(--brand-accent-foreground);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--brand-accent-foreground), transparent 88%);
 }
 .pulse-card strong {
   font-family: var(--font-display);

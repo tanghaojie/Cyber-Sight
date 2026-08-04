@@ -5,15 +5,16 @@ export type ThemeColor = (typeof THEME_COLORS)[number]
 export interface ThemeColorOption {
   value: ThemeColor
   color: string
+  darkColor: string
 }
 
 export const THEME_COLOR_OPTIONS: readonly ThemeColorOption[] = [
-  { value: 'jade', color: '#23734c' },
-  { value: 'civic', color: '#b4232c' },
-  { value: 'monochrome', color: '#1b1b1b' },
-  { value: 'azure', color: '#1769aa' },
-  { value: 'violet', color: '#6846c7' },
-  { value: 'amber', color: '#b65c00' },
+  { value: 'jade', color: '#277a52', darkColor: '#57b985' },
+  { value: 'civic', color: '#b33943', darkColor: '#d96069' },
+  { value: 'monochrome', color: '#292927', darkColor: '#e3e2dd' },
+  { value: 'azure', color: '#2b72a6', darkColor: '#62a7da' },
+  { value: 'violet', color: '#7251b2', darkColor: '#9e7dd8' },
+  { value: 'amber', color: '#a85d14', darkColor: '#d89342' },
 ]
 
 const LEGACY_THEME_COLORS: Readonly<Record<string, ThemeColor>> = {

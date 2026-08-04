@@ -113,17 +113,25 @@ async function handleSubmit(): Promise<void> {
   min-height: 100vh;
   display: grid;
   grid-template-columns: minmax(480px, 1.08fr) minmax(430px, 0.92fr);
-  background: #f6f8f6;
+  background: var(--canvas);
 }
 .login-atmosphere {
   position: relative;
   overflow: hidden;
   min-height: 100vh;
-  color: #f6f5ef;
+  color: var(--hero-foreground);
   background:
-    radial-gradient(circle at 15% 8%, rgba(112, 207, 162, 0.16), transparent 26%),
-    radial-gradient(circle at 80% 68%, rgba(139, 116, 246, 0.09), transparent 24%),
-    linear-gradient(145deg, #111614, #0b0e11 72%);
+    radial-gradient(
+      circle at 15% 8%,
+      color-mix(in srgb, var(--brand-accent), transparent 82%),
+      transparent 26%
+    ),
+    radial-gradient(
+      circle at 80% 68%,
+      color-mix(in srgb, var(--brand-node), transparent 90%),
+      transparent 24%
+    ),
+    linear-gradient(145deg, var(--brand-surface-start), var(--brand-surface-end) 72%);
 }
 .cyber-grid {
   position: absolute;
@@ -159,10 +167,10 @@ async function handleSubmit(): Promise<void> {
   right: calc(22% - 4px);
   width: 9px;
   height: 9px;
-  border: 2px solid #151817;
+  border: 2px solid var(--brand-surface-start);
   border-radius: 2px;
   background: var(--signal);
-  box-shadow: 0 0 24px rgba(139, 116, 246, 0.5);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--brand-node), transparent 50%);
 }
 .atmosphere-content {
   position: relative;
@@ -184,7 +192,7 @@ async function handleSubmit(): Promise<void> {
 }
 .manifesto > p {
   margin: 0 0 25px;
-  color: var(--primary);
+  color: var(--brand-accent);
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.25em;
@@ -198,14 +206,14 @@ async function handleSubmit(): Promise<void> {
   line-height: 1.12;
 }
 .manifesto h1 em {
-  color: var(--primary);
+  color: var(--brand-accent);
   font-style: normal;
 }
 .manifesto > span {
   display: block;
   max-width: 510px;
   margin-top: 28px;
-  color: rgba(232, 249, 240, 0.52);
+  color: var(--hero-muted);
   font-size: 14px;
   line-height: 1.9;
 }
@@ -215,7 +223,7 @@ async function handleSubmit(): Promise<void> {
   margin: 44px 0 0;
   padding: 0;
   list-style: none;
-  color: rgba(255, 255, 255, 0.58);
+  color: var(--hero-muted);
   font-size: 11px;
 }
 .manifesto li {
@@ -223,7 +231,7 @@ async function handleSubmit(): Promise<void> {
   gap: 8px;
 }
 .manifesto li b {
-  color: var(--primary);
+  color: var(--brand-accent);
   font-size: 9px;
   letter-spacing: 0.12em;
 }
@@ -234,7 +242,7 @@ async function handleSubmit(): Promise<void> {
   gap: 24px;
 }
 .signature {
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--hero-meta);
   font-size: 8px;
   font-weight: 650;
   letter-spacing: 0.16em;
@@ -250,7 +258,7 @@ async function handleSubmit(): Promise<void> {
   right: -150px;
   width: 380px;
   height: 380px;
-  box-shadow: inset 0 0 90px rgba(112, 207, 162, 0.03);
+  box-shadow: inset 0 0 90px color-mix(in srgb, var(--brand-accent), transparent 94%);
 }
 .orbit-two {
   bottom: -220px;
@@ -264,7 +272,12 @@ async function handleSubmit(): Promise<void> {
   place-items: center;
   padding: 60px 10%;
   background:
-    radial-gradient(circle at 92% 4%, rgba(112, 207, 162, 0.13), transparent 34%), #f7f9f7;
+    radial-gradient(
+      circle at 92% 4%,
+      color-mix(in srgb, var(--primary), transparent 87%),
+      transparent 34%
+    ),
+    var(--canvas);
 }
 .login-language {
   position: absolute;
@@ -276,10 +289,10 @@ async function handleSubmit(): Promise<void> {
   display: grid;
   gap: 22px;
   padding: 38px;
-  border: 1px solid rgba(24, 58, 48, 0.08);
+  border: 1px solid var(--line);
   border-radius: 30px;
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: 0 26px 80px rgba(18, 60, 49, 0.08);
+  background: color-mix(in srgb, var(--surface), transparent 14%);
+  box-shadow: var(--shadow);
   backdrop-filter: blur(18px);
 }
 .form-head {

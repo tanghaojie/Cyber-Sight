@@ -46,8 +46,8 @@ const { currentLocale, supportedLocales, setLocale, t } = useLocalization()
   padding: 3px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.68);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24);
+  background: color-mix(in srgb, var(--surface), transparent 22%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--surface), #fff 24%);
 }
 
 .language-switcher__option {
@@ -83,9 +83,9 @@ const { currentLocale, supportedLocales, setLocale, t } = useLocalization()
 }
 
 .language-switcher__option--active {
-  color: #102c23;
+  color: var(--primary-foreground);
   background: var(--primary);
-  box-shadow: 0 5px 14px rgba(36, 107, 81, 0.18);
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--primary), transparent 78%);
 }
 
 .language-switcher__short {
@@ -112,7 +112,7 @@ const { currentLocale, supportedLocales, setLocale, t } = useLocalization()
   }
 
   .language-switcher__option--active {
-    color: #102c23;
+    color: var(--primary-foreground);
   }
 }
 

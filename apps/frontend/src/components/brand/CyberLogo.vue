@@ -53,9 +53,9 @@ withDefaults(
 }
 
 .cyber-logo--dark {
-  --cyber-logo-mark: #151a18;
-  --cyber-logo-text: #151a18;
-  --cyber-logo-muted: #71837b;
+  --cyber-logo-mark: var(--ink);
+  --cyber-logo-text: var(--ink);
+  --cyber-logo-muted: var(--muted);
 }
 
 .cyber-logo--icon-only {
@@ -89,7 +89,7 @@ withDefaults(
 }
 
 .cyber-logo__accent {
-  stroke: var(--primary);
+  stroke: var(--brand-accent, var(--primary));
 }
 
 .cyber-logo__accent--top,
@@ -98,7 +98,7 @@ withDefaults(
 }
 
 .cyber-logo__node {
-  fill: var(--signal);
+  fill: var(--brand-node, var(--signal));
 }
 
 .cyber-logo__wordmark {

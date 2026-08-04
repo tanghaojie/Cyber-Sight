@@ -11,5 +11,5 @@ export const appConfig = Object.freeze({
   productLabel: configuredValue(import.meta.env.VITE_APP_PRODUCT_LABEL, 'SYSTEM SCAFFOLD'),
   creatorName: 'JTLab',
   creatorFullName: '桀士实验室',
-  primaryColor: '#70CFA2',
+  primaryColor: '#277A52',
 })

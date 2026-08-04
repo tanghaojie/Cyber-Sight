@@ -106,7 +106,11 @@ const { formatDateTime, t } = useLocalization()
   inset: 0;
   pointer-events: none;
   background-image:
-    radial-gradient(circle at 16% 0, rgba(112, 207, 162, 0.12), transparent 30%),
+    radial-gradient(
+      circle at 16% 0,
+      color-mix(in srgb, var(--brand-accent), transparent 84%),
+      transparent 30%
+    ),
     linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px);
   background-size:
     auto,
@@ -179,17 +183,17 @@ const { formatDateTime, t } = useLocalization()
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--primary);
-  box-shadow: 0 0 0 6px rgba(112, 207, 162, 0.1);
+  background: var(--brand-accent);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--brand-accent), transparent 86%);
 
   &.loading {
     background: var(--warning);
-    box-shadow: 0 0 0 6px rgba(201, 207, 112, 0.1);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--warning), transparent 86%);
   }
 
   &.error {
     background: var(--danger);
-    box-shadow: 0 0 0 6px rgba(207, 112, 134, 0.1);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--danger), transparent 86%);
   }
 }
 
@@ -206,8 +210,8 @@ const { formatDateTime, t } = useLocalization()
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--primary);
-    box-shadow: 0 0 0 6px rgba(112, 207, 162, 0.1);
+    background: var(--brand-accent);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--brand-accent), transparent 86%);
   }
 }
 </style>

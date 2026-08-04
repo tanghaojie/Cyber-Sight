@@ -2,7 +2,7 @@
 title: 前端系统设置模块
 status: active
 owner: maintainers
-updated: 2026-08-04
+updated: 2026-08-05
 ---
 
 # 前端系统设置模块
@@ -28,7 +28,7 @@ updated: 2026-08-04
 
 ## 公共接口与数据流
 
-`settings.store.ts` 导出 `useSettingsStore()`、`SystemSettings`、`NavigationMenuStyle`、`ThemeColor` 和 `DEFAULT_SYSTEM_SETTINGS`。`settings.theme.ts` 公开主题令牌元数据，供设置界面和主题控制器一致地使用。Store 公开只读 `settings`，并提供 `save(settings)` 和 `reset()`；`save()` 校验、克隆并写入浏览器存储。
+`settings.store.ts` 导出 `useSettingsStore()`、`SystemSettings`、`NavigationMenuStyle`、`ThemeColor` 和 `DEFAULT_SYSTEM_SETTINGS`。`settings.theme.ts` 公开六套主题元数据，供设置界面和主题控制器一致地使用。全局样式为每套主题分别定义浅色与深色的基础表面、文字、边界、品牌背景、Hero、光晕和状态令牌；组件不得直接写入某一主题的绿色。Store 公开只读 `settings`，并提供 `save(settings)` 和 `reset()`；`save()` 校验、克隆并写入浏览器存储。
 
 ```text
 AppHeader 用户下拉
@@ -50,7 +50,7 @@ AdminLayout
 
 模块只依赖 Pinia、Vue、本地化和 `shared/browserStorage`；应用根只通过登记的 ThemeController 公共文件挂载主题副作用，应用壳只通过登记的 Store 和 Dialog 公共文件消费本模块，模块不读取 Router、认证、导航或侧栏内部状态。
 
-损坏、旧版或字段不完整的存储内容会回退默认值。浏览器禁止或拒绝写入 `localStorage` 时，当前会话仍保留内存设置，刷新后的恢复不受保证。
+损坏、旧版或字段不完整的存储内容会回退默认值。浏览器禁止或拒绝写入 `localStorage` 时，当前会话仍保留内存设置，刷新后的恢复不受保证。深色规则必须以不低于主题浅色规则的选择器优先级覆盖所有表面令牌，避免主题专属浅色背景在深色模式下残留。
 
 AI 执行格式化、格式检查、TypeScript 检查、生产构建和最终 diff 检查，不创建或运行前端自动化测试。维护者人工验收应确认：每项选择无需保存即可应用和持久化、关闭弹窗不回滚、恢复默认值立即生效，刷新后六项设置恢复；六色主题与深色模式立即更新应用壳、基础表面、Element Plus 和设置弹窗；窄屏保持抽屉式侧边导航而不改写桌面偏好。
 

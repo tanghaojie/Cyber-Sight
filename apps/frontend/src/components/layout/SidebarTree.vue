@@ -155,8 +155,8 @@ function toggle(id: number): void {
 }
 
 .sidebar-link.router-link-active {
-  color: #102c23;
-  background: var(--primary);
+  color: var(--brand-accent-foreground);
+  background: var(--brand-accent);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
 }
 
@@ -172,7 +172,7 @@ function toggle(id: number): void {
 }
 
 .router-link-active .sidebar-node-icon {
-  background: rgba(16, 44, 35, 0.12);
+  background: color-mix(in srgb, var(--brand-accent-foreground), transparent 88%);
 }
 
 .sidebar-node-copy {
