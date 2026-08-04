@@ -11,7 +11,6 @@ export const localizationResource = defineLocalizationResource('settings', {
     'section.foundationDescription': '选择一套工作台基调',
     'section.experienceCode': '02 / 使用体验',
     'section.experienceTitle': '界面偏好',
-    'section.experienceDescription': '已保存，等待功能接入',
     'fields.navigationMenuStyle': '导航菜单风格',
     'fields.themeColor': '主题颜色',
     'navigation.sidebar.label': '侧边导航',
@@ -32,7 +31,7 @@ export const localizationResource = defineLocalizationResource('settings', {
     'preferences.sidebarLogo.description': '在侧栏上方显示 CYBER 品牌标识',
     'preferences.dynamicTitle.label': '动态标题',
     'preferences.dynamicTitle.description': '根据当前页面同步浏览器标签标题',
-    notice: '每项选择都会立即保存；已接入的功能会立刻更新。',
+    notice: '每项选择都会立即保存。',
   },
   'en-US': {
     'dropdown.open': 'System settings',
@@ -44,7 +43,6 @@ export const localizationResource = defineLocalizationResource('settings', {
     'section.foundationDescription': 'Choose the foundation for your workspace',
     'section.experienceCode': '02 / EXPERIENCE',
     'section.experienceTitle': 'Interface preferences',
-    'section.experienceDescription': 'Saved and waiting to be connected',
     'fields.navigationMenuStyle': 'Navigation menu style',
     'fields.themeColor': 'Theme color',
     'navigation.sidebar.label': 'Sidebar navigation',
@@ -65,6 +63,6 @@ export const localizationResource = defineLocalizationResource('settings', {
     'preferences.sidebarLogo.description': 'Show the CYBER brand mark above the sidebar',
     'preferences.dynamicTitle.label': 'Dynamic title',
     'preferences.dynamicTitle.description': 'Sync the browser tab title to the current page',
-    notice: 'Every selection is saved immediately; connected features update right away.',
+    notice: 'Every selection is saved immediately.',
   },
 })

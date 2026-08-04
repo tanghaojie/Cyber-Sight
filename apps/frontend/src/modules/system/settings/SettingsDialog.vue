@@ -103,7 +103,6 @@
             <span>{{ t('settings.section.experienceCode') }}</span>
             <h3 id="experience-heading">{{ t('settings.section.experienceTitle') }}</h3>
           </div>
-          <small>{{ t('settings.section.experienceDescription') }}</small>
         </div>
 
         <div class="settings-switch-list">
