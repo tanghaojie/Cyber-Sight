@@ -1,18 +1,31 @@
 <template>
-  <div class="app-shell" :class="{ 'app-shell--sidebar': useSidebarNavigation }">
+  <div class="app-shell" :class="{ 'app-shell--sidebar': showPersistentSidebar }">
+    <button
+      v-if="sidebarDrawerOpen"
+      class="app-shell__scrim"
+      type="button"
+      :aria-label="t('navigation.shell.closeMenu')"
+      @click="closeSidebarDrawer"
+    />
     <AppSidebar
-      v-if="useSidebarNavigation"
+      v-if="showPersistentSidebar || sidebarDrawerOpen"
       :items="navigation.items"
+      :drawer="!showPersistentSidebar"
+      :open="sidebarDrawerOpen"
       :loading="navigation.loading"
+      @close="closeSidebarDrawer"
+      @navigate="closeSidebarDrawer"
     />
     <section class="app-shell__content">
       <AppHeader
         :title="pageTitle"
         :menu-path="pageMenuPath"
         :items="navigation.items"
-        :show-top-navigation="!useSidebarNavigation"
+        :show-top-navigation="showTopNavigation"
+        :sidebar-open="sidebarIsOpen"
         :display-name="auth.user?.displayName"
         :roles="auth.user?.roles.map((role) => role.name)"
+        @toggle-sidebar="toggleSidebar"
         @logout="handleLogout"
       />
       <TagView
@@ -55,9 +68,18 @@ const settings = useSettingsStore()
 const tagView = useTagViewStore()
 const { t } = useLocalization()
 const narrowScreen = ref(matchesNarrowScreen())
-const useSidebarNavigation = computed(
-  () => narrowScreen.value || settings.settings.navigationMenuStyle === 'sidebar',
+const desktopSidebarVisible = ref(true)
+const sidebarDrawerOpen = ref(false)
+const showPersistentSidebar = computed(
+  () =>
+    !narrowScreen.value &&
+    settings.settings.navigationMenuStyle === 'sidebar' &&
+    desktopSidebarVisible.value,
 )
+const showTopNavigation = computed(
+  () => !narrowScreen.value && settings.settings.navigationMenuStyle === 'top',
+)
+const sidebarIsOpen = computed(() => showPersistentSidebar.value || sidebarDrawerOpen.value)
 let narrowScreenQuery: MediaQueryList | undefined
 const pageTitle = computed(() =>
   resolveLocalizedLabel(
@@ -108,6 +130,31 @@ function matchesNarrowScreen(): boolean {
 
 function synchronizeNarrowScreen(event: MediaQueryListEvent): void {
   narrowScreen.value = event.matches
+  if (!event.matches) {
+    sidebarDrawerOpen.value = false
+  }
+}
+
+watch(
+  () => settings.settings.navigationMenuStyle,
+  function synchronizeNavigationStyle(style) {
+    if (style === 'sidebar') {
+      desktopSidebarVisible.value = true
+    }
+    sidebarDrawerOpen.value = false
+  },
+)
+
+function toggleSidebar(): void {
+  if (!narrowScreen.value && settings.settings.navigationMenuStyle === 'sidebar') {
+    desktopSidebarVisible.value = !desktopSidebarVisible.value
+  } else {
+    sidebarDrawerOpen.value = !sidebarDrawerOpen.value
+  }
+}
+
+function closeSidebarDrawer(): void {
+  sidebarDrawerOpen.value = false
 }
 
 watch(
@@ -197,6 +244,15 @@ async function handleLogout(): Promise<void> {
   display: grid;
   grid-template-columns: var(--app-sidebar-width) minmax(0, 1fr);
   align-items: start;
+}
+
+.app-shell__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  border: 0;
+  background: rgba(9, 21, 16, 0.55);
+  backdrop-filter: blur(2px);
 }
 
 .app-shell__content {

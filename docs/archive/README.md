@@ -29,6 +29,7 @@
 
 ## 完成计划与 AI 协作记录
 
+- 2026-08-04：[导航抽屉行为修正计划](plans/2026-08-04-navigation-drawer-correction.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-04-navigation-drawer-correction.md)。
 - 2026-08-04：[导航菜单风格设置实施计划](plans/2026-08-04-navigation-style-settings.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-04-navigation-style-settings.md)。
 - 2026-08-04：[顶部级联导航实施计划](plans/2026-08-04-top-navigation.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-04-top-navigation.md)。
 - 2026-07-31：[移除部门编码实施计划](plans/2026-07-31-remove-department-code.md)及其[AI 协作记录](ai-logs/2026/07/2026-07-31-remove-department-code.md)。
