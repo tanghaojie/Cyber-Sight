@@ -2,6 +2,7 @@ import type { DataResourceDefinition, DataScopeType } from '@scaffold/api-contra
 
 // 功能权限键的代码侧目录，路由和菜单都引用这些稳定值，避免散落字符串。
 export const authorizationPermissionKeys = {
+  apiLogsRead: 'api_logs.read',
   departmentsManage: 'departments.manage',
   dictionariesManage: 'dictionaries.manage',
   menusManage: 'menus.manage',

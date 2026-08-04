@@ -123,6 +123,7 @@ describe('GET /health', () => {
       ['/auth/login', 'post', 'login'],
       ['/auth/logout', 'post', 'logout'],
       ['/auth/me', 'get', 'getCurrentUser'],
+      ['/admin/api-logs', 'get', 'listApiLogs'],
       ['/admin/users', 'get', 'listUsers'],
       ['/admin/users', 'post', 'createUser'],
       ['/admin/users/{id}', 'put', 'updateUser'],

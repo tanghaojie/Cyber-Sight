@@ -15,6 +15,8 @@ import { authorizationRoutes } from './modules/system/authorization/authorizatio
 import { registerAuthorization } from './modules/system/authorization/authorization.plugin.js'
 import type { AuthorizationProvider } from './modules/system/authorization/authorization.provider.js'
 import { departmentRoutes } from './modules/system/departments/departments.route.js'
+import apiLogsPlugin from './modules/system/api-logs/api-logs.plugin.js'
+import { apiLogRoutes } from './modules/system/api-logs/api-logs.routes.js'
 
 interface AppDependencies {
   jwtSecret?: string
@@ -46,12 +48,14 @@ export async function buildApp(
   app.register(sensible)
   await registerResponseHandling(app)
   await registerSwagger(app)
-  app.register(dbPlugin)
+  await app.register(dbPlugin)
+  await app.register(apiLogsPlugin)
   app.register(async function applicationRoutes(router) {
     // 授权插件先于路由注册，保证每条后续路由都经过元数据门禁和请求前检查。
     await registerAuthorization(router, dependencies.authorizationProvider)
     router.register(healthRoutes)
     router.register(authRoutes)
+    router.register(apiLogRoutes)
     router.register(authorizationRoutes)
     router.register(userRoutes)
     router.register(roleRoutes)

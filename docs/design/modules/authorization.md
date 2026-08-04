@@ -52,7 +52,7 @@ HTTP API：
 
 ## 功能权限模型
 
-模块在代码和迁移中登记稳定权限键，例如 `users.manage`、`roles.manage`、`departments.manage`、`menus.manage` 和 `dictionaries.manage`。`sys_permissions.key` 全局唯一且不复用；角色通过 `sys_role_permissions` 获得权限。
+模块在代码和迁移中登记稳定权限键，例如 `users.manage`、`roles.manage`、`departments.manage`、`menus.manage`、`dictionaries.manage` 和 `api_logs.read`。`sys_permissions.key` 全局唯一且不复用；角色通过 `sys_role_permissions` 获得权限。
 
 菜单可引用一个权限键。当前用户拥有该权限时菜单节点可见，目录祖先仅作为结构节点自动补齐。没有权限键的菜单对所有已认证用户可见。管理接口使用与对应页面相同的模块级权限键；后续可增加 `users.read`、`users.delete` 等细分键而无需替换数据模型。
 

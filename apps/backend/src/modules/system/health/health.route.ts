@@ -19,7 +19,7 @@ export async function healthRoutes(app: FastifyInstance): Promise<void> {
   app.get<{ Reply: HealthResponse }>(
     '/health',
     {
-      config: { authorization: { mode: 'public' } },
+      config: { authorization: { mode: 'public' }, apiLog: { enabled: false } },
       schema: {
         operationId: 'getHealth',
         tags: ['Health'],

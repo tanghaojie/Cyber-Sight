@@ -2,6 +2,7 @@
 export * from './shared/http.js'
 export * from './modules/health/index.js'
 export * from './modules/auth/auth.schema.js'
+export * from './modules/api-logs/api-logs.schema.js'
 export * from './modules/authorization/authorization.schema.js'
 export * from './modules/users/index.js'
 export * from './modules/roles/index.js'

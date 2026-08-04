@@ -48,14 +48,22 @@ function baselineMigrationSql(): string {
   return readFileSync(new URL(`../drizzle/${entry.tag}.sql`, import.meta.url), 'utf8')
 }
 
+function apiLogMigrationSql(): string {
+  return readFileSync(new URL('../drizzle/0001_luxuriant_violations.sql', import.meta.url), 'utf8')
+}
+
 describe('database migration baseline', () => {
-  it('collapses SQL, snapshot and journal history into one initial migration', () => {
+  it('keeps the initial baseline and appends later schema changes', () => {
     const journal = migrationJournal()
 
-    expect(journal.entries).toHaveLength(1)
+    expect(journal.entries).toHaveLength(2)
     expect(journal.entries[0]?.tag).toBe('0000_initial_system_schema')
-    expect(migrationFiles()).toEqual(['0000_initial_system_schema.sql'])
-    expect(snapshotFiles()).toEqual(['0000_snapshot.json'])
+    expect(journal.entries[1]?.tag).toBe('0001_luxuriant_violations')
+    expect(migrationFiles()).toEqual([
+      '0000_initial_system_schema.sql',
+      '0001_luxuriant_violations.sql',
+    ])
+    expect(snapshotFiles()).toEqual(['0000_snapshot.json', '0001_snapshot.json'])
   })
 
   it('creates every application table with the sys_ prefix', () => {
@@ -128,5 +136,15 @@ describe('database migration baseline', () => {
     }
     expect(migrationSql).not.toContain("'工作台'")
     expect(migrationSql).not.toContain("'首页'")
+  })
+
+  it('adds persistent API request logs and the administrator read permission', () => {
+    const migrationSql = apiLogMigrationSql()
+
+    expect(migrationSql).toContain('CREATE TABLE IF NOT EXISTS "sys_api_request_logs"')
+    expect(migrationSql).toContain('"expires_at" timestamp with time zone')
+    expect(migrationSql).toContain('"sys_api_request_logs_expires_at_index"')
+    expect(migrationSql).toContain("'api_logs.read'")
+    expect(migrationSql).not.toContain('DROP COLUMN')
   })
 })

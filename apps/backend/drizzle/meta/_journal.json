@@ -8,6 +8,13 @@
       "when": 1785419678915,
       "tag": "0000_initial_system_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1785866613648,
+      "tag": "0001_luxuriant_violations",
+      "breakpoints": true
     }
   ]
 }

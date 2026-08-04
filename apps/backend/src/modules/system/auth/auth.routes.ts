@@ -9,6 +9,7 @@ import {
   type LoginRequest,
 } from '@scaffold/api-contract'
 import { ErrorCode } from '@/shared/errors/error-codes.js'
+import { setApiLogActor } from '@/modules/system/api-logs/api-logs.plugin.js'
 import { failure, success } from '@/shared/http/response.js'
 import { authenticateCredentials, requireCurrentUser, revokeCurrentToken } from './auth.service.js'
 
@@ -20,7 +21,10 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
     '/auth/login',
     {
       // 登录是唯一公开认证路由，显式清空全局 Bearer 安全声明。
-      config: { authorization: { mode: 'public' } },
+      config: {
+        authorization: { mode: 'public' },
+        apiLog: { retention: 'permanent', actor: 'loginUsername' },
+      },
       schema: {
         operationId: 'login',
         summary: 'Sign in with username and password',
@@ -42,6 +46,8 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
       if (!loginData) {
         return failure(ErrorCode.INVALID_CREDENTIALS, 'Incorrect username or password')
       }
+      // 登录路由尚未进入认证 Hook；成功后显式提供操作者快照给永久审计记录。
+      setApiLogActor(request, loginData.user)
       return success(loginData)
     },
   )

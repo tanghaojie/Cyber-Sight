@@ -14,6 +14,7 @@
 - `drizzle.config.ts`：数据库迁移生成配置。
 - `src/modules/system/auth/`：密码散列、JWT、数据库 token 会话、进程内 LRU 读缓存、登录/退出和当前用户解析。
 - `src/modules/system/authorization/`：可注入 Provider、路由声明门禁、功能权限和数据范围解析。
+- `src/modules/system/api-logs/`：业务 API 最小日志采集、有界批量写入、90 天清理和管理员分页查询。
 - `src/modules/system/departments/`：部门树、闭包关系、管理 API 和公共组织查询。
 - `src/modules/system/users|roles|menus|dictionaries/`：独立管理 API 与仓储；菜单模块额外提供按有效权限过滤的当前用户导航树。
 

@@ -31,12 +31,13 @@ updated: 2026-07-30
 | `dataPolicyRules`       | `sys_data_policy_rules`       |
 | `dataPolicyDepartments` | `sys_data_policy_departments` |
 | `authSessions`          | `sys_auth_sessions`           |
+| `apiRequestLogs`        | `sys_api_request_logs`        |
 
 表属外键、唯一约束和显式索引也使用以对应物理表名开头的 `sys_` 名称，便于从数据库对象名直接识别归属。列名、枚举名、模块资源键和 HTTP 契约不因物理表前缀变化。
 
 ## 单一初始基线
 
-`apps/backend/drizzle/` 只保留一条 `0000` 初始迁移及其唯一 snapshot、journal。该迁移必须一次性创建最终 Schema，并写入脚手架运行所需的初始数据：
+`apps/backend/drizzle/0000_initial_system_schema.sql` 是初始迁移及其第一个 snapshot，必须一次性创建初始系统 Schema，并写入脚手架运行所需的初始数据：
 
 - 本地管理员、超级管理员角色及角色归属；
 - 权限目录、超级管理员功能权限及用户资源全量数据策略；
@@ -44,7 +45,7 @@ updated: 2026-07-30
 - `/sys`、`/config` 两个 `AdminLayout` 根目录、五个相对路径管理菜单及超级管理员的兼容菜单关系；静态首页不写入数据库；
 - 通用状态字典。
 
-后续 Schema 变化仍按正常规则追加新迁移，禁止再次改写已经在共享环境执行过的新基线。只有维护者再次明确宣布基线重置时，才能压缩历史。
+后续 Schema 变化按正常规则追加新迁移，禁止再次改写已经在共享环境执行过的新基线。`0001_luxuriant_violations` 新增 `sys_api_request_logs` 和 `api_logs.read` 初始授权；只有维护者再次明确宣布基线重置时，才能压缩历史。
 
 ## 发布与数据库切换
 
@@ -62,13 +63,13 @@ updated: 2026-07-30
 
 - 对旧库执行新基线：旧迁移 journal 与新基线不属于同一历史，可能跳过迁移或形成两套表；必须改用空库。
 - 只改表名不改初始数据 SQL：迁移会在种子或外键阶段失败；迁移测试必须扫描全部 SQL。
-- 漏加表前缀：Schema 测试枚举全部 14 张应用表并校验物理名称。
-- 快照、journal 与 SQL 不一致：`pnpm db:generate` 和迁移静态测试必须共同验证单一基线。
+- 漏加表前缀：Schema 测试枚举全部 15 张应用表并校验物理名称。
+- 快照、journal 与 SQL 不一致：`pnpm db:generate` 和迁移静态测试必须共同验证初始基线及全部追加迁移。
 
 ## 验证策略
 
 - Schema 测试验证全部应用表使用 `sys_` 前缀、表属索引/约束名称一致、审计字段及软删除唯一性不退化。
-- 迁移测试验证 journal 只有一个条目、目录只有一个 SQL 和一个 snapshot、最终 DDL/初始数据只引用 `sys_` 应用表。
+- 迁移测试验证初始迁移保持不变，追加迁移、snapshot 与 journal 连续一致，最终 DDL/初始数据只引用 `sys_` 应用表。
 - `pnpm test`、`pnpm build`、`pnpm lint`、`pnpm format:check` 验证后端、类型和静态质量。
 - 有可用空 PostgreSQL 数据库时，在新库执行迁移后运行 `pnpm test:db`；不得用维护者现有数据库代替空库验证。
 

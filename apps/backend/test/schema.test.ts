@@ -2,6 +2,7 @@ import { getTableColumns } from 'drizzle-orm'
 import { getTableConfig, type PgTable } from 'drizzle-orm/pg-core'
 import { describe, expect, it } from 'vitest'
 import {
+  apiRequestLogs,
   authSessions,
   dataPolicyDepartments,
   dataPolicyRules,
@@ -20,6 +21,7 @@ import {
 
 // 集中枚举框架系统表，确保新增表不会遗漏物理前缀、软删除与审计字段。
 const systemTables: Array<{ table: PgTable; name: string }> = [
+  { table: apiRequestLogs, name: 'sys_api_request_logs' },
   { table: users, name: 'sys_users' },
   { table: roles, name: 'sys_roles' },
   { table: userRoles, name: 'sys_user_roles' },
@@ -158,5 +160,20 @@ describe('soft-delete uniqueness', () => {
   it('keeps persisted session token hashes globally unique', () => {
     expect(authSessions.tokenHash.isUnique).toBe(true)
     expect(authSessions.tokenHash.uniqueName).toBe('sys_auth_sessions_token_hash_unique')
+  })
+})
+
+describe('API request log storage', () => {
+  it('keeps only minimal request-result metadata and retention fields', () => {
+    const columns = getTableColumns(apiRequestLogs)
+
+    expect(columns).toHaveProperty('occurredAt')
+    expect(columns).toHaveProperty('expiresAt')
+    expect(columns).toHaveProperty('requestId')
+    expect(columns).toHaveProperty('actorUserId')
+    expect(columns).toHaveProperty('actorUsername')
+    expect(columns).toHaveProperty('businessStatus')
+    expect(columns).not.toHaveProperty('requestBody')
+    expect(columns).not.toHaveProperty('responseBody')
   })
 })
