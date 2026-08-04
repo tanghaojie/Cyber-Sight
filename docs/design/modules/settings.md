@@ -28,7 +28,7 @@ updated: 2026-08-05
 
 ## 公共接口与数据流
 
-`settings.store.ts` 导出 `useSettingsStore()`、`SystemSettings`、`NavigationMenuStyle`、`ThemeColor` 和 `DEFAULT_SYSTEM_SETTINGS`。`settings.theme.ts` 公开六套主题元数据，供设置界面和主题控制器一致地使用。全局样式为每套主题分别定义浅色与深色的基础表面、文字、边界、品牌背景、Hero、光晕和状态令牌；组件不得直接写入某一主题的绿色。Store 公开只读 `settings`，并提供 `save(settings)` 和 `reset()`；`save()` 校验、克隆并写入浏览器存储。
+`settings.store.ts` 导出 `useSettingsStore()`、`SystemSettings`、`NavigationMenuStyle`、`ThemeColor` 和 `DEFAULT_SYSTEM_SETTINGS`。`settings.theme.ts` 公开六套主题元数据，供设置界面和主题控制器一致地使用。全局样式为每套主题分别定义浅色与深色的基础表面、文字、边界、品牌背景、Hero 和光晕令牌；健康状态始终使用固定的语义色：正常为绿色、加载为白色、异常为红色，不随主题切换。Store 公开只读 `settings`，并提供 `save(settings)` 和 `reset()`；`save()` 校验、克隆并写入浏览器存储。
 
 ```text
 AppHeader 用户下拉

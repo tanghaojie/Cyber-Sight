@@ -183,12 +183,12 @@ const { formatDateTime, t } = useLocalization()
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--health-ok);
-  box-shadow: 0 0 0 6px color-mix(in srgb, var(--health-ok), transparent 86%);
+  background: var(--success);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--success), transparent 86%);
 
   &.loading {
-    background: var(--warning);
-    box-shadow: 0 0 0 6px color-mix(in srgb, var(--warning), transparent 86%);
+    background: #ffffff;
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.14);
   }
 
   &.error {
@@ -210,8 +210,8 @@ const { formatDateTime, t } = useLocalization()
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--health-ok);
-    box-shadow: 0 0 0 6px color-mix(in srgb, var(--health-ok), transparent 86%);
+    background: var(--success);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--success), transparent 86%);
   }
 }
 </style>
