@@ -268,8 +268,6 @@ function restoreDefaults(): void {
   }
 
   .el-dialog__body {
-    max-height: min(62vh, 600px);
-    overflow-y: auto;
     padding: 6px 30px 10px;
   }
 
@@ -667,7 +665,6 @@ function restoreDefaults(): void {
     }
 
     .el-dialog__body {
-      max-height: 64vh;
       padding: 4px 20px 8px;
     }
 
