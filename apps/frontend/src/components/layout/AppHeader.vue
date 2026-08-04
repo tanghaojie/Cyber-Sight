@@ -3,13 +3,14 @@
     <div class="app-header__leading">
       <button
         class="app-header__menu-button"
+        :class="{ 'app-header__menu-button--open': sidebarOpen }"
         type="button"
         :aria-label="sidebarOpen ? t('navigation.shell.closeMenu') : t('navigation.shell.openMenu')"
         aria-controls="app-sidebar"
         :aria-expanded="sidebarOpen"
         @click="$emit('toggle-sidebar')"
       >
-        <AppIcon :name="sidebarOpen ? 'close' : 'panel'" />
+        <AppIcon name="panel" />
       </button>
       <div class="app-header__title-group">
         <p class="app-header__menu-path">{{ menuPath }}</p>
@@ -126,6 +127,7 @@ function handleCommand(command: string) {
 }
 
 .app-header__menu-button {
+  position: relative;
   display: grid;
   width: 44px;
   height: 44px;
@@ -145,6 +147,25 @@ function handleCommand(command: string) {
     border-color: var(--primary);
     color: var(--primary-deep);
     transform: translateY(-2px);
+  }
+}
+
+.app-header__menu-button--open {
+  border-color: rgba(18, 60, 49, 0.3);
+  color: var(--primary-deep);
+  background: rgba(112, 207, 162, 0.16);
+
+  &::after {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 6px;
+    height: 6px;
+    border: 2px solid var(--surface);
+    border-radius: 50%;
+    background: var(--primary-deep);
+    box-shadow: 0 0 0 1px rgba(18, 60, 49, 0.15);
+    content: '';
   }
 }
 
