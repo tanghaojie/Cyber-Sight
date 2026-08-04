@@ -46,12 +46,13 @@
                 :key="option.value"
                 class="settings-style-option"
                 :class="{
-                  'settings-style-option--active': draft.navigationMenuStyle === option.value,
+                  'settings-style-option--active':
+                    settingsStore.settings.navigationMenuStyle === option.value,
                 }"
                 type="button"
                 role="radio"
-                :aria-checked="draft.navigationMenuStyle === option.value"
-                @click="draft.navigationMenuStyle = option.value"
+                :aria-checked="settingsStore.settings.navigationMenuStyle === option.value"
+                @click="updateSettings({ navigationMenuStyle: option.value })"
               >
                 <span class="settings-style-option__preview" :class="`is-${option.value}`">
                   <i /><i /><i />
@@ -73,11 +74,14 @@
                 v-for="option in themeColors"
                 :key="option.value"
                 class="settings-theme-option"
-                :class="{ 'settings-theme-option--active': draft.themeColor === option.value }"
+                :class="{
+                  'settings-theme-option--active':
+                    settingsStore.settings.themeColor === option.value,
+                }"
                 type="button"
                 role="radio"
-                :aria-checked="draft.themeColor === option.value"
-                @click="draft.themeColor = option.value"
+                :aria-checked="settingsStore.settings.themeColor === option.value"
+                @click="updateSettings({ themeColor: option.value })"
               >
                 <span
                   class="settings-theme-option__swatch"
@@ -106,7 +110,10 @@
               <b>{{ option.label }}</b>
               <small>{{ option.description }}</small>
             </span>
-            <el-switch v-model="draft[option.key]" />
+            <el-switch
+              :model-value="settingsStore.settings[option.key]"
+              @update:model-value="updateSwitchSetting(option.key, $event)"
+            />
           </label>
         </div>
       </section>
@@ -119,17 +126,14 @@
         <button class="settings-dialog__reset" type="button" @click="restoreDefaults">
           <RefreshLeft />{{ t('shared.actions.reset') }}
         </button>
-        <div>
-          <el-button text @click="handleCancel">{{ t('shared.actions.cancel') }}</el-button>
-          <el-button type="primary" @click="handleSave">{{ t('settings.actions.save') }}</el-button>
-        </div>
+        <el-button text @click="handleCancel">{{ t('shared.actions.cancel') }}</el-button>
       </div>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import {
   CollectionTag,
   Connection,
@@ -140,7 +144,6 @@ import {
 } from '@element-plus/icons-vue'
 import { useLocalization } from '@/modules/system/localization/localization'
 import {
-  DEFAULT_SYSTEM_SETTINGS,
   useSettingsStore,
   type NavigationMenuStyle,
   type SystemSettings,
@@ -170,7 +173,6 @@ interface SwitchOption {
 
 const visible = defineModel<boolean>({ default: false })
 const settingsStore = useSettingsStore()
-const draft = ref<SystemSettings>(createDraft(settingsStore.settings))
 const { t } = useLocalization()
 const navigationStyles = computed<readonly NavigationStyleOption[]>(() => [
   {
@@ -217,27 +219,24 @@ const switchOptions = computed<readonly SwitchOption[]>(() => [
   },
 ])
 
-watch(visible, function synchronizeDraft(open) {
-  if (open) {
-    draft.value = createDraft(settingsStore.settings)
-  }
-})
-
-function createDraft(source: Readonly<SystemSettings>): SystemSettings {
-  return { ...source }
-}
-
 function handleCancel(): void {
   visible.value = false
 }
 
-function handleSave(): void {
-  settingsStore.save(draft.value)
-  visible.value = false
+function updateSettings(value: Partial<SystemSettings>): void {
+  settingsStore.save({ ...settingsStore.settings, ...value })
+}
+
+function updateSwitchSetting(key: SwitchSettingKey, value: boolean | string | number): void {
+  if (typeof value !== 'boolean') {
+    return
+  }
+
+  updateSettings({ [key]: value })
 }
 
 function restoreDefaults(): void {
-  draft.value = createDraft(DEFAULT_SYSTEM_SETTINGS)
+  settingsStore.reset()
 }
 </script>
 
@@ -613,18 +612,6 @@ function restoreDefaults(): void {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-
-  > div {
-    display: flex;
-    gap: 8px;
-  }
-
-  .el-button--primary {
-    min-width: 98px;
-    border-color: var(--settings-green);
-    background: var(--settings-green);
-    box-shadow: 0 8px 16px rgba(36, 107, 81, 0.18);
-  }
 }
 
 .settings-dialog__reset {
@@ -682,13 +669,7 @@ function restoreDefaults(): void {
   }
 
   .settings-dialog__footer {
-    align-items: flex-start;
-    flex-direction: column;
-
-    > div {
-      width: 100%;
-      justify-content: flex-end;
-    }
+    gap: 10px;
   }
 }
 </style>
