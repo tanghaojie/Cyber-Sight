@@ -1,5 +1,11 @@
 <template>
-  <div class="app-shell" :class="{ 'app-shell--sidebar': showPersistentSidebar }">
+  <div
+    class="app-shell"
+    :class="{
+      'app-shell--sidebar': showPersistentSidebar,
+      'app-shell--without-tag-view': !settings.settings.tagsView,
+    }"
+  >
     <button
       v-if="sidebarDrawerOpen"
       class="app-shell__scrim"
@@ -13,6 +19,7 @@
       :drawer="!showPersistentSidebar"
       :open="sidebarDrawerOpen"
       :loading="navigation.loading"
+      :show-logo="settings.settings.sidebarLogo"
       @close="closeSidebarDrawer"
       @navigate="closeSidebarDrawer"
     />
@@ -29,6 +36,7 @@
         @logout="handleLogout"
       />
       <TagView
+        v-if="settings.settings.tagsView"
         :tags="localizedTags"
         :active-path="route.path"
         @navigate="handleTagNavigation"
@@ -244,6 +252,10 @@ async function handleLogout(): Promise<void> {
   display: grid;
   grid-template-columns: var(--app-sidebar-width) minmax(0, 1fr);
   align-items: start;
+}
+
+.app-shell--without-tag-view {
+  --tag-view-height: 0px;
 }
 
 .app-shell__scrim {

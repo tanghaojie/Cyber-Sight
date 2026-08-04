@@ -19,7 +19,7 @@ updated: 2026-07-31
 
 - `TagView.vue` 是模块公开的标签导航组件，展示历史、当前项和操作入口，并通过事件请求导航或关闭。
 - `tag-view.store.ts` 是模块公开的 Pinia Store，拥有历史数据、账号作用域切换、持久化和关闭规则。
-- `AdminLayout.vue` 是应用组合点：把当前路由同步给 Store，并把组件事件转换为 Router 导航。
+- `AdminLayout.vue` 是应用组合点：把当前路由同步给 Store，按 `settings.store.ts` 的公开 `tagsView` 偏好控制导航组件可见性，并把组件事件转换为 Router 导航。关闭可见性不会清除或停止记录历史，因此重新开启后可恢复当前账号的标签。
 - 模块不依赖 `auth`、`navigation` 或任何页面模块。账号 ID、当前路径和标题均由应用壳通过公共命令传入。
 
 ## 公共接口

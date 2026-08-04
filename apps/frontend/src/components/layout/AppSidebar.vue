@@ -5,10 +5,11 @@
     :class="{
       'app-sidebar--drawer': drawer,
       'app-sidebar--open': !drawer || open,
+      'app-sidebar--without-logo': !showLogo,
     }"
   >
     <div class="sidebar-atmosphere" />
-    <header class="sidebar-brand">
+    <header v-if="showLogo" class="sidebar-brand">
       <CyberLogo class="sidebar-logo" tone="light" />
       <button
         v-if="drawer"
@@ -20,6 +21,15 @@
         <AppIcon name="close" />
       </button>
     </header>
+    <button
+      v-else-if="drawer"
+      class="sidebar-close sidebar-close--floating"
+      type="button"
+      :aria-label="t('navigation.shell.closeMenu')"
+      @click="$emit('close')"
+    >
+      <AppIcon name="close" />
+    </button>
     <nav class="sidebar-navigation" :aria-label="t('navigation.shell.mainNavigation')">
       <!-- 菜单树来自当前用户导航 Store；空态区分正在请求和确实无可用菜单。 -->
       <SidebarTree v-if="items.length" :items="items" @navigate="$emit('navigate')" />
@@ -52,10 +62,17 @@ import { useHealth } from '@/modules/system/health/composables/useHealth'
 import { useLocalization } from '@/modules/system/localization/localization'
 
 withDefaults(
-  defineProps<{ items: NavigationMenu[]; drawer?: boolean; open?: boolean; loading?: boolean }>(),
+  defineProps<{
+    items: NavigationMenu[]
+    drawer?: boolean
+    open?: boolean
+    loading?: boolean
+    showLogo?: boolean
+  }>(),
   {
     drawer: false,
     open: true,
+    showLogo: true,
   },
 )
 defineEmits<{ close: []; navigate: [] }>()
@@ -146,11 +163,23 @@ const { formatDateTime, t } = useLocalization()
   background: rgba(255, 255, 255, 0.08);
 }
 
+.sidebar-close--floating {
+  position: absolute;
+  z-index: 1;
+  top: 19px;
+  right: 24px;
+  margin-left: 0;
+}
+
 .sidebar-navigation {
   position: relative;
   overflow-y: auto;
   flex: 1;
   padding: 22px 12px;
+}
+
+.app-sidebar--drawer.app-sidebar--without-logo .sidebar-navigation {
+  padding-top: 70px;
 }
 
 .sidebar-status {
