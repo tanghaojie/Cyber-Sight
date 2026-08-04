@@ -2,27 +2,27 @@
 title: 前端系统设置模块
 status: active
 owner: maintainers
-updated: 2026-07-31
+updated: 2026-08-04
 ---
 
 # 前端系统设置模块
 
 ## 背景与目标
 
-管理端需要集中配置用户界面偏好，但首轮只提供可恢复的设置入口和数据模型，不提前改变既有应用壳行为。`settings` 将配置保存在当前浏览器，后续功能按项接入时消费同一份公开状态。
+管理端需要集中配置用户界面偏好。`settings` 将配置保存在当前浏览器；导航菜单风格已接入应用壳，其余设置项保留待后续功能接入。
 
 ## 范围与非目标
 
 本模块提供 Header 用户菜单入口、系统设置 Dialog、导航菜单风格、主题颜色、深色模式、Tags View、侧栏 Logo 与动态标题六项配置，以及本地持久化和安全降级。
 
-本模块不请求或保存后端配置，不同步跨浏览器/设备，不修改当前导航布局、CSS 主题、深色模式、TagView、侧栏品牌或浏览器标题的实际行为。每项功能的应用逻辑由后续独立变更接入。
+本模块不请求或保存后端配置，不同步跨浏览器/设备。导航菜单风格以外的 CSS 主题、深色模式、TagView、侧栏品牌或浏览器标题仍不改变实际行为；每项功能由后续独立变更接入。
 
 ## 职责与边界
 
 - `settings.store.ts` 是模块的设置数据所有者：恢复、校验、暂存提交和清除浏览器数据。
 - `SettingsDialog.vue` 是模块公开的编辑界面：只编辑草稿，保存时提交到 Store，取消时不改变已保存配置。
 - `settings.locales.ts` 是模块的固定中英文界面文案；资源加载器自动发现并校验键集合。
-- `AppHeader.vue` 是应用壳组件：通过 `SettingsDialog` 展示入口，不读取或解释具体设置值。
+- `AdminLayout.vue` 消费 `settings.store.ts` 的公开设置并决定应用壳使用顶部或侧边导航；`AppHeader.vue` 只通过 `SettingsDialog` 展示设置入口。
 - `shared/browserStorage.ts` 仅提供安全的浏览器存储访问；不拥有任何设置键或业务语义。
 
 ## 公共接口
@@ -39,6 +39,11 @@ AppHeader 用户下拉
     -> SettingsDialog 草稿
         -> settings.store.save()
             -> localStorage: cyber_system_settings:v1
+
+AdminLayout
+    -> settings.store.settings.navigationMenuStyle
+    -> matchMedia('(max-width: 1023px)')
+    -> 顶部导航 或 始终显示的侧边导航
 ```
 
 配置结构为：
@@ -52,16 +57,16 @@ AppHeader 用户下拉
 
 存储值必须是完整、已知的对象；任何键缺失、类型不匹配或 JSON 损坏时回退默认值。`localStorage` 不可用、空间不足或浏览器策略限制时保留当前会话内存值，不能阻断管理端使用。
 
+桌面宽度下，保存的 `navigationMenuStyle` 直接决定导航呈现。`max-width: 1023px` 的窄屏始终优先使用侧边导航，且不改写用户保存的首选项；窗口恢复到桌面宽度后自动恢复保存的风格。侧边模式的导航栏不使用打开、关闭或遮罩交互，始终占据应用壳左侧。
+
 ## 依赖关系
 
 ```text
-AppHeader
-    -> SettingsDialog.vue
-        -> settings.store.ts
-            -> Pinia + Vue + shared/browserStorage
+AppHeader -> SettingsDialog.vue -> settings.store.ts -> Pinia + Vue + shared/browserStorage
+AdminLayout -> settings.store.ts
 ```
 
-依赖只从应用壳流向模块公开文件。模块不读取 Router、认证、导航、TagView 或侧栏内部状态，避免在预留阶段形成反向耦合。
+依赖只从应用壳流向模块公开文件。模块不读取 Router、认证、导航、TagView 或侧栏内部状态；应用壳通过 Store 的公开设置决定呈现，避免反向耦合。
 
 ## 失败模式与安全考虑
 
@@ -76,7 +81,8 @@ AppHeader
 
 1. 用户下拉可打开系统设置，并能取消、保存与恢复默认值。
 2. 刷新页面后六项已保存值恢复，损坏的 `localStorage` 值不影响应用启动。
-3. 窄屏和桌面下弹窗可滚动、操作可达，关闭后不触发任何预留功能。
+3. 保存侧边/顶部风格后刷新页面，桌面端恢复对应布局；窄屏强制侧边导航，恢复宽度后回到保存风格。
+4. 侧边模式没有隐藏、显示或关闭按钮，导航始终可见。
 
 ## 兼容性与迁移
 

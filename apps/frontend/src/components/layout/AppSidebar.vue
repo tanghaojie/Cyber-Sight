@@ -1,20 +1,12 @@
 <template>
-  <aside id="app-sidebar" class="app-sidebar" :class="{ 'app-sidebar--open': open }">
+  <aside id="app-sidebar" class="app-sidebar">
     <div class="sidebar-atmosphere" />
     <header class="sidebar-brand">
       <CyberLogo class="sidebar-logo" tone="light" />
-      <button
-        class="sidebar-close"
-        type="button"
-        :aria-label="t('navigation.shell.closeMenu')"
-        @click="$emit('close')"
-      >
-        <AppIcon name="close" />
-      </button>
     </header>
     <nav class="sidebar-navigation" :aria-label="t('navigation.shell.mainNavigation')">
       <!-- 菜单树来自当前用户导航 Store；空态区分正在请求和确实无可用菜单。 -->
-      <SidebarTree v-if="items.length" :items="items" @navigate="$emit('navigate')" />
+      <SidebarTree v-if="items.length" :items="items" />
       <div v-else class="sidebar-empty">
         <span />{{
           loading ? t('navigation.shell.loadingNavigation') : t('navigation.shell.emptyNavigation')
@@ -37,14 +29,12 @@
 
 <script setup lang="ts">
 import type { NavigationMenu } from '@scaffold/api-contract'
-import AppIcon from '@/components/AppIcon.vue'
 import CyberLogo from '@/components/brand/CyberLogo.vue'
 import SidebarTree from './SidebarTree.vue'
 import { useHealth } from '@/modules/system/health/composables/useHealth'
 import { useLocalization } from '@/modules/system/localization/localization'
 
-defineProps<{ items: NavigationMenu[]; open: boolean; loading?: boolean }>()
-defineEmits<{ close: []; navigate: [] }>()
+defineProps<{ items: NavigationMenu[]; loading?: boolean }>()
 
 const { status, timestamp, error } = useHealth()
 const { formatDateTime, t } = useLocalization()
@@ -52,31 +42,18 @@ const { formatDateTime, t } = useLocalization()
 
 <style lang="scss" scoped>
 .app-sidebar {
-  position: fixed;
-  inset: 0 auto 0 0;
-  z-index: 40;
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
-  width: min(280px, calc(100vw - 48px));
+  width: var(--app-sidebar-width);
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
   flex-direction: column;
-  visibility: hidden;
   color: var(--sidebar-text);
   background: linear-gradient(180deg, var(--sidebar-surface) 0%, var(--sidebar-surface-deep) 100%);
-  box-shadow: 18px 0 48px rgba(4, 7, 6, 0.24);
-  pointer-events: none;
-  transform: translate3d(-100%, 0, 0);
-  transition:
-    transform 0.3s ease,
-    visibility 0s linear 0.3s;
-}
-
-.app-sidebar--open {
-  visibility: visible;
-  pointer-events: auto;
-  transform: translate3d(0, 0, 0);
-  transition-delay: 0s;
+  box-shadow: 12px 0 36px rgba(4, 7, 6, 0.14);
 }
 
 .sidebar-atmosphere {
@@ -106,18 +83,6 @@ const { formatDateTime, t } = useLocalization()
     --cyber-logo-wordmark-size: 15px;
     --cyber-logo-descriptor-size: 7px;
   }
-}
-
-.sidebar-close {
-  display: none;
-  width: 34px;
-  height: 34px;
-  margin-left: auto;
-  place-items: center;
-  border: 0;
-  border-radius: 11px;
-  color: rgba(255, 255, 255, 0.68);
-  background: rgba(255, 255, 255, 0.08);
 }
 
 .sidebar-navigation {
@@ -186,18 +151,6 @@ const { formatDateTime, t } = useLocalization()
     border-radius: 50%;
     background: var(--primary);
     box-shadow: 0 0 0 6px rgba(112, 207, 162, 0.1);
-  }
-}
-
-@media (min-width: 1024px) {
-  .app-sidebar {
-    display: none;
-  }
-}
-
-@media (max-width: 1023px) {
-  .sidebar-close {
-    display: grid;
   }
 }
 </style>

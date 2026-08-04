@@ -1,22 +1,13 @@
 <template>
   <header class="app-header">
     <div class="app-header__leading">
-      <button
-        class="app-header__menu-button"
-        type="button"
-        :aria-label="t('navigation.shell.openMenu')"
-        aria-controls="app-sidebar"
-        @click="$emit('open-menu')"
-      >
-        <AppIcon name="panel" />
-      </button>
       <div class="app-header__title-group">
         <p class="app-header__menu-path">{{ menuPath }}</p>
         <h1 class="app-header__title">{{ title }}</h1>
       </div>
     </div>
 
-    <TopNavigation :items="items" />
+    <TopNavigation v-if="showTopNavigation" :items="items" />
 
     <div class="app-header__actions">
       <LanguageSwitcher compact />
@@ -51,7 +42,6 @@
 import { computed, ref } from 'vue'
 import { ArrowDown, Setting, SwitchButton } from '@element-plus/icons-vue'
 import type { NavigationMenu } from '@scaffold/api-contract'
-import AppIcon from '@/components/AppIcon.vue'
 import TopNavigation from '@/components/layout/TopNavigation.vue'
 import LanguageSwitcher from '@/modules/system/localization/LanguageSwitcher.vue'
 import { useLocalization } from '@/modules/system/localization/localization'
@@ -61,14 +51,12 @@ const props = defineProps<{
   title: string
   menuPath: string
   items: NavigationMenu[]
+  showTopNavigation: boolean
   displayName?: string
   roles?: string[]
 }>()
 
-const emit = defineEmits<{
-  'open-menu': []
-  logout: []
-}>()
+const emit = defineEmits<{ logout: [] }>()
 
 const { t } = useLocalization()
 const initials = computed(() => props.displayName?.slice(0, 1).toUpperCase() ?? 'A')
@@ -113,7 +101,6 @@ function handleCommand(command: string) {
 .app-header__leading {
   min-width: 0;
   flex: 0 1 auto;
-  gap: 16px;
 }
 
 .app-header__actions {
@@ -123,27 +110,6 @@ function handleCommand(command: string) {
 
 .top-navigation {
   display: none;
-}
-
-.app-header__menu-button {
-  display: grid;
-  width: 44px;
-  height: 44px;
-  flex: 0 0 auto;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  color: var(--ink-soft);
-  background: var(--surface);
-  box-shadow: 0 4px 12px rgba(18, 60, 49, 0.06);
-  transition:
-    border-color 0.18s ease,
-    transform 0.18s ease;
-
-  &:hover {
-    border-color: var(--primary);
-    transform: translateY(-2px);
-  }
 }
 
 .app-header__title-group {
@@ -289,10 +255,6 @@ function handleCommand(command: string) {
   .app-header {
     padding-right: 40px;
     padding-left: 40px;
-  }
-
-  .app-header__menu-button {
-    display: none;
   }
 
   .top-navigation {
