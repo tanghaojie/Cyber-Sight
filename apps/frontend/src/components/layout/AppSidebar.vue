@@ -183,8 +183,8 @@ const { formatDateTime, t } = useLocalization()
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--brand-accent);
-  box-shadow: 0 0 0 6px color-mix(in srgb, var(--brand-accent), transparent 86%);
+  background: var(--health-ok);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--health-ok), transparent 86%);
 
   &.loading {
     background: var(--warning);
@@ -210,8 +210,8 @@ const { formatDateTime, t } = useLocalization()
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--brand-accent);
-    box-shadow: 0 0 0 6px color-mix(in srgb, var(--brand-accent), transparent 86%);
+    background: var(--health-ok);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--health-ok), transparent 86%);
   }
 }
 </style>
