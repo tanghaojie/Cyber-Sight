@@ -16,6 +16,8 @@
       </div>
     </div>
 
+    <TopNavigation :items="items" />
+
     <div class="app-header__actions">
       <LanguageSwitcher compact />
       <el-dropdown trigger="click" @command="handleCommand">
@@ -48,7 +50,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { ArrowDown, Setting, SwitchButton } from '@element-plus/icons-vue'
+import type { NavigationMenu } from '@scaffold/api-contract'
 import AppIcon from '@/components/AppIcon.vue'
+import TopNavigation from '@/components/layout/TopNavigation.vue'
 import LanguageSwitcher from '@/modules/system/localization/LanguageSwitcher.vue'
 import { useLocalization } from '@/modules/system/localization/localization'
 import SettingsDialog from '@/modules/system/settings/SettingsDialog.vue'
@@ -56,6 +60,7 @@ import SettingsDialog from '@/modules/system/settings/SettingsDialog.vue'
 const props = defineProps<{
   title: string
   menuPath: string
+  items: NavigationMenu[]
   displayName?: string
   roles?: string[]
 }>()
@@ -107,12 +112,17 @@ function handleCommand(command: string) {
 
 .app-header__leading {
   min-width: 0;
+  flex: 0 1 auto;
   gap: 16px;
 }
 
 .app-header__actions {
   flex: 0 0 auto;
   gap: 12px;
+}
+
+.top-navigation {
+  display: none;
 }
 
 .app-header__menu-button {
@@ -283,6 +293,14 @@ function handleCommand(command: string) {
 
   .app-header__menu-button {
     display: none;
+  }
+
+  .top-navigation {
+    display: block;
+  }
+
+  .app-header__title-group {
+    max-width: 210px;
   }
 }
 </style>

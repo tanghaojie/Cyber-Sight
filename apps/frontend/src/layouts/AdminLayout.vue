@@ -19,6 +19,7 @@
       <AppHeader
         :title="pageTitle"
         :menu-path="pageMenuPath"
+        :items="navigation.items"
         :display-name="auth.user?.displayName"
         :roles="auth.user?.roles.map((role) => role.name)"
         @open-menu="sidebarOpen = true"
@@ -192,19 +193,8 @@ async function handleLogout(): Promise<void> {
 }
 
 @media (min-width: 1024px) {
-  .app-shell {
-    display: grid;
-    grid-template-columns: 280px minmax(0, 1fr);
-    align-items: start;
-  }
-
   .app-shell__scrim {
     display: none;
-  }
-
-  .app-shell__content {
-    grid-column: 2;
-    grid-row: 1;
   }
 }
 </style>

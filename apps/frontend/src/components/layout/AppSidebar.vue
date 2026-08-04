@@ -191,17 +191,7 @@ const { formatDateTime, t } = useLocalization()
 
 @media (min-width: 1024px) {
   .app-sidebar {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    grid-column: 1;
-    grid-row: 1;
-    width: 280px;
-    visibility: visible;
-    box-shadow: 12px 0 36px rgba(4, 7, 6, 0.14);
-    pointer-events: auto;
-    transform: none;
-    transition: none;
+    display: none;
   }
 }
 

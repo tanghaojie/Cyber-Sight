@@ -2,7 +2,7 @@
 title: 前端应用与应用壳
 status: active
 owner: maintainers
-updated: 2026-07-31
+updated: 2026-08-04
 ---
 
 # 前端应用与应用壳
@@ -30,7 +30,7 @@ updated: 2026-07-31
 - `src/router/dynamicRoutes.ts`：根据菜单树生成、注册和清理动态路由。
 - `src/router/index.ts`：创建 Router，组装静态路由、最终 404 和认证守卫。
 - `src/bootstrap/registerHttpErrorHandler.ts`：组装 Router、认证、导航和全局 HTTP 错误动作。
-- `src/components/layout/` 与 `src/layouts/AdminLayout.vue`：侧栏、顶栏、内容出口和移动抽屉。
+- `src/components/layout/` 与 `src/layouts/AdminLayout.vue`：桌面级联顶部导航、移动侧栏抽屉、顶栏和内容出口。
 - `src/modules/system/tag-view/`：账号隔离的页面标签历史、浏览器持久化和标签控制界面。
 - `src/modules/system/settings/`：设备级系统界面偏好、版本化浏览器持久化和设置 Dialog；实际功能按项后续接入。
 - `src/modules/system/localization/`：默认中文的运行时语言状态、模块和 shared 资源发现、Element Plus
@@ -57,7 +57,7 @@ cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie�
 3. `navigation.store.ts` 通过 `navigation.api.ts` 获取 `GET /navigation/menus`，先把相对路径按目录层级解析为规范绝对路径，再缓存树和扁平列表。
 4. `dynamicRoutes.ts` 递归生成路由。`directory` 使用显式布局或 `RouterView` 并承载子路由；`menu` 使用已登记页面，显式布局存在时创建只有一个空路径子项的布局包装，否则直接加载页面；`button` 不注册站内路由。菜单路由保留原始 `meta.title` 和 `meta.menuPath`，并额外保存可响应语言切换的 `localizedTitle` 与 `localizedMenuPath` 标签描述；应用壳解析后展示当前语言标题路径。
 5. 每棵根菜单子树通过 `router.addRoute()` 注册。刷新菜单、退出或 401 时调用移除函数并重置 `routesReady`。
-6. `SidebarTree.vue` 只渲染有子项的目录、站内菜单和外链按钮；空目录不会显示。外链按钮仅打开 HTTP(S) 地址。
+6. 宽度不小于 `1024px` 时，`AppHeader` 使用递归 `TopNavigation.vue` 渲染首页和权限过滤后的根菜单。顶部默认只显示一级节点；带有子节点的任意节点在鼠标悬停或键盘焦点进入时展开其同级浮层，子级浮层贴靠父项右侧继续级联。目录仅作为分组入口，站内菜单使用 RouterLink，外链按钮在新窗口打开 HTTP(S) 地址；空目录不会显示。窄屏继续通过 `SidebarTree.vue` 的抽屉导航同一棵树。
 7. `AdminLayout` 把已认证账号 ID、当前 `route.path` 和 `meta.title` 交给 `tag-view` 模块；模块按账号恢复并保存不含 query/hash 的页面历史。关闭当前标签时应用壳导航到相邻标签，无后备项或关闭全部时回首页。
 
 目录层级通过嵌套路由自然传递上级布局：目录无显式布局时使用 `RouterView`，菜单无显式布局时直接使用页面。当前实现不会为所有动态根菜单自动包裹 `AdminLayout`；需要该布局时由菜单或祖先目录明确选择。未知页面 key、缺少组件名或未知菜单类型不会回退到任意导入；前两者记录控制台错误并跳过路由，未知类型抛出错误。
@@ -75,7 +75,7 @@ Element Plus 提供当前语言包。登录页与 Header 共用 `LanguageSwitche
 
 `tag-view` 位于 Header 与主内容之间，历史标签可横向滚动，操作入口提供关闭当前、关闭其他和关闭全部。其版本化 `localStorage` 数据按数字用户 ID 隔离；存储不可用或内容损坏时降级为内存状态，不影响 Router 导航。Header 用户下拉同时提供系统设置入口：该 Dialog 编辑并保存设备级的导航菜单风格、主题颜色、深色模式、Tags View、侧栏 Logo 和动态标题设置；当前只持久化状态，尚不改变应用壳行为。
 
-全局变量 `--app-shell-header-height` 定义应用壳顶部高度，当前值为 `72px`；`AppHeader` 与 `AppSidebar` 的 `sidebar-brand` 在桌面和移动端都引用该变量，使两栏顶部分隔线对齐。Header 保留粘性定位、菜单按钮、标题路径和用户菜单交互；紧凑高度不改变主内容与侧栏的布局职责。
+全局变量 `--app-shell-header-height` 定义应用壳顶部高度，当前值为 `72px`。桌面端应用壳为单列布局，粘性 Header 保留品牌、一级菜单、标题路径和用户菜单；下拉菜单在 Header 层级内显示，避免被内容区裁切。窄屏保留菜单按钮和侧栏抽屉，Header 不显示横向导航，避免菜单溢出。
 
 布局注册表通过懒加载发现 `src/layouts/*.vue`。`AdminLayout` 是静态根壳和必备布局；`EmptyLayout` 可供菜单显式选择。Tailwind CSS 负责布局、间距、响应式和多数视觉样式，Element Plus 提供表单、表格、弹窗和反馈；全局 SCSS 按基础、管理布局、过渡和 Element Plus 组件覆盖拆分。用户、角色、部门、菜单和字典管理页面共用的内容容器最大宽度为 `1920px`，窄于该宽度时仍保持响应式占满可用空间。
 
