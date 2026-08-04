@@ -100,7 +100,7 @@ function handleCommand(command: string) {
   gap: 20px;
   padding: 0 20px;
   border-bottom: 1px solid var(--line);
-  background: rgba(242, 247, 244, 0.9);
+  background: color-mix(in srgb, var(--canvas), transparent 10%);
   backdrop-filter: blur(18px);
 }
 
@@ -137,7 +137,7 @@ function handleCommand(command: string) {
   border-radius: 16px;
   color: var(--ink-soft);
   background: var(--surface);
-  box-shadow: 0 4px 12px rgba(18, 60, 49, 0.06);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--ink), transparent 94%);
   transition:
     border-color 0.18s ease,
     color 0.18s ease,
@@ -151,9 +151,9 @@ function handleCommand(command: string) {
 }
 
 .app-header__menu-button--open {
-  border-color: rgba(18, 60, 49, 0.3);
+  border-color: color-mix(in srgb, var(--primary-deep), transparent 70%);
   color: var(--primary-deep);
-  background: rgba(112, 207, 162, 0.16);
+  background: var(--primary-mist);
 
   &::after {
     position: absolute;
@@ -164,7 +164,7 @@ function handleCommand(command: string) {
     border: 2px solid var(--surface);
     border-radius: 50%;
     background: var(--primary-deep);
-    box-shadow: 0 0 0 1px rgba(18, 60, 49, 0.15);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary-deep), transparent 85%);
     content: '';
   }
 }
@@ -176,7 +176,7 @@ function handleCommand(command: string) {
 .app-header__menu-path {
   display: none;
   margin: 0 0 4px;
-  color: #829087;
+  color: var(--muted);
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.2em;
@@ -202,7 +202,7 @@ function handleCommand(command: string) {
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--muted);
-  background: rgba(255, 255, 255, 0.65);
+  background: color-mix(in srgb, var(--surface), transparent 35%);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.025em;
@@ -226,7 +226,7 @@ function handleCommand(command: string) {
   transition: background 0.18s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.75);
+    background: var(--surface-muted);
   }
 }
 
@@ -238,7 +238,7 @@ function handleCommand(command: string) {
   border-radius: 12px;
   color: var(--primary);
   background: var(--primary-deep);
-  box-shadow: 0 10px 22px rgba(18, 60, 49, 0.1);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--primary-deep), transparent 90%);
   font-size: 14px;
   font-weight: 900;
 }
@@ -257,14 +257,14 @@ function handleCommand(command: string) {
   }
 
   b {
-    color: #26352f;
+    color: var(--ink);
     font-size: 12px;
     font-weight: 800;
   }
 
   small {
     margin-top: 2px;
-    color: #819087;
+    color: var(--muted);
     font-size: 10px;
   }
 }
@@ -273,7 +273,7 @@ function handleCommand(command: string) {
   display: none;
   width: 14px;
   height: 14px;
-  color: #829087;
+  color: var(--muted);
 }
 
 .app-header__dropdown-icon {

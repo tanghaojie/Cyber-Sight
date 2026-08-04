@@ -1,21 +1,21 @@
 html body .el-button.el-button--primary {
-  --el-button-text-color: #10392e;
-  --el-button-hover-text-color: #10392e;
-  --el-button-active-text-color: #10392e;
-  color: #10392e;
+  --el-button-text-color: var(--primary-foreground);
+  --el-button-hover-text-color: var(--primary-foreground);
+  --el-button-active-text-color: var(--primary-foreground);
+  color: var(--primary-foreground);
   border-color: var(--primary);
   background: var(--primary);
   font-weight: 750;
 
   &:hover {
-    color: #0b2e25;
-    border-color: #8bdab5;
-    background: #8bdab5;
+    color: var(--primary-foreground);
+    border-color: color-mix(in srgb, var(--primary), var(--surface) 18%);
+    background: color-mix(in srgb, var(--primary), var(--surface) 18%);
   }
 
   &:active {
-    color: #0b2e25;
-    border-color: #55b989;
-    background: #55b989;
+    color: var(--primary-foreground);
+    border-color: color-mix(in srgb, var(--primary), #000 15%);
+    background: color-mix(in srgb, var(--primary), #000 15%);
   }
 }

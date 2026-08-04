@@ -112,8 +112,8 @@ function handleCommand(command: string): void {
   min-width: 0;
   align-items: stretch;
   border-bottom: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 8px 24px rgba(18, 60, 49, 0.04);
+  background: color-mix(in srgb, var(--surface), transparent 6%);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--ink), transparent 96%);
   backdrop-filter: blur(16px);
 }
 
@@ -183,7 +183,7 @@ function handleCommand(command: string): void {
 
 .tag-view__item--active .tag-view__marker {
   background: var(--primary-deep);
-  box-shadow: 0 0 0 3px rgba(112, 207, 162, 0.22);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary), transparent 78%);
 }
 
 .tag-view__title {
@@ -205,7 +205,7 @@ function handleCommand(command: string): void {
     background 0.18s ease;
 
   &:hover {
-    background: rgba(36, 107, 81, 0.1);
+    background: var(--primary-mist);
     opacity: 1;
   }
 

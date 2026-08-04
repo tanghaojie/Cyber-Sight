@@ -4,6 +4,7 @@ import router from './router/index'
 import { pinia } from './stores/pinia'
 import { appConfig } from './config/app.config'
 import 'virtual:svg-icons-register'
+import 'element-plus/theme-chalk/dark/css-vars.css'
 import './styles/main.scss'
 import { registerHttpErrorHandler } from './bootstrap/registerHttpErrorHandler'
 import {

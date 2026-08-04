@@ -4,6 +4,6 @@ html body .el-select__wrapper {
   &.is-focused {
     box-shadow:
       0 0 0 1px var(--primary-deep) inset,
-      0 0 0 3px rgba(112, 207, 162, 0.16);
+      0 0 0 3px color-mix(in srgb, var(--primary), transparent 84%);
   }
 }

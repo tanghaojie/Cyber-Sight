@@ -1,7 +1,7 @@
 @use 'element-plus/theme-chalk/el-message-box.css';
 
 html body .el-overlay.is-message-box {
-  background: rgba(8, 32, 25, 0.58);
+  background: rgba(8, 14, 11, 0.64);
   backdrop-filter: blur(3px);
 }
 
@@ -12,7 +12,7 @@ html body .el-message-box {
   border: 1px solid var(--line);
   border-radius: 22px;
   background: var(--surface);
-  box-shadow: 0 28px 80px rgba(10, 42, 33, 0.24);
+  box-shadow: var(--shadow);
 }
 
 html body .el-message-box__header {
@@ -50,7 +50,7 @@ html body .el-message-box__status {
   width: 40px;
   height: 40px;
   border-radius: 13px;
-  background: #fff0f2;
+  background: color-mix(in srgb, var(--danger), var(--surface) 88%);
   color: var(--danger);
   place-items: center;
 

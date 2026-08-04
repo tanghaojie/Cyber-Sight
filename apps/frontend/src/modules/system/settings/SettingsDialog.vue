@@ -149,6 +149,7 @@ import {
   type SystemSettings,
   type ThemeColor,
 } from './settings.store'
+import { THEME_COLOR_OPTIONS } from './settings.theme'
 
 interface NavigationStyleOption {
   value: NavigationMenuStyle
@@ -187,10 +188,12 @@ const navigationStyles = computed<readonly NavigationStyleOption[]>(() => [
   },
 ])
 const themeColors = computed<readonly ThemeColorOption[]>(() => [
-  { value: 'aurora', label: t('settings.theme.aurora'), color: '#70cfa2' },
-  { value: 'ocean', label: t('settings.theme.ocean'), color: '#53a7d8' },
-  { value: 'violet', label: t('settings.theme.violet'), color: '#8973e8' },
-  { value: 'sunset', label: t('settings.theme.sunset'), color: '#df9463' },
+  ...THEME_COLOR_OPTIONS.map(function createThemeOption(option) {
+    return {
+      ...option,
+      label: t(`settings.theme.${option.value}`),
+    }
+  }),
 ])
 const switchOptions = computed<readonly SwitchOption[]>(() => [
   {
@@ -242,14 +245,20 @@ function restoreDefaults(): void {
 
 <style lang="scss">
 .system-settings-dialog {
-  --settings-ink: #17382e;
-  --settings-muted: #70877d;
-  --settings-line: #dbe8e1;
-  --settings-panel: #f7fbf8;
-  --settings-green: #246b51;
+  --settings-ink: var(--ink);
+  --settings-muted: var(--muted);
+  --settings-line: var(--line);
+  --settings-panel: var(--surface-muted);
+  --settings-green: var(--primary-deep);
 
   max-width: 780px;
-  background: radial-gradient(circle at 86% -12%, rgba(112, 207, 162, 0.22), transparent 32%), #fff;
+  background:
+    radial-gradient(
+      circle at 86% -12%,
+      color-mix(in srgb, var(--primary), transparent 78%),
+      transparent 32%
+    ),
+    var(--surface);
 
   .el-dialog__header {
     padding: 28px 30px 18px;
@@ -272,7 +281,7 @@ function restoreDefaults(): void {
     height: 36px;
     border: 1px solid var(--settings-line);
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.74);
+    background: color-mix(in srgb, var(--surface), transparent 18%);
   }
 }
 
@@ -324,11 +333,11 @@ function restoreDefaults(): void {
   width: 48px;
   height: 48px;
   flex: 0 0 auto;
-  border: 1px solid rgba(36, 107, 81, 0.18);
+  border: 1px solid color-mix(in srgb, var(--primary-deep), transparent 82%);
   border-radius: 16px;
-  color: #fff;
-  background: linear-gradient(145deg, #2e8061, #164937);
-  box-shadow: 0 11px 24px rgba(36, 107, 81, 0.2);
+  color: var(--primary-foreground);
+  background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+  box-shadow: 0 11px 24px color-mix(in srgb, var(--primary-deep), transparent 80%);
 
   svg {
     width: 21px;
@@ -345,14 +354,19 @@ function restoreDefaults(): void {
   padding: 22px;
   border: 1px solid var(--settings-line);
   border-radius: 20px;
-  background: #fff;
+  background: var(--surface);
 }
 
 .settings-section--foundation {
   border-color: transparent;
   background:
     linear-gradient(var(--settings-panel), var(--settings-panel)) padding-box,
-    linear-gradient(125deg, rgba(112, 207, 162, 0.58), rgba(219, 232, 225, 0.7)) border-box;
+    linear-gradient(
+        125deg,
+        color-mix(in srgb, var(--primary), transparent 42%),
+        color-mix(in srgb, var(--line), transparent 25%)
+      )
+      border-box;
 }
 
 .settings-section__heading {
@@ -412,7 +426,7 @@ function restoreDefaults(): void {
   border: 1px solid var(--settings-line);
   border-radius: 14px;
   color: var(--settings-muted);
-  background: rgba(255, 255, 255, 0.72);
+  background: color-mix(in srgb, var(--surface), transparent 18%);
   text-align: left;
   transition:
     border-color 0.18s ease,
@@ -420,14 +434,14 @@ function restoreDefaults(): void {
     transform 0.18s ease;
 
   &:hover {
-    border-color: rgba(36, 107, 81, 0.42);
+    border-color: color-mix(in srgb, var(--primary-deep), transparent 58%);
     transform: translateY(-2px);
   }
 
   &--active {
     border-color: var(--settings-green);
     color: var(--settings-ink);
-    box-shadow: 0 8px 18px rgba(36, 107, 81, 0.1);
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--primary-deep), transparent 90%);
   }
 
   b,
@@ -454,14 +468,14 @@ function restoreDefaults(): void {
   height: 45px;
   gap: 3px;
   padding: 5px;
-  border: 1px solid #cfe0d7;
+  border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
 
   i {
     display: block;
     border-radius: 3px;
-    background: #dbe9e1;
+    background: var(--surface-muted);
   }
 
   &.is-sidebar {
@@ -470,7 +484,7 @@ function restoreDefaults(): void {
 
     i:first-child {
       grid-row: 1 / span 2;
-      background: #396f5c;
+      background: var(--primary-deep);
     }
   }
 
@@ -480,7 +494,7 @@ function restoreDefaults(): void {
 
     i:first-child {
       grid-column: 1 / span 2;
-      background: #396f5c;
+      background: var(--primary-deep);
     }
   }
 }
@@ -508,11 +522,11 @@ function restoreDefaults(): void {
   &--active {
     border-color: var(--settings-line);
     color: var(--settings-ink);
-    background: #fff;
+    background: var(--surface);
   }
 
   &--active {
-    box-shadow: 0 5px 12px rgba(23, 56, 46, 0.06);
+    box-shadow: 0 5px 12px color-mix(in srgb, var(--ink), transparent 94%);
   }
 }
 
@@ -520,10 +534,10 @@ function restoreDefaults(): void {
   width: 18px;
   height: 18px;
   flex: 0 0 auto;
-  border: 2px solid #fff;
+  border: 2px solid var(--surface);
   border-radius: 50%;
   background: var(--theme-swatch);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--theme-swatch), #1a3d32 20%);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--theme-swatch), var(--ink) 20%);
 }
 
 .settings-switch-list {
@@ -539,16 +553,16 @@ function restoreDefaults(): void {
   align-items: center;
   gap: 11px;
   padding: 12px;
-  border: 1px solid #edf3ef;
+  border: 1px solid color-mix(in srgb, var(--line), var(--surface) 55%);
   border-radius: 15px;
-  background: #fcfefd;
+  background: color-mix(in srgb, var(--surface), var(--surface-muted) 24%);
   transition:
     border-color 0.18s ease,
     background 0.18s ease;
 
   &:has(.el-switch.is-checked) {
-    border-color: rgba(112, 207, 162, 0.45);
-    background: #f4fbf7;
+    border-color: color-mix(in srgb, var(--primary), transparent 55%);
+    background: var(--primary-mist);
   }
 }
 
@@ -557,7 +571,7 @@ function restoreDefaults(): void {
   height: 36px;
   border-radius: 11px;
   color: var(--settings-green);
-  background: #e7f7ef;
+  background: var(--primary-mist);
 
   svg {
     width: 17px;
@@ -603,7 +617,7 @@ function restoreDefaults(): void {
     margin-top: 5px;
     border-radius: 50%;
     background: var(--settings-green);
-    box-shadow: 0 0 0 4px rgba(112, 207, 162, 0.2);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary), transparent 80%);
   }
 }
 

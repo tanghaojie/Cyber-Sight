@@ -176,11 +176,11 @@ function hasChildren(item: NavigationMenu): boolean {
   &.router-link-active {
     outline: 0;
     color: var(--primary-deep);
-    background: rgba(112, 207, 162, 0.16);
+    background: var(--primary-mist);
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px rgba(18, 60, 49, 0.22);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary), transparent 78%);
   }
 }
 
@@ -210,10 +210,10 @@ function hasChildren(item: NavigationMenu): boolean {
   max-width: min(300px, calc(100vw - 32px));
   gap: 2px;
   padding: 8px;
-  border: 1px solid rgba(18, 60, 49, 0.1);
+  border: 1px solid color-mix(in srgb, var(--line), transparent 10%);
   border-radius: 16px;
-  background: rgba(249, 252, 250, 0.97);
-  box-shadow: 0 18px 42px rgba(10, 38, 29, 0.18);
+  background: color-mix(in srgb, var(--surface), transparent 3%);
+  box-shadow: var(--shadow);
   opacity: 0;
   pointer-events: none;
   transform: translateY(-4px);

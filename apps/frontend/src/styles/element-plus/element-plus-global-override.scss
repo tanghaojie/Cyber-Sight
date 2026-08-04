@@ -1,16 +1,25 @@
 :root,
 html:root {
-  --el-color-primary: #70cfa2;
-  --el-color-primary-light-3: #93ddba;
-  --el-color-primary-light-5: #b7e8d0;
-  --el-color-primary-light-7: #d4f1e3;
-  --el-color-primary-light-8: #e2f5ec;
-  --el-color-primary-light-9: #f0faf5;
-  --el-color-primary-dark-2: #49aa7c;
-  --el-color-success: #359a70;
-  --el-border-color: #d8e6de;
-  --el-border-color-light: #e4eee8;
-  --el-fill-color-light: #f3f8f5;
+  --el-color-primary: var(--primary);
+  --el-color-primary-light-3: color-mix(in srgb, var(--primary), var(--surface) 30%);
+  --el-color-primary-light-5: color-mix(in srgb, var(--primary), var(--surface) 50%);
+  --el-color-primary-light-7: color-mix(in srgb, var(--primary), var(--surface) 70%);
+  --el-color-primary-light-8: color-mix(in srgb, var(--primary), var(--surface) 80%);
+  --el-color-primary-light-9: color-mix(in srgb, var(--primary), var(--surface) 90%);
+  --el-color-primary-dark-2: color-mix(in srgb, var(--primary), #000 20%);
+  --el-color-success: var(--success);
+  --el-border-color: var(--line);
+  --el-border-color-light: color-mix(in srgb, var(--line), var(--surface) 45%);
+  --el-fill-color: var(--surface-muted);
+  --el-fill-color-light: var(--surface-muted);
+  --el-fill-color-blank: var(--surface);
+  --el-bg-color: var(--surface);
+  --el-bg-color-page: var(--canvas);
+  --el-bg-color-overlay: var(--surface);
+  --el-text-color-primary: var(--ink);
+  --el-text-color-regular: var(--ink-soft);
+  --el-text-color-secondary: var(--muted);
+  --el-text-color-placeholder: var(--muted);
   --el-border-radius-base: 11px;
   --el-border-radius-small: 9px;
   --el-font-size-base: 13px;

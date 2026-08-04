@@ -1,14 +1,13 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { browserStorage } from '@/shared/browserStorage'
+import { normalizeThemeColor, type ThemeColor } from './settings.theme'
 
 const STORAGE_KEY = 'cyber_system_settings:v1'
 
 const NAVIGATION_MENU_STYLES = ['sidebar', 'top'] as const
-const THEME_COLORS = ['aurora', 'ocean', 'violet', 'sunset'] as const
-
 export type NavigationMenuStyle = (typeof NAVIGATION_MENU_STYLES)[number]
-export type ThemeColor = (typeof THEME_COLORS)[number]
+export type { ThemeColor } from './settings.theme'
 
 export interface SystemSettings {
   navigationMenuStyle: NavigationMenuStyle
@@ -21,7 +20,7 @@ export interface SystemSettings {
 
 export const DEFAULT_SYSTEM_SETTINGS: Readonly<SystemSettings> = Object.freeze({
   navigationMenuStyle: 'sidebar',
-  themeColor: 'aurora',
+  themeColor: 'jade',
   darkMode: false,
   tagsView: true,
   sidebarLogo: true,
@@ -33,7 +32,7 @@ function isNavigationMenuStyle(value: unknown): value is NavigationMenuStyle {
 }
 
 function isThemeColor(value: unknown): value is ThemeColor {
-  return typeof value === 'string' && THEME_COLORS.includes(value as ThemeColor)
+  return normalizeThemeColor(value) !== undefined
 }
 
 function createDefaultSettings(): SystemSettings {
@@ -59,7 +58,7 @@ function normalizeSettings(value: unknown): SystemSettings | undefined {
 
   return {
     navigationMenuStyle: candidate.navigationMenuStyle,
-    themeColor: candidate.themeColor,
+    themeColor: normalizeThemeColor(candidate.themeColor)!,
     darkMode: candidate.darkMode,
     tagsView: candidate.tagsView,
     sidebarLogo: candidate.sidebarLogo,
