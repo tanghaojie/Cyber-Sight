@@ -9,6 +9,7 @@ export function isUniqueViolation(error: unknown): boolean {
 }
 
 export function normalizedListQuery(query: ListQuery) {
+  // 关键字保留到仓储再按各模块字段处理；分页默认值在此统一，避免每个路由重复实现。
   return { ...normalizePagination(query), keyword: query.keyword }
 }
 
@@ -16,6 +17,7 @@ export async function mutationResult(operation: () => Promise<number>) {
   try {
     return success({ id: await operation() })
   } catch (error) {
+    // 唯一约束是预期业务冲突；其他异常交给全局处理器记录并脱敏。
     if (isUniqueViolation(error)) {
       return failure(ErrorCode.RESOURCE_CONFLICT, 'Resource already exists')
     }

@@ -29,6 +29,7 @@ export interface IssuedJwt {
   token: string
 }
 
+// 缓存未命中时的回源边界：实现必须同时确认持久会话、用户状态和令牌主体仍然一致。
 type TokenSessionLoader = (verified: VerifiedJwt) => Promise<LoadedTokenSession | null>
 
 interface JwtTokenCacheOptions {
@@ -37,6 +38,10 @@ interface JwtTokenCacheOptions {
   now?: () => number
 }
 
+/**
+ * 进程内 LRU 只减少已验证令牌的数据库读取，不是认证的权威来源。
+ * 每次解析仍验证 JWT；缓存失效、进程重启或容量淘汰后都可由持久会话回源恢复。
+ */
 export class JwtTokenCache {
   private readonly capacity: number
   private readonly entries = new Map<string, TokenEntry>()
@@ -127,6 +132,7 @@ export class JwtTokenCache {
   }
 
   invalidateUser(userId: number): number {
+    // 用户资料、角色或状态改变时调用；只清理本实例，下一次请求会重新读取持久会话快照。
     let invalidated = 0
     for (const [jti, entry] of this.entries) {
       if (entry.user.id === userId) {

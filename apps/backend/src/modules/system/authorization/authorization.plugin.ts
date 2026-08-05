@@ -25,6 +25,7 @@ export async function registerAuthorization(
   app: FastifyInstance,
   provider: AuthorizationProvider = new LocalAuthorizationProvider(),
 ): Promise<void> {
+  // Provider 在应用组合时注入；业务路由始终经 app.authorization 使用同一决策边界。
   app.decorate('authorization', provider)
   // 注册阶段即拒绝遗漏授权元数据的路由，避免新接口因开发疏忽默认公开。
   app.addHook('onRoute', function requireAuthorizationMetadata(routeOptions) {
@@ -35,6 +36,7 @@ export async function registerAuthorization(
     }
   })
   app.addHook('preHandler', async function authorizeRequest(request) {
+    // public 路由故意不解析令牌，避免把可选身份隐式变成认证依赖。
     const authorization = request.routeOptions.config.authorization
     if (!authorization || authorization.mode === 'public') {
       return
@@ -42,6 +44,7 @@ export async function registerAuthorization(
     const user = await requireCurrentUser(app, request)
     // 通过认证后缓存到当前请求，后续处理器可直接取得已验证的操作者。
     request.accessUser = user
+    // 权限不缓存到 JWT；每个受保护请求都委托 Provider 解析，使授权变更在下一次请求生效。
     if (
       authorization.mode === 'permission' &&
       !(await provider.effectivePermissionKeys(app, user)).some((key) =>

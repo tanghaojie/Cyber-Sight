@@ -5,6 +5,7 @@ import { auditColumns } from './common.schema.js'
 // 部门邻接表保存直接父子关系，闭包表保存全部祖先路径以加速树范围查询。
 export const departments = pgTable('sys_departments', {
   id: serial('id').primaryKey(),
+  // 0 是虚拟根节点，不对应 departments 表中的真实记录。
   parentId: integer('parent_id').default(0).notNull(),
   name: varchar('name', { length: 80 }).notNull(),
   sortOrder: integer('sort_order').default(0).notNull(),
@@ -22,6 +23,7 @@ export const departmentClosure = pgTable(
     descendantId: integer('descendant_id')
       .notNull()
       .references(() => departments.id),
+    // 自身到自身为 0；祖先展开和循环检测都依赖这一完整路径集合。
     depth: integer('depth').notNull(),
     ...auditColumns(),
   },

@@ -29,6 +29,7 @@ interface ApiLogWriterOptions {
   retentionMaxBatches?: number
 }
 
+// 默认值优先保证业务请求不被日志拖慢；队列容量和批量大小不是日志完整性的强保证。
 const defaultOptions = {
   batchSize: 100,
   flushDelayMs: 250,
@@ -107,6 +108,7 @@ export class ApiLogWriter {
       return
     }
     this.flushing = true
+    // 先从队列取出固定批次，写入期间新到事件仍可继续入队；失败时把该批次放回队首保持时间顺序。
     const batch = this.queue.splice(0, this.options.batchSize)
     try {
       await this.repository.insert(batch)
@@ -126,6 +128,7 @@ export class ApiLogWriter {
 
   public async runRetention(): Promise<void> {
     try {
+      // 每轮清理有上限，避免积压严重时长期占用连接或阻塞进程关闭。
       for (let batch = 0; batch < this.options.retentionMaxBatches; batch += 1) {
         const deleted = await this.repository.deleteExpired(this.options.retentionBatchSize)
         if (deleted < this.options.retentionBatchSize) {
@@ -142,6 +145,7 @@ export class ApiLogWriter {
   }
 
   private makeRoomFor(event: ApiLogEvent): boolean {
+    // 仅永久登录审计可挤出普通临时日志；普通事件满载时直接降级丢弃。
     if (event.expiresAt !== null) {
       return false
     }
@@ -182,6 +186,7 @@ export class ApiLogWriter {
   }
 
   private reportError(message: string, bindings: object): void {
+    // 同类日志故障可能在每个请求中发生，按分钟限频避免错误日志自身造成二次压力。
     const now = Date.now()
     if (now - this.lastErrorAt < 60_000) {
       return

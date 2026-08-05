@@ -29,6 +29,8 @@
 
 ## 完成计划与 AI 协作记录
 
+- 2026-08-05：[后端关键流程中文注释补充计划](plans/2026-08-05-backend-commentary.md)及其
+  [AI 协作记录](ai-logs/2026/08/2026-08-05-backend-commentary.md)。
 - 2026-08-05：[登录页三维展示与交互拆分计划](plans/2026-08-05-login-3d-presentation.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-05-login-3d-presentation.md)。
 - 2026-08-05：[个人资料编辑计划](plans/2026-08-05-personal-profile.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-05-personal-profile.md)。

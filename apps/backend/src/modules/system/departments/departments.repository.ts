@@ -75,6 +75,7 @@ export async function listDepartments(app: FastifyInstance) {
 }
 
 export async function listDepartmentOptions(app: FastifyInstance) {
+  // 选项接口只返回启用节点；禁用部门可保留在历史树中，但不能成为新的归属或策略目标。
   return app.db
     .select({
       id: departments.id,
@@ -136,6 +137,7 @@ export async function createDepartment(
   input: DepartmentRequest,
   actorId: number,
 ): Promise<number> {
+  // 新节点与重建后的闭包必须同事务提交，授权查询不会看到只有一半的组织树状态。
   return app.db.transaction(async function create(tx) {
     const [created] = await tx
       .insert(departments)
@@ -152,6 +154,7 @@ export async function updateDepartment(
   input: DepartmentRequest,
   actorId: number,
 ): Promise<boolean> {
+  // 父级调整会影响整棵子树的祖先路径，因此成功更新后统一重建闭包而非尝试局部拼接。
   return app.db.transaction(async function update(tx) {
     const rows = await tx
       .update(departments)

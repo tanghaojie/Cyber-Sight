@@ -62,6 +62,7 @@ async function hasValidAssignments(
 }
 
 export async function userRoutes(app: FastifyInstance): Promise<void> {
+  // 个人资料路由只使用当前认证用户，不接受外部用户 ID，也不叠加管理员数据范围。
   app.get(
     '/account/profile',
     {

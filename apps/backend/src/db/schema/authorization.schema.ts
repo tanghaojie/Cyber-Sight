@@ -15,6 +15,7 @@ export const permissions = pgTable('sys_permissions', {
   ...auditColumns(),
 })
 
+// 软删除后允许恢复同一角色—权限关系；部分唯一索引只禁止两个同时有效的重复授权。
 export const rolePermissions = pgTable(
   'sys_role_permissions',
   {
@@ -55,6 +56,7 @@ export const dataPolicyRules = pgTable(
   }),
 )
 
+// 仅 custom_departments 规则会有这些明细；includeDescendants 描述目标范围，不等同于主体策略继承。
 export const dataPolicyDepartments = pgTable(
   'sys_data_policy_departments',
   {

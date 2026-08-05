@@ -4,6 +4,7 @@ import { apiRequestLogs } from '@/db/schema.js'
 import { pageOffset } from '@/shared/database/pagination.js'
 import type { ApiLogEvent } from './api-logs.service.js'
 
+// 固定的应用级 advisory lock 标识；同一数据库中的多个服务实例据此串行化保留期清理。
 const retentionLockId = 529_843_201
 
 export interface NormalizedApiLogQuery {
@@ -59,6 +60,7 @@ export async function deleteExpiredApiLogs(
     if (!lock?.locked) {
       return 0
     }
+    // PostgreSQL 的 DELETE 没有跨方言的 limit 语义，先选出稳定 ID 批次再删除。
     const expired = await tx
       .select({ id: apiRequestLogs.id })
       .from(apiRequestLogs)
@@ -80,6 +82,7 @@ export async function deleteExpiredApiLogs(
 
 /** 管理查询只读取最小日志元数据；保留期字段本身用于区分永久与临时记录。 */
 export async function listApiLogs(app: FastifyInstance, query: NormalizedApiLogQuery) {
+  // rows 与 total 共用完全相同的谓词，避免分页总数与当前页筛选条件不一致。
   const predicate = and(
     eq(apiRequestLogs.isDeleted, false),
     query.actorUserId === undefined ? undefined : eq(apiRequestLogs.actorUserId, query.actorUserId),

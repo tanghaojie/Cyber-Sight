@@ -13,6 +13,7 @@ import { auditColumns } from './common.schema.js'
 import { departments } from './departments.schema.js'
 import { roles } from './roles.schema.js'
 
+// 用户主表不直接存储角色或部门，关联表可保留多对多归属及其审计历史。
 export const users = pgTable(
   'sys_users',
   {
@@ -65,6 +66,7 @@ export const userDepartments = pgTable(
     departmentId: integer('department_id')
       .notNull()
       .references(() => departments.id),
+    // 业务层确保每个有效用户指定一个主部门；部分唯一索引在数据库层防止出现多个活动主部门。
     isPrimary: boolean('is_primary').default(false).notNull(),
     ...auditColumns(),
   },

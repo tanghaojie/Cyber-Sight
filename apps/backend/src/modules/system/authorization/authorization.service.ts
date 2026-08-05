@@ -27,6 +27,10 @@ import {
 } from '@/modules/system/users/users.access.js'
 import { isRegisteredDataPolicy } from './authorization.resources.js'
 
+/**
+ * 资源仓储消费的中立数据范围。unrestricted 为 false 且两个集合均为空时表示默认拒绝，
+ * 仓储必须生成恒假谓词，不能把空集合误解为没有过滤条件。
+ */
 export interface DataAccessPlan {
   unrestricted: boolean
   ownerUserIds: number[]
@@ -58,6 +62,7 @@ export function mergeDataAccessPlans(plans: DataAccessPlan[]): DataAccessPlan {
 }
 
 export async function listPermissions(app: FastifyInstance): Promise<PermissionSummary[]> {
+  // 权限目录只公开当前可授予的键；已禁用或软删除键不能被新的主体策略引用。
   return app.db
     .select({
       key: permissions.key,
@@ -252,6 +257,9 @@ async function validateSubjectAccess(
   return true
 }
 
+/**
+ * 以一个事务整体替换主体的功能权限和数据策略；任一写入失败都不能留下半套授权配置。
+ */
 export async function replaceSubjectAccess(
   app: FastifyInstance,
   subjectType: AuthorizationSubjectType,
@@ -298,6 +306,7 @@ export async function replaceSubjectAccess(
       }
     }
 
+    // 无论输入是否包含策略，都先使当前主规则失效；后续循环只恢复本次请求明确保留的规则。
     const oldRules = await tx
       .select({ id: dataPolicyRules.id })
       .from(dataPolicyRules)
@@ -371,6 +380,7 @@ export async function replaceSubjectAccess(
         ruleId = created.id
       }
       for (const departmentId of policy.departmentIds) {
+        // 旧明细已被统一软删除；这里按规则—部门身份恢复或创建，避免重复活跃关系。
         const [assignment] = await tx
           .select({ id: dataPolicyDepartments.id })
           .from(dataPolicyDepartments)
@@ -451,6 +461,7 @@ export async function resolveDataAccess(
   if (subjectPredicates.length === 0) {
     return mergeDataAccessPlans([])
   }
+  // 仅查询与当前资源和动作精确匹配的有效规则，策略不会在未登记资源之间隐式复用。
   const rules = (await app.db
     .select({
       id: dataPolicyRules.id,

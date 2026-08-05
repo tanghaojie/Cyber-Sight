@@ -21,6 +21,7 @@ export interface AuthorizationProvider {
 
 export class LocalAuthorizationProvider implements AuthorizationProvider {
   effectivePermissionKeys(app: FastifyInstance, user: CurrentUser): Promise<string[]> {
+    // 默认实现只适配端口，不把本地数据表细节泄漏给调用方或路由层。
     return effectivePermissionKeys(app, user.id)
   }
 

@@ -1,3 +1,4 @@
+// Drizzle 的稳定聚合入口：新增 Schema 分片必须在此登记，避免迁移或运行时遗漏表定义。
 export * from './schema/common.schema.js'
 export * from './schema/roles.schema.js'
 export * from './schema/departments.schema.js'

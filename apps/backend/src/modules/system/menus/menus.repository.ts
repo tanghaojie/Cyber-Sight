@@ -4,9 +4,11 @@ import type { CurrentUser, MenuRequest, NavigationMenu } from '@scaffold/api-con
 import { menus } from '@/db/schema.js'
 import { auditView, pageOffset, type RepositoryListQuery } from '@/shared/database/pagination.js'
 
+// 导航构建阶段使用扁平且已脱敏的行；权限键和审计字段不应进入当前用户的导航响应。
 type NavigationRow = Omit<NavigationMenu, 'children'>
 
 function navigationRow(row: typeof menus.$inferSelect): NavigationRow {
+  // 菜单管理摘要与导航响应复用基础字段，但导航不泄露 enabled、审计或权限配置细节。
   return {
     id: row.id,
     parentId: row.parentId,
@@ -31,6 +33,7 @@ function menuSummary(row: typeof menus.$inferSelect) {
 }
 
 function orderedRows(rows: NavigationRow[]): NavigationRow[] {
+  // sortOrder 相同时按 ID 兜底，保证数据库返回顺序变化不会造成导航抖动。
   return [...rows].sort((left, right) => left.sortOrder - right.sortOrder || left.id - right.id)
 }
 
@@ -62,6 +65,7 @@ export function buildNavigationTree(
   rows: NavigationRow[],
   allowedMenuIds?: ReadonlySet<number>,
 ): NavigationMenu[] {
+  // 该函数容忍历史脏数据：异常节点降级为根，不影响其他用户可访问菜单的渲染。
   // 先丢弃无法导航的残缺节点，再基于权限决定初始可见集合。
   const usableRows = rows.filter(isUsableNavigationRow)
   const allRowsById = new Map(usableRows.map((row) => [row.id, row]))

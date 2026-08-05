@@ -13,6 +13,7 @@ export interface ApiLogRouteConfig {
   actor?: 'loginUsername'
 }
 
+// 采集过程只在当前 Fastify 请求对象中保留最小元数据，绝不缓存请求体、响应体或认证令牌。
 interface ApiLogRequestContext {
   startedAt: number
   businessStatus: number | null
@@ -77,6 +78,7 @@ async function registerApiLogs(app: FastifyInstance): Promise<void> {
   )
   app.decorate('apiLogWriter', writer)
   app.addHook('onRequest', async function createApiLogContext(request) {
+    // 最早的 Hook 记录起点，后续 Hook 只补充已知信息，最终在 onResponse 一次性形成事件。
     request.apiLogContext = {
       startedAt: Date.now(),
       businessStatus: null,
@@ -98,6 +100,7 @@ async function registerApiLogs(app: FastifyInstance): Promise<void> {
     if (!isObject(payload) || !Number.isInteger(payload.status)) {
       return payload
     }
+    // 只从统一响应外壳读取业务状态；原始异常细节不会进入审计记录。
     request.apiLogContext!.businessStatus = payload.status as number
     return payload
   })
@@ -112,6 +115,7 @@ async function registerApiLogs(app: FastifyInstance): Promise<void> {
       return
     }
     const isBusinessRequest = hasAuthorizationConfig(request)
+    // 无匹配路由没有授权元数据，但仍记录为固定模式，且不保存调用方 URL 或查询参数。
     if (!isBusinessRequest && reply.statusCode !== 404) {
       return
     }
@@ -134,6 +138,7 @@ async function registerApiLogs(app: FastifyInstance): Promise<void> {
     })
   })
   app.addHook('onListen', async function startApiLogWriter() {
+    // inject 不触发 onListen，因此路由测试不会因审计队列后台任务触达数据库。
     writer.start()
   })
   app.addHook('onClose', async function stopApiLogWriter() {

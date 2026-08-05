@@ -42,6 +42,7 @@ export async function ancestorDepartmentIds(
   if (departmentIds.length === 0) {
     return []
   }
+  // 闭包表包含 depth=0 自身路径，因此结果既含输入部门本身，也含全部祖先。
   const rows = await app.db
     .select({ id: departmentClosure.ancestorId })
     .from(departmentClosure)

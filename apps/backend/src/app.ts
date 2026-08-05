@@ -18,6 +18,9 @@ import { departmentRoutes } from './modules/system/departments/departments.route
 import apiLogsPlugin from './modules/system/api-logs/api-logs.plugin.js'
 import { apiLogRoutes } from './modules/system/api-logs/api-logs.routes.js'
 
+/**
+ * 组合根允许测试替换外部边界；业务模块仍只通过 Fastify 实例上的公开能力协作。
+ */
 interface AppDependencies {
   jwtSecret?: string
   authorizationProvider?: AuthorizationProvider
@@ -45,10 +48,12 @@ export async function buildApp(
   const jwtSecret = dependencies.jwtSecret ?? randomBytes(32).toString('base64url')
   app.decorate('authTokens', new JwtTokenCache(jwtSecret))
 
+  // 先注册框架通用能力和全局错误处理，再装配数据库与业务路由，保证异常始终使用统一响应外壳。
   app.register(sensible)
   await registerResponseHandling(app)
   await registerSwagger(app)
   await app.register(dbPlugin)
+  // 审计 Hook 位于路由封装域之外，才能观察到业务路由、404 和认证失败的最终响应。
   await app.register(apiLogsPlugin)
   app.register(async function applicationRoutes(router) {
     // 授权插件先于路由注册，保证每条后续路由都经过元数据门禁和请求前检查。

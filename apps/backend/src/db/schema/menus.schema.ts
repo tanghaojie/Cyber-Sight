@@ -4,6 +4,7 @@ import { auditColumns, menuType } from './common.schema.js'
 import { permissions } from './authorization.schema.js'
 import { roles } from './roles.schema.js'
 
+// 菜单保存导航元数据，权限授予仍由 authorization 模块的 rolePermissions 决定。
 export const menus = pgTable('sys_menus', {
   id: serial('id').primaryKey(),
   parentId: integer('parent_id').default(0).notNull(),
@@ -16,6 +17,7 @@ export const menus = pgTable('sys_menus', {
   sortOrder: integer('sort_order').default(0).notNull(),
   type: menuType('type').default('menu').notNull(),
   enabled: boolean('enabled').default(true).notNull(),
+  // 未绑定权限键表示所有已认证用户可见；绑定后只用于导航过滤，不能替代路由鉴权。
   requiredPermissionKey: varchar('required_permission_key', { length: 100 }).references(
     () => permissions.key,
   ),

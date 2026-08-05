@@ -95,6 +95,7 @@ export async function listUsers(
       departmentIds: departmentAssignments
         .filter((item) => item.userId === row.id)
         .map((item) => item.departmentId),
+      // 数据库部分唯一索引和写入校验保证每个有效用户有一个主部门，因此此处可安全解包。
       primaryDepartmentId: departmentAssignments.find(
         (item) => item.userId === row.id && item.isPrimary,
       )!.departmentId,
@@ -270,6 +271,7 @@ export async function personalProfileForUser(
   app: FastifyInstance,
   userId: number,
 ): Promise<PersonalProfile | null> {
+  // 个人资料只读取当前用户自己的可编辑字段，角色、部门和状态必须通过管理接口维护。
   const [profile] = await app.db
     .select({
       id: users.id,
@@ -289,6 +291,7 @@ export async function updatePersonalProfile(
   userId: number,
   input: PersonalProfileUpdate,
 ): Promise<PersonalProfile | null> {
+  // enabled 条件避免已禁用账户借持有的旧会话继续修改资料。
   const [profile] = await app.db
     .update(users)
     .set({

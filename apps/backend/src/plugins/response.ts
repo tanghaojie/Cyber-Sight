@@ -51,6 +51,7 @@ function responseHttpStatus(sourceHttpStatus: number): number {
   }
 }
 
+// 未匹配路由也走相同业务错误外壳，调用方无需为 Fastify 默认 404 另写解析分支。
 async function handleNotFound(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
   await reply.code(404).send(failure(ErrorCode.RESOURCE_NOT_FOUND, 'Resource not found'))
 }
@@ -60,6 +61,7 @@ async function handleError(
   request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<void> {
+  // sourceHttpStatus 描述框架原始失败；responseHttpStatus 决定项目对外保留的 HTTP 状态。
   const sourceHttpStatus = error.validation ? 400 : Math.max(400, error.statusCode ?? 500)
 
   if (sourceHttpStatus >= 500) {

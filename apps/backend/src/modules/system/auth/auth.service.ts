@@ -27,6 +27,9 @@ async function rolesForUser(app: FastifyInstance, userId: number): Promise<Curre
   return rows
 }
 
+/**
+ * 缓存未命中时从数据库恢复身份。有效 JWT 只是必要条件，仍必须匹配未撤销、未过期的 tokenHash 会话。
+ */
 async function loadPersistedSession(
   app: FastifyInstance,
   token: string,
@@ -86,6 +89,7 @@ export async function authenticateCredentials(
     .where(and(eq(users.username, username), eq(users.enabled, true), eq(users.isDeleted, false)))
     .limit(1)
 
+  // 不区分账号不存在、禁用或密码错误，避免登录接口成为用户名枚举渠道。
   if (!user || !(await verifyPassword(password, user.passwordHash))) {
     return null
   }
@@ -131,6 +135,7 @@ export async function currentUserFromRequest(
   app: FastifyInstance,
   request: FastifyRequest,
 ): Promise<CurrentUser | null> {
+  // 路由层只获得统一的当前用户结果，不接触 Bearer 解析、JWT 校验和持久会话查询细节。
   const token = bearerToken(request)
   if (!token) {
     return null

@@ -1,3 +1,4 @@
+// 在任何配置读取前加载本地 .env；生产环境可直接由进程环境提供同名值。
 import 'dotenv/config'
 import { z, type ZodIssue } from 'zod'
 
@@ -9,6 +10,7 @@ const envSchema = z.object({
   HOST: z.string().min(1).default('0.0.0.0'),
 })
 
+// 解析结果在模块加载期固定，其他模块只消费已验证的 env，不再各自处理 string | undefined。
 const parsed = envSchema.safeParse(process.env)
 
 function formatIssue(issue: ZodIssue): string {
@@ -16,6 +18,7 @@ function formatIssue(issue: ZodIssue): string {
 }
 
 if (!parsed.success) {
+  // 启动即失败而非用默认值掩盖安全配置错误；错误信息只包含字段路径和校验说明，不回显配置值。
   const details = parsed.error.issues.map(formatIssue).join('; ')
   throw new Error(`Invalid backend environment: ${details}`)
 }
