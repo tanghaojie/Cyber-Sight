@@ -27,6 +27,15 @@ updated: 2026-08-05
 - 后端公共文件：`auth.routes.ts` 暴露 `authRoutes`；`auth.service.ts` 暴露 `requireCurrentUser`、`currentUserFromRequest`、`invalidateUserTokenCache`、`revokeUserTokens`、`invalidateAllTokenCache`；`auth.security.ts` 暴露 `hashPassword` 与 `verifyPassword`。`sys_auth_sessions` 当前与其他系统表统一登记在 `src/db/schema.ts`，只有 auth 模块读写。
 - 前端公共文件：`auth.api.ts` 封装认证 HTTP 调用；`auth.store.ts` 暴露 `useAuthStore`；`auth.routes.ts` 暴露登录页面懒加载器 `loginPage`。
 
+## 登录页面组合
+
+`pages/LoginPage.vue` 只负责桌面双栏与窄屏单栏的页面组装，不承载认证状态或品牌展示细节。其同目录私有组件不属于 auth 模块的公共接口：
+
+- `pages/components/LoginPresentation.vue` 负责左侧 CYBER 品牌、既有多语言主张、创作者署名和纯展示性的全息背景。背景使用主题语义令牌构造透视网格、悬浮几何体、轨道与数据节点；它不读取认证状态、不发起请求，也不改变文案键。
+- `pages/components/LoginInteraction.vue` 负责右侧语言切换、凭据输入、错误提示、提交状态和登录后的 redirect 恢复。它通过 `useAuthStore().login()` 执行既有认证流程，成功后仍替换到路由 query 中的 `redirect` 或首页。
+
+展示动画仅使用组件内 CSS，不新增运行时依赖或网络资源；`prefers-reduced-motion: reduce` 时停止连续动画，保留静态空间层次和可读内容。窄屏继续隐藏左侧展示区，并在交互组件中显示产品标识和创作者署名。
+
 ## 失败模式与测试
 
 缺少 Bearer 头、格式错误、签名错误、过期、数据库会话不存在或已撤销均返回 HTTP 401；单纯缓存未命中会回源数据库。前端全局处理器同时清除用户、token、导航与动态路由。后端自动化测试覆盖密码、JWT 完整性与过期、LRU 容量和最近使用顺序、淘汰后回源与显式清会话；Bearer 注入、登录状态持久化、清状态和路由保护由维护者人工验收。

@@ -29,6 +29,8 @@
 
 ## 完成计划与 AI 协作记录
 
+- 2026-08-05：[登录页三维展示与交互拆分计划](plans/2026-08-05-login-3d-presentation.md)及其
+  [AI 协作记录](ai-logs/2026/08/2026-08-05-login-3d-presentation.md)。
 - 2026-08-05：[个人资料编辑计划](plans/2026-08-05-personal-profile.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-05-personal-profile.md)。
 - 2026-08-05：[数据库 Schema 源码拆分计划](plans/2026-08-05-database-schema-source-split.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-05-database-schema-source-split.md)。
 - 2026-08-05：[菜单图标前端必填校验计划](plans/2026-08-05-menu-icon-validation.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-05-menu-icon-validation.md)。
