@@ -25,6 +25,13 @@ const defaultNavigationFingerprints: readonly DefaultNavigationFingerprint[] = [
     key: 'navigation.defaultMenus.systemConfig',
   },
   {
+    type: 'directory',
+    path: '/ops',
+    component: '',
+    name: '运维监控',
+    key: 'navigation.defaultMenus.operationsMonitoring',
+  },
+  {
     type: 'menu',
     path: '/sys/users',
     component: 'users',
@@ -58,6 +65,13 @@ const defaultNavigationFingerprints: readonly DefaultNavigationFingerprint[] = [
     component: 'dictionaries',
     name: '字典管理',
     key: 'navigation.defaultMenus.dictionaries',
+  },
+  {
+    type: 'menu',
+    path: '/ops/api-logs',
+    component: 'api-logs',
+    name: '接口日志',
+    key: 'navigation.defaultMenus.apiLogs',
   },
 ]
 

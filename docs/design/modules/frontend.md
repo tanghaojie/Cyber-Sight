@@ -20,6 +20,8 @@ updated: 2026-08-05
 - `src/modules/{system,biz}/<module>/*.locales.ts`：所属模块的中英文运行时固定领域文案；由
   localization 在构建期自动发现。跨模块通用文案必须改用 `shared.*`，不得在模块资源中重复定义。
 - `src/modules/{system,biz}/**/registerViews.ts`：需要被数据库菜单选择的模块登记页面加载器。
+- `src/modules/system/api-logs/`：只读接口日志分页查询、筛选表格和元数据详情抽屉；它只消费
+  `ApiLogQuery` 和 `ApiLogItem` 的脱敏契约字段。
 - `src/shared/routing/view-registry.ts`：构建期发现全部 `registerViews.ts`，校验稳定 key 并冻结页面注册表。
 - `src/shared/routing/layout-registry.ts`：发现 `src/layouts/*.vue`，以文件名建立只读布局注册表；`AdminLayout` 必须存在。
 - `src/shared/browserStorage.ts`：向前端模块公开 `browserStorage()`；在 SSR、隐私模式或浏览器策略禁用存储时返回 `null`，调用方保留各自的内存降级和错误处理语义。

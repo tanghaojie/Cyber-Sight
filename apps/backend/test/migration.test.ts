@@ -52,16 +52,25 @@ function apiLogMigrationSql(): string {
   return readFileSync(new URL('../drizzle/0001_luxuriant_violations.sql', import.meta.url), 'utf8')
 }
 
+function apiLogNavigationMigrationSql(): string {
+  return readFileSync(
+    new URL('../drizzle/0002_api_log_operations_menu.sql', import.meta.url),
+    'utf8',
+  )
+}
+
 describe('database migration baseline', () => {
   it('keeps the initial baseline and appends later schema changes', () => {
     const journal = migrationJournal()
 
-    expect(journal.entries).toHaveLength(2)
+    expect(journal.entries).toHaveLength(3)
     expect(journal.entries[0]?.tag).toBe('0000_initial_system_schema')
     expect(journal.entries[1]?.tag).toBe('0001_luxuriant_violations')
+    expect(journal.entries[2]?.tag).toBe('0002_api_log_operations_menu')
     expect(migrationFiles()).toEqual([
       '0000_initial_system_schema.sql',
       '0001_luxuriant_violations.sql',
+      '0002_api_log_operations_menu.sql',
     ])
     expect(snapshotFiles()).toEqual(['0000_snapshot.json', '0001_snapshot.json'])
   })
@@ -146,5 +155,16 @@ describe('database migration baseline', () => {
     expect(migrationSql).toContain('"sys_api_request_logs_expires_at_index"')
     expect(migrationSql).toContain("'api_logs.read'")
     expect(migrationSql).not.toContain('DROP COLUMN')
+  })
+
+  it('adds the operations monitoring menu and administrator access to API logs', () => {
+    const migrationSql = apiLogNavigationMigrationSql()
+
+    expect(migrationSql).toContain("'运维监控', '/ops', '', 'AdminLayout'")
+    expect(migrationSql).toContain("'接口日志', 'api-logs', 'api-logs'")
+    expect(migrationSql).toContain("'api_logs.read'")
+    expect(migrationSql).toContain('INSERT INTO "sys_role_menus"')
+    expect(migrationSql).toContain('INSERT INTO "sys_role_permissions"')
+    expect(migrationSql).not.toContain('DROP')
   })
 })

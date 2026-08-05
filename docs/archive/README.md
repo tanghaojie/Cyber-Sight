@@ -29,6 +29,8 @@
 
 ## 完成计划与 AI 协作记录
 
+- 2026-08-05：[接口日志前端与运维导航计划](plans/2026-08-05-api-logs-frontend.md)及其
+  [AI 协作记录](ai-logs/2026/08/2026-08-05-api-logs-frontend.md)。
 - 2026-08-05：[接口日志持久化与查询计划](plans/2026-08-05-api-logs.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-05-api-logs.md)。
 - 2026-08-05：[统一 Element Plus 弹窗顶部间距计划](plans/2026-08-05-dialog-top-margin.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-05-dialog-top-margin.md)。
 - 2026-08-05：[系统设置剩余项接入计划](plans/2026-08-05-settings-shell-preferences.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-05-settings-shell-preferences.md)。
