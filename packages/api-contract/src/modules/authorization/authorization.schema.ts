@@ -9,7 +9,7 @@ export const PermissionKeySchema = z
   .string()
   .min(3)
   .max(100)
-  .regex(/^[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)+$/)
+  .regex(/^[a-z][a-z0-9_-]*(?:\.[a-z][a-z0-9_-]*)+$/)
 
 export const AuthorizationSubjectTypeSchema = z.enum(['user', 'role', 'department'])
 export const DataScopeTypeSchema = z.enum([

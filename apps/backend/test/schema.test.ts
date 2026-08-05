@@ -1,6 +1,7 @@
 import { getTableColumns } from 'drizzle-orm'
 import { getTableConfig, type PgTable } from 'drizzle-orm/pg-core'
 import { describe, expect, it } from 'vitest'
+import { PermissionKeySchema } from '@scaffold/api-contract'
 import {
   apiRequestLogs,
   authSessions,
@@ -118,6 +119,13 @@ describe('menu routing fields', () => {
     expect(columns).toHaveProperty('externalUrl')
     expect(columns).toHaveProperty('requiredPermissionKey')
     expect(columns).not.toHaveProperty('code')
+  })
+})
+
+describe('permission key contract', () => {
+  it('accepts stable module keys that use underscores', () => {
+    expect(PermissionKeySchema.safeParse('api_logs.read').success).toBe(true)
+    expect(PermissionKeySchema.safeParse('api..logs').success).toBe(false)
   })
 })
 
