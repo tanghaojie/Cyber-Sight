@@ -9,6 +9,8 @@
 
 - 2026-08-06：[仓库原生文档重建与归档审查计划](plans/2026-08-06-repository-native-archive-review.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-06-repository-native-archive-review.md)。
+- 2026-08-06：[仓库原生文档归档审查后续](plans/2026-08-06-repository-native-archive-review-follow-up.md)及其
+  [AI 协作记录](ai-logs/2026/08/2026-08-06-repository-native-archive-review-follow-up.md)。
 
 本目录保存初始版本形成过程、已完成任务和被合并设计的证据，不定义当前行为，也不属于 AI 默认阅读集。当前事实从[文档入口](../README.md)和[设计索引](../design/README.md)读取；发现冲突时以人类维护者的当前内容为准。
 

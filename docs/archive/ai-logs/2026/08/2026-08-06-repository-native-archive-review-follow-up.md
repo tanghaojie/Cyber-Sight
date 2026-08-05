@@ -1,7 +1,7 @@
 ---
 title: Repository-native documentation archive review follow-up
 date: 2026-08-06
-status: active
+status: completed
 ---
 
 # Repository-native documentation archive review follow-up
@@ -36,25 +36,31 @@ status: active
 - Created the active plan:
   `docs/plans/active/2026-08-06-repository-native-archive-review-follow-up.md`.
 - Created this active collaboration log.
+- Reviewed the baseline-to-HEAD implementation, tests, API contracts, migrations, current
+  Design documents, and current ADRs.
+- Confirmed current ADR-0024 through ADR-0030 remain accepted and no current Design or ADR was
+  proven superseded.
+- Moved the completed plan and this log to the matching `docs/archive/` locations and updated
+  the active and archive indexes.
 
 ## Verification
 
 - `pnpm docs:archive:check` currently reports `DUE`.
 - Trigger evidence: 48 effective commits, 6 accepted ADRs, 34 completed features, and an
   architecture change.
-- The plan and log still require formatting and final archive-review validation before they
-  are committed.
+- `pnpm test` passed: 14 backend test files and 120 tests.
+- `pnpm build` passed for the API contract, backend, and frontend packages.
+- `pnpm format:check` and the final archive audit passed after the archival changes.
 
 ## Open questions and next steps
 
-- Complete the evidence-based inventory and classify candidate historical documents.
-- Identify any current Design or ADR content that must be updated before archival.
-- Record maintainer confirmation for unresolved intent.
-- Complete validation, then archive the plan and log together with the reviewed evidence.
+- No unresolved maintainer-confirmation item remains from this review.
+- The ledger must be advanced to the completed review commit after the archival commit is
+  created; the resulting audit should return `NOT_DUE`.
 
 ## Related design, ADR, plan, and commit
 
 - `docs/design/documentation-governance.md`
 - `docs/decisions/ADR-0030-repository-native-documentation-archive-review.md`
-- `docs/plans/active/2026-08-06-repository-native-archive-review-follow-up.md`
+- `docs/archive/plans/2026-08-06-repository-native-archive-review-follow-up.md`
 - Baseline-setting commit: `8ea3c9ceea0bfcbc5748dd7b542bf91f9da4890d`

@@ -1,7 +1,7 @@
 ---
 title: Repository-native documentation archive review follow-up
 type: documentation-archive-review
-status: active
+status: completed
 scope: repository
 created: 2026-08-06
 updated: 2026-08-06
@@ -54,18 +54,18 @@ read-only trigger; this plan is the shared task marker for the review.
 
 ## Implementation tasks
 
-- [ ] Inventory commits, changed modules, tests, contracts, migrations, current Design, and
+- [x] Inventory commits, changed modules, tests, contracts, migrations, current Design, and
       current ADRs from the baseline to HEAD.
-- [ ] Classify each historical Design, ADR, completed plan, and AI log as current, mergeable,
+- [x] Classify each historical Design, ADR, completed plan, and AI log as current, mergeable,
       superseded, or unresolved using repository evidence.
-- [ ] Update current Design or ADR documents where the implementation establishes a clear
+- [x] Update current Design or ADR documents where the implementation establishes a clear
       current fact or long-term decision.
-- [ ] Move only proven superseded or completed artifacts into the matching `docs/archive/`
+- [x] Move only proven superseded or completed artifacts into the matching `docs/archive/`
       subtree and update indexes and links.
-- [ ] Record unresolved decisions and required maintainer confirmation in this plan and the
+- [x] Record unresolved decisions and required maintainer confirmation in this plan and the
       AI log.
-- [ ] Run formatting, link, and archive-audit verification; update the ledger after completion.
-- [ ] Move this completed plan and its AI log to the archive locations and mark them completed.
+- [x] Run formatting, link, and archive-audit verification; update the ledger after completion.
+- [x] Move this completed plan and its AI log to the archive locations and mark them completed.
 
 ## Verification
 
@@ -74,6 +74,20 @@ read-only trigger; this plan is the shared task marker for the review.
 - `pnpm docs:archive:check`
 - Repository-specific link and index checks required by the final diff
 - `git diff --check`
+
+Review results:
+
+- `pnpm test`: 14 backend test files and 120 tests passed; the shared API contract build and
+  distribution verification also passed.
+- `pnpm build`: API contract, backend, and frontend production builds passed. Existing Sass
+  legacy API and Rollup chunking warnings remain informational.
+- Current ADR-0024 through ADR-0030 remain accepted and explain current long-term decisions;
+  none has a superseded, replaced, or retired status.
+- Current Design documents remain the authoritative descriptions of the implementation. The
+  earlier Design snapshots and completed implementation records were already archived and no
+  additional current Design or ADR was proven superseded in this review.
+- The only artifacts newly eligible from the active area were this completed plan and its
+  corresponding AI log.
 
 ## Publication and rollback
 
@@ -84,11 +98,13 @@ move phase, preserve the evidence, and record the blocker for maintainer review.
 ## Actual deviations and open questions
 
 The plan was created after the initial `DUE` result because the previous task updated the
-baseline but did not create the required active archive-review plan. No archive moves have
-been performed yet.
+baseline but did not create the required active archive-review plan. The review found no
+unresolved maintainer-confirmation item and no additional current document requiring archival.
+This completed plan and its AI log are being moved to the archive as the final review evidence.
 
 ## Related design, ADR, and AI log
 
 - `docs/design/documentation-governance.md`
 - `docs/decisions/ADR-0030-repository-native-documentation-archive-review.md`
-- `docs/ai-logs/2026/08/2026-08-06-repository-native-archive-review-follow-up.md`
+- `docs/archive/plans/2026-08-06-repository-native-archive-review-follow-up.md`
+- `docs/archive/ai-logs/2026/08/2026-08-06-repository-native-archive-review-follow-up.md`
