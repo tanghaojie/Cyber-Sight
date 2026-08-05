@@ -5,12 +5,17 @@ import {
   IdParamsSchema,
   ListQuerySchema,
   MutationResultSchema,
+  PasswordUpdateSchema,
+  PersonalProfileResultSchema,
+  PersonalProfileUpdateSchema,
   toFastifySchema,
   UserCreateSchema,
   UserPageResultSchema,
   UserUpdateSchema,
   type IdParams,
   type ListQuery,
+  type PasswordUpdate,
+  type PersonalProfileUpdate,
   type UserCreate,
   type UserUpdate,
 } from '@scaffold/api-contract'
@@ -32,9 +37,12 @@ import { enabledRoleIds } from '@/modules/system/roles/roles.access.js'
 import { failure, paginatedSuccess, success } from '@/shared/http/response.js'
 import {
   canAssignUserDepartments,
+  changePersonalPassword,
   createUser,
   listUsers,
+  personalProfileForUser,
   softDeleteUser,
+  updatePersonalProfile,
   updateUser,
 } from './users.repository.js'
 
@@ -54,6 +62,89 @@ async function hasValidAssignments(
 }
 
 export async function userRoutes(app: FastifyInstance): Promise<void> {
+  app.get(
+    '/account/profile',
+    {
+      config: { authorization: { mode: 'authenticated' } },
+      schema: {
+        operationId: 'getPersonalProfile',
+        tags: ['Users'],
+        response: {
+          200: toFastifySchema(PersonalProfileResultSchema),
+          default: toFastifySchema(ErrorResponseSchema),
+        },
+      },
+    },
+    async function getPersonalProfileHandler(request) {
+      const actor = await requireCurrentUser(app, request)
+      const profile = await personalProfileForUser(app, actor.id)
+      if (!profile) {
+        throw app.httpErrors.notFound('Resource not found')
+      }
+      return success(profile)
+    },
+  )
+
+  app.put<{ Body: PersonalProfileUpdate }>(
+    '/account/profile',
+    {
+      config: { authorization: { mode: 'authenticated' } },
+      schema: {
+        operationId: 'updatePersonalProfile',
+        tags: ['Users'],
+        body: toFastifySchema(PersonalProfileUpdateSchema),
+        response: {
+          200: toFastifySchema(PersonalProfileResultSchema),
+          default: toFastifySchema(ErrorResponseSchema),
+        },
+      },
+    },
+    async function updatePersonalProfileHandler(request) {
+      const actor = await requireCurrentUser(app, request)
+      try {
+        const profile = await updatePersonalProfile(app, actor.id, request.body)
+        if (!profile) {
+          throw app.httpErrors.notFound('Resource not found')
+        }
+        invalidateUserTokenCache(app, actor.id)
+        return success(profile)
+      } catch (error) {
+        if (isUniqueViolation(error)) {
+          return failure(ErrorCode.RESOURCE_CONFLICT, 'Resource already exists')
+        }
+        throw error
+      }
+    },
+  )
+
+  app.put<{ Body: PasswordUpdate }>(
+    '/account/password',
+    {
+      config: { authorization: { mode: 'authenticated' } },
+      schema: {
+        operationId: 'updatePersonalPassword',
+        tags: ['Users'],
+        body: toFastifySchema(PasswordUpdateSchema),
+        response: {
+          200: toFastifySchema(EmptyResultSchema),
+          default: toFastifySchema(ErrorResponseSchema),
+        },
+      },
+    },
+    async function updatePersonalPasswordHandler(request) {
+      const actor = await requireCurrentUser(app, request)
+      const result = await changePersonalPassword(app, actor.id, request.body)
+      if (result === 'not-found') {
+        throw app.httpErrors.notFound('Resource not found')
+      }
+      if (result === 'invalid-current-password') {
+        return failure(ErrorCode.INVALID_CREDENTIALS, 'Current password is incorrect')
+      }
+      await revokeUserTokens(app, actor.id, actor.id)
+      return success()
+    },
+  )
+
   // 功能权限决定能否调用接口，数据访问计划进一步限制可见和可修改的用户记录。
   app.get<{ Querystring: ListQuery }>(
     '/admin/users',

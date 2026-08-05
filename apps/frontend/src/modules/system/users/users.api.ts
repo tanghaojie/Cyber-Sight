@@ -1,6 +1,11 @@
 import type {
+  ApiResponse,
   EmptySuccessResponse,
   IdResponse,
+  PersonalProfile,
+  PersonalProfileResponse,
+  PersonalProfileUpdate,
+  PasswordUpdate,
   PaginatedResponse,
   UserCreate,
   UserSummary,
@@ -33,5 +38,28 @@ export async function updateUser(id: number, payload: UserUpdate): Promise<ApiMu
 
 export async function deleteUser(id: number) {
   const { data, error } = await apiClient.DELETE<EmptySuccessResponse>(`/admin/users/${id}`)
+  return apiResult(data, error)
+}
+
+export async function getPersonalProfile(): Promise<ApiResponse<PersonalProfile>> {
+  const { data, error } = await apiClient.GET<PersonalProfileResponse>('/account/profile')
+  return apiResult(data, error)
+}
+
+export async function updatePersonalProfile(
+  payload: PersonalProfileUpdate,
+): Promise<ApiResponse<PersonalProfile>> {
+  const { data, error } = await apiClient.PUT<PersonalProfileResponse, PersonalProfileUpdate>(
+    '/account/profile',
+    { body: payload },
+  )
+  return apiResult(data, error)
+}
+
+export async function updatePersonalPassword(payload: PasswordUpdate) {
+  const { data, error } = await apiClient.PUT<EmptySuccessResponse, PasswordUpdate>(
+    '/account/password',
+    { body: payload },
+  )
   return apiResult(data, error)
 }

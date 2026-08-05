@@ -2,21 +2,21 @@
 title: 用户模块
 status: active
 owner: maintainers
-updated: 2026-07-30
+updated: 2026-08-05
 ---
 
 # 用户模块
 
 ## 职责与边界
 
-`users` 拥有用户列表、创建、编辑、软删除、角色归属、一个主部门加多个附属部门的归属关系，以及独立用户管理页面。它不拥有角色、部门树或授权规则；用户直接数据策略由授权模块保存。
+`users` 拥有用户列表、创建、编辑、软删除、角色归属、一个主部门加多个附属部门的归属关系、独立用户管理页面，以及当前登录用户的个人资料读写。它不拥有角色、部门树或授权规则；用户直接数据策略由授权模块保存。
 
 ## 公共接口
 
-- HTTP：`GET/POST /admin/users`、`PUT/DELETE /admin/users/{id}`。
-- 前端公共文件：`registerViews.ts` 登记用户管理页面；`users.api.ts` 暴露用户管理 API。
+- HTTP：`GET/POST /admin/users`、`PUT/DELETE /admin/users/{id}`、`GET/PUT /account/profile`、`PUT /account/password`。
+- 前端公共文件：`registerViews.ts` 登记用户管理页面；`users.api.ts` 暴露用户管理 API 与当前用户个人资料 API；`profile.routes.ts` 暴露个人资料页懒加载器。
 - 后端公共文件：`users.access.ts` 暴露主体存在性、有效角色/部门归属和部门成员引用查询。
-- 契约：`UserSummary`、`UserCreate`、`UserUpdate` 及分页响应。
+- 契约：`UserSummary`、`UserCreate`、`UserUpdate`、`PersonalProfile`、`PersonalProfileUpdate`、`PasswordUpdate` 及分页响应。
 
 ## 依赖、数据流与失败模式
 
@@ -26,10 +26,10 @@ updated: 2026-07-30
 
 后端运行时校验共享 Schema 并写入用户、用户角色和用户部门关系；有效用户至少属于一个部门且恰有一个主部门。用户名和邮箱分别只在未删除用户中唯一，数据库使用 `is_deleted = false` 部分唯一索引保证并发安全；软删除后允许复用，历史值保持不变。归属关系沿用软删除和恢复语义。
 
-所有管理路由要求 `users.manage`。列表与 count、更新、删除使用 authorization Provider 返回的同一个 `users` 数据范围；无匹配规则默认返回空列表或按不存在处理。创建和改变部门归属时，目标部门必须位于对应动作的数据范围。当前用户不可删除自身。
+所有管理路由要求 `users.manage`。列表与 count、更新、删除使用 authorization Provider 返回的同一个 `users` 数据范围；无匹配规则默认返回空列表或按不存在处理。创建和改变部门归属时，目标部门必须位于对应动作的数据范围。当前用户不可删除自身。个人资料路由只依赖已认证的当前用户，永不接受目标用户 ID，也不允许更改用户名、角色、部门、状态或数据权限；姓名和邮箱写入后失效当前用户身份快照。密码更新还必须验证当前密码，散列新密码并撤销该用户所有会话。
 
 ## 测试策略
 
-后端自动化测试覆盖 Schema、迁移、数据范围合并、路由门禁、软删除和有效记录唯一索引；前端部门归属、直接策略与业务错误展示由维护者人工验收。
+后端自动化测试覆盖 Schema、迁移、数据范围合并、路由门禁、软删除、有效记录唯一索引和个人资料密码验证；前端部门归属、直接策略、个人资料操作与业务错误展示由维护者人工验收。
 
 初始版本之前的软删除唯一性取舍保留在[归档 ADR](../../archive/README.md)，当前语义以本设计、数据库 Schema 和后端测试为准。

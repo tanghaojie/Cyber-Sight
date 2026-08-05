@@ -1,11 +1,17 @@
 import { and, count, eq, ilike, inArray, or, sql } from 'drizzle-orm'
 import type { FastifyInstance } from 'fastify'
-import type { UserCreate, UserUpdate } from '@scaffold/api-contract'
+import type {
+  PasswordUpdate,
+  PersonalProfile,
+  PersonalProfileUpdate,
+  UserCreate,
+  UserUpdate,
+} from '@scaffold/api-contract'
 import type { Database } from '@/db/index.js'
 import { userDepartments, userRoles, users } from '@/db/schema.js'
 import type { DataAccessPlan } from '@/modules/system/authorization/authorization.service.js'
 import { auditView, pageOffset, type RepositoryListQuery } from '@/shared/database/pagination.js'
-import { hashPassword } from '@/modules/system/auth/auth.security.js'
+import { hashPassword, verifyPassword } from '@/modules/system/auth/auth.security.js'
 
 type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0]
 
@@ -258,6 +264,77 @@ export async function updateUser(
     await replaceUserDepartments(tx, id, input.departmentIds, input.primaryDepartmentId, actorId)
     return true
   })
+}
+
+export async function personalProfileForUser(
+  app: FastifyInstance,
+  userId: number,
+): Promise<PersonalProfile | null> {
+  const [profile] = await app.db
+    .select({
+      id: users.id,
+      username: users.username,
+      displayName: users.displayName,
+      email: users.email,
+    })
+    .from(users)
+    .where(and(eq(users.id, userId), eq(users.isDeleted, false)))
+    .limit(1)
+
+  return profile ?? null
+}
+
+export async function updatePersonalProfile(
+  app: FastifyInstance,
+  userId: number,
+  input: PersonalProfileUpdate,
+): Promise<PersonalProfile | null> {
+  const [profile] = await app.db
+    .update(users)
+    .set({
+      displayName: input.displayName,
+      email: input.email,
+      updatedAt: new Date(),
+      updatedBy: userId,
+    })
+    .where(and(eq(users.id, userId), eq(users.enabled, true), eq(users.isDeleted, false)))
+    .returning({
+      id: users.id,
+      username: users.username,
+      displayName: users.displayName,
+      email: users.email,
+    })
+
+  return profile ?? null
+}
+
+export async function changePersonalPassword(
+  app: FastifyInstance,
+  userId: number,
+  input: PasswordUpdate,
+): Promise<'updated' | 'invalid-current-password' | 'not-found'> {
+  const [account] = await app.db
+    .select({ passwordHash: users.passwordHash })
+    .from(users)
+    .where(and(eq(users.id, userId), eq(users.enabled, true), eq(users.isDeleted, false)))
+    .limit(1)
+
+  if (!account) {
+    return 'not-found'
+  }
+  if (!(await verifyPassword(input.currentPassword, account.passwordHash))) {
+    return 'invalid-current-password'
+  }
+
+  // 散列在更新前完成，避免数据库写锁覆盖密码派生的耗时工作。
+  const passwordHash = await hashPassword(input.newPassword)
+  const updated = await app.db
+    .update(users)
+    .set({ passwordHash, updatedAt: new Date(), updatedBy: userId })
+    .where(and(eq(users.id, userId), eq(users.enabled, true), eq(users.isDeleted, false)))
+    .returning({ id: users.id })
+
+  return updated.length ? 'updated' : 'not-found'
 }
 
 export async function softDeleteUser(

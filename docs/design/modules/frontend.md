@@ -27,12 +27,12 @@ updated: 2026-08-05
 - `src/shared/browserStorage.ts`：向前端模块公开 `browserStorage()`；在 SSR、隐私模式或浏览器策略禁用存储时返回 `null`，调用方保留各自的内存降级和错误处理语义。
 - `src/shared/localization/localization.resource.ts`：定义受支持语言、资源结构和中英文键集合校验；
   `src/shared/localization/shared.locales.ts`：提供 `shared.*` 命名空间的领域无关界面文案。
-- `src/router/constRoutes.ts`：登录、显式 404、根 `AdminLayout` 和默认工作台路由。
+- `src/router/constRoutes.ts`：登录、显式 404、根 `AdminLayout`、默认工作台和不依赖后端菜单的个人资料路由。
 - `src/router/routerGuard.ts`：认证恢复、导航加载和首次动态路由安装。
 - `src/router/dynamicRoutes.ts`：根据菜单树生成、注册和清理动态路由。
 - `src/router/index.ts`：创建 Router，组装静态路由、最终 404 和认证守卫。
 - `src/bootstrap/registerHttpErrorHandler.ts`：组装 Router、认证、导航和全局 HTTP 错误动作。
-- `src/components/layout/` 与 `src/layouts/AdminLayout.vue`：桌面级联顶部导航、移动侧栏抽屉、顶栏和内容出口。
+- `src/components/layout/` 与 `src/layouts/AdminLayout.vue`：桌面级联顶部导航、移动侧栏抽屉、顶栏和内容出口；头像下拉菜单可打开个人资料页。
 - `src/modules/system/tag-view/`：账号隔离的页面标签历史、浏览器持久化和标签控制界面。
 - `src/modules/system/settings/`：设备级系统界面偏好、版本化浏览器持久化、设置 Dialog，以及主题颜色与深色模式的应用根控制器。
 - `src/modules/system/localization/`：默认中文的运行时语言状态、模块和 shared 资源发现、Element Plus

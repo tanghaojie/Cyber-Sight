@@ -62,6 +62,12 @@ export const useAuthStore = defineStore('auth', () => {
     checked.value = true
   }
 
+  function updateDisplayName(displayName: string): void {
+    if (user.value) {
+      user.value = { ...user.value, displayName }
+    }
+  }
+
   async function logout(): Promise<void> {
     try {
       await apiLogout()
@@ -71,5 +77,15 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { user, checked, busy, isAuthenticated, login, logout, fetchCurrentUser, clearSession }
+  return {
+    user,
+    checked,
+    busy,
+    isAuthenticated,
+    login,
+    logout,
+    fetchCurrentUser,
+    clearSession,
+    updateDisplayName,
+  }
 })

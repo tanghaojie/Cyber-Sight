@@ -9,7 +9,7 @@ updated: 2026-08-05
 
 ## 职责与边界
 
-`auth` 拥有登录、退出、当前用户、JWT 签发与校验、数据库 token 会话、进程内 LRU 读缓存、凭据校验和前端认证 store。它公开当前用户解析、会话撤销、缓存失效与密码散列服务供需要鉴权、使用户权限变更生效或创建用户的模块使用，不公开会话仓储或缓存内部状态。
+`auth` 拥有登录、退出、当前用户、JWT 签发与校验、数据库 token 会话、进程内 LRU 读缓存、凭据校验和前端认证 store。它公开当前用户解析、会话撤销、缓存失效、密码验证与密码散列服务供需要鉴权、使用户权限变更生效或创建用户的模块使用，不公开会话仓储或缓存内部状态。
 
 ## 数据流与会话生命周期
 
@@ -24,7 +24,7 @@ updated: 2026-08-05
 ## 公共接口
 
 - HTTP：`POST /auth/login`、`POST /auth/logout`、`GET /auth/me`。除登录外的认证请求使用 Bearer token。
-- 后端公共文件：`auth.routes.ts` 暴露 `authRoutes`；`auth.service.ts` 暴露 `requireCurrentUser`、`currentUserFromRequest`、`invalidateUserTokenCache`、`revokeUserTokens`、`invalidateAllTokenCache`；`auth.security.ts` 暴露 `hashPassword`。`sys_auth_sessions` 当前与其他系统表统一登记在 `src/db/schema.ts`，只有 auth 模块读写。
+- 后端公共文件：`auth.routes.ts` 暴露 `authRoutes`；`auth.service.ts` 暴露 `requireCurrentUser`、`currentUserFromRequest`、`invalidateUserTokenCache`、`revokeUserTokens`、`invalidateAllTokenCache`；`auth.security.ts` 暴露 `hashPassword` 与 `verifyPassword`。`sys_auth_sessions` 当前与其他系统表统一登记在 `src/db/schema.ts`，只有 auth 模块读写。
 - 前端公共文件：`auth.api.ts` 封装认证 HTTP 调用；`auth.store.ts` 暴露 `useAuthStore`；`auth.routes.ts` 暴露登录页面懒加载器 `loginPage`。
 
 ## 失败模式与测试

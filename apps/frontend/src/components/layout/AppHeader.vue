@@ -37,6 +37,10 @@
               <Setting class="app-header__dropdown-icon" />
               {{ t('settings.dropdown.open') }}
             </el-dropdown-item>
+            <el-dropdown-item command="profile">
+              <User class="app-header__dropdown-icon" />
+              {{ t('users.views.profile') }}
+            </el-dropdown-item>
             <el-dropdown-item divided command="logout">
               <SwitchButton class="app-header__dropdown-icon" />
               {{ t('navigation.shell.logout') }}
@@ -51,7 +55,8 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { ArrowDown, Setting, SwitchButton } from '@element-plus/icons-vue'
+import { ArrowDown, Setting, SwitchButton, User } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
 import type { NavigationMenu } from '@scaffold/api-contract'
 import AppIcon from '@/components/AppIcon.vue'
 import TopNavigation from '@/components/layout/TopNavigation.vue'
@@ -72,15 +77,18 @@ const props = defineProps<{
 const emit = defineEmits<{ 'toggle-sidebar': []; logout: [] }>()
 
 const { t } = useLocalization()
+const router = useRouter()
 const initials = computed(() => props.displayName?.slice(0, 1).toUpperCase() ?? 'A')
 const roleNames = computed(
   () => props.roles?.filter(Boolean).join('、') || t('navigation.shell.defaultRole'),
 )
 const settingsOpen = ref(false)
 
-function handleCommand(command: string) {
+async function handleCommand(command: string) {
   if (command === 'settings') {
     settingsOpen.value = true
+  } else if (command === 'profile') {
+    await router.push({ name: 'personal-profile' })
   } else if (command === 'logout') {
     emit('logout')
   }

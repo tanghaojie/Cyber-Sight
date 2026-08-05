@@ -1,5 +1,10 @@
 import { z } from 'zod'
-import { AuditFieldsSchema, ErrorResponseSchema, paginatedResponseSchema } from '@/shared/http.js'
+import {
+  apiResponseSchema,
+  AuditFieldsSchema,
+  ErrorResponseSchema,
+  paginatedResponseSchema,
+} from '@/shared/http.js'
 
 /** 用户可关联多个角色和部门，但必须且只能从已关联部门中指定一个主部门。 */
 const integerArray = z.array(z.number().int().min(1))
@@ -69,11 +74,39 @@ export const UserUpdateSchema = z
   })
   .superRefine(validateDepartments)
 
+/** 当前登录用户可自助维护的资料；不暴露角色、部门或账号管理字段。 */
+export const PersonalProfileSchema = z.strictObject({
+  id: z.number().int(),
+  username: z.string(),
+  displayName: z.string(),
+  email: z.email(),
+})
+
+export const PersonalProfileUpdateSchema = z.strictObject({
+  displayName: z.string().min(1).max(80),
+  email: z.email(),
+})
+
+export const PasswordUpdateSchema = z.strictObject({
+  currentPassword: z.string().min(8).max(128),
+  newPassword: z.string().min(8).max(128),
+})
+
 export const UserPageResponseSchema = paginatedResponseSchema(UserSummarySchema)
 export const UserPageResultSchema = z.union([UserPageResponseSchema, ErrorResponseSchema])
+export const PersonalProfileResponseSchema = apiResponseSchema(PersonalProfileSchema)
+export const PersonalProfileResultSchema = z.union([
+  PersonalProfileResponseSchema,
+  ErrorResponseSchema,
+])
 
 export type UserSummary = z.infer<typeof UserSummarySchema>
 export type UserCreate = z.infer<typeof UserCreateSchema>
 export type UserUpdate = z.infer<typeof UserUpdateSchema>
+export type PersonalProfile = z.infer<typeof PersonalProfileSchema>
+export type PersonalProfileUpdate = z.infer<typeof PersonalProfileUpdateSchema>
+export type PasswordUpdate = z.infer<typeof PasswordUpdateSchema>
 export type UserPageResponse = z.infer<typeof UserPageResponseSchema>
 export type UserPageResult = z.infer<typeof UserPageResultSchema>
+export type PersonalProfileResponse = z.infer<typeof PersonalProfileResponseSchema>
+export type PersonalProfileResult = z.infer<typeof PersonalProfileResultSchema>

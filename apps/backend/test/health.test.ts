@@ -123,6 +123,9 @@ describe('GET /health', () => {
       ['/auth/login', 'post', 'login'],
       ['/auth/logout', 'post', 'logout'],
       ['/auth/me', 'get', 'getCurrentUser'],
+      ['/account/profile', 'get', 'getPersonalProfile'],
+      ['/account/profile', 'put', 'updatePersonalProfile'],
+      ['/account/password', 'put', 'updatePersonalPassword'],
       ['/admin/api-logs', 'get', 'listApiLogs'],
       ['/admin/users', 'get', 'listUsers'],
       ['/admin/users', 'post', 'createUser'],
@@ -306,6 +309,7 @@ describe('GET /health', () => {
   it.each([
     ['GET', '/auth/me'],
     ['POST', '/auth/logout'],
+    ['GET', '/account/profile'],
     ['GET', '/admin/users'],
     ['GET', '/admin/roles'],
     ['GET', '/admin/departments'],
@@ -321,4 +325,24 @@ describe('GET /health', () => {
       err: 'Authentication required',
     })
   })
+
+  it.each([
+    ['PUT', '/account/profile', { displayName: 'Operator', email: 'operator@example.com' }],
+    [
+      'PUT',
+      '/account/password',
+      { currentPassword: 'CurrentPassword!123', newPassword: 'NewPassword!123' },
+    ],
+  ] as const)(
+    'protects %s %s with a valid body when no bearer token is present',
+    async (method, url, payload) => {
+      const response = await app.inject({ method, url, payload })
+
+      expect(response.statusCode).toBe(401)
+      expect(response.json()).toEqual({
+        status: ErrorCode.UNAUTHORIZED,
+        err: 'Authentication required',
+      })
+    },
+  )
 })
