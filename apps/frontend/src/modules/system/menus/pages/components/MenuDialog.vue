@@ -25,7 +25,7 @@
         <el-form-item :label="t('menus.fields.type')" required>
           <el-segmented v-model="form.type" :options="typeOptions" class="w-full" />
         </el-form-item>
-        <el-form-item :label="t('menus.fields.icon')">
+        <el-form-item :label="t('menus.fields.icon')" required>
           <el-select
             v-model="form.icon"
             class="w-full"
@@ -290,6 +290,9 @@ async function submit(): Promise<void> {
   try {
     if (!form.name) {
       throw new Error(t('menus.errors.nameRequired'))
+    }
+    if (!form.icon) {
+      throw new Error(t('menus.errors.iconRequired'))
     }
     const pathError = menuPathError(form.type, form.parentId, form.path)
     if (pathError) {
