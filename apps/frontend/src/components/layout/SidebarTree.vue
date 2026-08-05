@@ -4,8 +4,9 @@
     <RouterLink
       v-if="depth === 0 && showHomeMenu"
       :to="homeRoute?.path || '/'"
-      class="sidebar-link"
+      class="sidebar-link sidebar-link--home"
       :style="indentStyle"
+      exact-active-class="router-link-exact-active"
       @click="$emit('navigate')"
     >
       <span class="sidebar-node-icon">
@@ -154,7 +155,8 @@ function toggle(id: number): void {
   }
 }
 
-.sidebar-link.router-link-active {
+.sidebar-link.router-link-active:not(.sidebar-link--home),
+.sidebar-link.sidebar-link--home.router-link-exact-active {
   color: var(--brand-accent-foreground);
   background: var(--brand-accent);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
@@ -171,7 +173,8 @@ function toggle(id: number): void {
   background: rgba(255, 255, 255, 0.08);
 }
 
-.router-link-active .sidebar-node-icon {
+.sidebar-link.router-link-active:not(.sidebar-link--home) .sidebar-node-icon,
+.sidebar-link.sidebar-link--home.router-link-exact-active .sidebar-node-icon {
   background: color-mix(in srgb, var(--brand-accent-foreground), transparent 88%);
 }
 

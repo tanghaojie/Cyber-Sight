@@ -2,7 +2,11 @@
   <nav v-if="depth === 0" class="top-navigation" :aria-label="t('navigation.shell.mainNavigation')">
     <ul class="top-navigation__list top-navigation__list--root">
       <li v-if="showHomeMenu" class="top-navigation__item">
-        <RouterLink :to="homeRoute?.path || '/'" class="top-navigation__trigger">
+        <RouterLink
+          :to="homeRoute?.path || '/'"
+          class="top-navigation__trigger top-navigation__trigger--home"
+          exact-active-class="router-link-exact-active"
+        >
           <AppIcon name="home" class="top-navigation__icon" />
           <span>{{ t('navigation.routes.home') }}</span>
         </RouterLink>
@@ -173,7 +177,8 @@ function hasChildren(item: NavigationMenu): boolean {
 
   &:hover,
   &:focus-visible,
-  &.router-link-active {
+  &.router-link-active:not(.top-navigation__trigger--home),
+  &.top-navigation__trigger--home.router-link-exact-active {
     outline: 0;
     color: var(--primary-deep);
     background: var(--primary-mist);
