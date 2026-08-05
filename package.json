@@ -14,6 +14,7 @@
     "format:check": "prettier --check . --ignore-unknown",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "docs:archive:check": "node scripts/docs/archive-audit.mjs",
     "lint-staged": "lint-staged",
     "prepare": "simple-git-hooks",
     "preinstall": "npx only-allow pnpm"

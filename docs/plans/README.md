@@ -1,5 +1,9 @@
 # 活动计划
 
+`type: documentation-archive-review` 的计划是跨 AI 智能体共享的归档审查任务。任何 AI 启动任务时先运行
+`pnpm docs:archive:check`；发现 `DUE` 且没有同一范围的活动计划时，创建一个标准计划，发现 `IN_PROGRESS`
+时继续已有计划。该协议不使用任何 AI 平台私有目录。
+
 开始任务时检查 `plans/active/`，只读取与当前目标相同或直接相关的计划。
 
 ## 进行中

@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "scope": "module",
+  "thresholds": {
+    "effectiveCommits": 20,
+    "acceptedAdrs": 3,
+    "completedFeatures": 3,
+    "maxDaysSinceReview": 30
+  },
+  "immediateTriggers": [
+    "architecture_change",
+    "document_conflict",
+    "adr_superseded"
+  ],
+  "exclusions": {
+    "pathPrefixes": [
+      ".codegraph/",
+      ".vscode/"
+    ],
+    "subjectPatterns": [
+      "^(chore: )?(format|prettier|lint)(\\b|:)",
+      "^style(\\b|:)"
+    ]
+  }
+}

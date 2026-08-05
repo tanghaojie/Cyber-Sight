@@ -116,3 +116,12 @@
 交付非简单改动前，AI 必须确认：代码、契约、适用的自动化测试或人工验收边界、设计、计划和 AI 协作记录彼此一致，并在允许 AI 执行的验证通过后创建带有真实模型名称 trailer 的 Git 提交。无法完成其中一项时，要明确说明原因和后续动作，不能静默跳过。
 
 @RTK.md
+
+## 跨 AI 文档归档启动协议
+
+- 每次 AI 开始仓库任务时，先运行 `pnpm docs:archive:check`。
+- 若结果为 `DUE`，必须创建或继续 `docs/plans/active/` 下 `type: documentation-archive-review` 的计划。
+- 若结果为 `IN_PROGRESS`，优先继续已有归档审查计划，不得创建重复计划。
+- 若结果为 `BLOCKED`，保留现有文档和证据，向维护者报告具体冲突，不得猜测后归档。
+- 归档触发、基线和阈值使用 `docs/archive/archive-policy.json` 与 `docs/archive/archive-ledger.json`；禁止使用 Codex、Claude 或其他单一 AI 平台的私有状态文件作为仓库协议。
+- 归档审查必须先根据当前代码、测试、契约、迁移和 Git 历史补充当前 Design/ADR，再归档已经被取代的历史内容。

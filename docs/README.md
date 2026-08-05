@@ -51,3 +51,20 @@ docs/
 - 计划和日志：`YYYY-MM-DD-<topic>.md`。
 - ADR：`ADR-NNNN-<topic>.md`，编号递增且不复用。
 - 正文默认中文，代码标识保持原样。
+
+## AI 启动归档审查
+
+所有 AI 智能体进入仓库任务时都应运行：
+
+```text
+pnpm docs:archive:check
+```
+
+命令只读检查 Git 历史、当前文档、活动计划和归档基线，不依赖任何特定 AI 平台。若结果为
+`DUE`，AI 应在 `plans/active/` 创建或继续带有 `type: documentation-archive-review` 的归档审查计划；
+`IN_PROGRESS` 表示已有智能体创建了共享任务，`BLOCKED` 表示必须请求维护者确认。
+
+归档审查不是单纯移动旧文件。AI 必须先通过代码、测试、API 契约、数据库迁移和 Git 历史补充当前
+Design/ADR，再将已被当前事实取代的 Design、文档、ADR、计划和 AI 协作记录归入 `archive/`。
+
+机器可读的触发策略和归档基线位于 `archive/archive-policy.json` 与 `archive/archive-ledger.json`。
