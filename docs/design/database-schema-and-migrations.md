@@ -2,7 +2,7 @@
 title: 数据库 Schema 与迁移基线
 status: active
 owner: project maintainers
-updated: 2026-07-30
+updated: 2026-08-05
 ---
 
 # 数据库 Schema 与迁移基线
@@ -12,6 +12,12 @@ updated: 2026-07-30
 数据库层使用 PostgreSQL、Drizzle ORM 和受版本控制的 SQL 迁移。当前仓库中的表都是脚手架自带的系统能力表，物理表名统一使用 `sys_` 前缀；TypeScript 表对象继续使用既有语义名称，业务模块不直接拼接物理表名。
 
 `sys_` 只标识应用拥有的框架系统表。PostgreSQL 枚举类型 `menu_type`、`authorization_subject_type`、`data_scope_type` 以及 Drizzle 自有的 `drizzle.__drizzle_migrations` 不属于应用表，不增加该前缀。
+
+## Schema 源码组织
+
+`apps/backend/src/db/schema.ts` 是数据库 Schema 的稳定聚合入口：数据库客户端、Drizzle Kit 和既有调用方均从该文件取得完整 Schema。具体表定义按数据所有权拆分到同级 `schema/` 目录；聚合入口只显式重新导出各分片，不承载表定义，也不使用无差别 barrel。
+
+分片之间可以为外键显式导入被引用的表，但不得改变导出的表对象、枚举、列、约束或索引。纯源码组织重构不生成 SQL migration，不改写既有 migration、snapshot 或 journal；只有数据库对象发生语义变化时才追加迁移。
 
 ## 物理表映射
 

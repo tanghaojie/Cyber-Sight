@@ -29,6 +29,7 @@
 
 ## 完成计划与 AI 协作记录
 
+- 2026-08-05：[数据库 Schema 源码拆分计划](plans/2026-08-05-database-schema-source-split.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-05-database-schema-source-split.md)。
 - 2026-08-05：[菜单图标前端必填校验计划](plans/2026-08-05-menu-icon-validation.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-05-menu-icon-validation.md)。
 - 2026-08-05：[接口日志前端与运维导航计划](plans/2026-08-05-api-logs-frontend.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-05-api-logs-frontend.md)。

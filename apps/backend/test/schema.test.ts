@@ -2,6 +2,7 @@ import { getTableColumns } from 'drizzle-orm'
 import { getTableConfig, type PgTable } from 'drizzle-orm/pg-core'
 import { describe, expect, it } from 'vitest'
 import { PermissionKeySchema } from '@scaffold/api-contract'
+import * as schema from '@/db/schema.js'
 import {
   apiRequestLogs,
   authSessions,
@@ -95,6 +96,30 @@ const activeBusinessIdentityIndexes: Array<{
 ]
 
 describe('system table naming and lifecycle fields', () => {
+  it('keeps the stable schema entrypoint complete after source splitting', () => {
+    expect(Object.keys(schema).sort()).toEqual([
+      'apiRequestLogs',
+      'auditColumns',
+      'authSessions',
+      'authorizationSubjectType',
+      'dataPolicyDepartments',
+      'dataPolicyRules',
+      'dataScopeType',
+      'departmentClosure',
+      'departments',
+      'dictionaries',
+      'menuType',
+      'menus',
+      'permissions',
+      'roleMenus',
+      'rolePermissions',
+      'roles',
+      'userDepartments',
+      'userRoles',
+      'users',
+    ])
+  })
+
   it.each(systemTables)('$name uses the system prefix', ({ table, name }) => {
     expect(getTableConfig(table).name).toBe(name)
     expect(name).toMatch(/^sys_/)

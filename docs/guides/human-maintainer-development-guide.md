@@ -92,7 +92,8 @@ pnpm dev
 | `src/modules/biz/<module>/`    | 产品业务能力的路由入口                                 |
 | `src/shared/http/`             | 响应包装、分页默认值等公共 HTTP 规则                   |
 | `src/shared/errors/`           | 可执行错误码常量                                       |
-| `src/db/schema.ts`             | Drizzle 数据模型定义                                   |
+| `src/db/schema.ts`             | Drizzle 数据模型的稳定聚合入口                         |
+| `src/db/schema/`               | 按数据所有权拆分的表、枚举与共享字段定义               |
 | `src/db/index.ts`              | PostgreSQL 客户端和 Drizzle 实例                       |
 | `drizzle/`                     | 已生成并需要提交的 SQL 迁移和快照                      |
 | `test/`                        | Fastify 路由、契约和公共辅助函数测试                   |
@@ -292,11 +293,11 @@ export const findUser = async (id: number) => {
 
 ### 9.1 Drizzle 是什么
 
-Drizzle 用 TypeScript 定义数据库结构，并根据 Schema 差异生成 SQL 迁移。`src/db/schema.ts` 描述目标模型，`drizzle/` 记录数据库如何一步步演进。脚手架自带表的物理名称统一以 `sys_` 开头，TypeScript 表对象保留简洁的模块语义名。
+Drizzle 用 TypeScript 定义数据库结构，并根据 Schema 差异生成 SQL 迁移。`src/db/schema.ts` 聚合 `src/db/schema/` 中按数据所有权拆分的目标模型，`drizzle/` 记录数据库如何一步步演进。脚手架自带表的物理名称统一以 `sys_` 开头，TypeScript 表对象保留简洁的模块语义名。
 
 ### 9.2 修改表结构
 
-1. 修改 `apps/backend/src/db/schema.ts`。
+1. 修改 `apps/backend/src/db/schema/` 中拥有该表的分片；新增分片时同步在 `apps/backend/src/db/schema.ts` 显式导出。
 2. 运行 `pnpm db:generate`。
 3. 人工审查新生成的 SQL，特别关注删除列、修改类型、唯一约束和默认值。
 4. 在开发数据库运行 `pnpm db:migrate`。
@@ -381,7 +382,7 @@ pnpm --filter @scaffold/frontend build # 前端类型检查和生产构建，不
 
 ### 数据库迁移没有生成
 
-确认修改的是 `src/db/schema.ts`，并从仓库根运行 `pnpm db:generate`。首次运行 Drizzle Kit 可能需要系统允许其创建本地工作目录。
+确认修改的是 `src/db/schema/` 中对应分片，且该分片已由 `src/db/schema.ts` 导出；再从仓库根运行 `pnpm db:generate`。首次运行 Drizzle Kit 可能需要系统允许其创建本地工作目录。
 
 ### 测试不应连接数据库，为什么仍需要 DATABASE_URL
 
