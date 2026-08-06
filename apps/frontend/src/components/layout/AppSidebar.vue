@@ -122,16 +122,11 @@ const { formatDateTime, t } = useLocalization()
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image:
-    radial-gradient(
-      circle at 16% 0,
-      color-mix(in srgb, var(--brand-accent), transparent 84%),
-      transparent 30%
-    ),
-    linear-gradient(var(--sidebar-surface-soft) 1px, transparent 1px);
-  background-size:
-    auto,
-    100% 48px;
+  background-image: radial-gradient(
+    circle at 16% 0,
+    color-mix(in srgb, var(--brand-accent), transparent 84%),
+    transparent 30%
+  );
 }
 
 .sidebar-brand {
