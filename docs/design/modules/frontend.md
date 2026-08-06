@@ -2,7 +2,7 @@
 title: 前端应用与应用壳
 status: active
 owner: maintainers
-updated: 2026-08-05
+updated: 2026-08-07
 ---
 
 # 前端应用与应用壳
@@ -34,7 +34,7 @@ updated: 2026-08-05
 - `src/bootstrap/registerHttpErrorHandler.ts`：组装 Router、认证、导航和全局 HTTP 错误动作。
 - `src/components/layout/` 与 `src/layouts/AdminLayout.vue`：桌面级联顶部导航、移动侧栏抽屉、顶栏和内容出口；头像下拉菜单可打开个人资料页。
 - `src/modules/system/tag-view/`：账号隔离的页面标签历史、浏览器持久化和标签控制界面。
-- `src/modules/system/settings/`：设备级系统界面偏好、版本化浏览器持久化、设置 Dialog，以及主题颜色与深色模式的应用根控制器。
+- `src/modules/system/settings/`：设备级系统界面偏好、版本化浏览器持久化、设置 Dialog，以及主题颜色与深色模式的应用根控制器；登录页通过 auth 模块私有入口消费其 Store 与主题元数据。
 - `src/modules/system/localization/`：默认中文的运行时语言状态、模块和 shared 资源发现、Element Plus
   语言包、日期格式化和语言切换器。
 - `src/layouts/EmptyLayout.vue`：只提供一个 `<router-view>` 的可选布局。

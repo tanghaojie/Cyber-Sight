@@ -2,7 +2,7 @@
 title: 前端系统设置模块
 status: active
 owner: maintainers
-updated: 2026-08-05
+updated: 2026-08-07
 ---
 
 # 前端系统设置模块
@@ -19,7 +19,7 @@ updated: 2026-08-05
 
 ## 职责与边界
 
-- `settings.store.ts` 是设置数据所有者，负责恢复、校验、立即持久化和清除浏览器数据。
+- `settings.store.ts` 是设置数据所有者，负责恢复、校验、立即持久化和清除浏览器数据。登录页外观入口也消费同一 Store，用户无需认证即可设置设备级深色模式与主题颜色。
 - `SettingsDialog.vue` 是公开编辑界面。每次选择、开关变化和恢复默认值都立即更新 Store；关闭弹窗不回滚已应用的设置。
 - `ThemeController.vue` 是公开应用根控制器，订阅 Store 并把主题颜色、深色状态和浏览器 `color-scheme` 同步至 `html`；它不拥有或复制设置状态。
 - `settings.locales.ts` 提供模块固定中英文文案。
@@ -43,6 +43,11 @@ AdminLayout
     -> settings.store.settings.navigationMenuStyle / tagsView / sidebarLogo
     -> 顶部或侧边导航布局、Tags View 可见性、侧栏品牌区
 
+LoginInteraction
+    -> LoginAppearanceControls
+        -> settings.store.save()
+        -> 登录页主题与深色模式即时更新
+
 main.ts
     -> settings.store.settings.dynamicTitle
     -> 路由标题或固定 appConfig.name
@@ -56,7 +61,7 @@ main.ts
 
 损坏、旧版或字段不完整的存储内容会回退默认值。浏览器禁止或拒绝写入 `localStorage` 时，当前会话仍保留内存设置，刷新后的恢复不受保证。深色规则必须以不低于主题浅色规则的选择器优先级覆盖所有表面令牌，避免主题专属浅色背景在深色模式下残留。
 
-AI 执行格式化、格式检查、TypeScript 检查、生产构建和最终 diff 检查，不创建或运行前端自动化测试。维护者人工验收应确认：每项选择无需保存即可应用和持久化、关闭弹窗不回滚、恢复默认值立即生效，刷新后六项设置恢复；Tags View 关闭后不显示且不清除已保存历史，重新开启后恢复显示；侧栏 Logo 关闭后桌面侧栏不保留品牌区，抽屉侧栏仍有关闭按钮；动态标题关闭后路由和语言切换不改变浏览器标题且始终显示 app name；六色主题与深色模式立即更新应用壳、基础表面、Element Plus 和设置弹窗；窄屏保持抽屉式侧边导航而不改写桌面偏好。
+AI 执行格式化、格式检查、TypeScript 检查、生产构建和最终 diff 检查，不创建或运行前端自动化测试。维护者人工验收应确认：每项选择无需保存即可应用和持久化、关闭弹窗不回滚、恢复默认值立即生效，刷新后六项设置恢复；登录页外观入口可键盘聚焦，深色模式与六色主题立即更新登录页，刷新后仍恢复；Tags View 关闭后不显示且不清除已保存历史，重新开启后恢复显示；侧栏 Logo 关闭后桌面侧栏不保留品牌区，抽屉侧栏仍有关闭按钮；动态标题关闭后路由和语言切换不改变浏览器标题且始终显示 app name；六色主题与深色模式立即更新应用壳、基础表面、Element Plus 和设置弹窗；窄屏保持抽屉式侧边导航而不改写桌面偏好。
 
 ## 兼容性与迁移
 

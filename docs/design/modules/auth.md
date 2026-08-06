@@ -2,7 +2,7 @@
 title: 认证模块
 status: active
 owner: maintainers
-updated: 2026-08-05
+updated: 2026-08-07
 ---
 
 # 认证模块
@@ -33,14 +33,15 @@ updated: 2026-08-05
 
 - `pages/components/LoginPresentation.vue` 负责左侧 CYBER 品牌、AI 协作全栈基座主张、三项工程支柱、创作者署名和纯展示性的全息背景。背景使用主题语义令牌构造透视网格、悬浮几何体、轨道与数据节点；它不读取认证状态、不发起请求，也不改变文案键。
 - `pages/components/LoginInteraction.vue` 负责右侧语言切换、工作台访问环境提示、凭据输入、错误提示、提交状态、本地开发账号提示和登录后的 redirect 恢复。它通过 `useAuthStore().login()` 执行既有认证流程，成功后仍替换到路由 query 中的 `redirect` 或首页。
+- `pages/components/LoginAppearanceControls.vue` 是 `LoginInteraction` 使用的私有视觉偏好入口，消费 settings 模块登记的 Store、主题元数据和本地化键；它只更新设备级深色模式与主题颜色，不读取认证状态，也不改变登录流程。
 
 登录页的固定展示文案从 `auth.locales.ts` 提供，首屏明确说明模块边界、共享契约和持续演进三个价值支柱；窄屏隐藏左侧展示区，在交互区保留产品标识、访问环境和创作者署名。展示动画仅使用组件内 CSS，不新增运行时依赖或网络资源；`prefers-reduced-motion: reduce` 时停止连续动画，保留静态空间层次和可读内容。
 
-认证表单的输入、错误和登录行为仍由原有 store 与 API 负责，展示重设计不改变认证、会话、redirect、cookie 或主题切换语义。
+认证表单的输入、错误和登录行为仍由原有 store 与 API 负责，展示重设计不改变认证、会话、redirect 或 cookie 语义。登录页外观入口复用应用根的 `ThemeController`，因此主题切换只改变 CSS 令牌和浏览器 `color-scheme`，不改变认证语义。
 
 ## 失败模式与测试
 
-缺少 Bearer 头、格式错误、签名错误、过期、数据库会话不存在或已撤销均返回 HTTP 401；单纯缓存未命中会回源数据库。前端全局处理器同时清除用户、token、导航与动态路由。后端自动化测试覆盖密码、JWT 完整性与过期、LRU 容量和最近使用顺序、淘汰后回源与显式清会话；Bearer 注入、登录状态持久化、清状态和路由保护由维护者人工验收。
+缺少 Bearer 头、格式错误、签名错误、过期、数据库会话不存在或已撤销均返回 HTTP 401；单纯缓存未命中会回源数据库。前端全局处理器同时清除用户、token、导航与动态路由。后端自动化测试覆盖密码、JWT 完整性与过期、LRU 容量和最近使用顺序、淘汰后回源与显式清会话；Bearer 注入、登录状态持久化、清状态和路由保护，以及登录前主题入口由维护者人工验收。
 
 `sys_auth_sessions.token_hash` 全表唯一并保留软删除与审计字段。过期或撤销记录仍是历史安全标识，不重新使用；后续可增加独立清理策略，但清理不能改变仍有效 token 的鉴权语义。
 

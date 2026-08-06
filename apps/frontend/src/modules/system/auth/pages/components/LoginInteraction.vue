@@ -1,6 +1,9 @@
 <template>
   <section class="login-interaction">
-    <LanguageSwitcher class="login-language" />
+    <div class="login-toolbar">
+      <LanguageSwitcher />
+      <LoginAppearanceControls />
+    </div>
     <div class="login-shell">
       <div class="mobile-brand">
         <CyberLogo :show-descriptor="false" tone="dark" />
@@ -73,6 +76,7 @@ import { appConfig } from '@/config/app.config'
 import { useAuthStore } from '@/modules/system/auth/auth.store'
 import LanguageSwitcher from '@/modules/system/localization/LanguageSwitcher.vue'
 import { useLocalization } from '@/modules/system/localization/localization'
+import LoginAppearanceControls from './LoginAppearanceControls.vue'
 
 const auth = useAuthStore()
 const route = useRoute()
@@ -118,10 +122,13 @@ async function handleSubmit(): Promise<void> {
   gap: 17px;
 }
 
-.login-language {
+.login-toolbar {
   position: absolute;
   top: 28px;
   right: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .login-context {
@@ -300,7 +307,7 @@ async function handleSubmit(): Promise<void> {
     padding: 44px 24px 32px;
   }
 
-  .login-language {
+  .login-toolbar {
     top: 20px;
     right: 20px;
   }
