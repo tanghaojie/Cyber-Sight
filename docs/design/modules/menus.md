@@ -56,3 +56,5 @@ updated: 2026-08-05
 初始版本之前的菜单、布局和软删除唯一性取舍保留在[归档 ADR](../../archive/README.md)，当前语义以本设计、共享 Schema 和后端测试为准。
 
 本次默认菜单基线修正的实施证据见[完成计划](../../archive/plans/2026-07-30-default-menu-baseline.md)和 [AI 协作记录](../../archive/ai-logs/2026/07/2026-07-30-default-menu-baseline.md)。
+
+关于项目菜单由 `0003_about_project_menu.sql` 追加，使用 `/about`、`about`、`AdminLayout` 和高于现有根菜单的 `sort_order`，且不绑定权限键。

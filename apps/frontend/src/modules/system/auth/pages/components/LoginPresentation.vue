@@ -47,7 +47,15 @@
         <span><i /> {{ t('auth.manifesto.topline') }}</span>
         <small>{{ t('auth.manifesto.systemTag') }}</small>
       </div>
-      <CyberLogo class="login-logo" tone="light" />
+      <a
+        class="login-logo-link"
+        :href="appConfig.githubUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        :aria-label="t('auth.brand.githubLabel')"
+      >
+        <CyberLogo class="login-logo" tone="light" />
+      </a>
       <div class="manifesto">
         <p class="manifesto__eyebrow">
           <span>{{ t('auth.manifesto.kicker') }}</span>
@@ -540,6 +548,23 @@ const { t } = useLocalization()
   --cyber-logo-mark-size: 56px;
   --cyber-logo-wordmark-size: 19px;
   --cyber-logo-descriptor-size: 8px;
+}
+
+.login-logo-link {
+  display: inline-flex;
+  align-self: flex-start;
+  border-radius: 18px;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+.login-logo-link:hover,
+.login-logo-link:focus-visible {
+  outline: 0;
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--brand-accent), transparent 38%));
+  transform: translateY(-2px);
 }
 
 .manifesto {

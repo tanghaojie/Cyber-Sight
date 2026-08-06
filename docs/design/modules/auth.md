@@ -35,6 +35,8 @@ updated: 2026-08-07
 - `pages/components/LoginInteraction.vue` 负责右侧语言切换、工作台访问环境提示、凭据输入、错误提示、提交状态、本地开发账号提示和登录后的 redirect 恢复。它通过 `useAuthStore().login()` 执行既有认证流程，成功后仍替换到路由 query 中的 `redirect` 或首页。
 - `pages/components/LoginAppearanceControls.vue` 是 `LoginInteraction` 使用的私有视觉偏好入口，消费 settings 模块登记的 Store、主题元数据和本地化键；它只更新设备级深色模式与主题颜色，不读取认证状态，也不改变登录流程。
 
+登录页桌面展示区和窄屏交互区都将 CYBER Logo 作为 GitHub 项目入口，复用 `appConfig.githubUrl` 并以新窗口安全属性打开；该外链不参与登录、redirect 或会话流程。
+
 登录页的固定展示文案从 `auth.locales.ts` 提供，首屏明确说明模块边界、共享契约和持续演进三个价值支柱；窄屏隐藏左侧展示区，在交互区保留产品标识、访问环境和创作者署名。展示动画仅使用组件内 CSS，不新增运行时依赖或网络资源；`prefers-reduced-motion: reduce` 时停止连续动画，保留静态空间层次和可读内容。
 
 认证表单的输入、错误和登录行为仍由原有 store 与 API 负责，展示重设计不改变认证、会话、redirect 或 cookie 语义。登录页外观入口复用应用根的 `ThemeController`，因此主题切换只改变 CSS 令牌和浏览器 `color-scheme`，不改变认证语义。

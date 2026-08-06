@@ -9,6 +9,7 @@ export const appConfig = Object.freeze({
   fullName: configuredValue(import.meta.env.VITE_APP_FULL_NAME, 'Cyber Scaffold'),
   tagline: configuredValue(import.meta.env.VITE_APP_TAGLINE, 'Build clearly. Evolve safely.'),
   productLabel: configuredValue(import.meta.env.VITE_APP_PRODUCT_LABEL, 'SYSTEM SCAFFOLD'),
+  githubUrl: 'https://github.com/tanghaojie/cyber-scaffold',
   creatorName: 'JTLab',
   creatorFullName: '桀士实验室',
   primaryColor: '#277A52',

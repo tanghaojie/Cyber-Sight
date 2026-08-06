@@ -3,6 +3,15 @@
     <article class="hero-panel">
       <div class="hero-mesh" aria-hidden="true" />
       <div class="hero-topline">
+        <a
+          class="hero-brand-link"
+          :href="appConfig.githubUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          :aria-label="t('shared.brand.githubLabel')"
+        >
+          <CyberLogo :show-descriptor="false" tone="light" />
+        </a>
         <span class="hero-kicker"><i />{{ t('home.hero.kicker') }}</span>
         <span class="hero-status"><i />{{ t('home.hero.status') }}</span>
       </div>
@@ -19,10 +28,21 @@
       </div>
       <div class="hero-footer">
         <span class="hero-footer__note">{{ todayLabel }} · {{ t('home.hero.statusDetail') }}</span>
-        <div class="hero-notes">
-          <span><b>01</b>{{ t('home.hero.stat.structure') }}</span>
-          <span><b>02</b>{{ t('home.hero.stat.contract') }}</span>
-          <span><b>03</b>{{ t('home.hero.stat.foundation') }}</span>
+        <div class="hero-footer__actions">
+          <div class="hero-notes">
+            <span><b>01</b>{{ t('home.hero.stat.structure') }}</span>
+            <span><b>02</b>{{ t('home.hero.stat.contract') }}</span>
+            <span><b>03</b>{{ t('home.hero.stat.foundation') }}</span>
+          </div>
+          <a
+            class="hero-github-link"
+            :href="appConfig.githubUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <AppIcon name="external" />
+            <span>{{ t('home.hero.github') }}</span>
+          </a>
         </div>
       </div>
     </article>
@@ -88,6 +108,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
+import CyberLogo from '@/components/brand/CyberLogo.vue'
 import { appConfig } from '@/config/app.config'
 import { useLocalization } from '@/modules/system/localization/localization'
 import { navigationLabel } from '@/modules/system/navigation/navigation.labels'
@@ -197,13 +218,35 @@ const pillars = [
 }
 
 .hero-topline {
-  padding-bottom: 21px;
+  padding-bottom: 18px;
   border-bottom: 1px solid color-mix(in srgb, var(--hero-foreground), transparent 87%);
   color: var(--hero-meta);
   font-size: 8px;
   font-weight: 850;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+}
+
+.hero-brand-link {
+  display: inline-flex;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+.hero-brand-link:hover,
+.hero-brand-link:focus-visible {
+  outline: 0;
+  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--brand-accent), transparent 45%));
+  transform: translateY(-2px);
+}
+
+.hero-brand-link :deep(.cyber-logo) {
+  --cyber-logo-mark-size: 31px;
+  --cyber-logo-wordmark-size: 12px;
 }
 
 .hero-kicker,
@@ -284,6 +327,12 @@ const pillars = [
   border-top: 1px solid color-mix(in srgb, var(--hero-foreground), transparent 87%);
 }
 
+.hero-footer__actions {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
 .hero-footer__note {
   color: var(--hero-meta);
   font-size: 8px;
@@ -308,6 +357,32 @@ const pillars = [
   color: var(--brand-accent);
   font-size: 8px;
   letter-spacing: 0.1em;
+}
+
+.hero-github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--brand-accent);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition:
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.hero-github-link:hover,
+.hero-github-link:focus-visible {
+  outline: 0;
+  color: var(--hero-foreground);
+  transform: translateY(-2px);
+}
+
+.hero-github-link :deep(svg) {
+  width: 14px;
+  height: 14px;
 }
 
 .insight-section {
@@ -578,6 +653,12 @@ const pillars = [
   .hero-notes {
     flex-wrap: wrap;
     gap: 10px 18px;
+  }
+
+  .hero-footer__actions {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 13px;
   }
 
   .insight-grid {

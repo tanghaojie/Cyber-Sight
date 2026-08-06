@@ -19,6 +19,6 @@
 - [认证](modules/auth.md) · [授权与数据范围](modules/authorization.md) · [用户](modules/users.md) · [角色](modules/roles.md) · [部门](modules/departments.md)
 - [菜单](modules/menus.md) · [字典](modules/dictionaries.md)
 - [接口日志](modules/api-logs.md)
-- [前端导航](modules/navigation.md) · [前端运行时多语言](modules/localization.md) · [标签历史](modules/tag-view.md) · [系统设置](modules/settings.md) · [工作台](modules/home.md) · [错误页面](modules/errors.md)
+- [前端导航](modules/navigation.md) · [前端运行时多语言](modules/localization.md) · [标签历史](modules/tag-view.md) · [系统设置](modules/settings.md) · [工作台](modules/home.md) · [关于项目](modules/about.md) · [错误页面](modules/errors.md)
 
 新增一级模块时增加对应设计文档，并登记职责、边界、公共文件、依赖、数据流、失败模式和测试策略。

@@ -6,7 +6,15 @@
     </div>
     <div class="login-shell">
       <div class="mobile-brand">
-        <CyberLogo :show-descriptor="false" tone="dark" />
+        <a
+          class="mobile-brand__link"
+          :href="appConfig.githubUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          :aria-label="t('auth.brand.githubLabel')"
+        >
+          <CyberLogo :show-descriptor="false" tone="dark" />
+        </a>
       </div>
       <div class="login-context">
         <span><i />{{ t('auth.login.accessMode') }}</span>
@@ -298,6 +306,22 @@ async function handleSubmit(): Promise<void> {
 .mobile-brand,
 .mobile-credit {
   display: none;
+}
+
+.mobile-brand__link {
+  display: inline-flex;
+  border-radius: 15px;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+.mobile-brand__link:hover,
+.mobile-brand__link:focus-visible {
+  outline: 0;
+  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--primary), transparent 42%));
+  transform: translateY(-2px);
 }
 
 @media (max-width: 900px) {

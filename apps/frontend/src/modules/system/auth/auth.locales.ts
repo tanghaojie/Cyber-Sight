@@ -3,6 +3,7 @@ import { defineLocalizationResource } from '@/shared/localization/localization.r
 export const localizationResource = defineLocalizationResource('auth', {
   'zh-CN': {
     'brand.ariaLabel': 'CYBER 品牌介绍',
+    'brand.githubLabel': '在 GitHub 查看 Cyber Scaffold',
     'manifesto.kicker': 'AI 协作全栈基座',
     'manifesto.lineOne': '让复杂系统，',
     'manifesto.lineTwo': '清晰生长。',
@@ -36,6 +37,7 @@ export const localizationResource = defineLocalizationResource('auth', {
   },
   'en-US': {
     'brand.ariaLabel': 'About the CYBER brand',
+    'brand.githubLabel': 'View Cyber Scaffold on GitHub',
     'manifesto.kicker': 'AI-NATIVE FULL-STACK BASE',
     'manifesto.lineOne': 'Make complexity',
     'manifesto.lineTwo': 'grow clearly.',

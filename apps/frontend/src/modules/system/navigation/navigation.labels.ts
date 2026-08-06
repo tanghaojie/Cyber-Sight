@@ -73,6 +73,13 @@ const defaultNavigationFingerprints: readonly DefaultNavigationFingerprint[] = [
     name: '接口日志',
     key: 'navigation.defaultMenus.apiLogs',
   },
+  {
+    type: 'menu',
+    path: '/about',
+    component: 'about',
+    name: '关于项目',
+    key: 'navigation.defaultMenus.about',
+  },
 ]
 
 /**
