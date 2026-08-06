@@ -42,6 +42,7 @@ status: completed
 
 ## 相关设计、ADR、计划和提交
 
-- [关于项目实施计划](../../../../plans/2026-08-07-about-project.md)
+- [关于项目实施计划](../../../plans/2026-08-07-about-project.md)
 - [前端应用与应用壳](../../design/modules/frontend.md)
 - [菜单模块](../../design/modules/menus.md)
+- 相关提交：`3a63ad81a2fb2b85a918f7a2bb426e9d497114f9`

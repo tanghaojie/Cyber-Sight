@@ -78,4 +78,5 @@ updated: 2026-08-07
 - [菜单模块](../../design/modules/menus.md)
 - [CYBER 品牌与视觉系统](../../design/branding.md)
 - [AI 协作记录](../ai-logs/2026/08/2026-08-07-about-project.md)
+- 相关提交：`3a63ad81a2fb2b85a918f7a2bb426e9d497114f9`
 - 归档审计：本次 `pnpm docs:archive:check` 初始返回 `DUE`（architecture change detected）；已补充当前 Design、Plan 与 AI Log，归档完成后同步更新 archive ledger。
