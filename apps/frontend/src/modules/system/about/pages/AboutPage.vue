@@ -88,6 +88,78 @@
       </div>
     </section>
 
+    <section class="about-section audience-section">
+      <div class="section-heading">
+        <div>
+          <p class="about-section__eyebrow">{{ t('about.audience.eyebrow') }}</p>
+          <h2>{{ t('about.audience.title') }}</h2>
+        </div>
+        <p>{{ t('about.audience.description') }}</p>
+      </div>
+      <div class="audience-layout">
+        <div class="audience-card-grid">
+          <article v-for="audience in audiences" :key="audience.id" class="audience-card">
+            <div class="audience-card__icon"><AppIcon :name="audience.icon" /></div>
+            <div>
+              <p class="audience-card__label">{{ t(audience.label) }}</p>
+              <h3>{{ t(audience.title) }}</h3>
+              <p>{{ t(audience.detail) }}</p>
+            </div>
+          </article>
+        </div>
+        <aside class="audience-aside">
+          <span class="flow-signal"><i />{{ t('about.audience.noteLabel') }}</span>
+          <strong>{{ t('about.audience.noteTitle') }}</strong>
+          <p>{{ t('about.audience.noteDetail') }}</p>
+        </aside>
+      </div>
+      <div class="scenario-heading">
+        <div>
+          <p class="about-section__eyebrow">{{ t('about.scenarios.eyebrow') }}</p>
+          <h3>{{ t('about.scenarios.title') }}</h3>
+        </div>
+        <span>{{ t('about.scenarios.count') }}</span>
+      </div>
+      <div class="scenario-grid">
+        <article v-for="scenario in scenarios" :key="scenario.id" class="scenario-card">
+          <span class="scenario-card__index">{{ scenario.index }}</span>
+          <h4>{{ t(scenario.title) }}</h4>
+          <p>{{ t(scenario.detail) }}</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="about-section comparison-section">
+      <div class="section-heading section-heading--split">
+        <div>
+          <p class="about-section__eyebrow">{{ t('about.comparison.eyebrow') }}</p>
+          <h2>{{ t('about.comparison.title') }}</h2>
+        </div>
+        <p>{{ t('about.comparison.description') }}</p>
+      </div>
+      <div class="comparison-table-wrap">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th scope="col">{{ t('about.comparison.dimension') }}</th>
+              <th scope="col">{{ t('about.comparison.zero') }}</th>
+              <th scope="col" class="comparison-table__featured">
+                {{ t('about.comparison.cyber') }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="row in comparisonRows" :key="row.id">
+              <th scope="row">{{ t(row.label) }}</th>
+              <td>{{ t(row.zero) }}</td>
+              <td class="comparison-table__featured">{{ t(row.cyber) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <blockquote class="comparison-quote">{{ t('about.comparison.quote') }}</blockquote>
+    </section>
+
     <section class="about-section blueprint-section">
       <div class="section-heading section-heading--split">
         <div>
@@ -190,11 +262,132 @@ const principles = [
     detail: 'about.principles.contract.detail',
   },
   {
-    id: 'evolution',
+    id: 'context',
     index: '03',
+    icon: 'book',
+    title: 'about.principles.context.title',
+    detail: 'about.principles.context.detail',
+  },
+  {
+    id: 'fullstack',
+    index: '04',
     icon: 'activity',
-    title: 'about.principles.evolution.title',
-    detail: 'about.principles.evolution.detail',
+    title: 'about.principles.fullstack.title',
+    detail: 'about.principles.fullstack.detail',
+  },
+  {
+    id: 'foundation',
+    index: '05',
+    icon: 'shield',
+    title: 'about.principles.foundation.title',
+    detail: 'about.principles.foundation.detail',
+  },
+] as const
+
+const audiences = [
+  {
+    id: 'maker',
+    icon: 'user',
+    label: 'about.audience.maker.label',
+    title: 'about.audience.maker.title',
+    detail: 'about.audience.maker.detail',
+  },
+  {
+    id: 'developer',
+    icon: 'wrench',
+    label: 'about.audience.developer.label',
+    title: 'about.audience.developer.title',
+    detail: 'about.audience.developer.detail',
+  },
+] as const
+
+const scenarios = [
+  {
+    id: 'internal',
+    index: '01',
+    title: 'about.scenarios.internal.title',
+    detail: 'about.scenarios.internal.detail',
+  },
+  {
+    id: 'crm',
+    index: '02',
+    title: 'about.scenarios.crm.title',
+    detail: 'about.scenarios.crm.detail',
+  },
+  {
+    id: 'operations',
+    index: '03',
+    title: 'about.scenarios.operations.title',
+    detail: 'about.scenarios.operations.detail',
+  },
+  {
+    id: 'content',
+    index: '04',
+    title: 'about.scenarios.content.title',
+    detail: 'about.scenarios.content.detail',
+  },
+  {
+    id: 'project',
+    index: '05',
+    title: 'about.scenarios.project.title',
+    detail: 'about.scenarios.project.detail',
+  },
+  {
+    id: 'knowledge',
+    index: '06',
+    title: 'about.scenarios.knowledge.title',
+    detail: 'about.scenarios.knowledge.detail',
+  },
+  {
+    id: 'saas',
+    index: '07',
+    title: 'about.scenarios.saas.title',
+    detail: 'about.scenarios.saas.detail',
+  },
+  {
+    id: 'prototype',
+    index: '08',
+    title: 'about.scenarios.prototype.title',
+    detail: 'about.scenarios.prototype.detail',
+  },
+] as const
+
+const comparisonRows = [
+  {
+    id: 'startingPoint',
+    label: 'about.comparison.row.startingPoint.label',
+    zero: 'about.comparison.row.startingPoint.zero',
+    cyber: 'about.comparison.row.startingPoint.cyber',
+  },
+  {
+    id: 'context',
+    label: 'about.comparison.row.context.label',
+    zero: 'about.comparison.row.context.zero',
+    cyber: 'about.comparison.row.context.cyber',
+  },
+  {
+    id: 'foundation',
+    label: 'about.comparison.row.foundation.label',
+    zero: 'about.comparison.row.foundation.zero',
+    cyber: 'about.comparison.row.foundation.cyber',
+  },
+  {
+    id: 'location',
+    label: 'about.comparison.row.location.label',
+    zero: 'about.comparison.row.location.zero',
+    cyber: 'about.comparison.row.location.cyber',
+  },
+  {
+    id: 'collaboration',
+    label: 'about.comparison.row.collaboration.label',
+    zero: 'about.comparison.row.collaboration.zero',
+    cyber: 'about.comparison.row.collaboration.cyber',
+  },
+  {
+    id: 'outcome',
+    label: 'about.comparison.row.outcome.label',
+    zero: 'about.comparison.row.outcome.zero',
+    cyber: 'about.comparison.row.outcome.cyber',
   },
 ] as const
 
@@ -883,6 +1076,241 @@ const stack = [
   align-items: center;
 }
 
+.audience-section,
+.comparison-section {
+  padding: 25px 0 0;
+}
+
+.audience-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(250px, 0.75fr);
+  gap: 14px;
+}
+
+.audience-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.audience-card,
+.audience-aside,
+.scenario-card {
+  border: 1px solid var(--about-line);
+  background: color-mix(in srgb, var(--surface), transparent 10%);
+}
+
+.audience-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  min-height: 172px;
+  padding: 20px;
+  border-radius: 18px;
+}
+
+.audience-card__icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 12px;
+  color: var(--primary-deep);
+  background: var(--primary-mist);
+}
+
+.audience-card__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.audience-card__label {
+  margin: 0 0 8px;
+  color: var(--primary-deep);
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.audience-card h3 {
+  margin: 0;
+  color: var(--about-ink);
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.audience-card div > p:last-child {
+  margin: 10px 0 0;
+  color: var(--about-muted);
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+.audience-aside {
+  display: grid;
+  align-content: center;
+  gap: 12px;
+  padding: 24px;
+  border-color: color-mix(in srgb, var(--about-accent), transparent 72%);
+  border-radius: 18px;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--primary-mist), transparent 20%), transparent),
+    color-mix(in srgb, var(--surface), transparent 10%);
+}
+
+.audience-aside .flow-signal {
+  color: var(--about-accent);
+}
+
+.audience-aside strong {
+  color: var(--about-ink);
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: -0.04em;
+  line-height: 1.12;
+}
+
+.audience-aside p {
+  margin: 0;
+  color: var(--about-muted);
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.scenario-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 2px 12px;
+  border-bottom: 1px solid var(--about-line);
+}
+
+.scenario-heading h3 {
+  margin: 8px 0 0;
+  color: var(--about-ink);
+  font-family: var(--font-display);
+  font-size: 19px;
+  letter-spacing: -0.03em;
+}
+
+.scenario-heading > span {
+  color: var(--primary-deep);
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.16em;
+  white-space: nowrap;
+}
+
+.scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.scenario-card {
+  min-height: 116px;
+  padding: 15px;
+  border-radius: 15px;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.scenario-card:hover {
+  border-color: color-mix(in srgb, var(--about-accent), transparent 62%);
+  box-shadow: 0 18px 36px color-mix(in srgb, var(--about-accent), transparent 92%);
+  transform: translateY(-3px);
+}
+
+.scenario-card__index {
+  color: var(--primary-deep);
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.13em;
+}
+
+.scenario-card h4 {
+  margin: 17px 0 0;
+  color: var(--about-ink);
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.scenario-card p {
+  margin: 7px 0 0;
+  color: var(--about-muted);
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.comparison-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--about-line);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--surface), transparent 8%);
+}
+
+.comparison-table {
+  width: 100%;
+  min-width: 780px;
+  border-collapse: collapse;
+  color: var(--about-muted);
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 15px 16px;
+  border-bottom: 1px solid var(--about-line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.comparison-table thead th {
+  color: var(--about-ink);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.comparison-table tbody tr:last-child th,
+.comparison-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.comparison-table tbody th {
+  width: 18%;
+  color: var(--about-ink);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.comparison-table__featured {
+  background: color-mix(in srgb, var(--primary-mist), transparent 30%);
+}
+
+.comparison-table thead .comparison-table__featured {
+  color: var(--primary-deep);
+}
+
+.comparison-quote {
+  margin: 18px 0 0;
+  padding: 0 0 0 18px;
+  border-left: 2px solid var(--about-accent);
+  color: var(--about-ink);
+  font-family: var(--font-display);
+  font-size: 16px;
+  letter-spacing: -0.025em;
+  line-height: 1.35;
+}
+
 .blueprint-section {
   padding: 25px 0 0;
 }
@@ -1298,6 +1726,10 @@ const stack = [
     margin: 0;
     text-align: right;
   }
+
+  .scenario-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 820px) {
@@ -1329,9 +1761,17 @@ const stack = [
     width: 100%;
   }
 
+  .principle-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .blueprint-flow {
     grid-template-columns: 1fr;
     gap: 16px;
+  }
+
+  .audience-layout {
+    grid-template-columns: 1fr;
   }
 
   .blueprint-flow__aside,
@@ -1416,6 +1856,17 @@ const stack = [
 
   .principle-grid {
     grid-template-columns: 1fr;
+  }
+
+  .audience-card-grid,
+  .scenario-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .scenario-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 9px;
   }
 
   .principle-card {
