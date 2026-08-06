@@ -43,6 +43,8 @@
 
 ## 完成计划与 AI 协作记录
 
+- 2026-08-07：[前端主题色一致性修复计划](plans/2026-08-07-theme-color-consistency.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-07-theme-color-consistency.md)。
+
 - 2026-08-07：[关于项目页与品牌入口计划](plans/2026-08-07-about-project.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-07-about-project.md)。
 - 2026-08-07：[登录页主题外观入口计划](plans/2026-08-07-login-appearance-entry.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-07-login-appearance-entry.md)。
 - 2026-08-06：[登录页与工作台首屏信息重设计计划](plans/2026-08-06-auth-home-visual-refresh.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-06-auth-home-visual-refresh.md)。

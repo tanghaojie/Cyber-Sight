@@ -203,7 +203,11 @@ async function savePassword(): Promise<void> {
   color: var(--hero-foreground);
   background:
     linear-gradient(125deg, var(--hero-start), var(--hero-end)),
-    repeating-linear-gradient(90deg, transparent 0 34px, rgba(255, 255, 255, 0.04) 34px 35px);
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 34px,
+      color-mix(in srgb, var(--hero-foreground), transparent 96%) 34px 35px
+    );
   box-shadow: 0 22px 58px color-mix(in srgb, var(--hero-start), transparent 72%);
 }
 

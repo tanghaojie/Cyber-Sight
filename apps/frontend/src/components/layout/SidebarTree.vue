@@ -141,7 +141,7 @@ function toggle(id: number): void {
   padding-bottom: 7px;
   border: 0;
   border-radius: 15px;
-  color: rgba(241, 245, 243, 0.76);
+  color: var(--sidebar-muted);
   background: transparent;
   text-align: left;
   transition:
@@ -150,8 +150,8 @@ function toggle(id: number): void {
     box-shadow 0.18s ease;
 
   &:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.08);
+    color: var(--sidebar-text);
+    background: var(--sidebar-surface-hover);
   }
 }
 
@@ -159,7 +159,7 @@ function toggle(id: number): void {
 .sidebar-link.sidebar-link--home.router-link-exact-active {
   color: var(--brand-accent-foreground);
   background: var(--brand-accent);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--sidebar-surface-deep), transparent 60%);
 }
 
 .sidebar-node-icon {
@@ -170,7 +170,7 @@ function toggle(id: number): void {
   place-items: center;
   border-radius: 11px;
   color: inherit;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--sidebar-surface-hover);
 }
 
 .sidebar-link.router-link-active:not(.sidebar-link--home) .sidebar-node-icon,

@@ -10,6 +10,7 @@
   --success: #2f9268;
   --warning: #d29a2e;
   --danger: #d84f62;
+  --danger-foreground: #ffffff;
   --primary: #277a52;
   --primary-deep: #1c5d3d;
   --primary-dark: #123e29;
@@ -26,7 +27,12 @@
   --surface-muted: #eef4f0;
   --sidebar-surface: #15241d;
   --sidebar-surface-deep: #08110d;
-  --sidebar-text: #f0f6f2;
+  --sidebar-text: var(--hero-foreground);
+  --sidebar-muted: color-mix(in srgb, var(--sidebar-text), transparent 48%);
+  --sidebar-faint: color-mix(in srgb, var(--sidebar-text), transparent 66%);
+  --sidebar-line: color-mix(in srgb, var(--sidebar-text), transparent 88%);
+  --sidebar-surface-soft: color-mix(in srgb, var(--sidebar-text), transparent 95%);
+  --sidebar-surface-hover: color-mix(in srgb, var(--sidebar-text), transparent 92%);
   --brand-accent: #79d2a4;
   --brand-accent-foreground: #0b2619;
   --brand-node: #aa93e3;

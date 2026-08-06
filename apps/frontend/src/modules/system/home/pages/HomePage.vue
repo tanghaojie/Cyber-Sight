@@ -194,7 +194,11 @@ const pillars = [
       color-mix(in srgb, var(--brand-accent), transparent 89%) 1px,
       transparent 1px
     ),
-    linear-gradient(120deg, transparent 0 61%, color-mix(in srgb, white, transparent 95%) 61%);
+    linear-gradient(
+      120deg,
+      transparent 0 61%,
+      color-mix(in srgb, var(--hero-foreground), transparent 95%) 61%
+    );
   background-size:
     42px 42px,
     42px 42px,

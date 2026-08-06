@@ -43,9 +43,9 @@ withDefaults(
 
 <style scoped>
 .cyber-logo {
-  --cyber-logo-mark: #f6f5ef;
-  --cyber-logo-text: #ffffff;
-  --cyber-logo-muted: rgba(255, 255, 255, 0.48);
+  --cyber-logo-mark: var(--hero-foreground);
+  --cyber-logo-text: var(--hero-foreground);
+  --cyber-logo-muted: var(--hero-meta);
   --cyber-logo-mark-size: 48px;
   display: inline-flex;
   align-items: center;

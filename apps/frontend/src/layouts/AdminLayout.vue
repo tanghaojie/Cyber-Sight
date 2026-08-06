@@ -263,7 +263,7 @@ async function handleLogout(): Promise<void> {
   inset: 0;
   z-index: 35;
   border: 0;
-  background: rgba(9, 21, 16, 0.55);
+  background: color-mix(in srgb, var(--sidebar-surface-deep), transparent 45%);
   backdrop-filter: blur(2px);
 }
 

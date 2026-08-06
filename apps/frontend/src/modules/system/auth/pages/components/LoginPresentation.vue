@@ -138,8 +138,16 @@ const { t } = useLocalization()
   inset: 0;
   opacity: 0.48;
   background:
-    linear-gradient(90deg, transparent 49.88%, rgba(255, 255, 255, 0.045) 50%, transparent 50.12%),
-    linear-gradient(rgba(255, 255, 255, 0.026) 1px, transparent 1px);
+    linear-gradient(
+      90deg,
+      transparent 49.88%,
+      color-mix(in srgb, var(--hero-foreground), transparent 95%) 50%,
+      transparent 50.12%
+    ),
+    linear-gradient(
+      color-mix(in srgb, var(--hero-foreground), transparent 97%) 1px,
+      transparent 1px
+    );
   background-size:
     104px 100%,
     100% 9px;
@@ -176,7 +184,7 @@ const { t } = useLocalization()
     0deg,
     transparent 0,
     transparent 5px,
-    rgba(255, 255, 255, 0.022) 6px
+    color-mix(in srgb, var(--hero-foreground), transparent 98%) 6px
   );
   mask-image: linear-gradient(90deg, transparent, #000 40%, transparent);
 }
@@ -335,7 +343,7 @@ const { t } = useLocalization()
 
 .sphere-ring--three {
   inset: 24%;
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: color-mix(in srgb, var(--hero-foreground), transparent 75%);
   transform: rotateX(48deg) rotateY(42deg);
   animation: orbit-three 10s linear infinite;
 }

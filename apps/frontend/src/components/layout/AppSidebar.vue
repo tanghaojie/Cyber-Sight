@@ -94,7 +94,7 @@ const { formatDateTime, t } = useLocalization()
   flex-direction: column;
   color: var(--sidebar-text);
   background: linear-gradient(180deg, var(--sidebar-surface) 0%, var(--sidebar-surface-deep) 100%);
-  box-shadow: 12px 0 36px rgba(4, 7, 6, 0.14);
+  box-shadow: 12px 0 36px color-mix(in srgb, var(--sidebar-surface-deep), transparent 72%);
 }
 
 .app-sidebar--drawer {
@@ -103,7 +103,7 @@ const { formatDateTime, t } = useLocalization()
   z-index: 40;
   width: min(280px, calc(100vw - 48px));
   visibility: hidden;
-  box-shadow: 18px 0 48px rgba(4, 7, 6, 0.24);
+  box-shadow: 18px 0 48px color-mix(in srgb, var(--sidebar-surface-deep), transparent 58%);
   pointer-events: none;
   transform: translate3d(-100%, 0, 0);
   transition:
@@ -128,7 +128,7 @@ const { formatDateTime, t } = useLocalization()
       color-mix(in srgb, var(--brand-accent), transparent 84%),
       transparent 30%
     ),
-    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+    linear-gradient(var(--sidebar-surface-soft) 1px, transparent 1px);
   background-size:
     auto,
     100% 48px;
@@ -142,7 +142,7 @@ const { formatDateTime, t } = useLocalization()
   align-items: center;
   gap: 12px;
   padding: 0 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--sidebar-line);
 
   .sidebar-logo {
     --cyber-logo-mark-size: 42px;
@@ -159,8 +159,8 @@ const { formatDateTime, t } = useLocalization()
   place-items: center;
   border: 0;
   border-radius: 11px;
-  color: rgba(255, 255, 255, 0.68);
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--sidebar-muted);
+  background: var(--sidebar-surface-hover);
 }
 
 .sidebar-close--floating {
@@ -189,20 +189,20 @@ const { formatDateTime, t } = useLocalization()
   gap: 11px;
   margin: 12px;
   padding: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--sidebar-line);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.045);
+  background: var(--sidebar-surface-soft);
 
   b {
     display: block;
-    color: rgba(255, 255, 255, 0.82);
+    color: var(--sidebar-text);
     font-size: 10px;
   }
 
   small {
     display: block;
     margin-top: 4px;
-    color: rgba(255, 255, 255, 0.44);
+    color: var(--sidebar-faint);
     font-size: 7px;
     letter-spacing: 0.12em;
   }
@@ -216,8 +216,8 @@ const { formatDateTime, t } = useLocalization()
   box-shadow: 0 0 0 6px color-mix(in srgb, var(--success), transparent 86%);
 
   &.loading {
-    background: #ffffff;
-    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.14);
+    background: var(--sidebar-text);
+    box-shadow: 0 0 0 6px var(--sidebar-surface-hover);
   }
 
   &.error {
@@ -232,7 +232,7 @@ const { formatDateTime, t } = useLocalization()
   place-items: center;
   align-content: center;
   gap: 10px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--sidebar-faint);
   font-size: 10px;
 
   span {

@@ -341,7 +341,7 @@ function updateTheme(themeColor: ThemeColor): void {
   border-radius: 12px;
   color: var(--muted);
   background: color-mix(in srgb, var(--surface), transparent 22%);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--surface), #fff 24%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--surface), var(--ink) 24%);
   font-size: 10px;
   font-weight: 800;
   transition:

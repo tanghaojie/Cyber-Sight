@@ -1,7 +1,7 @@
 @use 'element-plus/theme-chalk/el-message-box.css';
 
 html body .el-overlay.is-message-box {
-  background: rgba(8, 14, 11, 0.64);
+  background: color-mix(in srgb, var(--sidebar-surface-deep), transparent 36%);
   backdrop-filter: blur(3px);
 }
 
@@ -81,24 +81,24 @@ html body .el-message-box__btns {
   }
 
   .el-button.el-button--primary {
-    --el-button-text-color: #fff;
-    --el-button-hover-text-color: #fff;
-    --el-button-active-text-color: #fff;
-    color: #fff;
+    --el-button-text-color: var(--danger-foreground);
+    --el-button-hover-text-color: var(--danger-foreground);
+    --el-button-active-text-color: var(--danger-foreground);
+    color: var(--danger-foreground);
     border-color: var(--danger);
     background: var(--danger);
 
     &:hover,
     &:focus-visible {
-      color: #fff;
-      border-color: #bd3d50;
-      background: #bd3d50;
+      color: var(--danger-foreground);
+      border-color: color-mix(in srgb, var(--danger), #000 12%);
+      background: color-mix(in srgb, var(--danger), #000 12%);
     }
 
     &:active {
-      color: #fff;
-      border-color: #a83245;
-      background: #a83245;
+      color: var(--danger-foreground);
+      border-color: color-mix(in srgb, var(--danger), #000 20%);
+      background: color-mix(in srgb, var(--danger), #000 20%);
     }
   }
 }

@@ -65,8 +65,15 @@ function goBack(): void {
   inset: 0;
   opacity: 0.11;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    linear-gradient(
+      color-mix(in srgb, var(--hero-foreground), transparent 90%) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--hero-foreground), transparent 90%) 1px,
+      transparent 1px
+    );
   background-size: 56px 56px;
   mask-image: radial-gradient(circle, #000, transparent 72%);
 }
@@ -126,10 +133,10 @@ code {
   overflow: hidden;
   margin-top: 20px;
   padding: 8px 13px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid color-mix(in srgb, var(--hero-foreground), transparent 90%);
   border-radius: 10px;
-  color: rgba(255, 255, 255, 0.42);
-  background: rgba(255, 255, 255, 0.04);
+  color: var(--hero-meta);
+  background: color-mix(in srgb, var(--hero-foreground), transparent 96%);
   font-size: 10px;
   text-overflow: ellipsis;
 }

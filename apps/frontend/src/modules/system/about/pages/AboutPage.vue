@@ -245,12 +245,18 @@ const stack = [
 
 <style scoped>
 .about-page {
-  --about-ink: #13221c;
-  --about-ink-soft: #486057;
-  --about-muted: #7c8e86;
-  --about-line: rgba(19, 34, 28, 0.12);
-  --about-accent: #70cfa2;
-  --about-purple: #8d6bf2;
+  --about-ink: var(--ink);
+  --about-ink-soft: var(--ink-soft);
+  --about-muted: var(--muted);
+  --about-line: var(--line);
+  --about-accent: var(--brand-accent);
+  --about-accent-foreground: var(--brand-accent-foreground);
+  --about-purple: var(--brand-node);
+  --about-hero-start: var(--hero-start);
+  --about-hero-end: var(--hero-end);
+  --about-hero-foreground: var(--hero-foreground);
+  --about-hero-muted: var(--hero-muted);
+  --about-hero-meta: var(--hero-meta);
   width: min(100%, 1480px);
   display: grid;
   gap: 30px;
@@ -264,14 +270,27 @@ const stack = [
   min-height: 610px;
   overflow: hidden;
   padding: 30px 38px 25px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid color-mix(in srgb, var(--about-hero-foreground), transparent 88%);
   border-radius: 32px;
-  color: #f8f7f1;
+  color: var(--about-hero-foreground);
   background:
-    radial-gradient(circle at 74% 45%, rgba(112, 207, 162, 0.16), transparent 23%),
-    radial-gradient(circle at 20% 0%, rgba(141, 107, 242, 0.18), transparent 32%),
-    linear-gradient(135deg, #0c1613 0%, #16271f 62%, #101d19 100%);
-  box-shadow: 0 28px 80px rgba(19, 34, 28, 0.2);
+    radial-gradient(
+      circle at 74% 45%,
+      color-mix(in srgb, var(--about-accent), transparent 84%),
+      transparent 23%
+    ),
+    radial-gradient(
+      circle at 20% 0%,
+      color-mix(in srgb, var(--about-purple), transparent 82%),
+      transparent 32%
+    ),
+    linear-gradient(
+      135deg,
+      var(--about-hero-end) 0%,
+      var(--about-hero-start) 62%,
+      var(--about-hero-end) 100%
+    );
+  box-shadow: 0 28px 80px color-mix(in srgb, var(--about-hero-end), transparent 78%);
 }
 
 .about-hero::after {
@@ -281,11 +300,11 @@ const stack = [
   right: -15%;
   width: min(56vw, 760px);
   aspect-ratio: 1;
-  border: 1px solid rgba(112, 207, 162, 0.18);
+  border: 1px solid color-mix(in srgb, var(--about-accent), transparent 82%);
   border-radius: 50%;
   box-shadow:
-    0 0 0 72px rgba(112, 207, 162, 0.035),
-    0 0 0 156px rgba(141, 107, 242, 0.03);
+    0 0 0 72px color-mix(in srgb, var(--about-accent), transparent 96.5%),
+    0 0 0 156px color-mix(in srgb, var(--about-purple), transparent 97%);
   content: '';
   transform: rotate(-18deg);
 }
@@ -302,8 +321,12 @@ const stack = [
   inset: 0;
   opacity: 0.58;
   background-image:
-    linear-gradient(rgba(112, 207, 162, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(112, 207, 162, 0.08) 1px, transparent 1px);
+    linear-gradient(color-mix(in srgb, var(--about-accent), transparent 92%) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--about-accent), transparent 92%) 1px,
+      transparent 1px
+    );
   background-size: 44px 44px;
   mask-image: linear-gradient(115deg, #000 14%, transparent 75%);
   animation: about-grid-flow 18s linear infinite;
@@ -320,10 +343,10 @@ const stack = [
   right: 11%;
   width: 360px;
   height: 360px;
-  border: 1px solid rgba(112, 207, 162, 0.18);
+  border: 1px solid color-mix(in srgb, var(--about-accent), transparent 82%);
   box-shadow:
-    inset 0 0 60px rgba(112, 207, 162, 0.04),
-    0 0 80px rgba(112, 207, 162, 0.06);
+    inset 0 0 60px color-mix(in srgb, var(--about-accent), transparent 96%),
+    0 0 80px color-mix(in srgb, var(--about-accent), transparent 94%);
   animation: about-orb-breathe 8s ease-in-out infinite;
 }
 
@@ -341,7 +364,7 @@ const stack = [
   z-index: -1;
   opacity: 0.55;
   background: linear-gradient(90deg, transparent, var(--about-accent), transparent);
-  box-shadow: 0 0 20px rgba(112, 207, 162, 0.6);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--about-accent), transparent 40%);
 }
 
 .about-hero__rail--one {
@@ -358,7 +381,7 @@ const stack = [
   width: 1px;
   height: 42%;
   background: linear-gradient(transparent, var(--about-purple), transparent);
-  box-shadow: 0 0 20px rgba(141, 107, 242, 0.6);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--about-purple), transparent 40%);
 }
 
 .about-hero__topline,
@@ -378,7 +401,7 @@ const stack = [
 
 .about-hero__topline {
   padding-bottom: 25px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.13);
+  border-bottom: 1px solid color-mix(in srgb, var(--about-hero-foreground), transparent 87%);
 }
 
 .about-brand-link {
@@ -393,7 +416,7 @@ const stack = [
 .about-brand-link:hover,
 .about-brand-link:focus-visible {
   outline: 0;
-  filter: drop-shadow(0 0 16px rgba(112, 207, 162, 0.36));
+  filter: drop-shadow(0 0 16px color-mix(in srgb, var(--about-accent), transparent 64%));
   transform: translateY(-2px);
 }
 
@@ -462,13 +485,13 @@ const stack = [
 .about-hero__copy h1 em {
   color: var(--about-accent);
   font-style: normal;
-  text-shadow: 0 0 36px rgba(112, 207, 162, 0.36);
+  text-shadow: 0 0 36px color-mix(in srgb, var(--about-accent), transparent 64%);
 }
 
 .about-hero__description {
   max-width: 570px;
   margin: 26px 0 0;
-  color: rgba(248, 247, 241, 0.63);
+  color: var(--about-hero-muted);
   font-size: 13px;
   line-height: 1.85;
 }
@@ -506,27 +529,27 @@ const stack = [
 }
 
 .about-button--primary {
-  color: #102019;
+  color: var(--about-accent-foreground);
   background: var(--about-accent);
-  box-shadow: 0 12px 28px rgba(112, 207, 162, 0.17);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--about-accent), transparent 83%);
 }
 
 .about-button--primary:hover,
 .about-button--primary:focus-visible {
-  background: #9ae7bf;
-  box-shadow: 0 16px 34px rgba(112, 207, 162, 0.25);
+  background: color-mix(in srgb, var(--about-accent), var(--about-hero-foreground) 18%);
+  box-shadow: 0 16px 34px color-mix(in srgb, var(--about-accent), transparent 75%);
 }
 
 .about-button--quiet {
-  color: rgba(248, 247, 241, 0.78);
-  border-color: rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.05);
+  color: color-mix(in srgb, var(--about-hero-foreground), transparent 22%);
+  border-color: color-mix(in srgb, var(--about-hero-foreground), transparent 84%);
+  background: color-mix(in srgb, var(--about-hero-foreground), transparent 95%);
 }
 
 .about-button--quiet:hover,
 .about-button--quiet:focus-visible {
-  border-color: rgba(112, 207, 162, 0.44);
-  background: rgba(112, 207, 162, 0.1);
+  border-color: color-mix(in srgb, var(--about-accent), transparent 56%);
+  background: color-mix(in srgb, var(--about-accent), transparent 90%);
 }
 
 .blueprint-visual {
@@ -552,8 +575,8 @@ const stack = [
   aspect-ratio: 1;
   background: radial-gradient(
     circle,
-    rgba(112, 207, 162, 0.13),
-    rgba(141, 107, 242, 0.04) 46%,
+    color-mix(in srgb, var(--about-accent), transparent 87%),
+    color-mix(in srgb, var(--about-purple), transparent 96%) 46%,
     transparent 70%
   );
   filter: blur(6px);
@@ -565,7 +588,7 @@ const stack = [
   right: 70px;
   width: 310px;
   aspect-ratio: 1;
-  border: 1px solid rgba(112, 207, 162, 0.36);
+  border: 1px solid color-mix(in srgb, var(--about-accent), transparent 64%);
   transform: rotateX(66deg) rotateZ(-22deg);
   transform-style: preserve-3d;
   animation: about-orbit-one 10s linear infinite;
@@ -574,7 +597,7 @@ const stack = [
 .blueprint-visual__orbit--two {
   inset: 105px 106px auto auto;
   width: 238px;
-  border-color: rgba(141, 107, 242, 0.5);
+  border-color: color-mix(in srgb, var(--about-purple), transparent 50%);
   transform: rotateY(67deg) rotateZ(22deg);
   animation: about-orbit-two 13s linear infinite;
 }
@@ -585,7 +608,7 @@ const stack = [
   left: -4px;
   width: 8px;
   height: 8px;
-  border: 1px solid #f8f7f1;
+  border: 1px solid var(--about-hero-foreground);
   border-radius: 2px;
   background: var(--about-accent);
   box-shadow: 0 0 16px var(--about-accent);
@@ -611,17 +634,17 @@ const stack = [
   place-items: center;
   align-content: center;
   gap: 2px;
-  border: 1px solid rgba(248, 247, 241, 0.48);
+  border: 1px solid color-mix(in srgb, var(--about-hero-foreground), transparent 52%);
   border-radius: 50%;
   background: radial-gradient(
     circle at 37% 26%,
-    rgba(248, 247, 241, 0.96),
-    rgba(112, 207, 162, 0.3) 18%,
-    rgba(12, 22, 19, 0.94) 62%
+    color-mix(in srgb, var(--about-hero-foreground), transparent 4%),
+    color-mix(in srgb, var(--about-accent), transparent 70%) 18%,
+    color-mix(in srgb, var(--about-hero-end), transparent 6%) 62%
   );
   box-shadow:
-    0 0 30px rgba(112, 207, 162, 0.4),
-    inset 0 0 30px rgba(112, 207, 162, 0.24);
+    0 0 30px color-mix(in srgb, var(--about-accent), transparent 60%),
+    inset 0 0 30px color-mix(in srgb, var(--about-accent), transparent 76%);
   transform: translateZ(40px);
   animation: about-core-pulse 4s ease-in-out infinite;
 }
@@ -631,7 +654,7 @@ const stack = [
 }
 
 .blueprint-visual__core span {
-  color: rgba(248, 247, 241, 0.72);
+  color: color-mix(in srgb, var(--about-hero-foreground), transparent 28%);
   font-family: var(--font-display);
   font-size: 9px;
   font-weight: 800;
@@ -643,7 +666,7 @@ const stack = [
   display: flex;
   align-items: center;
   gap: 7px;
-  color: rgba(248, 247, 241, 0.66);
+  color: color-mix(in srgb, var(--about-hero-foreground), transparent 34%);
   font-size: 8px;
   font-weight: 850;
   letter-spacing: 0.16em;
@@ -678,13 +701,13 @@ const stack = [
 }
 
 .blueprint-visual__node--three i {
-  background: #f8f7f1;
-  box-shadow: 0 0 15px #f8f7f1;
+  background: var(--about-hero-foreground);
+  box-shadow: 0 0 15px var(--about-hero-foreground);
 }
 
 .blueprint-visual__label {
   position: absolute;
-  color: rgba(248, 247, 241, 0.37);
+  color: color-mix(in srgb, var(--about-hero-foreground), transparent 63%);
   font-size: 8px;
   font-weight: 750;
   letter-spacing: 0.2em;
@@ -702,8 +725,8 @@ const stack = [
 
 .about-hero__footer {
   padding-top: 17px;
-  border-top: 1px solid rgba(255, 255, 255, 0.13);
-  color: rgba(248, 247, 241, 0.42);
+  border-top: 1px solid color-mix(in srgb, var(--about-hero-foreground), transparent 87%);
+  color: color-mix(in srgb, var(--about-hero-foreground), transparent 58%);
 }
 
 .about-hero__footer span {
@@ -769,7 +792,7 @@ const stack = [
 .stack-card {
   border: 1px solid var(--about-line);
   background: color-mix(in srgb, var(--surface), transparent 10%);
-  box-shadow: 0 18px 42px rgba(19, 34, 28, 0.04);
+  box-shadow: 0 18px 42px color-mix(in srgb, var(--ink), transparent 96%);
 }
 
 .principle-card {
@@ -787,8 +810,8 @@ const stack = [
 }
 
 .principle-card:hover {
-  border-color: rgba(39, 122, 82, 0.38);
-  box-shadow: 0 24px 46px rgba(39, 122, 82, 0.1);
+  border-color: color-mix(in srgb, var(--primary), transparent 62%);
+  box-shadow: 0 24px 46px color-mix(in srgb, var(--primary), transparent 90%);
   transform: translateY(-5px);
 }
 
@@ -798,7 +821,7 @@ const stack = [
   bottom: -32px;
   width: 100px;
   height: 100px;
-  border: 1px solid rgba(112, 207, 162, 0.18);
+  border: 1px solid color-mix(in srgb, var(--about-accent), transparent 82%);
   border-radius: 50%;
   content: '';
 }
@@ -935,7 +958,7 @@ const stack = [
 }
 
 .blueprint-layer:hover {
-  border-color: rgba(39, 122, 82, 0.32);
+  border-color: color-mix(in srgb, var(--primary), transparent 68%);
   background: color-mix(in srgb, var(--primary-mist), var(--surface) 62%);
   transform: translateX(5px);
 }
@@ -957,7 +980,7 @@ const stack = [
   height: 3px;
   overflow: hidden;
   border-radius: 99px;
-  background: rgba(39, 122, 82, 0.1);
+  background: color-mix(in srgb, var(--primary), transparent 90%);
 }
 
 .blueprint-layer__bar i {
@@ -1061,9 +1084,9 @@ const stack = [
   min-height: 220px;
   padding: 32px 38px;
   border-radius: 25px;
-  color: #f8f7f1;
-  background: linear-gradient(132deg, #16271f, #0c1613 82%);
-  box-shadow: 0 24px 62px rgba(19, 34, 28, 0.16);
+  color: var(--about-hero-foreground);
+  background: linear-gradient(132deg, var(--about-hero-start), var(--about-hero-end) 82%);
+  box-shadow: 0 24px 62px color-mix(in srgb, var(--about-hero-end), transparent 84%);
 }
 
 .about-cta__mesh {
@@ -1072,8 +1095,12 @@ const stack = [
   inset: 0;
   opacity: 0.62;
   background-image:
-    linear-gradient(rgba(112, 207, 162, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(112, 207, 162, 0.1) 1px, transparent 1px);
+    linear-gradient(color-mix(in srgb, var(--about-accent), transparent 90%) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--about-accent), transparent 90%) 1px,
+      transparent 1px
+    );
   background-size: 36px 36px;
   mask-image: linear-gradient(105deg, transparent 0, #000 55%, transparent 100%);
 }
@@ -1088,12 +1115,12 @@ const stack = [
 
 .about-cta h2 {
   margin-top: 10px;
-  color: #f8f7f1;
+  color: var(--about-hero-foreground);
 }
 
 .about-cta__copy > p:last-child {
   margin: 15px 0 0;
-  color: rgba(248, 247, 241, 0.54);
+  color: var(--about-hero-meta);
   font-size: 12px;
 }
 

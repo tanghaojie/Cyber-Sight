@@ -15,7 +15,7 @@ html body .el-button.el-button--primary {
 
   &:active {
     color: var(--primary-foreground);
-    border-color: color-mix(in srgb, var(--primary), #000 15%);
-    background: color-mix(in srgb, var(--primary), #000 15%);
+    border-color: color-mix(in srgb, var(--primary), var(--primary-foreground) 15%);
+    background: color-mix(in srgb, var(--primary), var(--primary-foreground) 15%);
   }
 }

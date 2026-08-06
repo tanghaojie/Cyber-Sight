@@ -47,7 +47,7 @@ const { currentLocale, supportedLocales, setLocale, t } = useLocalization()
   border: 1px solid var(--line);
   border-radius: 12px;
   background: color-mix(in srgb, var(--surface), transparent 22%);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--surface), #fff 24%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--surface), var(--ink) 24%);
 }
 
 .language-switcher__option {
@@ -99,15 +99,15 @@ const { currentLocale, supportedLocales, setLocale, t } = useLocalization()
 }
 
 .language-switcher--dark {
-  border-color: rgba(255, 255, 255, 0.14);
-  background: rgba(10, 16, 14, 0.62);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+  border-color: color-mix(in srgb, var(--hero-foreground), transparent 86%);
+  background: color-mix(in srgb, var(--brand-surface-end), transparent 38%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hero-foreground), transparent 96%);
 
   .language-switcher__option {
-    color: rgba(255, 255, 255, 0.54);
+    color: var(--hero-meta);
 
     &:hover {
-      color: #fff;
+      color: var(--hero-foreground);
     }
   }
 

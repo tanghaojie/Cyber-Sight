@@ -184,7 +184,7 @@ onMounted(async function loadOptions() {
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: #f8fbf9;
+  background: color-mix(in srgb, var(--surface), var(--primary-mist) 36%);
 }
 
 .policy-editor header {
@@ -210,9 +210,9 @@ onMounted(async function loadOptions() {
   align-items: center;
   gap: 8px;
   padding: 12px;
-  border: 1px solid #dfebe5;
+  border: 1px solid var(--line);
   border-radius: 12px;
-  background: white;
+  background: var(--surface);
 }
 
 .department-picker {

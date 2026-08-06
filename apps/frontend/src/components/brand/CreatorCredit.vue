@@ -24,9 +24,9 @@ const { t } = useLocalization()
 
 <style scoped>
 .creator-credit {
-  --creator-credit-ink: rgba(255, 255, 255, 0.82);
-  --creator-credit-muted: rgba(255, 255, 255, 0.34);
-  --creator-credit-line: rgba(255, 255, 255, 0.16);
+  --creator-credit-ink: color-mix(in srgb, var(--hero-foreground), transparent 18%);
+  --creator-credit-muted: color-mix(in srgb, var(--hero-foreground), transparent 66%);
+  --creator-credit-line: color-mix(in srgb, var(--hero-foreground), transparent 84%);
   display: inline-grid;
   grid-template-columns: auto minmax(34px, 64px) auto;
   align-items: center;
