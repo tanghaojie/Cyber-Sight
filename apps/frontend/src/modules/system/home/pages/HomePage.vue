@@ -1,49 +1,97 @@
 <template>
-  <section class="home-grid" :aria-label="t('home.overview.label')">
+  <section class="home-page" :aria-label="t('home.overview.label')">
     <article class="hero-panel">
-      <div class="hero-mesh" />
-      <div class="hero-copy">
-        <p>{{ todayLabel }} · {{ t('home.hero.kicker') }}</p>
-        <h2>{{ t('home.hero.lineOne') }}<br />{{ t('home.hero.lineTwo') }}</h2>
-        <span>{{ t('home.hero.description', { name: appConfig.fullName }) }}</span>
+      <div class="hero-mesh" aria-hidden="true" />
+      <div class="hero-topline">
+        <span class="hero-kicker"><i />{{ t('home.hero.kicker') }}</span>
+        <span class="hero-status"><i />{{ t('home.hero.status') }}</span>
       </div>
-      <div class="hero-index">
-        <small>{{ t('home.hero.systemIndex') }}</small
-        ><b>{{ String(navigation.flatItems.length).padStart(2, '0') }}</b
-        ><span>{{ t('home.hero.activeNodes') }}</span>
+      <div class="hero-content">
+        <div class="hero-copy">
+          <h1>{{ t('home.hero.lineOne') }}<br />{{ t('home.hero.lineTwo') }}</h1>
+          <p>{{ t('home.hero.description', { name: appConfig.fullName }) }}</p>
+        </div>
+        <div class="hero-index">
+          <small>{{ t('home.hero.systemIndex') }}</small>
+          <b>{{ String(navigation.flatItems.length).padStart(2, '0') }}</b>
+          <span>{{ t('home.hero.activeNodes') }}</span>
+        </div>
+      </div>
+      <div class="hero-footer">
+        <span class="hero-footer__note">{{ todayLabel }} · {{ t('home.hero.statusDetail') }}</span>
+        <div class="hero-notes">
+          <span><b>01</b>{{ t('home.hero.stat.structure') }}</span>
+          <span><b>02</b>{{ t('home.hero.stat.contract') }}</span>
+          <span><b>03</b>{{ t('home.hero.stat.foundation') }}</span>
+        </div>
       </div>
     </article>
-    <div class="module-grid">
-      <template v-for="item in quickEntries" :key="item.id">
-        <RouterLink v-if="item.type === 'menu'" :to="item.path" class="module-card"
-          ><span class="module-card__icon"><AppIcon :name="item.icon" /></span
-          ><span class="module-card__arrow">↗</span
-          ><b>{{ resolveLocalizedLabel(navigationLabel(item)) }}</b
-          ><small>{{ item.path }}</small></RouterLink
-        >
-        <a
-          v-else
-          :href="item.externalUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="module-card"
-          ><span class="module-card__icon"><AppIcon :name="item.icon || 'external'" /></span
-          ><span class="module-card__arrow">↗</span
-          ><b>{{ resolveLocalizedLabel(navigationLabel(item)) }}</b
-          ><small>{{ t('home.cards.externalResource') }}</small></a
-        >
-      </template>
-    </div>
+
+    <section class="insight-section" :aria-label="t('home.pillars.title')">
+      <div class="section-lead">
+        <span>{{ t('home.pillars.label') }}</span>
+        <h2>{{ t('home.pillars.title') }}</h2>
+      </div>
+      <div class="insight-grid">
+        <article v-for="pillar in pillars" :key="pillar.id" class="insight-card">
+          <div class="insight-card__topline">
+            <span class="insight-card__index">{{ pillar.index }}</span>
+            <span class="insight-card__icon"><AppIcon :name="pillar.icon" /></span>
+          </div>
+          <h3>{{ t(pillar.titleKey) }}</h3>
+          <p>{{ t(pillar.descriptionKey) }}</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="access-section" :aria-label="t('home.access.title')">
+      <div class="section-heading">
+        <div>
+          <span>{{ t('home.access.label') }}</span>
+          <h2>{{ t('home.access.title') }}</h2>
+        </div>
+        <p>{{ t('home.access.description') }}</p>
+      </div>
+      <div v-if="quickEntries.length" class="module-grid">
+        <template v-for="item in quickEntries" :key="item.id">
+          <RouterLink v-if="item.type === 'menu'" :to="item.path" class="module-card">
+            <span class="module-card__icon"><AppIcon :name="item.icon" /></span>
+            <span class="module-card__arrow">↗</span>
+            <b>{{ resolveLocalizedLabel(navigationLabel(item)) }}</b>
+            <small>{{ item.path }}</small>
+          </RouterLink>
+          <a
+            v-else
+            :href="item.externalUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="module-card"
+          >
+            <span class="module-card__icon"><AppIcon :name="item.icon || 'external'" /></span>
+            <span class="module-card__arrow">↗</span>
+            <b>{{ resolveLocalizedLabel(navigationLabel(item)) }}</b>
+            <small>{{ t('home.cards.externalResource') }}</small>
+          </a>
+        </template>
+      </div>
+      <div v-else class="access-empty">
+        <span class="access-empty__icon"><AppIcon name="layers" /></span>
+        <div>
+          <b>{{ t('home.access.emptyTitle') }}</b>
+          <p>{{ t('home.access.emptyDescription') }}</p>
+        </div>
+      </div>
+    </section>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { appConfig } from '@/config/app.config'
 import AppIcon from '@/components/AppIcon.vue'
-import { useNavigationStore } from '@/modules/system/navigation/navigation.store'
-import { navigationLabel } from '@/modules/system/navigation/navigation.labels'
+import { appConfig } from '@/config/app.config'
 import { useLocalization } from '@/modules/system/localization/localization'
+import { navigationLabel } from '@/modules/system/navigation/navigation.labels'
+import { useNavigationStore } from '@/modules/system/navigation/navigation.store'
 
 const navigation = useNavigationStore()
 const { formatDateTime, resolveLocalizedLabel, t } = useLocalization()
@@ -60,251 +108,519 @@ const todayLabel = computed(() =>
     day: '2-digit',
   }).toUpperCase(),
 )
+const pillars = [
+  {
+    id: 'structure',
+    index: '01',
+    icon: 'layers',
+    titleKey: 'home.pillars.structure.title',
+    descriptionKey: 'home.pillars.structure.description',
+  },
+  {
+    id: 'contract',
+    index: '02',
+    icon: 'link',
+    titleKey: 'home.pillars.contract.title',
+    descriptionKey: 'home.pillars.contract.description',
+  },
+  {
+    id: 'evolution',
+    index: '03',
+    icon: 'activity',
+    titleKey: 'home.pillars.evolution.title',
+    descriptionKey: 'home.pillars.evolution.description',
+  },
+] as const
 </script>
 
 <style scoped>
-.home-grid {
+.home-page {
   width: min(100%, 1480px);
   display: grid;
-  gap: 20px;
+  gap: 28px;
   margin: 0 auto;
 }
+
 .hero-panel {
   position: relative;
-  min-height: 330px;
+  min-height: 386px;
   display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: end;
+  grid-template-rows: auto 1fr auto;
   overflow: hidden;
-  padding: 38px;
-  border-radius: 32px;
+  padding: 28px 34px 25px;
+  border: 1px solid color-mix(in srgb, var(--hero-foreground), transparent 84%);
+  border-radius: 30px;
   color: var(--hero-foreground);
-  background: linear-gradient(135deg, var(--hero-start), var(--hero-end) 76%);
+  background:
+    radial-gradient(
+      circle at 85% 12%,
+      color-mix(in srgb, var(--brand-node), transparent 82%),
+      transparent 28%
+    ),
+    linear-gradient(135deg, var(--hero-start), var(--hero-end) 76%);
   box-shadow: 0 25px 70px color-mix(in srgb, var(--hero-start), transparent 68%);
 }
+
 .hero-mesh {
   position: absolute;
   inset: 0;
-  opacity: 0.75;
+  opacity: 0.62;
+  pointer-events: none;
   background-image:
-    radial-gradient(
-      circle at 79% 14%,
-      color-mix(in srgb, var(--brand-accent), transparent 58%),
-      transparent 24%
+    linear-gradient(color-mix(in srgb, var(--brand-accent), transparent 89%) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--brand-accent), transparent 89%) 1px,
+      transparent 1px
     ),
-    linear-gradient(116deg, transparent 58%, rgba(255, 255, 255, 0.045) 58%);
+    linear-gradient(120deg, transparent 0 61%, color-mix(in srgb, white, transparent 95%) 61%);
+  background-size:
+    42px 42px,
+    42px 42px,
+    100% 100%;
+  mask-image: linear-gradient(135deg, #000 20%, transparent 84%);
 }
-.hero-copy,
-.hero-index {
+
+.hero-topline,
+.hero-content,
+.hero-footer {
   position: relative;
+  z-index: 1;
 }
-.hero-copy {
-  max-width: 760px;
+
+.hero-topline,
+.hero-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
 }
-.hero-copy p {
-  margin: 0 0 22px;
+
+.hero-topline {
+  padding-bottom: 21px;
+  border-bottom: 1px solid color-mix(in srgb, var(--hero-foreground), transparent 87%);
+  color: var(--hero-meta);
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.hero-kicker,
+.hero-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.hero-kicker i,
+.hero-status i {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brand-accent);
+  box-shadow: 0 0 14px var(--brand-accent);
+}
+
+.hero-status {
   color: var(--brand-accent);
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 0.23em;
 }
-.hero-copy h2 {
+
+.hero-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 32px;
+  padding: 32px 0 25px;
+}
+
+.hero-copy {
+  max-width: 810px;
+}
+
+.hero-copy h1 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(32px, 4vw, 50px);
-  letter-spacing: -0.05em;
-  line-height: 1.08;
+  font-size: clamp(38px, 4.5vw, 62px);
+  font-weight: 820;
+  letter-spacing: -0.06em;
+  line-height: 1.06;
+  text-wrap: balance;
 }
-.hero-copy span {
-  display: block;
-  max-width: 620px;
-  margin-top: 20px;
+
+.hero-copy p {
+  max-width: 700px;
+  margin: 24px 0 0;
   color: var(--hero-muted);
   font-size: 13px;
   line-height: 1.8;
 }
+
 .hero-index {
   display: grid;
   justify-items: end;
-  padding-left: 30px;
+  padding-left: 34px;
+  border-left: 1px solid color-mix(in srgb, var(--hero-foreground), transparent 84%);
 }
+
 .hero-index small,
 .hero-index span {
   color: var(--hero-meta);
   font-size: 8px;
   letter-spacing: 0.18em;
 }
+
 .hero-index b {
+  margin: 6px 0 2px;
   font-family: var(--font-display);
-  font-size: 68px;
-  letter-spacing: -0.08em;
+  font-size: 72px;
+  letter-spacing: -0.09em;
+  line-height: 0.9;
 }
+
+.hero-footer {
+  padding-top: 17px;
+  border-top: 1px solid color-mix(in srgb, var(--hero-foreground), transparent 87%);
+}
+
+.hero-footer__note {
+  color: var(--hero-meta);
+  font-size: 8px;
+  font-weight: 760;
+  letter-spacing: 0.13em;
+}
+
+.hero-notes {
+  display: flex;
+  gap: 22px;
+}
+
+.hero-notes span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--hero-muted);
+  font-size: 9px;
+}
+
+.hero-notes b {
+  color: var(--brand-accent);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+}
+
+.insight-section {
+  display: grid;
+  grid-template-columns: 0.36fr 1.64fr;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.section-lead,
+.section-heading {
+  padding: 4px 0;
+}
+
+.section-lead > span,
+.section-heading > div > span {
+  color: var(--primary-deep);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+}
+
+.section-lead h2,
+.section-heading h2 {
+  margin: 12px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(23px, 2.4vw, 32px);
+  letter-spacing: -0.05em;
+  line-height: 1.05;
+}
+
+.insight-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.insight-card {
+  min-height: 176px;
+  display: grid;
+  align-content: start;
+  padding: 19px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--surface), transparent 7%);
+  box-shadow: 0 15px 40px color-mix(in srgb, var(--ink), transparent 97%);
+}
+
+.insight-card__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.insight-card__index {
+  color: var(--primary-deep);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.insight-card__icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 11px;
+  color: var(--primary-deep);
+  background: var(--primary-mist);
+}
+
+.insight-card h3 {
+  margin: 23px 0 0;
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.insight-card p {
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.access-section {
+  display: grid;
+  gap: 17px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 28px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid var(--line);
+}
+
+.section-heading h2 {
+  margin-top: 8px;
+}
+
+.section-heading p {
+  max-width: 310px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+  text-align: right;
+}
+
 .module-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
 }
+
 .module-card {
-  min-height: 170px;
+  min-height: 154px;
   display: grid;
   grid-template-columns: 1fr auto;
   align-content: space-between;
-  padding: 20px;
+  padding: 18px;
   border: 1px solid var(--line);
-  border-radius: 24px;
-  background: color-mix(in srgb, var(--surface), transparent 12%);
-  box-shadow: 0 15px 40px color-mix(in srgb, var(--ink), transparent 96%);
-  transition: 0.2s;
+  border-radius: 19px;
+  background: color-mix(in srgb, var(--surface), transparent 9%);
+  box-shadow: 0 15px 40px color-mix(in srgb, var(--ink), transparent 97%);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
+
 .module-card:hover {
   transform: translateY(-4px);
   border-color: var(--primary);
   box-shadow: 0 20px 50px color-mix(in srgb, var(--primary), transparent 88%);
 }
+
 .module-card__icon {
   display: grid;
-  width: 43px;
-  height: 43px;
+  width: 40px;
+  height: 40px;
   place-items: center;
-  border-radius: 15px;
+  border-radius: 13px;
   color: var(--primary-deep);
   background: var(--primary-mist);
 }
+
 .module-card__arrow {
   color: var(--muted);
-  transition: 0.2s;
+  transition: transform 0.2s ease;
 }
+
 .module-card:hover .module-card__arrow {
   transform: translate(2px, -2px);
   color: var(--primary-deep);
 }
+
 .module-card b {
   grid-column: 1/-1;
   align-self: end;
-  margin-top: 28px;
+  margin-top: 24px;
   font-family: var(--font-display);
-  font-size: 16px;
+  font-size: 15px;
 }
+
 .module-card small {
   grid-column: 1/-1;
   margin-top: 5px;
+  overflow: hidden;
   color: var(--muted);
   font-size: 8px;
   letter-spacing: 0.11em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.home-detail-grid {
-  display: grid;
-  grid-template-columns: 1.45fr 0.55fr;
-  gap: 14px;
-}
-.architecture-card {
+
+.access-empty {
   display: flex;
-  justify-content: space-between;
-  gap: 28px;
-  padding: 25px;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  border: 1px dashed var(--line);
+  border-radius: 19px;
+  background: color-mix(in srgb, var(--surface), transparent 22%);
 }
-.architecture-card h3 {
-  margin: 8px 0 0;
-  font-family: var(--font-display);
-  font-size: 18px;
-}
-.architecture-card ol {
+
+.access-empty__icon {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 9px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 13px;
+  color: var(--muted);
+  background: var(--surface-muted);
 }
-.architecture-card li {
-  min-width: 130px;
-  padding: 15px;
-  border-radius: 17px;
-  background: var(--canvas);
+
+.access-empty b {
+  font-family: var(--font-display);
+  font-size: 14px;
 }
-.architecture-card li span {
-  display: block;
-  color: var(--primary-deep);
-  font-size: 9px;
-  font-weight: 900;
-}
-.architecture-card li b {
-  display: block;
-  margin-top: 22px;
+
+.access-empty p {
+  margin: 5px 0 0;
+  color: var(--muted);
   font-size: 11px;
 }
-.architecture-card li small {
-  display: block;
-  margin-top: 5px;
-  color: var(--muted);
-  font-size: 9px;
-}
-.pulse-card {
-  min-height: 210px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 25px;
-  border-radius: 25px;
-  color: var(--brand-accent-foreground);
-  background: linear-gradient(145deg, var(--brand-accent), var(--primary));
-  box-shadow: 0 18px 44px color-mix(in srgb, var(--primary), transparent 84%);
-}
-.pulse-card > div {
-  font-size: 8px;
-  font-weight: 900;
-  letter-spacing: 0.18em;
-}
-.pulse-dot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-right: 7px;
-  border-radius: 50%;
-  background: var(--brand-accent-foreground);
-  box-shadow: 0 0 0 6px color-mix(in srgb, var(--brand-accent-foreground), transparent 88%);
-}
-.pulse-card strong {
-  font-family: var(--font-display);
-  font-size: 38px;
-  letter-spacing: -0.06em;
-}
-.pulse-card p {
-  margin: -14px 0 0;
-  font-size: 12px;
-}
-.pulse-card small {
-  font-size: 8px;
-  letter-spacing: 0.18em;
-}
-@media (max-width: 1100px) {
-  .module-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .home-detail-grid {
+
+@media (max-width: 1120px) {
+  .insight-section {
     grid-template-columns: 1fr;
   }
-  .architecture-card {
-    flex-direction: column;
+
+  .section-lead {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .section-lead h2 {
+    margin: 0;
+  }
+
+  .module-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-@media (max-width: 650px) {
+
+@media (max-width: 760px) {
   .hero-panel {
-    min-height: 380px;
-    grid-template-columns: 1fr;
-    padding: 26px;
+    min-height: 420px;
+    padding: 23px 23px 20px;
+    border-radius: 24px;
   }
+
+  .hero-content {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 27px 0 24px;
+  }
+
   .hero-index {
-    display: none;
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 15px 0 0;
+    border-top: 1px solid color-mix(in srgb, var(--hero-foreground), transparent 84%);
+    border-left: 0;
   }
-  .module-grid {
-    grid-template-columns: 1fr 1fr;
+
+  .hero-index b {
+    margin: 0;
+    font-size: 46px;
   }
-  .architecture-card ol {
+
+  .hero-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .hero-notes {
+    flex-wrap: wrap;
+    gap: 10px 18px;
+  }
+
+  .insight-grid {
     grid-template-columns: 1fr;
   }
-  .module-card {
-    min-height: 150px;
+
+  .insight-card {
+    min-height: 0;
+  }
+
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .section-heading p {
+    text-align: left;
+  }
+}
+
+@media (max-width: 520px) {
+  .home-page {
+    gap: 22px;
+  }
+
+  .hero-topline {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(34px, 10vw, 45px);
+  }
+
+  .hero-copy p {
+    margin-top: 19px;
+    font-size: 12px;
+  }
+
+  .module-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

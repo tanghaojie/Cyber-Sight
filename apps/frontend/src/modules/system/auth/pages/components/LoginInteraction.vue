@@ -1,52 +1,66 @@
 <template>
   <section class="login-interaction">
     <LanguageSwitcher class="login-language" />
-    <form class="login-card" @submit.prevent="handleSubmit">
+    <div class="login-shell">
       <div class="mobile-brand">
         <CyberLogo :show-descriptor="false" tone="dark" />
       </div>
-      <div class="form-head">
-        <p>{{ t('auth.login.kicker') }}</p>
-        <h2>{{ t('auth.login.title', { name: appConfig.name }) }}</h2>
-        <span>{{ t('auth.login.subtitle', { name: appConfig.fullName }) }}</span>
+      <div class="login-context">
+        <span><i />{{ t('auth.login.accessMode') }}</span>
+        <b>{{ t('auth.login.environment') }}</b>
       </div>
-      <label class="login-field">
-        <span>{{ t('auth.login.username') }}</span>
-        <el-input
-          v-model.trim="username"
+      <form class="login-card" @submit.prevent="handleSubmit">
+        <div class="form-head">
+          <p>{{ t('auth.login.kicker') }}</p>
+          <h2>{{ t('auth.login.title', { name: appConfig.name }) }}</h2>
+          <span>{{ t('auth.login.subtitle', { name: appConfig.fullName }) }}</span>
+        </div>
+        <div class="login-fields">
+          <label class="login-field">
+            <span>{{ t('auth.login.username') }}</span>
+            <el-input
+              v-model.trim="username"
+              size="large"
+              autocomplete="username"
+              :placeholder="t('auth.login.usernamePlaceholder')"
+            />
+          </label>
+          <label class="login-field">
+            <span
+              >{{ t('auth.login.password') }}
+              <small>{{ t('auth.login.passwordHint') }}</small></span
+            >
+            <el-input
+              v-model="password"
+              size="large"
+              type="password"
+              show-password
+              autocomplete="current-password"
+              :placeholder="t('auth.login.passwordPlaceholder')"
+            />
+          </label>
+        </div>
+        <el-alert v-if="error" :title="error" type="error" show-icon :closable="false" />
+        <el-button
+          native-type="submit"
+          type="primary"
           size="large"
-          autocomplete="username"
-          :placeholder="t('auth.login.usernamePlaceholder')"
-        />
-      </label>
-      <label class="login-field">
-        <span
-          >{{ t('auth.login.password') }} <small>{{ t('auth.login.passwordHint') }}</small></span
+          :loading="auth.busy"
+          class="login-submit"
         >
-        <el-input
-          v-model="password"
-          size="large"
-          type="password"
-          show-password
-          autocomplete="current-password"
-          :placeholder="t('auth.login.passwordPlaceholder')"
-        />
-      </label>
-      <el-alert v-if="error" :title="error" type="error" show-icon :closable="false" />
-      <el-button
-        native-type="submit"
-        type="primary"
-        size="large"
-        :loading="auth.busy"
-        class="login-submit"
-      >
-        {{ t('auth.login.submit') }} <span aria-hidden="true">→</span>
-      </el-button>
-      <p class="login-hint">
-        {{ t('auth.login.initialAccount') }} <b>admin</b> / <b>Admin@123456</b>
-      </p>
-    </form>
-    <CreatorCredit class="mobile-credit" tone="dark" />
+          {{ t('auth.login.submit') }} <span aria-hidden="true">↗</span>
+        </el-button>
+        <div class="login-card__footer">
+          <p class="login-hint">
+            <span>{{ t('auth.login.initialAccount') }}</span>
+            <b>admin</b><i>/</i><b>Admin@123456</b>
+            <small>{{ t('auth.login.initialAccountNote') }}</small>
+          </p>
+          <p class="security-note"><i />{{ t('auth.login.securityNote') }}</p>
+        </div>
+      </form>
+      <CreatorCredit class="mobile-credit" tone="dark" />
+    </div>
   </section>
 </template>
 
@@ -88,7 +102,7 @@ async function handleSubmit(): Promise<void> {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 60px 10%;
+  padding: 88px 8% 56px;
   background:
     radial-gradient(
       circle at 92% 4%,
@@ -98,26 +112,73 @@ async function handleSubmit(): Promise<void> {
     var(--canvas);
 }
 
+.login-shell {
+  width: min(100%, 470px);
+  display: grid;
+  gap: 17px;
+}
+
 .login-language {
   position: absolute;
   top: 28px;
   right: 32px;
 }
 
+.login-context {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 5px;
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.login-context span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.login-context span i,
+.security-note i {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-mist);
+}
+
+.login-context b {
+  color: var(--primary-deep);
+  font-size: 8px;
+  font-weight: 900;
+}
+
 .login-card {
   width: min(100%, 420px);
+  width: 100%;
   display: grid;
-  gap: 22px;
-  padding: 38px;
+  gap: 24px;
+  padding: 36px;
   border: 1px solid var(--line);
-  border-radius: 30px;
-  background: color-mix(in srgb, var(--surface), transparent 14%);
-  box-shadow: var(--shadow);
+  border-radius: 26px;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--surface), transparent 7%), transparent),
+    color-mix(in srgb, var(--surface), transparent 6%);
+  box-shadow: 0 24px 80px color-mix(in srgb, var(--ink), transparent 91%);
   backdrop-filter: blur(18px);
 }
 
 .form-head {
-  margin-bottom: 12px;
+  display: grid;
+  gap: 10px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--line);
 }
 
 .form-head p {
@@ -129,15 +190,22 @@ async function handleSubmit(): Promise<void> {
 }
 
 .form-head h2 {
-  margin: 12px 0 8px;
+  margin: 0;
   font-family: var(--font-display);
-  font-size: 32px;
+  font-size: clamp(30px, 4vw, 38px);
   letter-spacing: -0.04em;
+  line-height: 1.05;
 }
 
 .form-head span {
   color: var(--muted);
   font-size: 12px;
+  line-height: 1.65;
+}
+
+.login-fields {
+  display: grid;
+  gap: 18px;
 }
 
 .login-field {
@@ -162,21 +230,62 @@ async function handleSubmit(): Promise<void> {
 .login-submit {
   width: 100%;
   height: 52px !important;
-  margin-top: 4px;
+  margin-top: -2px;
   justify-content: space-between !important;
-  padding: 0 20px !important;
+  padding: 0 18px !important;
   font-weight: 800;
 }
 
+.login-card__footer {
+  display: grid;
+  gap: 15px;
+  margin-top: -2px;
+}
+
 .login-hint {
-  margin: -8px 0 0;
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
   color: var(--muted);
   font-size: 10px;
-  text-align: center;
 }
 
 .login-hint b {
   color: var(--ink-soft);
+  font-family: var(--font-display);
+  font-size: 11px;
+}
+
+.login-hint i {
+  color: var(--line);
+  font-style: normal;
+}
+
+.login-hint small {
+  grid-column: 1/-1;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.security-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding-top: 13px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.security-note i {
+  flex: 0 0 auto;
+  width: 5px;
+  height: 5px;
+  box-shadow: none;
 }
 
 .mobile-brand,
@@ -188,7 +297,7 @@ async function handleSubmit(): Promise<void> {
   .login-interaction {
     align-content: center;
     gap: 30px;
-    padding: 44px 24px;
+    padding: 44px 24px 32px;
   }
 
   .login-language {
@@ -202,7 +311,7 @@ async function handleSubmit(): Promise<void> {
 
   .mobile-brand {
     display: block;
-    margin-bottom: 28px;
+    margin: 0 0 10px 2px;
   }
 
   .mobile-brand :deep(.cyber-logo) {
@@ -212,6 +321,26 @@ async function handleSubmit(): Promise<void> {
 
   .mobile-credit {
     display: inline-grid;
+    justify-self: center;
+  }
+}
+
+@media (max-width: 520px) {
+  .login-context {
+    padding: 0 2px;
+  }
+
+  .login-context b {
+    font-size: 7px;
+  }
+
+  .login-card {
+    padding: 26px 21px;
+    border-radius: 22px;
+  }
+
+  .login-hint {
+    grid-template-columns: 1fr auto auto auto;
   }
 }
 </style>

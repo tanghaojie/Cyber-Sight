@@ -31,10 +31,12 @@ updated: 2026-08-05
 
 `pages/LoginPage.vue` 只负责桌面双栏与窄屏单栏的页面组装，不承载认证状态或品牌展示细节。其同目录私有组件不属于 auth 模块的公共接口：
 
-- `pages/components/LoginPresentation.vue` 负责左侧 CYBER 品牌、既有多语言主张、创作者署名和纯展示性的全息背景。背景使用主题语义令牌构造透视网格、悬浮几何体、轨道与数据节点；它不读取认证状态、不发起请求，也不改变文案键。
-- `pages/components/LoginInteraction.vue` 负责右侧语言切换、凭据输入、错误提示、提交状态和登录后的 redirect 恢复。它通过 `useAuthStore().login()` 执行既有认证流程，成功后仍替换到路由 query 中的 `redirect` 或首页。
+- `pages/components/LoginPresentation.vue` 负责左侧 CYBER 品牌、AI 协作全栈基座主张、三项工程支柱、创作者署名和纯展示性的全息背景。背景使用主题语义令牌构造透视网格、悬浮几何体、轨道与数据节点；它不读取认证状态、不发起请求，也不改变文案键。
+- `pages/components/LoginInteraction.vue` 负责右侧语言切换、工作台访问环境提示、凭据输入、错误提示、提交状态、本地开发账号提示和登录后的 redirect 恢复。它通过 `useAuthStore().login()` 执行既有认证流程，成功后仍替换到路由 query 中的 `redirect` 或首页。
 
-展示动画仅使用组件内 CSS，不新增运行时依赖或网络资源；`prefers-reduced-motion: reduce` 时停止连续动画，保留静态空间层次和可读内容。窄屏继续隐藏左侧展示区，并在交互组件中显示产品标识和创作者署名。
+登录页的固定展示文案从 `auth.locales.ts` 提供，首屏明确说明模块边界、共享契约和持续演进三个价值支柱；窄屏隐藏左侧展示区，在交互区保留产品标识、访问环境和创作者署名。展示动画仅使用组件内 CSS，不新增运行时依赖或网络资源；`prefers-reduced-motion: reduce` 时停止连续动画，保留静态空间层次和可读内容。
+
+认证表单的输入、错误和登录行为仍由原有 store 与 API 负责，展示重设计不改变认证、会话、redirect、cookie 或主题切换语义。
 
 ## 失败模式与测试
 

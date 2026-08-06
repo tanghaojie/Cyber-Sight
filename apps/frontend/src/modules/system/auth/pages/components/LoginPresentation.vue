@@ -43,17 +43,41 @@
     </div>
 
     <div class="presentation-content">
+      <div class="presentation-topline" aria-hidden="true">
+        <span><i /> {{ t('auth.manifesto.topline') }}</span>
+        <small>{{ t('auth.manifesto.systemTag') }}</small>
+      </div>
       <CyberLogo class="login-logo" tone="light" />
       <div class="manifesto">
-        <p>{{ t('auth.manifesto.kicker') }}</p>
+        <p class="manifesto__eyebrow">
+          <span>{{ t('auth.manifesto.kicker') }}</span>
+        </p>
         <h1>
           {{ t('auth.manifesto.lineOne') }}<br /><em>{{ t('auth.manifesto.lineTwo') }}</em>
         </h1>
-        <span>{{ t('auth.manifesto.description') }}</span>
-        <ol>
-          <li><b>01</b>{{ t('auth.manifesto.moduleBoundary') }}</li>
-          <li><b>02</b>{{ t('auth.manifesto.runtimeContract') }}</li>
-          <li><b>03</b>{{ t('auth.manifesto.controlledEvolution') }}</li>
+        <span class="manifesto__description">{{ t('auth.manifesto.description') }}</span>
+        <ol class="manifesto__pillars">
+          <li>
+            <b>01</b>
+            <span>
+              <strong>{{ t('auth.manifesto.moduleBoundary') }}</strong>
+              <small>{{ t('auth.manifesto.moduleBoundaryDetail') }}</small>
+            </span>
+          </li>
+          <li>
+            <b>02</b>
+            <span>
+              <strong>{{ t('auth.manifesto.runtimeContract') }}</strong>
+              <small>{{ t('auth.manifesto.runtimeContractDetail') }}</small>
+            </span>
+          </li>
+          <li>
+            <b>03</b>
+            <span>
+              <strong>{{ t('auth.manifesto.continuousEvolution') }}</strong>
+              <small>{{ t('auth.manifesto.continuousEvolutionDetail') }}</small>
+            </span>
+          </li>
         </ol>
       </div>
       <footer class="presentation-footer">
@@ -477,6 +501,41 @@ const { t } = useLocalization()
   padding: 50px 8.5% 42px;
 }
 
+.presentation-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 30px;
+  color: var(--hero-meta);
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.presentation-topline span {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.presentation-topline i,
+.manifesto__eyebrow i {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brand-accent);
+  box-shadow: 0 0 12px var(--brand-accent);
+}
+
+.presentation-topline small {
+  color: var(--brand-accent);
+  font-size: 8px;
+  letter-spacing: 0.16em;
+}
+
 .login-logo {
   --cyber-logo-mark-size: 56px;
   --cyber-logo-wordmark-size: 19px;
@@ -489,12 +548,28 @@ const { t } = useLocalization()
   padding: 46px 0;
 }
 
-.manifesto > p {
+.manifesto__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin: 0 0 25px;
   color: var(--brand-accent);
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.25em;
+}
+
+.manifesto__eyebrow i {
+  width: 36px;
+  height: 1px;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.manifesto__eyebrow small {
+  color: var(--hero-meta);
+  font-size: 8px;
+  letter-spacing: 0.15em;
 }
 
 .manifesto h1 {
@@ -513,7 +588,7 @@ const { t } = useLocalization()
   text-shadow: 0 0 34px color-mix(in srgb, var(--brand-accent), transparent 68%);
 }
 
-.manifesto > span {
+.manifesto__description {
   display: block;
   max-width: 510px;
   margin-top: 28px;
@@ -522,25 +597,53 @@ const { t } = useLocalization()
   line-height: 1.9;
 }
 
-.manifesto ol {
-  display: flex;
-  gap: 36px;
-  margin: 44px 0 0;
+.manifesto__pillars {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin: 46px 0 0;
   padding: 0;
+  border-top: 1px solid color-mix(in srgb, var(--hero-foreground), transparent 84%);
   list-style: none;
   color: var(--hero-muted);
   font-size: 11px;
 }
 
-.manifesto li {
+.manifesto__pillars li {
   display: grid;
-  gap: 8px;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  min-width: 0;
+  padding: 17px 18px 0 0;
 }
 
-.manifesto li b {
+.manifesto__pillars li + li {
+  padding-left: 18px;
+  border-left: 1px solid color-mix(in srgb, var(--hero-foreground), transparent 88%);
+}
+
+.manifesto__pillars li > b {
   color: var(--brand-accent);
   font-size: 9px;
   letter-spacing: 0.12em;
+}
+
+.manifesto__pillars li span {
+  display: grid;
+  gap: 7px;
+}
+
+.manifesto__pillars li strong {
+  color: var(--hero-foreground);
+  font-size: 11px;
+  font-weight: 760;
+  line-height: 1.35;
+}
+
+.manifesto__pillars li small {
+  color: var(--hero-meta);
+  font-size: 9px;
+  line-height: 1.5;
 }
 
 .presentation-footer {
@@ -724,8 +827,14 @@ const { t } = useLocalization()
     animation-name: stage-float-compact;
   }
 
-  .manifesto ol {
-    gap: 22px;
+  .manifesto__pillars {
+    grid-template-columns: 1fr;
+  }
+
+  .manifesto__pillars li + li {
+    padding-left: 0;
+    border-top: 1px solid color-mix(in srgb, var(--hero-foreground), transparent 88%);
+    border-left: 0;
   }
 }
 
