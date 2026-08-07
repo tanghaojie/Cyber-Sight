@@ -1,22 +1,5 @@
 <template>
   <ul class="sidebar-tree" :class="{ 'sidebar-tree--nested': depth > 0 }">
-    <!-- 首页属于静态路由，只在根层额外插入一次。 -->
-    <RouterLink
-      v-if="depth === 0 && showHomeMenu"
-      :to="homeRoute?.path || '/'"
-      class="sidebar-link sidebar-link--home"
-      :style="indentStyle"
-      exact-active-class="router-link-exact-active"
-      @click="$emit('navigate')"
-    >
-      <span class="sidebar-node-icon">
-        <AppIcon :name="(homeRoute?.meta?.icon as string | undefined) || 'home'" />
-      </span>
-      <span class="sidebar-node-copy">
-        <b>{{ t('navigation.routes.home') }}</b>
-        <small>{{ homeRoute?.path || '/' }}</small>
-      </span>
-    </RouterLink>
     <li v-for="item in items" :key="item.id">
       <button
         v-if="item.type === 'directory' && item.children.length"
@@ -81,8 +64,6 @@
 import { computed, reactive } from 'vue'
 import type { NavigationMenu } from '@scaffold/api-contract'
 import AppIcon from '@/components/AppIcon.vue'
-import constRoutes from '@/router/constRoutes'
-import { RouteRecordRaw } from 'vue-router'
 import { navigationLabel } from '@/modules/system/navigation/navigation.labels'
 import { useLocalization } from '@/modules/system/localization/localization'
 
@@ -90,20 +71,6 @@ const props = withDefaults(defineProps<{ items: NavigationMenu[]; depth?: number
 defineEmits<{ navigate: [] }>()
 
 const { resolveLocalizedLabel, t } = useLocalization()
-const homeRoute = computed(() => constRoutes.find((route: RouteRecordRaw) => route.path === '/'))
-
-const showHomeMenu = computed(() => {
-  // 根路由有空路径首页子项时显示首页；没有 children 时兼容简单静态根路由。
-  if (!homeRoute.value) {
-    return false
-  }
-  if (!homeRoute.value.children || homeRoute.value.children.length <= 0) {
-    return true
-  }
-
-  const children = homeRoute.value.children
-  return !!children.find((c) => c.path === '')
-})
 
 const expanded = reactive<Record<number, boolean>>({})
 

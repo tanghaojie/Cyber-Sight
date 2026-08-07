@@ -1,16 +1,6 @@
 <template>
   <nav v-if="depth === 0" class="top-navigation" :aria-label="t('navigation.shell.mainNavigation')">
     <ul class="top-navigation__list top-navigation__list--root">
-      <li v-if="showHomeMenu" class="top-navigation__item">
-        <RouterLink
-          :to="homeRoute?.path || '/'"
-          class="top-navigation__trigger top-navigation__trigger--home"
-          exact-active-class="router-link-exact-active"
-        >
-          <AppIcon name="home" class="top-navigation__icon" />
-          <span>{{ t('navigation.routes.home') }}</span>
-        </RouterLink>
-      </li>
       <li
         v-for="item in displayItems"
         :key="item.id"
@@ -98,9 +88,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { NavigationMenu } from '@scaffold/api-contract'
-import type { RouteRecordRaw } from 'vue-router'
 import AppIcon from '@/components/AppIcon.vue'
-import constRoutes from '@/router/constRoutes'
 import { useLocalization } from '@/modules/system/localization/localization'
 import { navigationLabel } from '@/modules/system/navigation/navigation.labels'
 
@@ -111,19 +99,9 @@ const props = withDefaults(defineProps<{ items: NavigationMenu[]; depth?: number
 })
 
 const { resolveLocalizedLabel, t } = useLocalization()
-const homeRoute = computed(() => constRoutes.find((route: RouteRecordRaw) => route.path === '/'))
 const displayItems = computed(() =>
   props.items.filter((item) => item.type !== 'directory' || item.children.length > 0),
 )
-const showHomeMenu = computed(() => {
-  if (!homeRoute.value) {
-    return false
-  }
-
-  return (
-    !homeRoute.value.children?.length || homeRoute.value.children.some((child) => child.path === '')
-  )
-})
 
 function hasChildren(item: NavigationMenu): boolean {
   return item.children.length > 0

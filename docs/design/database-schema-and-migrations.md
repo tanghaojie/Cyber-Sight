@@ -54,6 +54,8 @@ updated: 2026-08-07
 
 已追加并在 `apps/backend/drizzle/meta/_journal.json` 登记 `apps/backend/drizzle/0004_positions_management.sql`，登记 `positions.manage` 权限、岗位管理菜单并为既有超级管理员角色补授该权限。两张表复用审计字段、软删除、外键和活动部分唯一索引，完整字段及跨模块约束见[岗位模块](modules/positions.md)。迁移 SQL 文件必须与 journal 条目一一对应，避免文件存在但 `db:migrate` 静默跳过。
 
+`apps/backend/drizzle/0005_dynamic_home_menu.sql` 追加 `home.read`、默认 `/` 工作台和初始超级管理员授权。迁移只在不存在有效 `home` 菜单且不存在其他有效 `/` 页面时创建工作台；已存在的权限键、工作台路径或根页面配置均不覆盖。
+
 ## 单一初始基线
 
 `apps/backend/drizzle/0000_initial_system_schema.sql` 是初始迁移及其第一个 snapshot，必须一次性创建初始系统 Schema，并写入脚手架运行所需的初始数据：
@@ -61,7 +63,7 @@ updated: 2026-08-07
 - 本地管理员、超级管理员角色及角色归属；
 - 权限目录、超级管理员功能权限及用户资源全量数据策略；
 - 默认部门、闭包自关系及管理员主部门；
-- `/sys`、`/config` 两个 `AdminLayout` 根目录、五个相对路径管理菜单及超级管理员的兼容菜单关系；静态首页不写入数据库；
+- `/sys`、`/config` 两个 `AdminLayout` 根目录、五个相对路径管理菜单及超级管理员的兼容菜单关系；后续迁移追加受 `home.read` 控制的动态 `/` 工作台；
 - 通用状态字典。
 
 后续 Schema 变化按正常规则追加新迁移，禁止再次改写已经在共享环境执行过的新基线。`0001_luxuriant_violations` 新增 `sys_api_request_logs` 和 `api_logs.read` 初始授权；只有维护者再次明确宣布基线重置时，才能压缩历史。

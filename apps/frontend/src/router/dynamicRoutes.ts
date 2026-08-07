@@ -1,4 +1,10 @@
-import { RouterView, type RouteRecordRaw, type Router } from 'vue-router'
+import {
+  RouterView,
+  type RouteLocationRaw,
+  type RouteRecordName,
+  type RouteRecordRaw,
+  type Router,
+} from 'vue-router'
 import type { NavigationMenu } from '@scaffold/api-contract'
 import { layoutRegistry } from '@/shared/routing/layout-registry'
 import { viewRegistry } from '@/shared/routing/view-registry'
@@ -11,6 +17,17 @@ const DYNAMIC_ROUTE_NAME_PREFIX = 'dynamic'
 export let routesReady = false
 
 const dynamicRouteRemovers: Array<() => void> = []
+let dynamicRootRouteName: RouteRecordName | undefined
+let firstDynamicPageRouteName: RouteRecordName | undefined
+
+export function isDynamicRouteName(name: RouteRecordName | null | undefined): name is string {
+  return typeof name === 'string' && name.startsWith(`${DYNAMIC_ROUTE_NAME_PREFIX}-`)
+}
+
+export function dynamicLandingRoute(): RouteLocationRaw | undefined {
+  const name = dynamicRootRouteName ?? firstDynamicPageRouteName
+  return name ? { name } : undefined
+}
 
 function normalizePath(path: string): string {
   // 清理重复斜杠，同时保留相对路径和绝对路径的区别。
@@ -46,6 +63,27 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
       return
     }
 
+    if (path === '/' && dynamicRootRouteName) {
+      console.error(`Ignored duplicate dynamic root page for menu item ${item.id}`)
+      return
+    }
+
+    const pageRouteName = `${DYNAMIC_ROUTE_NAME_PREFIX}-menu-${compName}-${item.id}`
+    firstDynamicPageRouteName ??= pageRouteName
+    if (path === '/') {
+      dynamicRootRouteName = pageRouteName
+    }
+
+    const pageMeta = {
+      title: item.name,
+      menuPath: menuPath.map((label) => label.fallback).join(' / '),
+      localizedTitle: navigationLabel(item),
+      localizedMenuPath: menuPath,
+      menuId: item.id,
+      dynamicPage: true,
+      rootEntry: path === '/',
+    }
+
     if (layoutInfo) {
       // 带布局的页面使用空路径子路由承载页面组件，布局只负责外壳和 RouterView。
       const route: RouteRecordRaw = {
@@ -55,15 +93,9 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
         children: [
           {
             path: '', // 只能有一个空路径子路由，确保访问父路径时直接渲染目标页面。
-            name: `${DYNAMIC_ROUTE_NAME_PREFIX}-menu-${compName}-${item.id}`,
+            name: pageRouteName,
             component: componentInfo.component,
-            meta: {
-              title: item.name,
-              menuPath: menuPath.map((label) => label.fallback).join(' / '),
-              localizedTitle: navigationLabel(item),
-              localizedMenuPath: menuPath,
-              menuId: item.id,
-            },
+            meta: pageMeta,
           },
         ],
       }
@@ -71,15 +103,9 @@ export function installMenuRoutes(targetRouter: Router, nodes: NavigationMenu[])
     } else {
       const route: RouteRecordRaw = {
         path: path,
-        name: `${DYNAMIC_ROUTE_NAME_PREFIX}-menu-${compName}-${item.id}`,
+        name: pageRouteName,
         component: componentInfo.component,
-        meta: {
-          title: item.name,
-          menuPath: menuPath.map((label) => label.fallback).join(' / '),
-          localizedTitle: navigationLabel(item),
-          localizedMenuPath: menuPath,
-          menuId: item.id,
-        },
+        meta: pageMeta,
       }
       return route
     }
@@ -153,5 +179,7 @@ export function clearDynamicRoutes(): void {
   for (const remove of dynamicRouteRemovers.splice(0)) {
     remove()
   }
+  dynamicRootRouteName = undefined
+  firstDynamicPageRouteName = undefined
   routesReady = false
 }

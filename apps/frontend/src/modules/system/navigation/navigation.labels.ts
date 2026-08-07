@@ -11,6 +11,13 @@ interface DefaultNavigationFingerprint {
 
 const defaultNavigationFingerprints: readonly DefaultNavigationFingerprint[] = [
   {
+    type: 'menu',
+    path: '/',
+    component: 'home',
+    name: '首页',
+    key: 'navigation.routes.home',
+  },
+  {
     type: 'directory',
     path: '/sys',
     component: '',

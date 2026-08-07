@@ -14,5 +14,6 @@
 - [ADR-0031](ADR-0031-cyber-ai-forge-brand.md)：将正式产品名更新为 Cyber AI Forge，并同步项目级认证与浏览器存储标识。
 - [ADR-0032](ADR-0032-nestjs-fastify-adapter.md)：后端迁移到 NestJS 11，继续使用 Fastify 5 adapter，并保留共享 Zod 契约为唯一 HTTP 数据源。
 - [ADR-0034](ADR-0034-position-organization-ownership.md)：岗位作为按部门归属的组织主数据，由独立 `positions` 模块拥有用户岗位关系，不参与授权。
+- [ADR-0035](ADR-0035-permission-controlled-root-entry.md)：首页回归权限控制的动态菜单，并以根入口解析器统一选择根页面、首个可访问页面或无权限页。
 
 新增 ADR 时使用 [ADR 模板](../templates/adr-template.md)和下一个连续编号。ADR 被取代或被后续基线吸收后更新替代关系并移入 `docs/archive/decisions/`，编号不得复用。

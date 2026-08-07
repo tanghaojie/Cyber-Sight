@@ -57,7 +57,8 @@ import AppHeader from '@/components/layout/AppHeader.vue'
 import AppMain from '@/components/layout/AppMain.vue'
 import AppSidebar from '@/components/layout/AppSidebar.vue'
 import TagView from '@/modules/system/tag-view/TagView.vue'
-import { clearDynamicRoutes, installMenuRoutes } from '@/router/dynamicRoutes'
+import { clearDynamicRoutes, installMenuRoutes, isDynamicRouteName } from '@/router/dynamicRoutes'
+import { resolveRootEntry } from '@/router/rootEntry'
 import { useAuthStore } from '@/modules/system/auth/auth.store'
 import { useNavigationStore } from '@/modules/system/navigation/navigation.store'
 import { useSettingsStore } from '@/modules/system/settings/settings.store'
@@ -113,10 +114,22 @@ const localizedTags = computed(() =>
 
 watch(
   () => navigation.items,
-  function refreshRoutes(items) {
+  async function refreshRoutes(items) {
     // 菜单被后台刷新后同步替换 Router 记录，不要求用户重新登录。
     if (navigation.loaded) {
+      const currentDynamicName = route.matched
+        .map((record) => record.name)
+        .filter(isDynamicRouteName)
+        .at(-1)
       installMenuRoutes(router, items)
+      if (currentDynamicName && router.hasRoute(currentDynamicName)) {
+        const refreshedRoute = router.resolve({ name: currentDynamicName })
+        if (refreshedRoute.path !== route.path) {
+          await router.replace({ name: currentDynamicName })
+        }
+      } else if (currentDynamicName || (route.path === '/' && route.meta.rootEntry !== true)) {
+        await router.replace(resolveRootEntry(router))
+      }
     }
   },
   { deep: true },
@@ -209,7 +222,7 @@ async function handleCloseTag(path: string): Promise<void> {
   if (targetPath !== route.path) {
     await router.push(targetPath)
   }
-  // 首页关闭或重复导航不会触发路由 watcher，需要主动恢复当前页标签。
+  // 根页面关闭或重复导航不会触发路由 watcher，需要主动恢复当前页标签。
   syncCurrentTag()
 }
 

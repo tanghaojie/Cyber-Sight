@@ -2,7 +2,7 @@
 title: 前端应用与应用壳
 status: active
 owner: maintainers
-updated: 2026-08-07
+updated: 2026-08-08
 ---
 
 # 前端应用与应用壳
@@ -27,7 +27,7 @@ updated: 2026-08-07
 - `src/shared/browserStorage.ts`：向前端模块公开 `browserStorage()`；在 SSR、隐私模式或浏览器策略禁用存储时返回 `null`，调用方保留各自的内存降级和错误处理语义。
 - `src/shared/localization/localization.resource.ts`：定义受支持语言、资源结构和中英文键集合校验；
   `src/shared/localization/shared.locales.ts`：提供 `shared.*` 命名空间的领域无关界面文案。
-- `src/router/constRoutes.ts`：登录、显式 404、根 `AdminLayout`、默认工作台和不依赖后端菜单的个人资料路由。
+- `src/router/constRoutes.ts`：登录、显式错误页面和不依赖后端菜单的个人资料路由；默认静态配置不占用 `/`。
 - `src/router/routerGuard.ts`：认证恢复、导航加载和首次动态路由安装。
 - `src/router/dynamicRoutes.ts`：根据菜单树生成、注册和清理动态路由。
 - `src/router/index.ts`：创建 Router，组装静态路由、最终 404 和认证守卫。
@@ -54,13 +54,13 @@ cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie�
 
 ## 导航与路由数据流
 
-1. `constRoutes.ts` 直接注册公开登录、公开 404，以及使用 `AdminLayout` 的 `/` 根路由和默认 `HomePage`。
+1. `constRoutes.ts` 直接注册公开登录、公开 404、受认证保护的无权限页，以及使用 `AdminLayout` 的个人资料页；默认静态配置不注册首页或占用 `/`。
 2. 非公开导航进入 `authenticationRouteGuard()`：恢复当前用户；未认证时跳转登录；首次认证成功时加载菜单树、安装动态路由并按原地址重新匹配。
 3. `navigation.store.ts` 通过 `navigation.api.ts` 获取 `GET /navigation/menus`，先把相对路径按目录层级解析为规范绝对路径，再缓存树和扁平列表。
 4. `dynamicRoutes.ts` 递归生成路由。`directory` 使用显式布局或 `RouterView` 并承载子路由；`menu` 使用已登记页面，显式布局存在时创建只有一个空路径子项的布局包装，否则直接加载页面；`button` 不注册站内路由。菜单路由保留原始 `meta.title` 和 `meta.menuPath`，并额外保存可响应语言切换的 `localizedTitle` 与 `localizedMenuPath` 标签描述；应用壳解析后展示当前语言标题路径。
-5. 每棵根菜单子树通过 `router.addRoute()` 注册。刷新菜单、退出或 401 时调用移除函数并重置 `routesReady`。
+5. 每棵根菜单子树通过 `router.addRoute()` 注册。安装过程同时记录成功生成的动态根页面和首个站内页面路由名称；认证守卫访问 `/` 时优先使用显式静态根页面，其次动态根页面、首个动态页面，最后进入无权限页。刷新菜单、退出或 401 时调用移除函数并重置动态落点。
 6. `AdminLayout` 读取 settings 模块保存的导航风格：桌面端可在固定侧边导航和递归 `TopNavigation.vue` 顶部导航之间切换。顶部只渲染首页和权限过滤后的根菜单；带有子节点的任意节点在鼠标悬停或键盘焦点进入时展开其同级浮层，子级浮层贴靠父项右侧继续级联。目录仅作为分组入口，站内菜单使用 RouterLink，外链按钮在新窗口打开 HTTP(S) 地址；空目录不会显示。`max-width: 1023px` 时，无论保存的桌面偏好为何都自动使用抽屉式侧边导航，不改写该偏好；Header 的菜单按钮始终可见，可在任何尺寸打开或关闭抽屉。
-7. `AdminLayout` 把已认证账号 ID、当前 `route.path` 和 `meta.title` 交给 `tag-view` 模块；模块按账号恢复并保存不含 query/hash 的页面历史。关闭当前标签时应用壳导航到相邻标签，无后备项或关闭全部时回首页。
+7. `AdminLayout` 把已认证账号 ID、当前 `route.path` 和 `meta.title` 交给 `tag-view` 模块；模块按账号恢复并保存不含 query/hash 的页面历史。关闭当前标签时应用壳导航到相邻标签，无后备项或关闭全部时重新进入 `/` 并由根入口解析当前有效落点。菜单刷新移除当前动态页面时，应用壳也使用同一落点规则替换失效地址。
 
 目录层级通过嵌套路由自然传递上级布局：目录无显式布局时使用 `RouterView`，菜单无显式布局时直接使用页面。当前实现不会为所有动态根菜单自动包裹 `AdminLayout`；需要该布局时由菜单或祖先目录明确选择。未知页面 key、缺少组件名或未知菜单类型不会回退到任意导入；前两者记录控制台错误并跳过路由，未知类型抛出错误。
 
@@ -89,7 +89,7 @@ Element Plus 提供当前语言包。登录页与 Header 共用 `LanguageSwitche
 
 - AI 执行格式、静态检查、TypeScript 检查和生产构建；不创建或运行前端自动化、端到端或浏览器测试。
 - 维护者人工验收登录恢复、cookie 到期、退出/401 清理、直接访问动态 URL、页面与布局发现、目录嵌套、权限菜单过滤、标签历史恢复与关闭操作、部门与三类主体策略弹窗和响应式外壳。
-- 当前构建会提示 `AdminLayout.vue` 和 `HomePage.vue` 同时被静态与动态导入，因此不会拆入独立动态 chunk；这不阻止生产构建。
+- 当前构建会提示 `AdminLayout.vue` 同时被静态与动态导入，因此不会拆入独立动态 chunk；这不阻止生产构建。
 - `useHealth` 会在传输异常、超时或无效响应时更新错误状态；系统化可访问性审计和生产环境 API 地址策略尚未补齐。
 
 初始版本之前的前端应用壳和注册表取舍保留在[归档索引](../../archive/README.md)，当前行为以本设计和维护者实现为准。

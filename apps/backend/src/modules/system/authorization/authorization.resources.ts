@@ -5,6 +5,7 @@ export const authorizationPermissionKeys = {
   apiLogsRead: 'api_logs.read',
   departmentsManage: 'departments.manage',
   dictionariesManage: 'dictionaries.manage',
+  homeRead: 'home.read',
   menusManage: 'menus.manage',
   positionsManage: 'positions.manage',
   rolesManage: 'roles.manage',

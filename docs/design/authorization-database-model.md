@@ -86,7 +86,7 @@ WHERE ur.user_id = :current_user_id
 
 ### 初始数据
 
-唯一初始迁移 apps/backend/drizzle/0000_initial_system_schema.sql 会创建权限目录、超级管理员角色及归属，并授予该初始角色全部已登记功能权限。超级管理员不依赖运行时用户 ID 或角色编码绕过；其能力同样来自上述关系表。
+初始迁移 apps/backend/drizzle/0000_initial_system_schema.sql 会创建权限目录、超级管理员角色及归属，并授予该初始角色当时已登记的功能权限；后续追加迁移以同一关系模型登记新能力，例如 `0005_dynamic_home_menu.sql` 为超级管理员追加 `home.read`。超级管理员不依赖运行时用户 ID 或角色编码绕过；其能力同样来自上述关系表。
 
 ## 数据权限
 

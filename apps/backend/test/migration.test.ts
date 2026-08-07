@@ -68,17 +68,22 @@ function positionMigrationSql(): string {
   return readFileSync(new URL('../drizzle/0004_positions_management.sql', import.meta.url), 'utf8')
 }
 
+function dynamicHomeMigrationSql(): string {
+  return readFileSync(new URL('../drizzle/0005_dynamic_home_menu.sql', import.meta.url), 'utf8')
+}
+
 describe('database migration baseline', () => {
   it('keeps the initial baseline and appends later schema changes', () => {
     const journal = migrationJournal()
 
-    expect(journal.entries).toHaveLength(5)
+    expect(journal.entries).toHaveLength(6)
     expect(journal.entries.map(({ tag }) => tag)).toEqual([
       '0000_initial_system_schema',
       '0001_luxuriant_violations',
       '0002_api_log_operations_menu',
       '0003_about_project_menu',
       '0004_positions_management',
+      '0005_dynamic_home_menu',
     ])
     expect(migrationFiles()).toEqual([
       '0000_initial_system_schema.sql',
@@ -86,6 +91,7 @@ describe('database migration baseline', () => {
       '0002_api_log_operations_menu.sql',
       '0003_about_project_menu.sql',
       '0004_positions_management.sql',
+      '0005_dynamic_home_menu.sql',
     ])
     expect(journal.entries.map(({ tag }) => `${tag}.sql`)).toEqual(migrationFiles())
     expect(snapshotFiles()).toEqual(['0000_snapshot.json', '0001_snapshot.json'])
@@ -206,6 +212,20 @@ describe('database migration baseline', () => {
     expect(migrationSql).toContain("'book', 999, 'menu', true")
     expect(migrationSql).toContain('WHERE NOT EXISTS')
     expect(migrationSql).not.toContain('required_permission_key')
+    expect(migrationSql).not.toContain('DROP')
+  })
+
+  it('adds a permission-controlled dynamic home without overwriting existing navigation', () => {
+    const migrationSql = dynamicHomeMigrationSql()
+
+    expect(migrationSql).toContain("'home.read'")
+    expect(migrationSql).toContain("'首页', '/', 'home', 'AdminLayout'")
+    expect(migrationSql).toContain('INSERT INTO "sys_role_permissions"')
+    expect(migrationSql).toContain('INSERT INTO "sys_role_menus"')
+    expect(migrationSql).toContain('WHERE NOT EXISTS')
+    expect(migrationSql).toContain('ON CONFLICT ("key") DO NOTHING')
+    expect(migrationSql).not.toContain('DO UPDATE')
+    expect(migrationSql).not.toContain('UPDATE "sys_menus"')
     expect(migrationSql).not.toContain('DROP')
   })
 })

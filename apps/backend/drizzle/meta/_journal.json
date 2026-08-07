@@ -36,6 +36,13 @@
       "when": 1786116837174,
       "tag": "0004_positions_management",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1786204800000,
+      "tag": "0005_dynamic_home_menu",
+      "breakpoints": true
     }
   ]
 }

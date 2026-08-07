@@ -38,7 +38,7 @@ export async function listPositionOptions(): Promise<PositionOption[]> {
     '/admin/positions/options',
   )
   const result = data ?? error
-  if (!result || result.status !== 0 || result.data === undefined) {
+  if (!result || result.status !== 0 || !('data' in result) || result.data === undefined) {
     throw new Error(translate('positions.errors.optionsLoadFailed'))
   }
   return result.data

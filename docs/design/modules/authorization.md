@@ -55,7 +55,7 @@ HTTP API：
 
 模块在代码和迁移中登记稳定权限键，例如 `users.manage`、`roles.manage`、`departments.manage`、`positions.manage`、`menus.manage`、`dictionaries.manage` 和 `api_logs.read`。权限键至少包含两个以 `.` 分隔的片段，每个片段以小写字母开头，后续可使用小写字母、数字、连字符或下划线。`sys_permissions.key` 全局唯一且不复用；角色通过 `sys_role_permissions` 获得权限。
 
-菜单可引用一个权限键。当前用户拥有该权限时菜单节点可见，目录祖先仅作为结构节点自动补齐。没有权限键的菜单对所有已认证用户可见。管理接口使用与对应页面相同的模块级权限键；后续可增加 `users.read`、`users.delete` 等细分键而无需替换数据模型。
+菜单可引用一个权限键。当前用户拥有该权限时菜单节点可见，目录祖先仅作为结构节点自动补齐。没有权限键的菜单对所有已认证用户可见。默认工作台引用 `home.read`，因此可独立于其他管理能力授权；管理接口使用与对应页面相同的模块级权限键。后续可增加 `users.read`、`users.delete` 等细分键而无需替换数据模型。
 
 Nest Controller 处理器必须声明：
 

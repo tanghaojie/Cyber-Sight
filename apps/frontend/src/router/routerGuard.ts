@@ -3,6 +3,7 @@ import { pinia } from '@/stores/pinia'
 import { useAuthStore } from '@/modules/system/auth/auth.store'
 import { useNavigationStore } from '@/modules/system/navigation/navigation.store'
 import { installMenuRoutes, routesReady } from './dynamicRoutes'
+import { resolveRootEntry } from './rootEntry'
 
 export async function authenticationRouteGuard(to: RouteLocationNormalized, router: Router) {
   const auth = useAuthStore(pinia)
@@ -25,7 +26,13 @@ export async function authenticationRouteGuard(to: RouteLocationNormalized, rout
     // 首次认证导航先拉菜单再注册路由，然后重放目标地址让 Router 重新匹配新记录。
     await navigation.load()
     installMenuRoutes(router, navigation.items)
+    if (to.path === '/') {
+      return resolveRootEntry(router)
+    }
     return to.fullPath
+  }
+  if (to.path === '/' && to.meta.rootEntry !== true) {
+    return resolveRootEntry(router)
   }
   return true
 }

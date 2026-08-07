@@ -1,11 +1,10 @@
 import { loginPage } from '@/modules/system/auth/auth.routes'
-import { notFoundPage } from '@/modules/system/errors/error.routes'
+import { noAccessPage, notFoundPage } from '@/modules/system/errors/error.routes'
 import AdminLayout from '@/layouts/AdminLayout.vue'
-import { RouteRecordRaw, RouterView } from 'vue-router'
-import HomePage from '@/modules/system/home/pages/HomePage.vue'
+import { RouteRecordRaw } from 'vue-router'
 import { personalProfilePage } from '@/modules/system/users/profile.routes'
 
-// 登录、首页和错误页是应用启动所需的最小静态路由，不依赖后端菜单配置。
+// 登录、错误页和个人资料是应用启动所需的最小静态路由；首页由动态菜单决定。
 const routes: RouteRecordRaw[] = [
   {
     path: '/login',
@@ -28,23 +27,29 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/',
+    path: '/403',
     component: AdminLayout,
     children: [
       {
         path: '',
-        name: 'admin-root',
-        component: HomePage,
+        name: 'no-access',
+        component: noAccessPage,
         meta: {
           public: false,
-          title: '首页',
-          menuPath: '首页',
-          localizedTitle: { key: 'navigation.routes.home', fallback: '首页' },
-          localizedMenuPath: [{ key: 'navigation.routes.home', fallback: '首页' }],
+          title: '暂无访问权限',
+          menuPath: '暂无访问权限',
+          localizedTitle: { key: 'errors.noAccess.title', fallback: '暂无访问权限' },
+          localizedMenuPath: [{ key: 'errors.noAccess.title', fallback: '暂无访问权限' }],
         },
       },
+    ],
+  },
+  {
+    path: '/profile',
+    component: AdminLayout,
+    children: [
       {
-        path: 'profile',
+        path: '',
         name: 'personal-profile',
         component: personalProfilePage,
         meta: {

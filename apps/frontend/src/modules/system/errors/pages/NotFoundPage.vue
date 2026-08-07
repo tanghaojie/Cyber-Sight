@@ -34,7 +34,7 @@ async function goHome(): Promise<void> {
   await router.push('/')
 }
 function goBack(): void {
-  // 没有可返回历史时回到静态首页，避免按钮在新标签页中无响应。
+  // 没有可返回历史时回到根入口，由守卫选择当前账号的有效落点。
   if (window.history.length > 1) {
     router.back()
   } else {
