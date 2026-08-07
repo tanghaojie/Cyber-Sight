@@ -50,6 +50,7 @@
 - 2026-08-07：[关于项目页与品牌入口计划](plans/2026-08-07-about-project.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-07-about-project.md)。
 - 2026-08-07：[登录页主题外观入口计划](plans/2026-08-07-login-appearance-entry.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-07-login-appearance-entry.md)。
 - 2026-08-07：[Cyber AI Forge 品牌与项目标识改名](plans/2026-08-07-cyber-ai-forge-renaming.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-07-cyber-ai-forge-renaming.md)。
+- 2026-08-07：[Cyber AI Forge 改名后的文档归档审查](plans/2026-08-07-cyber-ai-forge-archive-review.md)。
 - 2026-08-06：[登录页与工作台首屏信息重设计计划](plans/2026-08-06-auth-home-visual-refresh.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-06-auth-home-visual-refresh.md)。
 - 2026-08-05：[个人资料页首页导航高亮修复计划](plans/2026-08-05-profile-navigation-highlight.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-05-profile-navigation-highlight.md)。
