@@ -30,7 +30,7 @@ updated: 2026-08-07
 - [x] 更新 `archive-ledger.json` 到审查基线并运行 `pnpm docs:archive:check:ci`。
 - [x] 将本计划移入 `docs/archive/plans/`。
 
-最终审查结论：Health 当前行为已由 `docs/design/modules/health.md` 记录；未发现需要取代或归档的 Health 历史 Design/ADR。本次仅修复异常收敛和请求超时，不新增长期技术决策。归档账本在本任务期间已由并发的人类岗位迁移任务更新到 `de921bfc5b8415d92c1b559a6fd0436b2f9fa640`，本任务保留该人类修改。
+最终审查结论：Health 当前行为已由 `docs/design/modules/health.md` 记录；未发现需要取代或归档的 Health 历史 Design/ADR。本次仅修复异常收敛和请求超时，不新增长期技术决策。归档账本先由并发的人类岗位迁移任务更新到 `de921bfc5b8415d92c1b559a6fd0436b2f9fa640`，最终再推进到本任务已验证提交 `7bd762d89b0def6f4c7446469c39a25951bb4004`。
 
 ## 相关文档
 

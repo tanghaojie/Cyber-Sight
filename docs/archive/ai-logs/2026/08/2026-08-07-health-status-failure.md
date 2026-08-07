@@ -28,7 +28,7 @@ status: completed
 
 ## 验证结果
 
-本任务文件已完成范围化 Prettier、`pnpm format:check` 和 Health 文件 ESLint。前端生产构建被并发的人类岗位模块 `positions.api.ts` 的既有类型错误阻塞；未修改该模块。按仓库前端边界未创建或运行自动化测试。归档账本由并发的人类岗位迁移任务更新到本任务开始后的 `de921bfc5b8415d92c1b559a6fd0436b2f9fa640`，本任务未覆盖该修改。
+本任务文件已完成范围化 Prettier、`pnpm format:check` 和 Health 文件 ESLint。前端生产构建被并发的人类岗位模块 `positions.api.ts` 的既有类型错误阻塞；未修改该模块。按仓库前端边界未创建或运行自动化测试。归档账本先由并发的人类岗位迁移任务更新到 `de921bfc5b8415d92c1b559a6fd0436b2f9fa640`，最终再更新到本任务已验证提交 `7bd762d89b0def6f4c7446469c39a25951bb4004`。
 
 ## 未决问题与下一步
 
