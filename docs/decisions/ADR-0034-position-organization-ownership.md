@@ -30,7 +30,7 @@ date: 2026-08-07
 采用方案 3：
 
 - 新增 `system/positions` 模块，稳定模块名为 `positions`。
-- `sys_positions.department_id` 为必填外键；一个岗位定义只属于一个有效部门，同部门活动岗位名称唯一，岗位编码全局活动唯一。
+- `sys_positions.department_id` 为必填外键；一个岗位定义只属于一个有效部门，同部门活动岗位名称唯一。
 - 新增 `sys_user_positions(user_id, position_id)` 多对多关系；关系表不复制 `department_id`，任职部门始终由岗位定义推导。
 - `positions` 拥有岗位定义和用户岗位关系。`users` 通过登记的 `positions.service.ts` 协作，`positions` 通过 `departments.access.ts` 校验岗位所属部门；模块之间不能直接读写对方仓储或表。
 - 用户可以无岗位或多岗位，第一版不设主岗位。用户任职有效的必要条件是：用户、岗位、岗位所属部门和关系均未软删除且启用，并且用户有该部门的有效归属。
