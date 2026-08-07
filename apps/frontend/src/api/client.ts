@@ -7,6 +7,7 @@ type QueryValue = string | number | boolean | undefined
 interface RequestOptions<TBody = never> {
   body?: TBody
   query?: Record<string, QueryValue>
+  signal?: AbortSignal
 }
 
 export interface ApiResult<TResponse> {
@@ -58,6 +59,7 @@ async function request<TResponse, TBody = never>(
     method,
     headers,
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
+    signal: options.signal,
   })
 
   // 401/404/500 先触发应用级导航和会话副作用；响应体仍继续解析给调用方。

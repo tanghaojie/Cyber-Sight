@@ -64,6 +64,9 @@
   [AI 协作记录](ai-logs/2026/08/2026-08-07-position-remove-code-design.md)。
 - 2026-08-07：[岗位管理功能实施计划](plans/2026-08-07-job-positions-implementation.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-07-job-positions-implementation.md)。
+- 2026-08-07：[Health 模块失败状态修复计划](plans/2026-08-07-health-status-failure.md)及其
+  [归档审查计划](plans/2026-08-07-health-status-failure-archive-review.md)与
+  [AI 协作记录](ai-logs/2026/08/2026-08-07-health-status-failure.md)。
 - 2026-08-06：[登录页与工作台首屏信息重设计计划](plans/2026-08-06-auth-home-visual-refresh.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-06-auth-home-visual-refresh.md)。
 - 2026-08-05：[个人资料页首页导航高亮修复计划](plans/2026-08-05-profile-navigation-highlight.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-05-profile-navigation-highlight.md)。

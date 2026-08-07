@@ -3,6 +3,8 @@ import type { HealthResponse } from '@scaffold/api-contract'
 import { apiClient } from '@/api/client'
 import { translate } from '@/modules/system/localization/localization'
 
+const HEALTH_CHECK_TIMEOUT_MS = 5_000
+
 /** 在使用组件存活期间每六秒轮询进程健康状态，并在卸载时释放定时器。 */
 export function useHealth() {
   const status = ref<'loading' | 'error' | 'ok'>('loading')
@@ -10,27 +12,44 @@ export function useHealth() {
   const error = ref<string | null>(null)
   const healthTimer = ref<number | undefined>(undefined)
 
+  function setErrorState(message: string): void {
+    error.value = message
+    status.value = 'error'
+    timestamp.value = ''
+  }
+
   async function fetchHealth() {
     error.value = null
+    const controller = new AbortController()
+    const timeout = window.setTimeout(() => {
+      controller.abort()
+    }, HEALTH_CHECK_TIMEOUT_MS)
 
-    const { data: response, error: responseError } = await apiClient.GET<HealthResponse>('/health')
+    try {
+      const { data: response, error: responseError } = await apiClient.GET<HealthResponse>(
+        '/health',
+        {
+          signal: controller.signal,
+        },
+      )
 
-    if (responseError) {
-      error.value = translate('health.errors.unreachable')
-      status.value = 'error'
-      timestamp.value = ''
-      return
+      if (responseError) {
+        setErrorState(translate('health.errors.unreachable'))
+        return
+      }
+
+      if (!response || response.status !== 0 || !response.data) {
+        setErrorState(translate('shared.messages.invalidResponse'))
+        return
+      }
+
+      status.value = response.data.status
+      timestamp.value = response.data.timestamp
+    } catch {
+      setErrorState(translate('health.errors.unreachable'))
+    } finally {
+      window.clearTimeout(timeout)
     }
-
-    if (!response || response.status !== 0 || !response.data) {
-      error.value = translate('shared.messages.invalidResponse')
-      status.value = 'error'
-      timestamp.value = ''
-      return
-    }
-
-    status.value = response.data.status
-    timestamp.value = response.data.timestamp
   }
 
   async function fetchHealthInterval() {
