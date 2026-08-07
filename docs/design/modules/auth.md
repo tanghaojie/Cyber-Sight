@@ -13,8 +13,8 @@ updated: 2026-08-07
 
 ## 数据流与会话生命周期
 
-1. 登录在数据库中校验用户凭据并读取角色，签发 issuer 为 `cyber-scaffold`、audience 为 `cyber-scaffold-api`、8 小时有效的 HS256 JWT，把 token 的 SHA-256 哈希、用户和过期时间写入 `sys_auth_sessions`，再把 token 标识与当前用户快照写入容量为 100 的进程内 LRU 缓存。数据库不保存可直接复用的明文 token。
-2. 登录响应返回 `{ status: 0, data: { user, issued: { token, expiresAt } } }`。`auth.api.ts` 封装登录、当前用户和退出请求，`auth.store.ts` 负责会话状态，并通过 `shared/accessToken.ts` 把 token 写入键为 `cyber_access_token`、到期时间来自 `expiresAt` 的浏览器 cookie。共享 API Client 为请求附加 `Authorization: Bearer <token>`；清会话时同时清理当前 cookie、旧 `jtlib_access_token` cookie 和对应 `localStorage` 键。
+1. 登录在数据库中校验用户凭据并读取角色，签发 issuer 为 `cyber-ai-forge`、audience 为 `cyber-ai-forge-api`、8 小时有效的 HS256 JWT，把 token 的 SHA-256 哈希、用户和过期时间写入 `sys_auth_sessions`，再把 token 标识与当前用户快照写入容量为 100 的进程内 LRU 缓存。数据库不保存可直接复用的明文 token。
+2. 登录响应返回 `{ status: 0, data: { user, issued: { token, expiresAt } } }`。`auth.api.ts` 封装登录、当前用户和退出请求，`auth.store.ts` 负责会话状态，并通过 `shared/accessToken.ts` 把 token 写入键为 `cyber_ai_forge_access_token`、到期时间来自 `expiresAt` 的浏览器 cookie。共享 API Client 为请求附加 `Authorization: Bearer <token>`；清会话时同时清理当前 cookie、旧 `cyber_access_token` 和 `jtlib_access_token` cookie 及对应 `localStorage` 键。
 3. 鉴权先严格解析 Bearer 头并校验 JWT 签名、issuer、audience、算法和过期时间，再按 token 标识读取 LRU；缓存命中会刷新最近使用顺序，不查询数据库。
 4. 缓存未命中时，以 token 哈希查询未撤销且未过期的 `sys_auth_sessions`，联查启用用户和角色后回填 LRU。第 101 个 token 只淘汰最久未使用的缓存项，不撤销数据库会话；该 token 下次请求会回源后继续有效。进程重启同样只产生冷缓存。
 5. 显式退出先在数据库软删除当前会话，再删除缓存项。用户资料或角色变更只失效相关缓存，使下一次请求回源获得新快照；删除用户时同时撤销该用户全部数据库会话并失效缓存。
@@ -31,7 +31,7 @@ updated: 2026-08-07
 
 `pages/LoginPage.vue` 只负责桌面双栏与窄屏单栏的页面组装，不承载认证状态或品牌展示细节。其同目录私有组件不属于 auth 模块的公共接口：
 
-- `pages/components/LoginPresentation.vue` 负责左侧 CYBER 品牌、AI 协作全栈基座主张、三项工程支柱、创作者署名和纯展示性的全息背景。背景使用主题语义令牌构造透视网格、悬浮几何体、轨道与数据节点；它不读取认证状态、不发起请求，也不改变文案键。
+- `pages/components/LoginPresentation.vue` 负责左侧 CYBER 品牌、AI 驱动的企业应用智能构建平台主张、三项工程支柱、创作者署名和纯展示性的全息背景。背景使用主题语义令牌构造透视网格、悬浮几何体、轨道与数据节点；它不读取认证状态、不发起请求，也不改变文案键。
 - `pages/components/LoginInteraction.vue` 负责右侧语言切换、工作台访问环境提示、凭据输入、错误提示、提交状态、本地开发账号提示和登录后的 redirect 恢复。它通过 `useAuthStore().login()` 执行既有认证流程，成功后仍替换到路由 query 中的 `redirect` 或首页。
 - `pages/components/LoginAppearanceControls.vue` 是 `LoginInteraction` 使用的私有视觉偏好入口，消费 settings 模块登记的 Store、主题元数据和本地化键；它只更新设备级深色模式与主题颜色，不读取认证状态，也不改变登录流程。
 
@@ -49,7 +49,7 @@ updated: 2026-08-07
 
 登录页的品牌氛围、表单表面、光晕和 CYBER Logo 强调色消费全局语义主题令牌，并响应设备级主题颜色和深色模式；认证逻辑、凭据与会话数据不依赖主题设置。
 
-2026-07-31 品牌切换同时更换 JWT issuer/audience 和访问令牌键；旧品牌下签发的令牌不再通过校验，已有用户需要重新登录。该兼容性边界只影响会话，不迁移或删除账号、授权和业务数据。
+2026-08-07 品牌切换同时更换 JWT issuer/audience 和访问令牌键；旧品牌下签发的令牌不再通过校验，已有用户需要重新登录。该兼容性边界只影响会话，不迁移或删除账号、授权和业务数据。具体命名基线见 ADR-0031。
 
 认证提供当前身份和角色展示信息。`CurrentUser.roles` 中的每项包含内部关联用的角色 ID 与展示用角色名称；认证接口和前端不传递角色编码，顶部栏按角色 ID 的稳定顺序展示全部角色名称。认证不把功能权限或数据策略写入 JWT。业务路由由 authorization 插件在认证后从 Provider 重新解析权限，因此角色权限和数据策略修改可在下一请求生效；认证缓存中的角色快照不是授权判断来源。
 

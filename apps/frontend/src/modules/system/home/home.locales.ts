@@ -3,11 +3,11 @@ import { defineLocalizationResource } from '@/shared/localization/localization.r
 export const localizationResource = defineLocalizationResource('home', {
   'zh-CN': {
     'overview.label': '工作台总览',
-    'hero.kicker': 'CYBER SCAFFOLD · 工作台简报',
+    'hero.kicker': 'CYBER AI FORGE · 工作台简报',
     'hero.lineOne': '让系统脉络可见，',
     'hero.lineTwo': '让每次变更有据可循。',
     'hero.description':
-      '{name} 把模块边界、共享运行时契约与管理基础能力放在同一张工程蓝图里，让 AI 和人类可以持续协作、持续交付。',
+      '{name} 把企业应用所需的模块边界、共享运行时契约与管理基础能力放在同一张工程蓝图里，让 AI 和人类可以持续协作、持续交付。',
     'hero.systemIndex': '可访问入口',
     'hero.activeNodes': 'ACTIVE NODES',
     'hero.status': '系统基座已就绪',
@@ -35,11 +35,11 @@ export const localizationResource = defineLocalizationResource('home', {
   },
   'en-US': {
     'overview.label': 'Dashboard overview',
-    'hero.kicker': 'CYBER SCAFFOLD · WORKSPACE BRIEF',
+    'hero.kicker': 'CYBER AI FORGE · WORKSPACE BRIEF',
     'hero.lineOne': 'Make the system visible.',
     'hero.lineTwo': 'Make every change traceable.',
     'hero.description':
-      '{name} puts module boundaries, shared runtime contracts, and management foundations on one engineering blueprint for continuous human–AI delivery.',
+      '{name} puts the module boundaries, shared runtime contracts, and management foundations for enterprise applications on one engineering blueprint for continuous human–AI delivery.',
     'hero.systemIndex': 'ACCESSIBLE ENTRY POINTS',
     'hero.activeNodes': 'ACTIVE NODES',
     'hero.status': 'SYSTEM BASELINE READY',

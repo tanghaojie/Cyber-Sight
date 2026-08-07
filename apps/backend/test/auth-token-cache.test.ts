@@ -16,13 +16,13 @@ function user(id: number): CurrentUser {
 
 // 覆盖 JWT 验签、LRU 容量、过期/撤销，以及缓存失效与持久会话撤销的职责差异。
 describe('JWT LRU token cache', () => {
-  it('issues tokens for the Cyber Scaffold issuer and API audience', async () => {
+  it('issues tokens for the Cyber AI Forge issuer and API audience', async () => {
     const cache = new JwtTokenCache(SECRET)
     const issued = await cache.issue(user(1))
 
     expect(decodeJwt(issued.token)).toMatchObject({
-      aud: 'cyber-scaffold-api',
-      iss: 'cyber-scaffold',
+      aud: 'cyber-ai-forge-api',
+      iss: 'cyber-ai-forge',
       sub: '1',
     })
   })

@@ -2,7 +2,7 @@
 title: 前端运行时多语言模块
 status: active
 owner: project maintainers
-updated: 2026-07-31
+updated: 2026-08-07
 ---
 
 # 前端运行时多语言模块
@@ -65,7 +65,7 @@ Vue 应用提供统一的语言状态、文案解析、日期格式、Element Pl
 SupportedLocale = 'zh-CN' | 'en-US'
 ```
 
-浏览器存储键为 `cyber_locale:v1`。读取不到、存储不可用、值损坏或值不受支持时使用
+浏览器存储键为 `cyber_ai_forge_locale:v1`。读取不到、存储不可用、值损坏或值不受支持时使用
 `zh-CN`；写入失败只影响刷新后的恢复，不阻断当前会话切换。
 
 每个模块资源以中文键集合为结构基准，英文资源必须提供相同键。界面文案使用稳定 key，
@@ -75,7 +75,7 @@ SupportedLocale = 'zh-CN' | 'en-US'
 应用启动
     -> 发现 system/biz 模块及 shared/localization 的 *.locales.ts
     -> 创建并安装 localization
-    -> 恢复 cyber_locale:v1 或使用 zh-CN
+    -> 恢复 cyber_ai_forge_locale:v1 或使用 zh-CN
     -> LocalizationProvider 选择 Element Plus locale
     -> 页面、路由标题和日期格式响应当前语言
 ```
@@ -160,7 +160,7 @@ TypeScript 检查和生产构建；维护者人工验收：
 ## 兼容性与迁移
 
 本次不修改数据库、迁移、后端或共享 API 契约。现有菜单、账号和业务数据无需迁移。
-`cyber_tag_view_history:v1:<userId>` 结构不变。语言偏好使用新的独立键，不读取或删除其他
+`cyber_ai_forge_tag_view_history:v1:<userId>` 结构不变。语言偏好使用新的独立键，不读取或删除其他
 浏览器存储。
 
 ## 未决问题

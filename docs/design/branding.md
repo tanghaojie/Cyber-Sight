@@ -2,14 +2,14 @@
 title: CYBER 品牌与视觉系统
 status: active
 owner: project maintainers
-updated: 2026-08-05
+updated: 2026-08-07
 ---
 
-# CYBER 品牌与视觉系统
+# CYBER / Cyber AI Forge 品牌与视觉系统
 
 ## 背景与目标
 
-项目原先直接使用维护者个人品牌 `JTLab / 桀士实验室` 作为脚手架名称，导致产品身份与创作者身份混合。当前项目品牌调整为 `CYBER`，正式名称为 `Cyber Scaffold`，用克制的赛博朋克视觉表达 AI 原生、模块化、运行时契约和可演进系统底座。
+项目原先直接使用维护者个人品牌 `JTLab / 桀士实验室` 作为脚手架名称，导致产品身份与创作者身份混合。当前项目品牌使用 `CYBER` 短品牌，正式名称为 `Cyber AI Forge`，用克制的赛博朋克视觉表达 AI 原生、企业应用、模块化、运行时契约和可演进系统底座。
 
 ## 范围与非目标
 
@@ -18,8 +18,10 @@ updated: 2026-08-05
 ## 品牌层级
 
 - 产品短名称：`CYBER`。
-- 正式名称：`Cyber Scaffold`。
-- 默认产品标签：`SYSTEM SCAFFOLD`。
+- 正式名称：`Cyber AI Forge`。
+- 英文副标题：`AI-Native Enterprise Application Scaffold`。
+- 中文副标题：`AI 驱动的企业应用智能构建平台`。
+- 默认产品标签：`AI-NATIVE ENTERPRISE APPLICATION SCAFFOLD`。
 - 英文主张：`Build clearly. Evolve safely.`。
 - 中文主张：`让复杂系统清晰生长。`。
 - 创作者品牌：`JTLab / 桀士实验室`，只以明确标注 `CREATED BY` 的独立署名出现在登录页、README 作者信息等合适位置，不进入 CYBER Logo、侧栏、404 或工作台产品标识。
@@ -42,13 +44,14 @@ Logo 以仓库内 SVG/Vue 组件实现，保证侧栏、移动端、404 和 favi
 
 默认根包名、浏览器存储键和 JWT 元数据同步采用 CYBER 命名：
 
-- 根包名：`cyber-scaffold`。
-- 访问令牌键：`cyber_access_token`。
-- 标签历史键：`cyber_tag_view_history:v1:<userId>`。
-- JWT issuer：`cyber-scaffold`。
-- JWT audience：`cyber-scaffold-api`。
+- 根包名：`cyber-ai-forge`。
+- 访问令牌键：`cyber_ai_forge_access_token`。
+- 标签历史键：`cyber_ai_forge_tag_view_history:v1:<userId>`。
+- 语言偏好键：`cyber_ai_forge_locale:v1`。
+- JWT issuer：`cyber-ai-forge`。
+- JWT audience：`cyber-ai-forge-api`。
 
-旧 `jtlib_access_token` 会在认证状态清理时一并删除。JWT issuer/audience 切换会使旧令牌失效，用户需要重新登录；数据库账号、菜单、授权和业务数据不迁移也不删除。旧标签历史不迁移，切换后从新的版本化键开始记录。
+旧 `cyber_access_token` 和 `jtlib_access_token` 会在认证状态清理时一并删除。JWT issuer/audience 切换会使旧令牌失效，用户需要重新登录；数据库账号、菜单、授权和业务数据不迁移也不删除。旧标签历史和语言偏好不迁移，切换后从新的版本化键开始记录。
 
 ## 失败模式与安全考虑
 
@@ -63,8 +66,11 @@ Logo 以仓库内 SVG/Vue 组件实现，保证侧栏、移动端、404 和 favi
 - 搜索当前代码与现行文档，确认旧产品品牌和旧技术标识只保留在明确的兼容性说明中。
 - 维护者人工验收桌面与窄屏登录页、侧栏、404、工作台、favicon、浏览器标题和 Swagger 品牌展示；前端不创建或运行自动化测试。
 
+2026-08-07 已完成 `pnpm format`、`pnpm format:check`、`pnpm lint`、`pnpm build` 和 `pnpm test`；格式、Lint、共享契约/后端/前端构建以及 121 项后端测试均通过。浏览器界面和语言切换仍需维护者人工验收。
+
 ## 相关 ADR、计划和 AI 日志
 
 - [ADR-0028：分离 CYBER 产品品牌与 JTLab 创作者品牌](../decisions/ADR-0028-product-and-creator-brand-separation.md)
-- [实施计划](../archive/plans/2026-07-31-cyber-branding.md)
-- [AI 协作记录](../archive/ai-logs/2026/07/2026-07-31-cyber-branding.md)
+- [ADR-0031：Cyber AI Forge 品牌与项目级技术标识](../decisions/ADR-0031-cyber-ai-forge-brand.md)
+- [实施计划](../archive/plans/2026-08-07-cyber-ai-forge-renaming.md)
+- [AI 协作记录](../archive/ai-logs/2026/08/2026-08-07-cyber-ai-forge-renaming.md)

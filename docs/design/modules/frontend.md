@@ -45,7 +45,7 @@ updated: 2026-08-07
 ## 认证数据流
 
 1. `auth.api.ts` 封装登录、当前用户和退出请求，`auth.store.ts` 只编排状态、错误文案和 token 生命周期。
-2. 登录成功数据为 `{ user, issued: { token, expiresAt } }`。store 通过 `shared/accessToken.ts` 把 token 写入 `cyber_access_token` cookie，并使用服务端返回时间作为到期时间；清状态时同时删除旧 `jtlib_access_token`，但不继续使用旧令牌。
+2. 登录成功数据为 `{ user, issued: { token, expiresAt } }`。store 通过 `shared/accessToken.ts` 把 token 写入 `cyber_ai_forge_access_token` cookie，并使用服务端返回时间作为到期时间；清状态时同时删除旧 `cyber_access_token` 和 `jtlib_access_token`，但不继续使用旧令牌。
 3. 共享 API Client 从 token 适配器读取值并附加 `Authorization: Bearer <token>`。
 4. 退出或 HTTP 401 清除认证、导航和动态路由状态；token 适配器同时移除 cookie 与旧 `localStorage` 键。
 5. `api/result.ts` 在后端既没有合法成功响应也没有错误响应时显示统一消息并抛出异常；HTTP `200` 中的非零业务 `status` 仍由调用模块处理。
@@ -68,11 +68,11 @@ cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie�
 
 `view-registry.ts` 通过两个 `import.meta.glob` 模式扫描 `@/modules/system/**/registerViews.ts` 与 `@/modules/biz/**/registerViews.ts`，自动发现两个分类下的登记模块。登记 key 必须符合小写字母开头的 kebab-case 约束且全局唯一；页面标签使用 `{ key?, fallback }` 描述，供菜单编辑器按当前语言解析，未提供或找不到翻译 key 时保留回退文案。缺少 `registerViews()`、非法 key 或重复 key 会在注册表构建时失败。
 
-默认产品品牌为 `CYBER / Cyber Scaffold`。`components/brand/CyberLogo.vue` 以可缩放 SVG 实现连续双层 C 和数据节点，供登录页、侧栏和 404 复用；`public/cyber-mark.svg` 提供 favicon。`CreatorCredit.vue` 只在登录页以当前语言的创作者标签展示 JTLab / 桀士实验室，不进入产品 Logo 或应用壳。完整边界见[CYBER 品牌与视觉系统](../branding.md)。
+默认产品品牌为 `CYBER / Cyber AI Forge`，英文副标题为 `AI-Native Enterprise Application Scaffold`，中文副标题为 `AI 驱动的企业应用智能构建平台`。`components/brand/CyberLogo.vue` 以可缩放 SVG 实现连续双层 C 和数据节点，供登录页、侧栏和 404 复用；`public/cyber-mark.svg` 提供 favicon。`CreatorCredit.vue` 只在登录页以当前语言的创作者标签展示 JTLab / 桀士实验室，不进入产品 Logo 或应用壳。完整边界见[CYBER 品牌与视觉系统](../branding.md)。
 
 `main.ts` 安装 localization 后再安装 Router；`App.vue` 通过 `LocalizationProvider.vue` 为
 Element Plus 提供当前语言包。登录页与 Header 共用 `LanguageSwitcher.vue`，语言切换立即
-更新固定文案、`<html lang>`、页面标题和本地日期格式，并写入 `cyber_locale:v1`。
+更新固定文案、`<html lang>`、页面标题和本地日期格式，并写入 `cyber_ai_forge_locale:v1`。
 数据库与 API 契约不保存语言偏好。
 
 `tag-view` 位于 Header 与主内容之间，历史标签可横向滚动，操作入口提供关闭当前、关闭其他和关闭全部。其版本化 `localStorage` 数据按数字用户 ID 隔离；存储不可用或内容损坏时降级为内存状态，不影响 Router 导航。Header 用户下拉同时提供系统设置入口：该 Dialog 对设备级的导航菜单风格、主题颜色、深色模式、Tags View、侧栏 Logo 和动态标题设置逐项立即保存。导航菜单风格控制桌面导航布局；Tags View 控制标签栏可见性但不清空历史，并把应用主区的标签栏高度归零；侧栏 Logo 控制侧栏品牌区，移动抽屉在隐藏品牌时仍保留可访问的关闭按钮；动态标题打开时按当前路由与语言更新浏览器标题，关闭时始终显示 `appConfig.name`。主题颜色和深色模式会立即控制应用根。具体边界见[系统设置模块](settings.md)。

@@ -8,7 +8,7 @@ import {
 } from '@/shared/localization/localization.resource'
 
 const DEFAULT_LOCALE: SupportedLocale = 'zh-CN'
-const STORAGE_KEY = 'cyber_locale:v1'
+const STORAGE_KEY = 'cyber_ai_forge_locale:v1'
 
 export interface LocalizedLabel {
   key?: string

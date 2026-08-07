@@ -7,9 +7,10 @@ export async function registerSwagger(app: FastifyInstance) {
   await app.register(swagger, {
     openapi: {
       info: {
-        title: 'Cyber Scaffold API',
+        title: 'Cyber AI Forge API',
         version: '0.1.0',
-        description: 'CYBER management scaffold — runtime-safe, modular, and AI-native',
+        description:
+          'AI-Native Enterprise Application Scaffold — runtime-safe, modular, and built for continuous enterprise delivery',
       },
       servers: [{ url: 'http://localhost:3000' }],
       security: [{ bearerAuth: [] }],

@@ -2,8 +2,8 @@ import cookies from 'js-cookie'
 import { browserStorage } from './browserStorage'
 
 const USE_COOKIES = true
-const ACCESS_TOKEN_KEY = 'cyber_access_token'
-const LEGACY_ACCESS_TOKEN_KEYS = ['jtlib_access_token'] as const
+const ACCESS_TOKEN_KEY = 'cyber_ai_forge_access_token'
+const LEGACY_ACCESS_TOKEN_KEYS = ['cyber_access_token', 'jtlib_access_token'] as const
 
 export function getAccessToken(): string | undefined {
   try {

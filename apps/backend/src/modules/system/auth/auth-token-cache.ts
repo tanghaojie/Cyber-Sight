@@ -4,8 +4,8 @@ import { SignJWT, jwtVerify } from 'jose'
 
 const DEFAULT_CAPACITY = 100
 const DEFAULT_TTL_MS = 7 * 24 * 60 * 60 * 1000
-const JWT_AUDIENCE = 'cyber-scaffold-api'
-const JWT_ISSUER = 'cyber-scaffold'
+const JWT_AUDIENCE = 'cyber-ai-forge-api'
+const JWT_ISSUER = 'cyber-ai-forge'
 
 /** 内存项以 JWT jti 为键，保存解析后的用户快照和最终有效期。 */
 interface TokenEntry {

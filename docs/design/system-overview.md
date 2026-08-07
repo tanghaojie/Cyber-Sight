@@ -2,12 +2,12 @@
 title: 系统概览
 status: accepted
 owner: project maintainers
-updated: 2026-07-31
+updated: 2026-08-07
 ---
 
 # 系统概览
 
-CYBER（正式名称 `Cyber Scaffold`）是用于快速生成管理类业务模块的 pnpm 全栈脚手架，不是某个具体业务系统。它通过运行时契约、模块边界、后端与契约自动化测试、前端人工验收边界和文档门禁，让人和 AI 在明确约束内持续扩展。产品与创作者品牌边界遵循 [CYBER 品牌与视觉系统](branding.md)和 [ADR-0028](../decisions/ADR-0028-product-and-creator-brand-separation.md)。
+CYBER（正式名称 `Cyber AI Forge`）是用于快速生成企业应用模块的 pnpm 全栈脚手架，不是某个具体业务系统。它以 `AI-Native Enterprise Application Scaffold` 为英文副标题，以 `AI 驱动的企业应用智能构建平台` 为中文副标题，通过运行时契约、模块边界、后端与契约自动化测试、前端人工验收边界和文档门禁，让人和 AI 在明确约束内持续扩展。产品与创作者品牌边界遵循 [CYBER 品牌与视觉系统](branding.md)、[ADR-0028](../decisions/ADR-0028-product-and-creator-brand-separation.md) 和 [ADR-0031](../decisions/ADR-0031-cyber-ai-forge-brand.md)。
 
 ## 初始版本基线
 

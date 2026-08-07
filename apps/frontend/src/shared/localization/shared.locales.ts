@@ -2,7 +2,7 @@ import { defineLocalizationResource } from './localization.resource'
 
 export const localizationResource = defineLocalizationResource('shared', {
   'zh-CN': {
-    'brand.githubLabel': '在 GitHub 查看 Cyber Scaffold',
+    'brand.githubLabel': '在 GitHub 查看 Cyber AI Forge',
     'actions.add': '新增',
     'actions.cancel': '取消',
     'actions.close': '关闭',
@@ -28,7 +28,7 @@ export const localizationResource = defineLocalizationResource('shared', {
     'messages.invalidResponse': '后端返回了无效响应',
   },
   'en-US': {
-    'brand.githubLabel': 'View Cyber Scaffold on GitHub',
+    'brand.githubLabel': 'View Cyber AI Forge on GitHub',
     'actions.add': 'Add',
     'actions.cancel': 'Cancel',
     'actions.close': 'Close',

@@ -2,7 +2,7 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { browserStorage } from '@/shared/browserStorage'
 
-const STORAGE_KEY_PREFIX = 'cyber_tag_view_history:v1:'
+const STORAGE_KEY_PREFIX = 'cyber_ai_forge_tag_view_history:v1:'
 
 export interface TagViewItem {
   path: string

@@ -21,13 +21,13 @@ date: 2026-07-31
 
 1. 继续使用 JTLab：修改最少，但产品与个人品牌边界不成立。
 2. 使用裸 `Cyber` 且完全移除 JTLab：产品身份清晰，但失去合理的创作者署名。
-3. 使用 `CYBER / Cyber Scaffold` 作为产品品牌，将 JTLab 作为明确标注的独立创作者署名：兼顾产品辨识、项目用途和作者归属。
+3. 使用 `CYBER / Cyber AI Forge` 作为产品品牌，将 JTLab 作为明确标注的独立创作者署名：兼顾产品辨识、项目用途和作者归属。
 
 ## 决策
 
 采用方案 3：
 
-- UI 主品牌统一为 `CYBER`，正式项目名称为 `Cyber Scaffold`。
+- UI 主品牌统一为 `CYBER`，正式项目名称为 `Cyber AI Forge`；名称和项目级技术标识的后续升级由 ADR-0031 记录。
 - CYBER Logo 只表达产品，不包含 `JTLab`、`桀士实验室` 或模糊的 `A ... Project` 文案。
 - 登录页可以显示与产品 Logo 分离、明确标注 `CREATED BY` 的 JTLab 创作者签名；侧栏、404、工作台和 Swagger 只展示产品品牌。
 - 根包名、浏览器存储键和 JWT issuer/audience 同步切换到 CYBER 命名，不继续扩散旧品牌技术标识。
@@ -44,7 +44,7 @@ date: 2026-07-31
 
 - JWT 元数据和 cookie 键变化会要求现有本地会话重新登录。
 - 白标部署不能只改环境变量，还需要替换默认 C 形产品标。
-- `CYBER` 本身较宽泛，对外发布时仍需搭配 `Cyber Scaffold` 描述用途。
+- `CYBER` 本身较宽泛，对外发布时仍需搭配 `Cyber AI Forge` 及其企业应用副标题描述用途。
 
 ## 验证和复审条件
 
@@ -57,3 +57,4 @@ date: 2026-07-31
 
 - [CYBER 品牌与视觉系统](../design/branding.md)
 - [实施计划](../archive/plans/2026-07-31-cyber-branding.md)
+- [ADR-0031：Cyber AI Forge 品牌与项目级技术标识](ADR-0031-cyber-ai-forge-brand.md)
