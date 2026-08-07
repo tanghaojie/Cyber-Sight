@@ -2,9 +2,9 @@
   "version": 1,
   "scopes": {
     "repository": {
-      "lastReviewedCommit": "ba0657a22b8531c4d9d4f1fda859e31a741cd9b4",
-      "lastReviewedAt": "2026-08-07T22:40:00+08:00",
-      "reviewId": "archive-check-trigger-policy-review"
+      "lastReviewedCommit": "de921bfc5b8415d92c1b559a6fd0436b2f9fa640",
+      "lastReviewedAt": "2026-08-07T23:45:00+08:00",
+      "reviewId": "position-migration-journal-registration"
     }
   }
 }

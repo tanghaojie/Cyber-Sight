@@ -52,7 +52,7 @@ updated: 2026-08-07
 | `positions`     | `sys_positions`      | `positions` | 一个岗位定义绑定一个有效部门；同部门活动岗位名称唯一。                                    |
 | `userPositions` | `sys_user_positions` | `positions` | 用户与岗位多对多；岗位所属部门由 `sys_positions.department_id` 推导，不在关系表重复保存。 |
 
-已追加 `apps/backend/drizzle/0004_positions_management.sql`，登记 `positions.manage` 权限、岗位管理菜单并为既有超级管理员角色补授该权限。两张表复用审计字段、软删除、外键和活动部分唯一索引，完整字段及跨模块约束见[岗位模块](modules/positions.md)。
+已追加并在 `apps/backend/drizzle/meta/_journal.json` 登记 `apps/backend/drizzle/0004_positions_management.sql`，登记 `positions.manage` 权限、岗位管理菜单并为既有超级管理员角色补授该权限。两张表复用审计字段、软删除、外键和活动部分唯一索引，完整字段及跨模块约束见[岗位模块](modules/positions.md)。迁移 SQL 文件必须与 journal 条目一一对应，避免文件存在但 `db:migrate` 静默跳过。
 
 ## 单一初始基线
 

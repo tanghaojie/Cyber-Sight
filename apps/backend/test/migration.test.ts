@@ -72,11 +72,14 @@ describe('database migration baseline', () => {
   it('keeps the initial baseline and appends later schema changes', () => {
     const journal = migrationJournal()
 
-    expect(journal.entries).toHaveLength(4)
-    expect(journal.entries[0]?.tag).toBe('0000_initial_system_schema')
-    expect(journal.entries[1]?.tag).toBe('0001_luxuriant_violations')
-    expect(journal.entries[2]?.tag).toBe('0002_api_log_operations_menu')
-    expect(journal.entries[3]?.tag).toBe('0003_about_project_menu')
+    expect(journal.entries).toHaveLength(5)
+    expect(journal.entries.map(({ tag }) => tag)).toEqual([
+      '0000_initial_system_schema',
+      '0001_luxuriant_violations',
+      '0002_api_log_operations_menu',
+      '0003_about_project_menu',
+      '0004_positions_management',
+    ])
     expect(migrationFiles()).toEqual([
       '0000_initial_system_schema.sql',
       '0001_luxuriant_violations.sql',
@@ -84,6 +87,7 @@ describe('database migration baseline', () => {
       '0003_about_project_menu.sql',
       '0004_positions_management.sql',
     ])
+    expect(journal.entries.map(({ tag }) => `${tag}.sql`)).toEqual(migrationFiles())
     expect(snapshotFiles()).toEqual(['0000_snapshot.json', '0001_snapshot.json'])
   })
 

@@ -44,6 +44,8 @@
 
 ## 完成计划与 AI 协作记录
 
+- 2026-08-07：[职位迁移 journal 登记修复与文档归档审查](plans/2026-08-07-position-migration-journal-registration.md)及其
+  [AI 协作记录](ai-logs/2026/08/2026-08-07-position-migration-journal-registration.md)。
 - 2026-08-07：[NestJS 与 Fastify adapter 后端迁移](plans/2026-08-07-nestjs-fastify-migration.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-07-nestjs-fastify-migration.md)。
 - 2026-08-07：[架构变更后的文档归档审查计划](plans/2026-08-07-documentation-archive-review.md)及其
