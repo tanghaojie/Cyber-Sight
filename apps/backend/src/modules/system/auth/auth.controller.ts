@@ -17,12 +17,11 @@ import { ErrorCode } from '@/shared/errors/error-codes.js'
 import { ContractRoute } from '@/shared/http/contract.js'
 import { failure, success } from '@/shared/http/response.js'
 import { ZodValidationPipe } from '@/shared/http/zod-validation.pipe.js'
-import { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
-import { authenticateCredentials, revokeCurrentToken } from './auth.service.js'
+import { AuthService } from './auth.service.js'
 
 @Controller()
 export class AuthController {
-  constructor(@Inject(BackendRuntime) private readonly runtime: BackendRuntime) {}
+  constructor(@Inject(AuthService) private readonly authService: AuthService) {}
 
   @Post('/auth/login')
   @Public()
@@ -35,7 +34,7 @@ export class AuthController {
     public: true,
   })
   async login(@Body(new ZodValidationPipe(LoginRequestSchema)) body: LoginRequest) {
-    const loginData = await authenticateCredentials(this.runtime, body.username, body.password)
+    const loginData = await this.authService.authenticateCredentials(body.username, body.password)
     return loginData
       ? success(loginData)
       : failure(ErrorCode.INVALID_CREDENTIALS, 'Incorrect username or password')
@@ -62,7 +61,7 @@ export class AuthController {
     response: EmptySuccessResponseSchema,
   })
   async logout(@Req() request: FastifyRequest, @CurrentAccessUser() user: CurrentUser) {
-    await revokeCurrentToken(this.runtime, request.headers.authorization, user.id)
+    await this.authService.revokeCurrentToken(request.headers.authorization, user.id)
     return success()
   }
 }

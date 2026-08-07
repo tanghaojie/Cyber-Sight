@@ -10,12 +10,14 @@ import {
   createApiLogWriter,
   registerApiLogHooks,
 } from './modules/system/api-logs/api-logs.hooks.js'
+import type { AuthorizationProvider } from './modules/system/authorization/authorization.provider.js'
+import { ApiLogsRepository } from './modules/system/api-logs/api-logs.repository.js'
 import type { ApiLogWriter } from './modules/system/api-logs/api-logs.service.js'
-import { BackendRuntime } from './shared/runtime/backend-runtime.js'
 import type { RuntimeDependencies } from './shared/runtime/runtime.module.js'
 
 export interface AppDependencies extends Partial<Omit<RuntimeDependencies, 'jwtSecret'>> {
   jwtSecret?: string
+  authorizationProvider?: AuthorizationProvider
   apiLogWriter?: ApiLogWriter
   controllers?: Type<unknown>[]
 }
@@ -59,7 +61,7 @@ export async function buildApp(
   const fastify = app.getHttpAdapter().getInstance()
   registerApiLogHooks(
     fastify,
-    dependencies.apiLogWriter ?? createApiLogWriter(fastify, app.get(BackendRuntime)),
+    dependencies.apiLogWriter ?? createApiLogWriter(fastify, app.get(ApiLogsRepository)),
   )
   await app.init()
   registerSwagger(app)

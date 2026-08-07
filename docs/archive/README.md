@@ -44,6 +44,9 @@
 
 ## 完成计划与 AI 协作记录
 
+- 2026-08-08：[BackendRuntime 到 Nest Injectable Provider 重构](plans/2026-08-08-injectable-backend-runtime.md)及其
+  [AI 协作记录](ai-logs/2026/08/2026-08-08-injectable-backend-runtime.md)。
+
 - 2026-08-08：[动态首页与根入口解析](plans/2026-08-08-dynamic-home-root-entry.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-08-dynamic-home-root-entry.md)。
 - 2026-08-07：[职位迁移 journal 登记修复与文档归档审查](plans/2026-08-07-position-migration-journal-registration.md)及其

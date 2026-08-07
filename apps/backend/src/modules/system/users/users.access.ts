@@ -1,46 +1,47 @@
+import { Inject, Injectable } from '@nestjs/common'
 import { and, eq } from 'drizzle-orm'
-import type { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
+import type { Database } from '@/db/index.js'
 import { userDepartments, userRoles, users } from '@/db/schema.js'
+import { DATABASE } from '@/shared/database/database.provider.js'
 
 // 向授权等模块公开只读访问查询，调用方无需依赖用户模块的仓储实现细节。
-export async function userExists(app: BackendRuntime, userId: number): Promise<boolean> {
-  const [row] = await app.db
-    .select({ id: users.id })
-    .from(users)
-    .where(and(eq(users.id, userId), eq(users.isDeleted, false)))
-    .limit(1)
-  return Boolean(row)
-}
+@Injectable()
+export class UsersAccess {
+  constructor(@Inject(DATABASE) private readonly db: Database) {}
 
-export async function assignedRoleIds(app: BackendRuntime, userId: number): Promise<number[]> {
-  const rows = await app.db
-    .select({ id: userRoles.roleId })
-    .from(userRoles)
-    .where(and(eq(userRoles.userId, userId), eq(userRoles.isDeleted, false)))
-  return rows.map((row) => row.id)
-}
+  async userExists(userId: number): Promise<boolean> {
+    const [row] = await this.db
+      .select({ id: users.id })
+      .from(users)
+      .where(and(eq(users.id, userId), eq(users.isDeleted, false)))
+      .limit(1)
+    return Boolean(row)
+  }
 
-export async function assignedDepartmentIds(
-  app: BackendRuntime,
-  userId: number,
-): Promise<number[]> {
-  const rows = await app.db
-    .select({ id: userDepartments.departmentId })
-    .from(userDepartments)
-    .where(and(eq(userDepartments.userId, userId), eq(userDepartments.isDeleted, false)))
-  return rows.map((row) => row.id)
-}
+  async assignedRoleIds(userId: number): Promise<number[]> {
+    const rows = await this.db
+      .select({ id: userRoles.roleId })
+      .from(userRoles)
+      .where(and(eq(userRoles.userId, userId), eq(userRoles.isDeleted, false)))
+    return rows.map((row) => row.id)
+  }
 
-export async function hasActiveDepartmentMembership(
-  app: BackendRuntime,
-  departmentId: number,
-): Promise<boolean> {
-  const [row] = await app.db
-    .select({ id: userDepartments.id })
-    .from(userDepartments)
-    .where(
-      and(eq(userDepartments.departmentId, departmentId), eq(userDepartments.isDeleted, false)),
-    )
-    .limit(1)
-  return Boolean(row)
+  async assignedDepartmentIds(userId: number): Promise<number[]> {
+    const rows = await this.db
+      .select({ id: userDepartments.departmentId })
+      .from(userDepartments)
+      .where(and(eq(userDepartments.userId, userId), eq(userDepartments.isDeleted, false)))
+    return rows.map((row) => row.id)
+  }
+
+  async hasActiveDepartmentMembership(departmentId: number): Promise<boolean> {
+    const [row] = await this.db
+      .select({ id: userDepartments.id })
+      .from(userDepartments)
+      .where(
+        and(eq(userDepartments.departmentId, departmentId), eq(userDepartments.isDeleted, false)),
+      )
+      .limit(1)
+    return Boolean(row)
+  }
 }

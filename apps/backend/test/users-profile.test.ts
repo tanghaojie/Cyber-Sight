@@ -1,11 +1,6 @@
-import type { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 import { describe, expect, it, vi } from 'vitest'
 import { PasswordUpdateSchema, PersonalProfileUpdateSchema } from '@scaffold/api-contract'
-import {
-  changePersonalPassword,
-  personalProfileForUser,
-  updatePersonalProfile,
-} from '@/modules/system/users/users.repository.js'
+import { UsersRepository } from '@/modules/system/users/users.repository.js'
 import { hashPassword } from '@/modules/system/auth/auth.security.js'
 
 function selectResult<T>(rows: T[]) {
@@ -14,6 +9,10 @@ function selectResult<T>(rows: T[]) {
       where: vi.fn(() => ({ limit: vi.fn().mockResolvedValue(rows) })),
     })),
   }
+}
+
+function repository(db: unknown): UsersRepository {
+  return new UsersRepository(db as never, {} as never, {} as never, {} as never, {} as never)
 }
 
 // 个人资料的输入边界必须与管理端用户编辑隔离，拒绝角色、部门和账号状态字段。
@@ -49,11 +48,9 @@ describe('personal profile repository', () => {
       displayName: 'Alice',
       email: 'alice@example.com',
     }
-    const app = {
-      db: { select: vi.fn(() => selectResult([profile])) },
-    } as unknown as BackendRuntime
+    const users = repository({ select: vi.fn(() => selectResult([profile])) })
 
-    await expect(personalProfileForUser(app, profile.id)).resolves.toEqual(profile)
+    await expect(users.personalProfileForUser(profile.id)).resolves.toEqual(profile)
   })
 
   it('updates profile fields with the current user as audit actor', async () => {
@@ -65,12 +62,10 @@ describe('personal profile repository', () => {
     }
     const returning = vi.fn().mockResolvedValue([profile])
     const set = vi.fn(() => ({ where: vi.fn(() => ({ returning })) }))
-    const app = {
-      db: { update: vi.fn(() => ({ set })) },
-    } as unknown as BackendRuntime
+    const users = repository({ update: vi.fn(() => ({ set })) })
 
     await expect(
-      updatePersonalProfile(app, profile.id, {
+      users.updatePersonalProfile(profile.id, {
         displayName: profile.displayName,
         email: profile.email,
       }),
@@ -86,39 +81,37 @@ describe('personal profile repository', () => {
 
   it('rejects an incorrect current password without writing a new hash', async () => {
     const passwordHash = await hashPassword('Correct!123')
-    const app = {
-      db: {
-        select: vi.fn(() => selectResult([{ passwordHash }])),
-        update: vi.fn(),
-      },
-    } as unknown as BackendRuntime
+    const db = {
+      select: vi.fn(() => selectResult([{ passwordHash }])),
+      update: vi.fn(),
+    }
+    const users = repository(db)
 
     await expect(
-      changePersonalPassword(app, 4, {
+      users.changePersonalPassword(4, {
         currentPassword: 'Incorrect!123',
         newPassword: 'NewPassword!123',
       }),
     ).resolves.toBe('invalid-current-password')
-    expect(app.db.update).not.toHaveBeenCalled()
+    expect(db.update).not.toHaveBeenCalled()
   })
 
   it('hashes and persists a verified new password', async () => {
     const oldPassword = 'Correct!123'
     const passwordHash = await hashPassword(oldPassword)
     const returning = vi.fn().mockResolvedValue([{ id: 4 }])
-    const app = {
-      db: {
-        select: vi.fn(() => selectResult([{ passwordHash }])),
-        update: vi.fn(() => ({ set: vi.fn(() => ({ where: vi.fn(() => ({ returning })) })) })),
-      },
-    } as unknown as BackendRuntime
+    const db = {
+      select: vi.fn(() => selectResult([{ passwordHash }])),
+      update: vi.fn(() => ({ set: vi.fn(() => ({ where: vi.fn(() => ({ returning })) })) })),
+    }
+    const users = repository(db)
 
     await expect(
-      changePersonalPassword(app, 4, {
+      users.changePersonalPassword(4, {
         currentPassword: oldPassword,
         newPassword: 'NewPassword!123',
       }),
     ).resolves.toBe('updated')
-    expect(app.db.update).toHaveBeenCalledOnce()
+    expect(db.update).toHaveBeenCalledOnce()
   })
 })

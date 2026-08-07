@@ -15,18 +15,22 @@ import {
   CurrentAccessUser,
   RequirePermissions,
 } from '@/modules/system/authorization/authorization.guard.js'
-import { invalidateAllTokenCache } from '@/modules/system/auth/auth.service.js'
+import { AuthService } from '@/modules/system/auth/auth.service.js'
 import { authorizationPermissionKeys } from '@/modules/system/authorization/authorization.resources.js'
 import { ContractRoute } from '@/shared/http/contract.js'
 import { ensureUpdated, mutationResult, normalizedListQuery } from '@/shared/http/route-helpers.js'
 import { paginatedSuccess, success } from '@/shared/http/response.js'
 import { ZodValidationPipe } from '@/shared/http/zod-validation.pipe.js'
-import { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
-import { createRole, listRoles, softDeleteRole, updateRole } from './roles.repository.js'
+import { RolesRepository } from './roles.repository.js'
 
 @Controller()
 export class RolesController {
-  constructor(@Inject(BackendRuntime) private readonly runtime: BackendRuntime) {}
+  constructor(
+    @Inject(RolesRepository)
+    private readonly repository: RolesRepository,
+    @Inject(AuthService)
+    private readonly authService: AuthService,
+  ) {}
 
   @Get('/admin/roles')
   @RequirePermissions(
@@ -40,7 +44,7 @@ export class RolesController {
     response: RolePageResultSchema,
   })
   async list(@Query(new ZodValidationPipe(ListQuerySchema)) query: ListQuery) {
-    const page = await listRoles(this.runtime, normalizedListQuery(query))
+    const page = await this.repository.listRoles(normalizedListQuery(query))
     return paginatedSuccess(page.list, page.total)
   }
 
@@ -56,7 +60,7 @@ export class RolesController {
     @Body(new ZodValidationPipe(RoleRequestSchema)) body: RoleRequest,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    return mutationResult(() => createRole(this.runtime, body, actor.id))
+    return mutationResult(() => this.repository.createRole(body, actor.id))
   }
 
   @Put('/admin/roles/:id')
@@ -73,8 +77,8 @@ export class RolesController {
     @Body(new ZodValidationPipe(RoleRequestSchema)) body: RoleRequest,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    ensureUpdated(await updateRole(this.runtime, params.id, body, actor.id))
-    invalidateAllTokenCache(this.runtime)
+    ensureUpdated(await this.repository.updateRole(params.id, body, actor.id))
+    this.authService.invalidateAllTokenCache()
     return success({ id: params.id })
   }
 
@@ -90,8 +94,8 @@ export class RolesController {
     @Param(new ZodValidationPipe(IdParamsSchema)) params: IdParams,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    ensureUpdated(await softDeleteRole(this.runtime, params.id, actor.id))
-    invalidateAllTokenCache(this.runtime)
+    ensureUpdated(await this.repository.softDeleteRole(params.id, actor.id))
+    this.authService.invalidateAllTokenCache()
     return success()
   }
 }

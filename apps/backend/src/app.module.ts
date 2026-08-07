@@ -1,9 +1,9 @@
 import { DynamicModule, Module, type Type } from '@nestjs/common'
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
 import { ApiLogsModule } from '@/modules/system/api-logs/api-logs.module.js'
-import { AuthModule } from '@/modules/system/auth/auth.module.js'
 import { AuthorizationGuard } from '@/modules/system/authorization/authorization.guard.js'
 import { AuthorizationModule } from '@/modules/system/authorization/authorization.module.js'
+import type { AuthorizationProvider } from '@/modules/system/authorization/authorization.provider.js'
 import { DepartmentsModule } from '@/modules/system/departments/departments.module.js'
 import { DictionariesModule } from '@/modules/system/dictionaries/dictionaries.module.js'
 import { HealthModule } from '@/modules/system/health/health.module.js'
@@ -18,16 +18,18 @@ import { RuntimeModule, type RuntimeDependencies } from '@/shared/runtime/runtim
 @Module({})
 export class AppModule {
   static register(
-    dependencies: RuntimeDependencies & { controllers?: Type<unknown>[] },
+    dependencies: RuntimeDependencies & {
+      authorizationProvider?: AuthorizationProvider
+      controllers?: Type<unknown>[]
+    },
   ): DynamicModule {
     return {
       module: AppModule,
       imports: [
         RuntimeModule.register(dependencies),
         HealthModule,
-        AuthModule,
         ApiLogsModule,
-        AuthorizationModule,
+        AuthorizationModule.register(dependencies.authorizationProvider),
         UsersModule,
         RolesModule,
         DepartmentsModule,

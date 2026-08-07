@@ -1,7 +1,11 @@
+import { Inject, Injectable } from '@nestjs/common'
 import { and, count, eq, ilike } from 'drizzle-orm'
-import type { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 import type { CurrentUser, MenuRequest, NavigationMenu } from '@scaffold/api-contract'
+import type { Database } from '@/db/index.js'
 import { menus } from '@/db/schema.js'
+import { authorizationProviderToken } from '@/modules/system/authorization/authorization.guard.js'
+import type { AuthorizationProvider } from '@/modules/system/authorization/authorization.provider.js'
+import { DATABASE } from '@/shared/database/database.provider.js'
 import { auditView, pageOffset, type RepositoryListQuery } from '@/shared/database/pagination.js'
 
 // 导航构建阶段使用扁平且已脱敏的行；权限键和审计字段不应进入当前用户的导航响应。
@@ -106,141 +110,129 @@ export function buildNavigationTree(
   return roots
 }
 
-export async function listMenus(app: BackendRuntime, query: RepositoryListQuery) {
-  const keyword = query.keyword?.trim()
-  const predicate = and(
-    eq(menus.isDeleted, false),
-    keyword ? ilike(menus.name, `%${keyword}%`) : undefined,
-  )
-  const rows = await app.db
-    .select()
-    .from(menus)
-    .where(predicate)
-    .orderBy(menus.sortOrder, menus.id)
-    .limit(query.pageSize)
-    .offset(pageOffset(query))
-  const [{ value: total }] = await app.db.select({ value: count() }).from(menus).where(predicate)
-  return {
-    total,
-    list: rows.map(menuSummary),
-  }
-}
+@Injectable()
+export class MenusRepository {
+  constructor(
+    @Inject(DATABASE) private readonly db: Database,
+    @Inject(authorizationProviderToken) private readonly authorization: AuthorizationProvider,
+  ) {}
 
-export async function listAllMenus(app: BackendRuntime) {
-  const rows = await app.db
-    .select()
-    .from(menus)
-    .where(eq(menus.isDeleted, false))
-    .orderBy(menus.sortOrder, menus.id)
-  return rows.map(menuSummary)
-}
-
-export async function listNavigationMenus(
-  app: BackendRuntime,
-  user: CurrentUser,
-): Promise<NavigationMenu[]> {
-  const rows = await app.db
-    .select()
-    .from(menus)
-    .where(and(eq(menus.enabled, true), eq(menus.isDeleted, false)))
-    .orderBy(menus.sortOrder, menus.id)
-  const permissionKeys = new Set(await app.authorization.effectivePermissionKeys(app, user))
-  // 未绑定权限键的菜单对所有已认证用户可见，绑定后必须命中有效权限。
-  const allowedMenuIds = new Set(
-    rows
-      .filter(
-        (row) =>
-          row.requiredPermissionKey === null || permissionKeys.has(row.requiredPermissionKey),
-      )
-      .map((row) => row.id),
-  )
-  return buildNavigationTree(rows.map(navigationRow), allowedMenuIds)
-}
-
-export async function validateMenuParent(
-  app: BackendRuntime,
-  parentId: number,
-  currentId?: number,
-): Promise<boolean> {
-  if (parentId === 0) {
-    return true
-  }
-  if (parentId === currentId) {
-    return false
+  async listMenus(query: RepositoryListQuery) {
+    const keyword = query.keyword?.trim()
+    const predicate = and(
+      eq(menus.isDeleted, false),
+      keyword ? ilike(menus.name, `%${keyword}%`) : undefined,
+    )
+    const rows = await this.db
+      .select()
+      .from(menus)
+      .where(predicate)
+      .orderBy(menus.sortOrder, menus.id)
+      .limit(query.pageSize)
+      .offset(pageOffset(query))
+    const [{ value: total }] = await this.db.select({ value: count() }).from(menus).where(predicate)
+    return {
+      total,
+      list: rows.map(menuSummary),
+    }
   }
 
-  const rows = await app.db
-    .select({ id: menus.id, parentId: menus.parentId, type: menus.type })
-    .from(menus)
-    .where(eq(menus.isDeleted, false))
-  const byId = new Map(rows.map((row) => [row.id, row]))
-  const parent = byId.get(parentId)
-  // 只有目录可以承载子节点，页面和外链按钮必须是叶子。
-  if (!parent || parent.type !== 'directory') {
-    return false
+  async listAllMenus() {
+    const rows = await this.db
+      .select()
+      .from(menus)
+      .where(eq(menus.isDeleted, false))
+      .orderBy(menus.sortOrder, menus.id)
+    return rows.map(menuSummary)
   }
 
-  const visited = new Set<number>()
-  let cursor = parent
-  // 从候选父级向上追溯，拒绝把当前节点或其后代放到自身下面。
-  while (cursor.parentId > 0 && !visited.has(cursor.id)) {
-    if (cursor.parentId === currentId) {
+  async listNavigationMenus(user: CurrentUser): Promise<NavigationMenu[]> {
+    const rows = await this.db
+      .select()
+      .from(menus)
+      .where(and(eq(menus.enabled, true), eq(menus.isDeleted, false)))
+      .orderBy(menus.sortOrder, menus.id)
+    const permissionKeys = new Set(await this.authorization.effectivePermissionKeys(user))
+    // 未绑定权限键的菜单对所有已认证用户可见，绑定后必须命中有效权限。
+    const allowedMenuIds = new Set(
+      rows
+        .filter(
+          (row) =>
+            row.requiredPermissionKey === null || permissionKeys.has(row.requiredPermissionKey),
+        )
+        .map((row) => row.id),
+    )
+    return buildNavigationTree(rows.map(navigationRow), allowedMenuIds)
+  }
+
+  async validateMenuParent(parentId: number, currentId?: number): Promise<boolean> {
+    if (parentId === 0) {
+      return true
+    }
+    if (parentId === currentId) {
       return false
     }
-    visited.add(cursor.id)
-    const next = byId.get(cursor.parentId)
-    if (!next) {
-      break
+
+    const rows = await this.db
+      .select({ id: menus.id, parentId: menus.parentId, type: menus.type })
+      .from(menus)
+      .where(eq(menus.isDeleted, false))
+    const byId = new Map(rows.map((row) => [row.id, row]))
+    const parent = byId.get(parentId)
+    // 只有目录可以承载子节点，页面和外链按钮必须是叶子。
+    if (!parent || parent.type !== 'directory') {
+      return false
     }
-    cursor = next
+
+    const visited = new Set<number>()
+    let cursor = parent
+    // 从候选父级向上追溯，拒绝把当前节点或其后代放到自身下面。
+    while (cursor.parentId > 0 && !visited.has(cursor.id)) {
+      if (cursor.parentId === currentId) {
+        return false
+      }
+      visited.add(cursor.id)
+      const next = byId.get(cursor.parentId)
+      if (!next) {
+        break
+      }
+      cursor = next
+    }
+    return !visited.has(cursor.id)
   }
-  return !visited.has(cursor.id)
-}
 
-export async function createMenu(
-  app: BackendRuntime,
-  input: MenuRequest,
-  actorId: number,
-): Promise<number> {
-  const [created] = await app.db
-    .insert(menus)
-    .values({ ...input, createdBy: actorId, updatedBy: actorId })
-    .returning({ id: menus.id })
-  return created.id
-}
+  async createMenu(input: MenuRequest, actorId: number): Promise<number> {
+    const [created] = await this.db
+      .insert(menus)
+      .values({ ...input, createdBy: actorId, updatedBy: actorId })
+      .returning({ id: menus.id })
+    return created.id
+  }
 
-export async function updateMenu(
-  app: BackendRuntime,
-  id: number,
-  input: MenuRequest,
-  actorId: number,
-): Promise<boolean> {
-  const result = await app.db
-    .update(menus)
-    .set({ ...input, updatedAt: new Date(), updatedBy: actorId })
-    .where(and(eq(menus.id, id), eq(menus.isDeleted, false)))
-    .returning({ id: menus.id })
-  return result.length > 0
-}
+  async updateMenu(id: number, input: MenuRequest, actorId: number): Promise<boolean> {
+    const result = await this.db
+      .update(menus)
+      .set({ ...input, updatedAt: new Date(), updatedBy: actorId })
+      .where(and(eq(menus.id, id), eq(menus.isDeleted, false)))
+      .returning({ id: menus.id })
+    return result.length > 0
+  }
 
-export async function hasActiveMenuChildren(app: BackendRuntime, id: number): Promise<boolean> {
-  const [child] = await app.db
-    .select({ id: menus.id })
-    .from(menus)
-    .where(and(eq(menus.parentId, id), eq(menus.isDeleted, false)))
-    .limit(1)
-  return Boolean(child)
-}
+  async hasActiveMenuChildren(id: number): Promise<boolean> {
+    const [child] = await this.db
+      .select({ id: menus.id })
+      .from(menus)
+      .where(and(eq(menus.parentId, id), eq(menus.isDeleted, false)))
+      .limit(1)
+    return Boolean(child)
+  }
 
-export async function softDeleteMenu(
-  app: BackendRuntime,
-  id: number,
-  actorId: number,
-): Promise<boolean> {
-  const result = await app.db
-    .update(menus)
-    .set({ isDeleted: true, updatedAt: new Date(), updatedBy: actorId })
-    .where(and(eq(menus.id, id), eq(menus.isDeleted, false)))
-    .returning({ id: menus.id })
-  return result.length > 0
+  async softDeleteMenu(id: number, actorId: number): Promise<boolean> {
+    const result = await this.db
+      .update(menus)
+      .set({ isDeleted: true, updatedAt: new Date(), updatedBy: actorId })
+      .where(and(eq(menus.id, id), eq(menus.isDeleted, false)))
+      .returning({ id: menus.id })
+    return result.length > 0
+  }
 }

@@ -1,7 +1,6 @@
 import type { CurrentUser } from '@scaffold/api-contract'
 import type { FastifyInstance, FastifyRequest } from 'fastify'
-import { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
-import { deleteExpiredApiLogs, insertApiLogEvents } from './api-logs.repository.js'
+import { ApiLogsRepository } from './api-logs.repository.js'
 import { ApiLogWriter } from './api-logs.service.js'
 
 const ninetyDaysMs = 90 * 24 * 60 * 60 * 1_000
@@ -41,11 +40,14 @@ function captureLoginActor(request: AuditedRequest, payload: Record<string, unkn
   }
 }
 
-export function createApiLogWriter(app: FastifyInstance, runtime: BackendRuntime): ApiLogWriter {
+export function createApiLogWriter(
+  app: FastifyInstance,
+  repository: ApiLogsRepository,
+): ApiLogWriter {
   return new ApiLogWriter(
     {
-      insert: (events) => insertApiLogEvents(runtime, events),
-      deleteExpired: (batchSize) => deleteExpiredApiLogs(runtime, batchSize),
+      insert: (events) => repository.insertApiLogEvents(events),
+      deleteExpired: (batchSize) => repository.deleteExpiredApiLogs(batchSize),
     },
     app.log,
   )

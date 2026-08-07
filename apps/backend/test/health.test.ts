@@ -15,10 +15,11 @@ import { z } from 'zod'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import type { FastifyInstance } from 'fastify'
 import { buildApp } from '@/app.js'
+import { ApiLogWriter } from '@/modules/system/api-logs/api-logs.service.js'
+import { JwtTokenCache } from '@/modules/system/auth/auth-token-cache.js'
 import { Public } from '@/modules/system/authorization/authorization.guard.js'
 import { ErrorCode } from '@/shared/errors/error-codes.js'
 import { ZodValidationPipe } from '@/shared/http/zod-validation.pipe.js'
-import { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 
 const TestQuerySchema = z.strictObject({ value: z.string() })
 
@@ -71,7 +72,18 @@ class TestErrorController {
 
 let nestApp: NestFastifyApplication
 let app: FastifyInstance
-let runtime: BackendRuntime
+let authTokens: JwtTokenCache
+
+const updateWhere = vi.fn().mockResolvedValue([])
+const update = vi.fn(() => ({ set: vi.fn(() => ({ where: updateWhere })) }))
+const fakeDatabase = { update } as never
+const apiLogWriter = new ApiLogWriter(
+  {
+    insert: vi.fn().mockResolvedValue(undefined),
+    deleteExpired: vi.fn().mockResolvedValue(0),
+  },
+  { error: vi.fn() },
+)
 
 beforeAll(async () => {
   nestApp = await buildApp(
@@ -86,10 +98,12 @@ beforeAll(async () => {
           return { unrestricted: true, ownerUserIds: [], departmentIds: [] }
         },
       },
+      database: fakeDatabase,
+      apiLogWriter,
     },
   )
   app = nestApp.getHttpAdapter().getInstance()
-  runtime = nestApp.get(BackendRuntime)
+  authTokens = nestApp.get(JwtTokenCache)
 })
 
 afterAll(async () => {
@@ -218,23 +232,15 @@ describe('Nest application HTTP compatibility', () => {
       displayName: 'Operator',
       roles: [{ id: 2, name: 'User' }],
     }
-    const issued = await runtime.authTokens.issue(currentUser)
+    const issued = await authTokens.issue(currentUser)
     const headers = { authorization: `Bearer ${issued.token}` }
     const me = await app.inject({ method: 'GET', url: '/auth/me', headers })
     expect(me.json()).toEqual({ status: 0, data: currentUser })
 
-    const originalDb = runtime.db
-    const updateWhere = vi.fn().mockResolvedValue([])
-    const update = vi.fn(() => ({ set: vi.fn(() => ({ where: updateWhere })) }))
-    runtime.db = { update } as unknown as BackendRuntime['db']
-    try {
-      const logout = await app.inject({ method: 'POST', url: '/auth/logout', headers })
-      expect(logout.json()).toEqual({ status: 0 })
-      expect(update).toHaveBeenCalledOnce()
-      await expect(runtime.authTokens.resolve(issued.token, async () => null)).resolves.toBeNull()
-    } finally {
-      runtime.db = originalDb
-    }
+    const logout = await app.inject({ method: 'POST', url: '/auth/logout', headers })
+    expect(logout.json()).toEqual({ status: 0 })
+    expect(update).toHaveBeenCalledOnce()
+    await expect(authTokens.resolve(issued.token, async () => null)).resolves.toBeNull()
   })
 
   it('enforces strict request contracts and coerces HTTP query numbers', async () => {
@@ -245,7 +251,7 @@ describe('Nest application HTTP compatibility', () => {
     })
     expect(undeclared.json()).toEqual({ status: ErrorCode.INVALID_REQUEST, err: 'Invalid request' })
 
-    const issued = await runtime.authTokens.issue({
+    const issued = await authTokens.issue({
       id: 3,
       username: 'reader',
       displayName: 'Reader',

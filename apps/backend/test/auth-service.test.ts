@@ -1,13 +1,14 @@
 import { describe, expect, it, vi } from 'vitest'
-import {
-  authenticateCredentials,
-  currentUserFromAuthorization,
-} from '@/modules/system/auth/auth.service.js'
+import { JwtService } from '@nestjs/jwt'
+import { AuthService } from '@/modules/system/auth/auth.service.js'
 import { JwtTokenCache } from '@/modules/system/auth/auth-token-cache.js'
 import { hashPassword, hashSessionToken } from '@/modules/system/auth/auth.security.js'
-import type { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 
 const SECRET = 'test-only-jwt-secret-at-least-32-characters'
+
+function tokenCache() {
+  return new JwtTokenCache(new JwtService({ secret: SECRET }), {})
+}
 
 // 验证登录签发必须落库，内存淘汰后仍可从有效持久会话恢复且只恢复一次。
 describe('authentication service persistence cache', () => {
@@ -36,18 +37,16 @@ describe('authentication service persistence cache', () => {
         })),
       })
     const insertValues = vi.fn().mockResolvedValue([])
-    const app = {
-      authTokens: new JwtTokenCache(SECRET),
-      db: {
-        insert: vi.fn(() => ({ values: insertValues })),
-        select,
-        update: vi.fn(() => ({
-          set: vi.fn(() => ({ where: vi.fn().mockResolvedValue([]) })),
-        })),
-      },
-    } as unknown as BackendRuntime
+    const db = {
+      insert: vi.fn(() => ({ values: insertValues })),
+      select,
+      update: vi.fn(() => ({
+        set: vi.fn(() => ({ where: vi.fn().mockResolvedValue([]) })),
+      })),
+    }
+    const service = new AuthService(db as never, tokenCache())
 
-    const result = await authenticateCredentials(app, userRow.username, password)
+    const result = await service.authenticateCredentials(userRow.username, password)
 
     expect(result?.user).toEqual({
       id: 7,
@@ -73,7 +72,7 @@ describe('authentication service persistence cache', () => {
       displayName: 'Cached User',
       roles: [{ id: 4, name: '管理员' }],
     }
-    const cache = new JwtTokenCache(SECRET)
+    const cache = tokenCache()
     const issued = await cache.issue(currentUser)
     cache.clear()
 
@@ -104,16 +103,13 @@ describe('authentication service persistence cache', () => {
           })),
         })),
       })
-    const app = {
-      authTokens: cache,
-      db: { select },
-    } as unknown as BackendRuntime
+    const service = new AuthService({ select } as never, cache)
     const authorization = `Bearer ${issued.token}`
 
-    await expect(currentUserFromAuthorization(app, authorization)).resolves.toEqual(currentUser)
+    await expect(service.currentUserFromAuthorization(authorization)).resolves.toEqual(currentUser)
     expect(select).toHaveBeenCalledTimes(2)
 
-    await expect(currentUserFromAuthorization(app, authorization)).resolves.toEqual(currentUser)
+    await expect(service.currentUserFromAuthorization(authorization)).resolves.toEqual(currentUser)
     expect(select).toHaveBeenCalledTimes(2)
   })
 })

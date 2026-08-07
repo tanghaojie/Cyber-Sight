@@ -22,18 +22,7 @@ import { ContractRoute } from '@/shared/http/contract.js'
 import { ensureUpdated, isUniqueViolation, mutationResult } from '@/shared/http/route-helpers.js'
 import { failure, paginatedSuccess, success } from '@/shared/http/response.js'
 import { ZodValidationPipe } from '@/shared/http/zod-validation.pipe.js'
-import { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
-import {
-  canChangePositionDepartment,
-  canUseDepartment,
-  createPosition,
-  hasActivePositionAssignments,
-  listPositionOptions,
-  listPositions,
-  positionExists,
-  softDeletePosition,
-  updatePosition,
-} from './positions.service.js'
+import { PositionsService } from './positions.service.js'
 
 function normalizePositionListQuery(query: PositionListQuery) {
   return {
@@ -47,7 +36,7 @@ function normalizePositionListQuery(query: PositionListQuery) {
 
 @Controller()
 export class PositionsController {
-  constructor(@Inject(BackendRuntime) private readonly runtime: BackendRuntime) {}
+  constructor(@Inject(PositionsService) private readonly positions: PositionsService) {}
 
   @Get('/admin/positions')
   @RequirePermissions(authorizationPermissionKeys.positionsManage)
@@ -58,7 +47,7 @@ export class PositionsController {
     response: PositionPageResultSchema,
   })
   async list(@Query(new ZodValidationPipe(PositionListQuerySchema)) query: PositionListQuery) {
-    const page = await listPositions(this.runtime, normalizePositionListQuery(query))
+    const page = await this.positions.listPositions(normalizePositionListQuery(query))
     return paginatedSuccess(page.list, page.total)
   }
 
@@ -73,7 +62,7 @@ export class PositionsController {
     response: PositionOptionListResultSchema,
   })
   async options() {
-    return success(await listPositionOptions(this.runtime))
+    return success(await this.positions.listPositionOptions())
   }
 
   @Post('/admin/positions')
@@ -88,10 +77,10 @@ export class PositionsController {
     @Body(new ZodValidationPipe(PositionRequestSchema)) body: PositionRequest,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    if (!(await canUseDepartment(this.runtime, body.departmentId))) {
+    if (!(await this.positions.canUseDepartment(body.departmentId))) {
       return failure(ErrorCode.INVALID_REQUEST, 'Invalid department')
     }
-    return mutationResult(() => createPosition(this.runtime, body, actor.id))
+    return mutationResult(() => this.positions.createPosition(body, actor.id))
   }
 
   @Put('/admin/positions/:id')
@@ -108,17 +97,17 @@ export class PositionsController {
     @Body(new ZodValidationPipe(PositionRequestSchema)) body: PositionRequest,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    if (!(await canUseDepartment(this.runtime, body.departmentId))) {
+    if (!(await this.positions.canUseDepartment(body.departmentId))) {
       return failure(ErrorCode.INVALID_REQUEST, 'Invalid department')
     }
-    if (!(await positionExists(this.runtime, params.id))) {
+    if (!(await this.positions.positionExists(params.id))) {
       ensureUpdated(false)
     }
-    if (!(await canChangePositionDepartment(this.runtime, params.id, body.departmentId))) {
+    if (!(await this.positions.canChangePositionDepartment(params.id, body.departmentId))) {
       return failure(ErrorCode.RESOURCE_CONFLICT, 'Position has active user assignments')
     }
     try {
-      ensureUpdated(await updatePosition(this.runtime, params.id, body, actor.id))
+      ensureUpdated(await this.positions.updatePosition(params.id, body, actor.id))
       return success({ id: params.id })
     } catch (error) {
       if (isUniqueViolation(error)) {
@@ -140,10 +129,10 @@ export class PositionsController {
     @Param(new ZodValidationPipe(IdParamsSchema)) params: IdParams,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    if (await hasActivePositionAssignments(this.runtime, params.id)) {
+    if (await this.positions.hasActivePositionAssignments(params.id)) {
       return failure(ErrorCode.RESOURCE_CONFLICT, 'Position has active user assignments')
     }
-    ensureUpdated(await softDeletePosition(this.runtime, params.id, actor.id))
+    ensureUpdated(await this.positions.softDeletePosition(params.id, actor.id))
     return success()
   }
 }

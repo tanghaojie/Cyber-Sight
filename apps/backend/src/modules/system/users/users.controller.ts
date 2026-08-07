@@ -26,11 +26,8 @@ import {
 } from '@/modules/system/authorization/authorization.guard.js'
 import type { AuthorizationProvider } from '@/modules/system/authorization/authorization.provider.js'
 import { authorizationPermissionKeys } from '@/modules/system/authorization/authorization.resources.js'
-import { invalidateUserTokenCache, revokeUserTokens } from '@/modules/system/auth/auth.service.js'
-import { enabledDepartmentIds } from '@/modules/system/departments/departments.access.js'
-import { positionAssignmentsAreValid } from '@/modules/system/positions/positions.access.js'
+import { AuthService } from '@/modules/system/auth/auth.service.js'
 import { isInvalidPositionAssignment } from '@/modules/system/positions/positions.service.js'
-import { enabledRoleIds } from '@/modules/system/roles/roles.access.js'
 import { ErrorCode } from '@/shared/errors/error-codes.js'
 import { forbidden, notFound } from '@/shared/errors/http-errors.js'
 import { ContractRoute } from '@/shared/http/contract.js'
@@ -42,22 +39,15 @@ import {
 } from '@/shared/http/route-helpers.js'
 import { failure, paginatedSuccess, success } from '@/shared/http/response.js'
 import { ZodValidationPipe } from '@/shared/http/zod-validation.pipe.js'
-import { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
-import {
-  canAssignUserDepartments,
-  changePersonalPassword,
-  createUser,
-  listUsers,
-  personalProfileForUser,
-  softDeleteUser,
-  updatePersonalProfile,
-  updateUser,
-} from './users.repository.js'
+import { UsersRepository } from './users.repository.js'
 
 @Controller()
 export class UsersController {
   constructor(
-    @Inject(BackendRuntime) private readonly runtime: BackendRuntime,
+    @Inject(UsersRepository)
+    private readonly repository: UsersRepository,
+    @Inject(AuthService)
+    private readonly authService: AuthService,
     @Inject(authorizationProviderToken)
     private readonly authorization: AuthorizationProvider,
   ) {}
@@ -70,7 +60,7 @@ export class UsersController {
     response: PersonalProfileResultSchema,
   })
   async profile(@CurrentAccessUser() actor: CurrentUser) {
-    const profile = await personalProfileForUser(this.runtime, actor.id)
+    const profile = await this.repository.personalProfileForUser(actor.id)
     if (!profile) {
       throw notFound()
     }
@@ -90,11 +80,11 @@ export class UsersController {
     @CurrentAccessUser() actor: CurrentUser,
   ) {
     try {
-      const profile = await updatePersonalProfile(this.runtime, actor.id, body)
+      const profile = await this.repository.updatePersonalProfile(actor.id, body)
       if (!profile) {
         throw notFound()
       }
-      invalidateUserTokenCache(this.runtime, actor.id)
+      this.authService.invalidateUserTokenCache(actor.id)
       return success(profile)
     } catch (error) {
       if (isUniqueViolation(error)) {
@@ -116,14 +106,14 @@ export class UsersController {
     @Body(new ZodValidationPipe(PasswordUpdateSchema)) body: PasswordUpdate,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    const result = await changePersonalPassword(this.runtime, actor.id, body)
+    const result = await this.repository.changePersonalPassword(actor.id, body)
     if (result === 'not-found') {
       throw notFound()
     }
     if (result === 'invalid-current-password') {
       return failure(ErrorCode.INVALID_CREDENTIALS, 'Current password is incorrect')
     }
-    await revokeUserTokens(this.runtime, actor.id, actor.id)
+    await this.authService.revokeUserTokens(actor.id, actor.id)
     return success()
   }
 
@@ -139,8 +129,8 @@ export class UsersController {
     @Query(new ZodValidationPipe(ListQuerySchema)) query: ListQuery,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    const access = await this.authorization.resolveDataAccess(this.runtime, actor, 'users', 'read')
-    const page = await listUsers(this.runtime, normalizedListQuery(query), access)
+    const access = await this.authorization.resolveDataAccess(actor, 'users', 'read')
+    const page = await this.repository.listUsers(normalizedListQuery(query), access)
     return paginatedSuccess(page.list, page.total)
   }
 
@@ -156,20 +146,21 @@ export class UsersController {
     @Body(new ZodValidationPipe(UserCreateSchema)) body: UserCreate,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    if (!(await this.hasValidAssignments(body.roleIds, body.departmentIds, body.positionIds))) {
+    if (
+      !(await this.repository.hasValidAssignments(
+        body.roleIds,
+        body.departmentIds,
+        body.positionIds,
+      ))
+    ) {
       return failure(ErrorCode.INVALID_REQUEST, 'Invalid role, department or position assignment')
     }
-    const access = await this.authorization.resolveDataAccess(
-      this.runtime,
-      actor,
-      'users',
-      'create',
-    )
-    if (!(await canAssignUserDepartments(this.runtime, body.departmentIds, access))) {
+    const access = await this.authorization.resolveDataAccess(actor, 'users', 'create')
+    if (!(await this.repository.canAssignUserDepartments(body.departmentIds, access))) {
       return failure(ErrorCode.FORBIDDEN, 'Data scope does not allow these departments')
     }
     try {
-      return await mutationResult(() => createUser(this.runtime, body, actor.id))
+      return await mutationResult(() => this.repository.createUser(body, actor.id))
     } catch (error) {
       if (isInvalidPositionAssignment(error)) {
         return failure(ErrorCode.INVALID_REQUEST, 'Invalid position assignment')
@@ -192,21 +183,22 @@ export class UsersController {
     @Body(new ZodValidationPipe(UserUpdateSchema)) body: UserUpdate,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    if (!(await this.hasValidAssignments(body.roleIds, body.departmentIds, body.positionIds))) {
+    if (
+      !(await this.repository.hasValidAssignments(
+        body.roleIds,
+        body.departmentIds,
+        body.positionIds,
+      ))
+    ) {
       return failure(ErrorCode.INVALID_REQUEST, 'Invalid role, department or position assignment')
     }
-    const access = await this.authorization.resolveDataAccess(
-      this.runtime,
-      actor,
-      'users',
-      'update',
-    )
-    if (!(await canAssignUserDepartments(this.runtime, body.departmentIds, access, params.id))) {
+    const access = await this.authorization.resolveDataAccess(actor, 'users', 'update')
+    if (!(await this.repository.canAssignUserDepartments(body.departmentIds, access, params.id))) {
       return failure(ErrorCode.FORBIDDEN, 'Data scope does not allow these departments')
     }
     try {
-      ensureUpdated(await updateUser(this.runtime, params.id, body, actor.id, access))
-      invalidateUserTokenCache(this.runtime, params.id)
+      ensureUpdated(await this.repository.updateUser(params.id, body, actor.id, access))
+      this.authService.invalidateUserTokenCache(params.id)
       return success({ id: params.id })
     } catch (error) {
       if (isUniqueViolation(error)) {
@@ -234,31 +226,9 @@ export class UsersController {
     if (actor.id === params.id) {
       throw forbidden('You cannot delete your own account')
     }
-    const access = await this.authorization.resolveDataAccess(
-      this.runtime,
-      actor,
-      'users',
-      'delete',
-    )
-    ensureUpdated(await softDeleteUser(this.runtime, params.id, actor.id, access))
-    await revokeUserTokens(this.runtime, params.id, actor.id)
+    const access = await this.authorization.resolveDataAccess(actor, 'users', 'delete')
+    ensureUpdated(await this.repository.softDeleteUser(params.id, actor.id, access))
+    await this.authService.revokeUserTokens(params.id, actor.id)
     return success()
-  }
-
-  private async hasValidAssignments(
-    roleIds: number[],
-    departmentIds: number[],
-    positionIds: number[],
-  ): Promise<boolean> {
-    const [validRoleIds, validDepartmentIds, validPositions] = await Promise.all([
-      enabledRoleIds(this.runtime, roleIds),
-      enabledDepartmentIds(this.runtime, departmentIds),
-      positionAssignmentsAreValid(this.runtime, positionIds, departmentIds),
-    ])
-    return (
-      validRoleIds.length === roleIds.length &&
-      validDepartmentIds.length === departmentIds.length &&
-      validPositions
-    )
   }
 }

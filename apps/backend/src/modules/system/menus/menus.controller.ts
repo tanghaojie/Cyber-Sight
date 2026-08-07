@@ -19,28 +19,23 @@ import {
   CurrentAccessUser,
   RequirePermissions,
 } from '@/modules/system/authorization/authorization.guard.js'
-import { activePermissionKeyExists } from '@/modules/system/authorization/authorization.references.js'
+import { AuthorizationReferences } from '@/modules/system/authorization/authorization.references.js'
 import { authorizationPermissionKeys } from '@/modules/system/authorization/authorization.resources.js'
 import { ErrorCode } from '@/shared/errors/error-codes.js'
 import { ContractRoute } from '@/shared/http/contract.js'
 import { ensureUpdated, mutationResult, normalizedListQuery } from '@/shared/http/route-helpers.js'
 import { failure, paginatedSuccess, success } from '@/shared/http/response.js'
 import { ZodValidationPipe } from '@/shared/http/zod-validation.pipe.js'
-import { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
-import {
-  createMenu,
-  hasActiveMenuChildren,
-  listAllMenus,
-  listMenus,
-  listNavigationMenus,
-  softDeleteMenu,
-  updateMenu,
-  validateMenuParent,
-} from './menus.repository.js'
+import { MenusRepository } from './menus.repository.js'
 
 @Controller()
 export class MenusController {
-  constructor(@Inject(BackendRuntime) private readonly runtime: BackendRuntime) {}
+  constructor(
+    @Inject(MenusRepository)
+    private readonly repository: MenusRepository,
+    @Inject(AuthorizationReferences)
+    private readonly authorizationReferences: AuthorizationReferences,
+  ) {}
 
   @Get('/admin/menus')
   @RequirePermissions(authorizationPermissionKeys.menusManage)
@@ -51,7 +46,7 @@ export class MenusController {
     response: MenuPageResultSchema,
   })
   async list(@Query(new ZodValidationPipe(ListQuerySchema)) query: ListQuery) {
-    const page = await listMenus(this.runtime, normalizedListQuery(query))
+    const page = await this.repository.listMenus(normalizedListQuery(query))
     return paginatedSuccess(page.list, page.total)
   }
 
@@ -63,7 +58,7 @@ export class MenusController {
     response: NavigationMenuResponseSchema,
   })
   async navigation(@CurrentAccessUser() user: CurrentUser) {
-    return success(await listNavigationMenus(this.runtime, user))
+    return success(await this.repository.listNavigationMenus(user))
   }
 
   @Get('/admin/menus/tree')
@@ -77,7 +72,7 @@ export class MenusController {
     response: MenuListResponseSchema,
   })
   async tree() {
-    return success(await listAllMenus(this.runtime))
+    return success(await this.repository.listAllMenus())
   }
 
   @Post('/admin/menus')
@@ -96,7 +91,7 @@ export class MenusController {
     if (validation) {
       return validation
     }
-    return mutationResult(() => createMenu(this.runtime, body, actor.id))
+    return mutationResult(() => this.repository.createMenu(body, actor.id))
   }
 
   @Put('/admin/menus/:id')
@@ -117,7 +112,7 @@ export class MenusController {
     if (validation) {
       return validation
     }
-    ensureUpdated(await updateMenu(this.runtime, params.id, body, actor.id))
+    ensureUpdated(await this.repository.updateMenu(params.id, body, actor.id))
     return success({ id: params.id })
   }
 
@@ -133,13 +128,13 @@ export class MenusController {
     @Param(new ZodValidationPipe(IdParamsSchema)) params: IdParams,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    if (await hasActiveMenuChildren(this.runtime, params.id)) {
+    if (await this.repository.hasActiveMenuChildren(params.id)) {
       return failure(
         ErrorCode.RESOURCE_CONFLICT,
         'Delete child menus before deleting this directory',
       )
     }
-    ensureUpdated(await softDeleteMenu(this.runtime, params.id, actor.id))
+    ensureUpdated(await this.repository.softDeleteMenu(params.id, actor.id))
     return success()
   }
 
@@ -147,7 +142,7 @@ export class MenusController {
     if (!isValidMenuPath(body)) {
       return failure(ErrorCode.INVALID_REQUEST, 'Root menu path must start with /')
     }
-    if (!(await validateMenuParent(this.runtime, body.parentId, currentId))) {
+    if (!(await this.repository.validateMenuParent(body.parentId, currentId))) {
       return failure(
         ErrorCode.INVALID_REQUEST,
         currentId
@@ -157,7 +152,7 @@ export class MenusController {
     }
     if (
       body.requiredPermissionKey &&
-      !(await activePermissionKeyExists(this.runtime, body.requiredPermissionKey))
+      !(await this.authorizationReferences.activePermissionKeyExists(body.requiredPermissionKey))
     ) {
       return failure(ErrorCode.INVALID_REQUEST, 'Permission key is not active')
     }

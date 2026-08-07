@@ -20,17 +20,13 @@ import { ContractRoute } from '@/shared/http/contract.js'
 import { ensureUpdated, mutationResult, normalizedListQuery } from '@/shared/http/route-helpers.js'
 import { paginatedSuccess, success } from '@/shared/http/response.js'
 import { ZodValidationPipe } from '@/shared/http/zod-validation.pipe.js'
-import { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
-import {
-  createDictionary,
-  listDictionaries,
-  softDeleteDictionary,
-  updateDictionary,
-} from './dictionaries.repository.js'
+import { DictionariesRepository } from './dictionaries.repository.js'
 
 @Controller()
 export class DictionariesController {
-  constructor(@Inject(BackendRuntime) private readonly runtime: BackendRuntime) {}
+  constructor(
+    @Inject(DictionariesRepository) private readonly repository: DictionariesRepository,
+  ) {}
 
   @Get('/admin/dictionaries')
   @RequirePermissions(authorizationPermissionKeys.dictionariesManage)
@@ -41,7 +37,7 @@ export class DictionariesController {
     response: DictionaryPageResultSchema,
   })
   async list(@Query(new ZodValidationPipe(ListQuerySchema)) query: ListQuery) {
-    const page = await listDictionaries(this.runtime, normalizedListQuery(query))
+    const page = await this.repository.listDictionaries(normalizedListQuery(query))
     return paginatedSuccess(page.list, page.total)
   }
 
@@ -57,7 +53,7 @@ export class DictionariesController {
     @Body(new ZodValidationPipe(DictionaryRequestSchema)) body: DictionaryRequest,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    return mutationResult(() => createDictionary(this.runtime, body, actor.id))
+    return mutationResult(() => this.repository.createDictionary(body, actor.id))
   }
 
   @Put('/admin/dictionaries/:id')
@@ -74,7 +70,7 @@ export class DictionariesController {
     @Body(new ZodValidationPipe(DictionaryRequestSchema)) body: DictionaryRequest,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    ensureUpdated(await updateDictionary(this.runtime, params.id, body, actor.id))
+    ensureUpdated(await this.repository.updateDictionary(params.id, body, actor.id))
     return success({ id: params.id })
   }
 
@@ -90,7 +86,7 @@ export class DictionariesController {
     @Param(new ZodValidationPipe(IdParamsSchema)) params: IdParams,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    ensureUpdated(await softDeleteDictionary(this.runtime, params.id, actor.id))
+    ensureUpdated(await this.repository.softDeleteDictionary(params.id, actor.id))
     return success()
   }
 }

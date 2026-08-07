@@ -5,8 +5,7 @@ import { authorizationPermissionKeys } from '@/modules/system/authorization/auth
 import { ContractRoute } from '@/shared/http/contract.js'
 import { paginatedSuccess } from '@/shared/http/response.js'
 import { ZodValidationPipe } from '@/shared/http/zod-validation.pipe.js'
-import { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
-import { listApiLogs, type NormalizedApiLogQuery } from './api-logs.repository.js'
+import { ApiLogsRepository, type NormalizedApiLogQuery } from './api-logs.repository.js'
 
 function normalizedApiLogQuery(query: ApiLogQuery): NormalizedApiLogQuery {
   return {
@@ -25,7 +24,7 @@ function normalizedApiLogQuery(query: ApiLogQuery): NormalizedApiLogQuery {
 
 @Controller()
 export class ApiLogsController {
-  constructor(@Inject(BackendRuntime) private readonly runtime: BackendRuntime) {}
+  constructor(@Inject(ApiLogsRepository) private readonly repository: ApiLogsRepository) {}
 
   @Get('/admin/api-logs')
   @RequirePermissions(authorizationPermissionKeys.apiLogsRead)
@@ -36,7 +35,7 @@ export class ApiLogsController {
     response: ApiLogPageResultSchema,
   })
   async list(@Query(new ZodValidationPipe(ApiLogQuerySchema)) query: ApiLogQuery) {
-    const result = await listApiLogs(this.runtime, normalizedApiLogQuery(query))
+    const result = await this.repository.listApiLogs(normalizedApiLogQuery(query))
     return paginatedSuccess(result.list, result.total)
   }
 }

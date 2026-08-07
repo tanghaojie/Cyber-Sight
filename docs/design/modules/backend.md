@@ -9,7 +9,7 @@
 - `src/app.ts`：可测试的应用组装函数。
 - `src/app.module.ts`：Nest 根模块、全局 Guard、Filter 和 Interceptor 组装。
 - `src/server.ts`：进程启动、端口监听与启动失败处理。
-- `src/shared/runtime/`：数据库、令牌缓存和授权 Provider 的进程级依赖容器。
+- `src/shared/runtime/`：数据库 Provider 和进程生命周期的组合根适配；业务依赖通过 Nest Provider 注入，不再传递聚合式 `BackendRuntime`。
 - `src/modules/system/`：脚手架内置系统能力；`src/modules/biz/`：后续产品业务能力。
 - `src/db/`：Drizzle Schema 聚合入口、按数据所有权拆分的 Schema 分片与数据库客户端。
 - `drizzle.config.ts`：数据库迁移生成配置。
@@ -21,7 +21,7 @@
 
 应用组装与网络监听必须分离，使测试可以通过底层 Fastify `inject` 验证完整 Nest 应用而不占用端口。环境变量由集中配置模块加载和校验，数据库客户端由 Nest 生命周期负责释放。
 
-业务端点由 Nest Controller 声明，并通过装饰器显式选择 `public`、`authenticated` 或 `permission(anyOf)`；全局 `AuthorizationGuard` 拒绝缺少声明的业务处理器。`buildApp()` 可注入其他 `AuthorizationProvider`，默认使用本地 PostgreSQL Provider。
+业务端点由 Nest Controller 声明，并通过装饰器显式选择 `public`、`authenticated` 或 `permission(anyOf)`；全局 `AuthorizationGuard` 拒绝缺少声明的业务处理器。数据库使用稳定的 Nest Provider token，认证模块通过 `JwtModule` 和 `JwtTokenCache` 管理 JWT；`RuntimeModule` 只组合数据库、JWT secret 与生命周期，`AppModule` 通过 `AuthorizationModule.register()` 组装可替换的 `AuthorizationProvider`。`buildApp()` 可覆盖数据库、JWT 配置和授权 Provider。
 
 `src/shared/http/` 提供 Zod Pipe、契约装饰器、响应 Interceptor、异常 Filter 和响应辅助函数；`src/shared/errors/` 维护错误码与 Nest HTTP 异常构造器。全局 Filter 把校验失败、未找到路由和未捕获异常转换为统一错误响应。
 
@@ -38,7 +38,7 @@
 - 领域层：可独立测试的业务规则。
 - 基础设施层：数据库、消息、文件和外部服务适配器。
 
-小型模块可以在模块目录内合并文件，但不能省略独立目录，也不能把核心业务规则永久写在路由处理函数中。跨模块协作通过公共应用服务、端口或事件完成，依赖必须单向且无循环。`src/db/` 只保留连接、迁移聚合等平台能力；新增或实质修改的业务表定义及仓储适配器由其所有者模块管理。
+小型模块可以在模块目录内合并文件，但不能省略独立目录，也不能把核心业务规则永久写在路由处理函数中。跨模块协作通过公共应用服务、端口或事件完成，依赖必须单向且无循环。`src/db/` 只保留连接、迁移聚合等平台能力；新增或实质修改的业务表定义及仓储适配器由其所有者模块管理。Repository、access 和 application service 使用 `@Injectable()` class，并只注入其实际需要的数据库、认证或授权 Provider；不得通过共享运行时对象取得额外能力。
 
 所有有名称的函数优先使用函数声明。箭头函数只用于短小回调、闭包或必须保持词法作用域的场景，禁止使用 `const fn = () => {}` 作为默认函数定义方式。
 

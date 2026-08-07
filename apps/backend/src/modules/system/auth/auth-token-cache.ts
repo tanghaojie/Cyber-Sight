@@ -1,11 +1,14 @@
+import { Inject, Injectable } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
 import { randomUUID } from 'node:crypto'
 import type { CurrentUser } from '@scaffold/api-contract'
-import { SignJWT, jwtVerify } from 'jose'
 
 const DEFAULT_CAPACITY = 100
 const DEFAULT_TTL_MS = 7 * 24 * 60 * 60 * 1000
 const JWT_AUDIENCE = 'cyber-ai-forge-api'
 const JWT_ISSUER = 'cyber-ai-forge'
+
+export const JWT_TOKEN_OPTIONS = Symbol('jwtTokenOptions')
 
 /** 内存项以 JWT jti 为键，保存解析后的用户快照和最终有效期。 */
 interface TokenEntry {
@@ -30,30 +33,36 @@ export interface IssuedJwt {
 }
 
 // 缓存未命中时的回源边界：实现必须同时确认持久会话、用户状态和令牌主体仍然一致。
-type TokenSessionLoader = (verified: VerifiedJwt) => Promise<LoadedTokenSession | null>
+export type TokenSessionLoader = (verified: VerifiedJwt) => Promise<LoadedTokenSession | null>
 
-interface JwtTokenCacheOptions {
+export interface JwtTokenCacheOptions {
   capacity?: number
   ttlMs?: number
   now?: () => number
+}
+
+interface JwtPayload {
+  exp?: number
+  jti?: string
+  sub?: string
 }
 
 /**
  * 进程内 LRU 只减少已验证令牌的数据库读取，不是认证的权威来源。
  * 每次解析仍验证 JWT；缓存失效、进程重启或容量淘汰后都可由持久会话回源恢复。
  */
+@Injectable()
 export class JwtTokenCache {
   private readonly capacity: number
   private readonly entries = new Map<string, TokenEntry>()
-  private readonly key: Uint8Array
   private readonly now: () => number
   private readonly ttlMs: number
 
-  constructor(secret: string, options: JwtTokenCacheOptions = {}) {
-    if (secret.length < 32) {
-      throw new Error('JWT secret must contain at least 32 characters')
-    }
-
+  constructor(
+    @Inject(JwtService)
+    private readonly jwtService: JwtService,
+    @Inject(JWT_TOKEN_OPTIONS) options: JwtTokenCacheOptions,
+  ) {
     this.capacity = options.capacity ?? DEFAULT_CAPACITY
     this.ttlMs = options.ttlMs ?? DEFAULT_TTL_MS
     this.now = options.now ?? Date.now
@@ -63,7 +72,6 @@ export class JwtTokenCache {
     if (!Number.isFinite(this.ttlMs) || this.ttlMs < 1) {
       throw new Error('JWT token TTL must be positive')
     }
-    this.key = new TextEncoder().encode(secret)
   }
 
   get size(): number {
@@ -74,15 +82,19 @@ export class JwtTokenCache {
     const issuedAt = this.now()
     const expiresAt = issuedAt + this.ttlMs
     const jti = randomUUID()
-    const token = await new SignJWT({})
-      .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
-      .setIssuer(JWT_ISSUER)
-      .setAudience(JWT_AUDIENCE)
-      .setSubject(String(user.id))
-      .setJti(jti)
-      .setIssuedAt(Math.floor(issuedAt / 1000))
-      .setExpirationTime(Math.floor(expiresAt / 1000))
-      .sign(this.key)
+    const token = await this.jwtService.signAsync(
+      {
+        exp: Math.floor(expiresAt / 1000),
+        iat: Math.floor(issuedAt / 1000),
+      },
+      {
+        algorithm: 'HS256',
+        audience: JWT_AUDIENCE,
+        issuer: JWT_ISSUER,
+        jwtid: jti,
+        subject: String(user.id),
+      },
+    )
 
     // Map 的插入顺序充当 LRU 队列；签发前清理过期项，再限制最大容量。
     this.pruneExpired(issuedAt)
@@ -167,10 +179,10 @@ export class JwtTokenCache {
 
   private async verify(token: string): Promise<VerifiedJwt | null> {
     try {
-      const { payload } = await jwtVerify(token, this.key, {
+      const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
         algorithms: ['HS256'],
         audience: JWT_AUDIENCE,
-        currentDate: new Date(this.now()),
+        clockTimestamp: Math.floor(this.now() / 1000),
         issuer: JWT_ISSUER,
       })
       if (!payload.jti || !payload.sub || typeof payload.exp !== 'number') {
@@ -182,7 +194,7 @@ export class JwtTokenCache {
         subject: payload.sub,
       }
     } catch {
-      // 外部令牌错误是正常认证失败，不把 jose 的细节暴露给路由层。
+      // 外部令牌错误是正常认证失败，不把 jsonwebtoken 的细节暴露给路由层。
       return null
     }
   }

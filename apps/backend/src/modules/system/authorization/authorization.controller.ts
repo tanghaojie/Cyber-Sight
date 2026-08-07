@@ -15,23 +15,14 @@ import {
   CurrentAccessUser,
   RequirePermissions,
 } from '@/modules/system/authorization/authorization.guard.js'
-import {
-  invalidateAllTokenCache,
-  invalidateUserTokenCache,
-} from '@/modules/system/auth/auth.service.js'
+import { AuthService } from '@/modules/system/auth/auth.service.js'
 import { ErrorCode } from '@/shared/errors/error-codes.js'
 import { notFound } from '@/shared/errors/http-errors.js'
 import { ContractRoute } from '@/shared/http/contract.js'
 import { failure, success } from '@/shared/http/response.js'
 import { ZodValidationPipe } from '@/shared/http/zod-validation.pipe.js'
-import { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 import { authorizationPermissionKeys, dataResourceDefinitions } from './authorization.resources.js'
-import {
-  authorizationSubjectExists,
-  getSubjectAccess,
-  listPermissions,
-  replaceSubjectAccess,
-} from './authorization.service.js'
+import { AuthorizationService } from './authorization.service.js'
 
 const accessAdministrationPermissions = [
   authorizationPermissionKeys.usersManage,
@@ -42,7 +33,12 @@ const accessAdministrationPermissions = [
 
 @Controller()
 export class AuthorizationController {
-  constructor(@Inject(BackendRuntime) private readonly runtime: BackendRuntime) {}
+  constructor(
+    @Inject(AuthorizationService)
+    private readonly authorization: AuthorizationService,
+    @Inject(AuthService)
+    private readonly authService: AuthService,
+  ) {}
 
   @Get('/admin/authorization/permissions')
   @RequirePermissions(...accessAdministrationPermissions)
@@ -52,7 +48,7 @@ export class AuthorizationController {
     response: PermissionListResultSchema,
   })
   async permissions() {
-    return success(await listPermissions(this.runtime))
+    return success(await this.authorization.listPermissions())
   }
 
   @Get('/admin/authorization/data-resources')
@@ -154,10 +150,10 @@ export class AuthorizationController {
   }
 
   private async getAccess(subjectType: AuthorizationSubjectType, id: number) {
-    if (!(await authorizationSubjectExists(this.runtime, subjectType, id))) {
+    if (!(await this.authorization.authorizationSubjectExists(subjectType, id))) {
       throw notFound()
     }
-    return success(await getSubjectAccess(this.runtime, subjectType, id))
+    return success(await this.authorization.getSubjectAccess(subjectType, id))
   }
 
   private async replaceAccess(
@@ -166,16 +162,16 @@ export class AuthorizationController {
     body: SubjectAccessRequest,
     actorId: number,
   ) {
-    if (!(await authorizationSubjectExists(this.runtime, subjectType, id))) {
+    if (!(await this.authorization.authorizationSubjectExists(subjectType, id))) {
       throw notFound()
     }
-    if (!(await replaceSubjectAccess(this.runtime, subjectType, id, body, actorId))) {
+    if (!(await this.authorization.replaceSubjectAccess(subjectType, id, body, actorId))) {
       return failure(ErrorCode.INVALID_REQUEST, 'Invalid permission or data policy')
     }
     if (subjectType === 'user') {
-      invalidateUserTokenCache(this.runtime, id)
+      this.authService.invalidateUserTokenCache(id)
     } else {
-      invalidateAllTokenCache(this.runtime)
+      this.authService.invalidateAllTokenCache()
     }
     return success({ id })
   }

@@ -7,7 +7,7 @@ import {
   routeAuthorizationKey,
 } from '@/modules/system/authorization/authorization.guard.js'
 import { ErrorCode } from '@/shared/errors/error-codes.js'
-import { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
+import { JwtTokenCache } from '@/modules/system/auth/auth-token-cache.js'
 
 describe('authorization route declarations', () => {
   it('stores all three explicit authorization modes as Nest metadata', () => {
@@ -52,8 +52,8 @@ describe('authorization provider boundary', () => {
         },
       },
     )
-    const runtime = app.get(BackendRuntime)
-    const issued = await runtime.authTokens.issue({
+    const authTokens = app.get(JwtTokenCache)
+    const issued = await authTokens.issue({
       id: 8,
       username: 'operator',
       displayName: 'Operator',

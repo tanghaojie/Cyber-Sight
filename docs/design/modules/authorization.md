@@ -33,9 +33,9 @@ updated: 2026-07-30
 后端公共文件：
 
 - `authorization.route.ts`：注册权限目录、数据资源目录和主体访问配置 HTTP API。
-- `authorization.provider.ts`：定义 `AuthorizationProvider` 端口和默认 `LocalAuthorizationProvider`；`buildApp()` 支持注入替代实现。
-- `authorization.service.ts`：实现有效权限解析、`resolveDataAccess`、allow 并集合并与主体策略事务替换。
-- `authorization.plugin.ts`：校验路由授权声明并在请求前执行认证或功能权限检查。
+- `authorization.provider.ts`：定义 `AuthorizationProvider` 端口和默认 `LocalAuthorizationProvider`；Provider 通过 Nest 注入数据库，`buildApp()` 支持覆盖替代实现。
+- `authorization.service.ts`：以 `@Injectable()` application service 实现有效权限解析、`resolveDataAccess`、allow 并集合并与主体策略事务替换。
+- `authorization.guard.ts`：校验 Nest 路由授权声明，并在请求前通过 `AuthService` 执行认证和通过 `AuthorizationProvider` 执行功能权限检查。
 - `authorization.references.ts`：向部门删除校验公开策略引用查询。
 
 前端公共文件：
@@ -69,13 +69,13 @@ permission(anyOf: [...])
 
 ## 请求期授权调用流程
 
-`registerAuthorization()` 必须先于业务路由注册。它在路由注册期通过 `onRoute` 拒绝没有 `config.authorization` 的路由；在每个匹配请求的 `preHandler` 阶段执行以下流程：
+全局 `AuthorizationGuard` 在业务路由执行前读取 Nest 元数据并拒绝没有授权声明的处理器，在每个匹配请求阶段执行以下流程：
 
 ```mermaid
 flowchart TD
     A[客户端请求业务接口] --> B[Nest 匹配目标 Controller]
-    B --> C[preHandler: authorizeRequest]
-    C --> D[读取 routeOptions.config.authorization]
+    B --> C[Nest AuthorizationGuard]
+    C --> D[读取 handler metadata]
     D --> E{授权模式}
 
     E -->|public| F[直接放行]
@@ -89,7 +89,7 @@ flowchart TD
 
     J --> K{是否为 permission 模式}
     K -->|否: authenticated| N
-    K -->|是| L[provider.effectivePermissionKeys app, user]
+    K -->|是| L[provider.effectivePermissionKeys user]
     L --> M{用户权限是否命中 anyOf 中任一键}
     M -->|否| O[抛出 403: Permission required]
     M -->|是| N
@@ -115,7 +115,7 @@ flowchart TD
 
 ## 数据查询计划
 
-`AuthorizationProvider.resolveDataAccess(app, principal, resource, action)` 返回：
+`AuthorizationProvider.resolveDataAccess(principal, resource, action)` 返回：
 
 ```text
 unrestricted

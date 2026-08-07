@@ -20,20 +20,11 @@ import { ContractRoute } from '@/shared/http/contract.js'
 import { ensureUpdated, mutationResult } from '@/shared/http/route-helpers.js'
 import { failure, success } from '@/shared/http/response.js'
 import { ZodValidationPipe } from '@/shared/http/zod-validation.pipe.js'
-import { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
-import {
-  canDeleteDepartment,
-  createDepartment,
-  listDepartmentOptions,
-  listDepartments,
-  softDeleteDepartment,
-  updateDepartment,
-  validateDepartmentParent,
-} from './departments.repository.js'
+import { DepartmentsRepository } from './departments.repository.js'
 
 @Controller()
 export class DepartmentsController {
-  constructor(@Inject(BackendRuntime) private readonly runtime: BackendRuntime) {}
+  constructor(@Inject(DepartmentsRepository) private readonly repository: DepartmentsRepository) {}
 
   @Get('/admin/departments')
   @RequirePermissions(authorizationPermissionKeys.departmentsManage)
@@ -43,7 +34,7 @@ export class DepartmentsController {
     response: DepartmentListResultSchema,
   })
   async list() {
-    return success(await listDepartments(this.runtime))
+    return success(await this.repository.listDepartments())
   }
 
   @Get('/admin/departments/options')
@@ -59,7 +50,7 @@ export class DepartmentsController {
     response: DepartmentOptionListResultSchema,
   })
   async options() {
-    return success(await listDepartmentOptions(this.runtime))
+    return success(await this.repository.listDepartmentOptions())
   }
 
   @Post('/admin/departments')
@@ -74,10 +65,10 @@ export class DepartmentsController {
     @Body(new ZodValidationPipe(DepartmentRequestSchema)) body: DepartmentRequest,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    if (!(await validateDepartmentParent(this.runtime, body.parentId))) {
+    if (!(await this.repository.validateDepartmentParent(body.parentId))) {
       return failure(ErrorCode.INVALID_REQUEST, 'Invalid parent department')
     }
-    return mutationResult(() => createDepartment(this.runtime, body, actor.id))
+    return mutationResult(() => this.repository.createDepartment(body, actor.id))
   }
 
   @Put('/admin/departments/:id')
@@ -94,10 +85,10 @@ export class DepartmentsController {
     @Body(new ZodValidationPipe(DepartmentRequestSchema)) body: DepartmentRequest,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    if (!(await validateDepartmentParent(this.runtime, body.parentId, params.id))) {
+    if (!(await this.repository.validateDepartmentParent(body.parentId, params.id))) {
       return failure(ErrorCode.INVALID_REQUEST, 'Invalid parent department')
     }
-    ensureUpdated(await updateDepartment(this.runtime, params.id, body, actor.id))
+    ensureUpdated(await this.repository.updateDepartment(params.id, body, actor.id))
     return success({ id: params.id })
   }
 
@@ -113,13 +104,13 @@ export class DepartmentsController {
     @Param(new ZodValidationPipe(IdParamsSchema)) params: IdParams,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    if (!(await canDeleteDepartment(this.runtime, params.id))) {
+    if (!(await this.repository.canDeleteDepartment(params.id))) {
       return failure(
         ErrorCode.RESOURCE_CONFLICT,
         'Department still has child departments, active users or policy references',
       )
     }
-    ensureUpdated(await softDeleteDepartment(this.runtime, params.id, actor.id))
+    ensureUpdated(await this.repository.softDeleteDepartment(params.id, actor.id))
     return success()
   }
 }

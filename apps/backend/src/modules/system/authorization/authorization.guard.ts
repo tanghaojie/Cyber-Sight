@@ -9,9 +9,8 @@ import {
 import { Reflector } from '@nestjs/core'
 import type { CurrentUser } from '@scaffold/api-contract'
 import type { FastifyRequest } from 'fastify'
-import { requireCurrentUser } from '@/modules/system/auth/auth.service.js'
+import { AuthService } from '@/modules/system/auth/auth.service.js'
 import { forbidden, internalError } from '@/shared/errors/http-errors.js'
-import { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 import type { AuthorizationProvider } from './authorization.provider.js'
 
 export const authorizationProviderToken = Symbol('authorizationProvider')
@@ -53,7 +52,8 @@ export const CurrentAccessUser = createParamDecorator(
 export class AuthorizationGuard implements CanActivate {
   constructor(
     @Inject(Reflector) private readonly reflector: Reflector,
-    @Inject(BackendRuntime) private readonly runtime: BackendRuntime,
+    @Inject(AuthService)
+    private readonly authService: AuthService,
     @Inject(authorizationProviderToken)
     private readonly provider: AuthorizationProvider,
   ) {}
@@ -71,12 +71,12 @@ export class AuthorizationGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest<AuthorizedRequest>()
-    const user = await requireCurrentUser(this.runtime, request.headers.authorization)
+    const user = await this.authService.requireCurrentUser(request.headers.authorization)
     request.accessUser = user
 
     if (
       authorization.mode === 'permission' &&
-      !(await this.provider.effectivePermissionKeys(this.runtime, user)).some((key) =>
+      !(await this.provider.effectivePermissionKeys(user)).some((key) =>
         authorization.anyOf.includes(key),
       )
     ) {
