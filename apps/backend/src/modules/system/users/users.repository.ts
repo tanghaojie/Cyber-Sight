@@ -10,6 +10,11 @@ import type {
 import type { Database } from '@/db/index.js'
 import { userDepartments, userRoles, users } from '@/db/schema.js'
 import type { DataAccessPlan } from '@/modules/system/authorization/authorization.service.js'
+import {
+  replaceUserPositionsInTransaction,
+  softDeleteUserPositionsInTransaction,
+} from '@/modules/system/positions/positions.service.js'
+import { activePositionAssignments } from '@/modules/system/positions/positions.access.js'
 import { auditView, pageOffset, type RepositoryListQuery } from '@/shared/database/pagination.js'
 import { hashPassword, verifyPassword } from '@/modules/system/auth/auth.security.js'
 
@@ -65,8 +70,9 @@ export async function listUsers(
   const [{ value: total }] = await app.db.select({ value: count() }).from(users).where(predicate)
 
   const ids = rows.map((row) => row.id)
+  const enabledIds = rows.filter((row) => row.enabled).map((row) => row.id)
   // 当前页的角色和部门一次批量读取，避免为每个用户分别执行关联查询。
-  const [roleAssignments, departmentAssignments] = ids.length
+  const [roleAssignments, departmentAssignments, positionAssignments] = ids.length
     ? await Promise.all([
         app.db
           .select({ userId: userRoles.userId, roleId: userRoles.roleId })
@@ -80,8 +86,9 @@ export async function listUsers(
           })
           .from(userDepartments)
           .where(and(inArray(userDepartments.userId, ids), eq(userDepartments.isDeleted, false))),
+        activePositionAssignments(app, enabledIds),
       ])
-    : [[], []]
+    : [[], [], []]
 
   return {
     total,
@@ -92,6 +99,9 @@ export async function listUsers(
       email: row.email,
       enabled: row.enabled,
       roleIds: roleAssignments.filter((item) => item.userId === row.id).map((item) => item.roleId),
+      positionIds: positionAssignments
+        .filter((item) => item.userId === row.id)
+        .map((item) => item.positionId),
       departmentIds: departmentAssignments
         .filter((item) => item.userId === row.id)
         .map((item) => item.departmentId),
@@ -232,6 +242,13 @@ export async function createUser(
       input.primaryDepartmentId,
       actorId,
     )
+    await replaceUserPositionsInTransaction(
+      tx,
+      created.id,
+      input.positionIds,
+      input.departmentIds,
+      actorId,
+    )
     return created.id
   })
 }
@@ -263,6 +280,7 @@ export async function updateUser(
     }
     await replaceUserRoles(tx, id, input.roleIds, actorId)
     await replaceUserDepartments(tx, id, input.departmentIds, input.primaryDepartmentId, actorId)
+    await replaceUserPositionsInTransaction(tx, id, input.positionIds, input.departmentIds, actorId)
     return true
   })
 }
@@ -346,10 +364,16 @@ export async function softDeleteUser(
   actorId: number,
   access: DataAccessPlan,
 ): Promise<boolean> {
-  const result = await app.db
-    .update(users)
-    .set({ isDeleted: true, updatedAt: new Date(), updatedBy: actorId })
-    .where(and(eq(users.id, id), eq(users.isDeleted, false), userAccessPredicate(access)))
-    .returning({ id: users.id })
-  return result.length > 0
+  return app.db.transaction(async function softDelete(tx) {
+    const result = await tx
+      .update(users)
+      .set({ isDeleted: true, updatedAt: new Date(), updatedBy: actorId })
+      .where(and(eq(users.id, id), eq(users.isDeleted, false), userAccessPredicate(access)))
+      .returning({ id: users.id })
+    if (result.length === 0) {
+      return false
+    }
+    await softDeleteUserPositionsInTransaction(tx, id, actorId)
+    return true
+  })
 }

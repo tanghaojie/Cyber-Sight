@@ -11,6 +11,7 @@
       ref="usersList"
       :role-options="roleOptions"
       :department-options="departmentOptions"
+      :position-options="positionOptions"
       @edit="openEdit"
     />
     <UserDialog
@@ -18,6 +19,7 @@
       :user="editingUser"
       :role-options="roleOptions"
       :department-options="departmentOptions"
+      :position-options="positionOptions"
       @saved="refreshList"
     />
   </section>
@@ -28,6 +30,7 @@ import { onMounted, ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import type { DepartmentOption, UserSummary } from '@scaffold/api-contract'
 import { listDepartmentOptions } from '@/modules/system/departments/departments.api'
+import { listPositionOptions, type PositionOption } from '@/modules/system/positions/positions.api'
 import { listRoleOptions, type RoleOption } from '@/modules/system/roles/roles.api'
 import UserDialog from './components/UserDialog.vue'
 import UsersList from './components/UsersList.vue'
@@ -37,6 +40,7 @@ const { t } = useLocalization()
 const usersList = ref<InstanceType<typeof UsersList> | null>(null)
 const roleOptions = ref<RoleOption[]>([])
 const departmentOptions = ref<DepartmentOption[]>([])
+const positionOptions = ref<PositionOption[]>([])
 const editingUser = ref<UserSummary | null>(null)
 const dialogOpen = ref(false)
 
@@ -56,11 +60,13 @@ async function refreshList(): Promise<void> {
 
 onMounted(async function loadOptions() {
   // 两组选项互不依赖，并行加载且允许其中一组失败后页面仍可展示用户列表。
-  const [roles, departments] = await Promise.allSettled([
+  const [roles, departments, positions] = await Promise.allSettled([
     listRoleOptions(),
     listDepartmentOptions(),
+    listPositionOptions(),
   ])
   roleOptions.value = roles.status === 'fulfilled' ? roles.value : []
   departmentOptions.value = departments.status === 'fulfilled' ? departments.value : []
+  positionOptions.value = positions.status === 'fulfilled' ? positions.value : []
 })
 </script>

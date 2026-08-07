@@ -54,6 +54,13 @@ const defaultNavigationFingerprints: readonly DefaultNavigationFingerprint[] = [
   },
   {
     type: 'menu',
+    path: '/sys/positions',
+    component: 'positions',
+    name: '岗位管理',
+    key: 'navigation.defaultMenus.positions',
+  },
+  {
+    type: 'menu',
     path: '/sys/menus',
     component: 'menus',
     name: '菜单管理',

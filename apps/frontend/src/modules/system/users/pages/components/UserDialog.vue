@@ -69,6 +69,23 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item :label="t('users.fields.positions')" class="sm:col-span-2">
+          <el-select
+            v-model="form.positionIds"
+            multiple
+            filterable
+            class="w-full"
+            :placeholder="t('users.dialog.positionsPlaceholder')"
+          >
+            <el-option
+              v-for="position in selectedPositions"
+              :key="position.id"
+              :label="positionLabel(position)"
+              :value="position.id"
+            />
+          </el-select>
+          <small class="field-hint">{{ t('users.dialog.positionsHint') }}</small>
+        </el-form-item>
         <el-form-item :label="t('users.fields.primaryDepartment')" class="sm:col-span-2" required>
           <el-select
             v-model="form.primaryDepartmentId"
@@ -109,6 +126,7 @@ import { computed, reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import type {
   DepartmentOption,
+  PositionOption,
   SubjectAccessRequest,
   UserCreate,
   UserSummary,
@@ -120,6 +138,7 @@ import {
   replaceSubjectAccess,
 } from '@/modules/system/authorization/authorization.api'
 import type { RoleOption } from '@/modules/system/roles/roles.api'
+import type { PositionOption as PositionOptionType } from '@/modules/system/positions/positions.api'
 import { createUser, updateUser } from '@/modules/system/users/users.api'
 import { useLocalization } from '@/modules/system/localization/localization'
 
@@ -127,6 +146,7 @@ const props = defineProps<{
   user: UserSummary | null
   roleOptions: RoleOption[]
   departmentOptions: DepartmentOption[]
+  positionOptions: PositionOptionType[]
 }>()
 const emit = defineEmits<{
   saved: []
@@ -144,6 +164,7 @@ const form = reactive({
   password: '',
   roleIds: [] as number[],
   departmentIds: [] as number[],
+  positionIds: [] as number[],
   primaryDepartmentId: 0,
   enabled: true,
 })
@@ -152,6 +173,14 @@ const access = reactive<SubjectAccessRequest>({ permissionKeys: [], dataPolicies
 const selectedDepartments = computed(() =>
   props.departmentOptions.filter((department) => form.departmentIds.includes(department.id)),
 )
+const selectedPositions = computed<PositionOption[]>(() =>
+  props.positionOptions.filter((position) => form.departmentIds.includes(position.departmentId)),
+)
+
+function positionLabel(position: PositionOption): string {
+  const department = props.departmentOptions.find((item) => item.id === position.departmentId)
+  return department ? `${department.name} / ${position.name}` : position.name
+}
 
 function resetForm(): void {
   // 每次打开都从 props 重新构造数组，避免编辑过程直接修改列表中的用户对象。
@@ -165,6 +194,7 @@ function resetForm(): void {
           password: '',
           roleIds: [...props.user.roleIds],
           departmentIds: [...props.user.departmentIds],
+          positionIds: [...props.user.positionIds],
           primaryDepartmentId: props.user.primaryDepartmentId,
           enabled: props.user.enabled,
         }
@@ -175,6 +205,7 @@ function resetForm(): void {
           password: '',
           roleIds: [],
           departmentIds: props.departmentOptions[0] ? [props.departmentOptions[0].id] : [],
+          positionIds: [],
           primaryDepartmentId: props.departmentOptions[0]?.id ?? 0,
           enabled: true,
         },
@@ -203,6 +234,7 @@ async function submit(): Promise<void> {
           email: form.email,
           ...(form.password ? { password: form.password } : {}),
           roleIds: form.roleIds,
+          positionIds: form.positionIds,
           departmentIds: form.departmentIds,
           primaryDepartmentId: form.primaryDepartmentId,
           enabled: form.enabled,
@@ -213,6 +245,7 @@ async function submit(): Promise<void> {
           email: form.email,
           password: form.password,
           roleIds: form.roleIds,
+          positionIds: form.positionIds,
           departmentIds: form.departmentIds,
           primaryDepartmentId: form.primaryDepartmentId,
           enabled: form.enabled,
@@ -279,4 +312,23 @@ watch(
   },
   { deep: true },
 )
+
+watch(
+  [() => form.departmentIds, () => props.positionOptions],
+  function keepPositionsInsideDepartments() {
+    const validPositionIds = new Set(selectedPositions.value.map((position) => position.id))
+    form.positionIds = form.positionIds.filter((positionId) => validPositionIds.has(positionId))
+  },
+  { deep: true },
+)
 </script>
+
+<style scoped lang="scss">
+.field-hint {
+  display: block;
+  margin-top: 5px;
+  color: var(--el-text-color-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+</style>

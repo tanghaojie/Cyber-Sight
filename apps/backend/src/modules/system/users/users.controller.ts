@@ -28,6 +28,8 @@ import type { AuthorizationProvider } from '@/modules/system/authorization/autho
 import { authorizationPermissionKeys } from '@/modules/system/authorization/authorization.resources.js'
 import { invalidateUserTokenCache, revokeUserTokens } from '@/modules/system/auth/auth.service.js'
 import { enabledDepartmentIds } from '@/modules/system/departments/departments.access.js'
+import { positionAssignmentsAreValid } from '@/modules/system/positions/positions.access.js'
+import { isInvalidPositionAssignment } from '@/modules/system/positions/positions.service.js'
 import { enabledRoleIds } from '@/modules/system/roles/roles.access.js'
 import { ErrorCode } from '@/shared/errors/error-codes.js'
 import { forbidden, notFound } from '@/shared/errors/http-errors.js'
@@ -154,8 +156,8 @@ export class UsersController {
     @Body(new ZodValidationPipe(UserCreateSchema)) body: UserCreate,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    if (!(await this.hasValidAssignments(body.roleIds, body.departmentIds))) {
-      return failure(ErrorCode.INVALID_REQUEST, 'Invalid role or department assignment')
+    if (!(await this.hasValidAssignments(body.roleIds, body.departmentIds, body.positionIds))) {
+      return failure(ErrorCode.INVALID_REQUEST, 'Invalid role, department or position assignment')
     }
     const access = await this.authorization.resolveDataAccess(
       this.runtime,
@@ -166,7 +168,14 @@ export class UsersController {
     if (!(await canAssignUserDepartments(this.runtime, body.departmentIds, access))) {
       return failure(ErrorCode.FORBIDDEN, 'Data scope does not allow these departments')
     }
-    return mutationResult(() => createUser(this.runtime, body, actor.id))
+    try {
+      return await mutationResult(() => createUser(this.runtime, body, actor.id))
+    } catch (error) {
+      if (isInvalidPositionAssignment(error)) {
+        return failure(ErrorCode.INVALID_REQUEST, 'Invalid position assignment')
+      }
+      throw error
+    }
   }
 
   @Put('/admin/users/:id')
@@ -183,8 +192,8 @@ export class UsersController {
     @Body(new ZodValidationPipe(UserUpdateSchema)) body: UserUpdate,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    if (!(await this.hasValidAssignments(body.roleIds, body.departmentIds))) {
-      return failure(ErrorCode.INVALID_REQUEST, 'Invalid role or department assignment')
+    if (!(await this.hasValidAssignments(body.roleIds, body.departmentIds, body.positionIds))) {
+      return failure(ErrorCode.INVALID_REQUEST, 'Invalid role, department or position assignment')
     }
     const access = await this.authorization.resolveDataAccess(
       this.runtime,
@@ -202,6 +211,9 @@ export class UsersController {
     } catch (error) {
       if (isUniqueViolation(error)) {
         return failure(ErrorCode.RESOURCE_CONFLICT, 'Resource already exists')
+      }
+      if (isInvalidPositionAssignment(error)) {
+        return failure(ErrorCode.INVALID_REQUEST, 'Invalid position assignment')
       }
       throw error
     }
@@ -233,13 +245,20 @@ export class UsersController {
     return success()
   }
 
-  private async hasValidAssignments(roleIds: number[], departmentIds: number[]): Promise<boolean> {
-    const [validRoleIds, validDepartmentIds] = await Promise.all([
+  private async hasValidAssignments(
+    roleIds: number[],
+    departmentIds: number[],
+    positionIds: number[],
+  ): Promise<boolean> {
+    const [validRoleIds, validDepartmentIds, validPositions] = await Promise.all([
       enabledRoleIds(this.runtime, roleIds),
       enabledDepartmentIds(this.runtime, departmentIds),
+      positionAssignmentsAreValid(this.runtime, positionIds, departmentIds),
     ])
     return (
-      validRoleIds.length === roleIds.length && validDepartmentIds.length === departmentIds.length
+      validRoleIds.length === roleIds.length &&
+      validDepartmentIds.length === departmentIds.length &&
+      validPositions
     )
   }
 }

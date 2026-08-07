@@ -51,6 +51,7 @@ export class DepartmentsController {
     authorizationPermissionKeys.departmentsManage,
     authorizationPermissionKeys.usersManage,
     authorizationPermissionKeys.rolesManage,
+    authorizationPermissionKeys.positionsManage,
   )
   @ContractRoute({
     operationId: 'listDepartmentOptions',

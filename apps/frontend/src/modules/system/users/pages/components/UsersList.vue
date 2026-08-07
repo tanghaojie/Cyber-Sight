@@ -39,6 +39,18 @@
           </div>
         </template>
       </el-table-column>
+      <el-table-column :label="t('users.fields.positions')" min-width="200">
+        <template #default="{ row }">
+          <div class="flex flex-wrap gap-1.5">
+            <el-tag v-for="positionId in row.positionIds" :key="positionId" effect="plain" round>
+              {{ positionName(positionId) }}
+            </el-tag>
+            <span v-if="!row.positionIds.length" class="table-muted">{{
+              t('users.list.unassigned')
+            }}</span>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column :label="t('users.fields.primaryDepartment')" min-width="150">
         <template #default="{ row }">
           {{ departmentName(row.primaryDepartmentId) }}
@@ -81,6 +93,7 @@ import { onMounted, ref } from 'vue'
 import { Delete, EditPen, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { DepartmentOption, UserSummary } from '@scaffold/api-contract'
+import type { PositionOption } from '@/modules/system/positions/positions.api'
 import type { RoleOption } from '@/modules/system/roles/roles.api'
 import { deleteUser, listUsers } from '@/modules/system/users/users.api'
 import { useLocalization } from '@/modules/system/localization/localization'
@@ -88,6 +101,7 @@ import { useLocalization } from '@/modules/system/localization/localization'
 const props = defineProps<{
   roleOptions: RoleOption[]
   departmentOptions: DepartmentOption[]
+  positionOptions: PositionOption[]
 }>()
 const emit = defineEmits<{
   edit: [user: UserSummary]
@@ -137,6 +151,13 @@ function departmentName(id: number): string {
   return (
     props.departmentOptions.find((department) => department.id === id)?.name ??
     t('users.list.unknownDepartment', { id })
+  )
+}
+
+function positionName(id: number): string {
+  return (
+    props.positionOptions.find((position) => position.id === id)?.name ??
+    t('users.list.unknownPosition', { id })
   )
 }
 

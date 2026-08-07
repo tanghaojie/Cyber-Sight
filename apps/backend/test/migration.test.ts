@@ -22,6 +22,7 @@ const legacyTableNames = [
   'users',
 ]
 const systemTableNames = legacyTableNames.map((name) => `sys_${name}`)
+const positionTableNames = ['sys_positions', 'sys_user_positions']
 
 function migrationJournal(): MigrationJournal {
   const journalUrl = new URL('../drizzle/meta/_journal.json', import.meta.url)
@@ -63,6 +64,10 @@ function aboutProjectMigrationSql(): string {
   return readFileSync(new URL('../drizzle/0003_about_project_menu.sql', import.meta.url), 'utf8')
 }
 
+function positionMigrationSql(): string {
+  return readFileSync(new URL('../drizzle/0004_positions_management.sql', import.meta.url), 'utf8')
+}
+
 describe('database migration baseline', () => {
   it('keeps the initial baseline and appends later schema changes', () => {
     const journal = migrationJournal()
@@ -77,6 +82,7 @@ describe('database migration baseline', () => {
       '0001_luxuriant_violations.sql',
       '0002_api_log_operations_menu.sql',
       '0003_about_project_menu.sql',
+      '0004_positions_management.sql',
     ])
     expect(snapshotFiles()).toEqual(['0000_snapshot.json', '0001_snapshot.json'])
   })
@@ -90,6 +96,20 @@ describe('database migration baseline', () => {
     for (const tableName of legacyTableNames) {
       expect(migrationSql).not.toContain(`"${tableName}"`)
     }
+  })
+
+  it('appends the position tables and organization-management seed data', () => {
+    const migrationSql = positionMigrationSql()
+
+    for (const tableName of positionTableNames) {
+      expect(migrationSql).toContain(`CREATE TABLE IF NOT EXISTS "${tableName}"`)
+    }
+    expect(migrationSql).toContain('"sys_positions_department_name_active_unique"')
+    expect(migrationSql).toContain('"sys_user_positions_user_position_active_unique"')
+    expect(migrationSql).toContain("'positions.manage'")
+    expect(migrationSql).toContain("'岗位管理'")
+    expect(migrationSql).not.toContain('岗位编码')
+    expect(migrationSql).not.toContain('"code"')
   })
 
   it('contains the final menu and soft-delete uniqueness model directly', () => {

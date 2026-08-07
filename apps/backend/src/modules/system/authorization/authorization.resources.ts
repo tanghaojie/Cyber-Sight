@@ -6,6 +6,7 @@ export const authorizationPermissionKeys = {
   departmentsManage: 'departments.manage',
   dictionariesManage: 'dictionaries.manage',
   menusManage: 'menus.manage',
+  positionsManage: 'positions.manage',
   rolesManage: 'roles.manage',
   usersManage: 'users.manage',
 } as const

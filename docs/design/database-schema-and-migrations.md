@@ -2,7 +2,7 @@
 title: 数据库 Schema 与迁移基线
 status: active
 owner: project maintainers
-updated: 2026-08-05
+updated: 2026-08-07
 ---
 
 # 数据库 Schema 与迁移基线
@@ -38,19 +38,21 @@ updated: 2026-08-05
 | `dataPolicyDepartments` | `sys_data_policy_departments` |
 | `authSessions`          | `sys_auth_sessions`           |
 | `apiRequestLogs`        | `sys_api_request_logs`        |
+| `positions`             | `sys_positions`               |
+| `userPositions`         | `sys_user_positions`          |
 
 表属外键、唯一约束和显式索引也使用以对应物理表名开头的 `sys_` 名称，便于从数据库对象名直接识别归属。列名、枚举名、模块资源键和 HTTP 契约不因物理表前缀变化。
 
-## 岗位模块扩展（设计阶段）
+## 岗位模块扩展（已实施）
 
-岗位设计预计新增以下系统表；在代码和迁移实现前，它们不属于当前 15 张应用表，也不应被写入现有 `0000` 初始迁移：
+岗位模块已新增以下两张系统表，当前应用表总数由 15 张扩展为 17 张；它们通过追加迁移加入，不改写现有 `0000` 初始迁移：
 
 | Drizzle 导出    | PostgreSQL 物理表    | 数据所有者  | 关系                                                                                      |
 | --------------- | -------------------- | ----------- | ----------------------------------------------------------------------------------------- |
 | `positions`     | `sys_positions`      | `positions` | 一个岗位定义绑定一个有效部门；同部门活动岗位名称唯一。                                    |
 | `userPositions` | `sys_user_positions` | `positions` | 用户与岗位多对多；岗位所属部门由 `sys_positions.department_id` 推导，不在关系表重复保存。 |
 
-实现岗位模块时必须追加迁移，不能改写已执行的基线；迁移还需要登记 `positions.manage` 权限并为既有超级管理员角色补授该权限。两张表继续复用审计字段、软删除和活动部分唯一索引，完整字段及跨模块约束见[岗位模块](modules/positions.md)。
+已追加 `apps/backend/drizzle/0004_positions_management.sql`，登记 `positions.manage` 权限、岗位管理菜单并为既有超级管理员角色补授该权限。两张表复用审计字段、软删除、外键和活动部分唯一索引，完整字段及跨模块约束见[岗位模块](modules/positions.md)。
 
 ## 单一初始基线
 
@@ -80,13 +82,13 @@ updated: 2026-08-05
 
 - 对旧库执行新基线：旧迁移 journal 与新基线不属于同一历史，可能跳过迁移或形成两套表；必须改用空库。
 - 只改表名不改初始数据 SQL：迁移会在种子或外键阶段失败；迁移测试必须扫描全部 SQL。
-- 漏加表前缀：Schema 测试枚举全部 15 张应用表并校验物理名称。
-- 快照、journal 与 SQL 不一致：`pnpm db:generate` 和迁移静态测试必须共同验证初始基线及全部追加迁移。
+- 漏加表前缀：Schema 测试枚举全部 17 张应用表并校验物理名称。
+- 快照、journal 与追加 SQL 的基线关系不清：`pnpm db:generate` 和迁移静态测试必须共同验证初始基线及全部追加迁移；手工追加迁移必须沿用现有项目约定并明确记录。
 
 ## 验证策略
 
 - Schema 测试验证全部应用表使用 `sys_` 前缀、表属索引/约束名称一致、审计字段及软删除唯一性不退化。
-- 迁移测试验证初始迁移保持不变，追加迁移、snapshot 与 journal 连续一致，最终 DDL/初始数据只引用 `sys_` 应用表。
+- 迁移测试验证初始迁移保持不变、全部追加 SQL 已被扫描，且既有 snapshot/journal 基线未被改写；最终 DDL/初始数据只引用 `sys_` 应用表。
 - `pnpm test`、`pnpm build`、`pnpm lint`、`pnpm format:check` 验证后端、类型和静态质量。
 - 有可用空 PostgreSQL 数据库时，在新库执行迁移后运行 `pnpm test:db`；不得用维护者现有数据库代替空库验证。
 

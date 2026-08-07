@@ -12,11 +12,13 @@ import {
   departments,
   dictionaries,
   menus,
+  positions,
   permissions,
   roleMenus,
   rolePermissions,
   roles,
   userDepartments,
+  userPositions,
   userRoles,
   users,
 } from '@/db/schema.js'
@@ -25,6 +27,8 @@ import {
 const systemTables: Array<{ table: PgTable; name: string }> = [
   { table: apiRequestLogs, name: 'sys_api_request_logs' },
   { table: users, name: 'sys_users' },
+  { table: positions, name: 'sys_positions' },
+  { table: userPositions, name: 'sys_user_positions' },
   { table: roles, name: 'sys_roles' },
   { table: userRoles, name: 'sys_user_roles' },
   { table: departments, name: 'sys_departments' },
@@ -62,6 +66,16 @@ const activeBusinessIdentityIndexes: Array<{
     table: userDepartments,
     name: 'sys_user_departments_user_department_active_unique',
     columns: ['user_id', 'department_id'],
+  },
+  {
+    table: positions,
+    name: 'sys_positions_department_name_active_unique',
+    columns: ['department_id', 'name'],
+  },
+  {
+    table: userPositions,
+    name: 'sys_user_positions_user_position_active_unique',
+    columns: ['user_id', 'position_id'],
   },
   {
     table: userDepartments,
@@ -111,10 +125,12 @@ describe('system table naming and lifecycle fields', () => {
       'menuType',
       'menus',
       'permissions',
+      'positions',
       'roleMenus',
       'rolePermissions',
       'roles',
       'userDepartments',
+      'userPositions',
       'userRoles',
       'users',
     ])
@@ -171,6 +187,25 @@ describe('department model fields', () => {
     expect(columns).toHaveProperty('id')
     expect(columns).toHaveProperty('name')
     expect(columns).not.toHaveProperty('code')
+  })
+})
+
+describe('position model fields', () => {
+  it('uses an internal ID, department ownership and user-facing name without a position code', () => {
+    const columns = getTableColumns(positions)
+
+    expect(columns).toHaveProperty('id')
+    expect(columns).toHaveProperty('departmentId')
+    expect(columns).toHaveProperty('name')
+    expect(columns).not.toHaveProperty('code')
+  })
+
+  it('stores user assignments separately from the position department', () => {
+    const columns = getTableColumns(userPositions)
+
+    expect(columns).toHaveProperty('userId')
+    expect(columns).toHaveProperty('positionId')
+    expect(columns).not.toHaveProperty('departmentId')
   })
 })
 

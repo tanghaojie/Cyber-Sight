@@ -10,7 +10,12 @@ import {
 const integerArray = z.array(z.number().int().min(1))
 
 function validateDepartments(
-  input: { departmentIds: number[]; primaryDepartmentId: number; roleIds: number[] },
+  input: {
+    departmentIds: number[]
+    primaryDepartmentId: number
+    roleIds: number[]
+    positionIds: number[]
+  },
   context: z.RefinementCtx,
 ): void {
   // 该复合约束由创建和更新 Schema 共用，保证两个写入入口行为一致。
@@ -35,6 +40,13 @@ function validateDepartments(
       message: 'Role IDs must be unique',
     })
   }
+  if (new Set(input.positionIds).size !== input.positionIds.length) {
+    context.addIssue({
+      code: 'custom',
+      path: ['positionIds'],
+      message: 'Position IDs must be unique',
+    })
+  }
 }
 
 export const UserSummarySchema = AuditFieldsSchema.extend({
@@ -44,6 +56,7 @@ export const UserSummarySchema = AuditFieldsSchema.extend({
   email: z.email(),
   enabled: z.boolean(),
   roleIds: integerArray,
+  positionIds: integerArray,
   departmentIds: integerArray,
   primaryDepartmentId: z.number().int().min(1),
   lastLoginAt: z.iso.datetime().nullable().optional(),
@@ -57,6 +70,7 @@ export const UserCreateSchema = z
     password: z.string().min(8).max(128),
     enabled: z.boolean(),
     roleIds: integerArray,
+    positionIds: integerArray.default([]),
     departmentIds: integerArray.min(1),
     primaryDepartmentId: z.number().int().min(1),
   })
@@ -69,6 +83,7 @@ export const UserUpdateSchema = z
     password: z.string().min(8).max(128).optional(),
     enabled: z.boolean(),
     roleIds: integerArray,
+    positionIds: integerArray.default([]),
     departmentIds: integerArray.min(1),
     primaryDepartmentId: z.number().int().min(1),
   })

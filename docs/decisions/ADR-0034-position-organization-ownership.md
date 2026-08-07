@@ -1,6 +1,6 @@
 ---
 title: 岗位与组织归属模型
-status: proposed
+status: accepted
 date: 2026-08-07
 ---
 
@@ -54,7 +54,7 @@ date: 2026-08-07
 
 ## 验证和复审条件
 
-实现时必须验证：
+实现已验证：
 
 - 两张新表符合 `sys_` 前缀、审计字段、外键和活动部分唯一索引规则。
 - 用户岗位关系的创建、替换、软删除和恢复不会绕过用户部门有效性。
@@ -62,6 +62,10 @@ date: 2026-08-07
 - 岗位权限键不会出现在角色权限、菜单运行时授权来源或数据策略主体中。
 
 出现以下需求时复审本 ADR：同一岗位定义跨多个部门、岗位层级/继承、主岗位影响业务规则、任职历史/生效时间、部门级岗位数据权限或岗位参与授权决策。
+
+## 实现状态
+
+实现已落在 `apps/backend/src/modules/system/positions/`、`apps/frontend/src/modules/system/positions/` 和 `packages/api-contract/src/modules/positions/`；数据库通过 `apps/backend/drizzle/0004_positions_management.sql` 追加两张岗位表、权限和菜单种子。用户模块通过岗位公共服务在同一事务中替换或失效岗位关系，岗位编码未加入模型。
 
 ## 相关设计
 
