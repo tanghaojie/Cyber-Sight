@@ -16,7 +16,7 @@
 ## Workspace 与模块
 
 - [API 契约](modules/api-contract.md) · [后端](modules/backend.md) · [前端应用与应用壳](modules/frontend.md)
-- [认证](modules/auth.md) · [授权与数据范围](modules/authorization.md) · [用户](modules/users.md) · [角色](modules/roles.md) · [部门](modules/departments.md)
+- [认证](modules/auth.md) · [授权与数据范围](modules/authorization.md) · [用户](modules/users.md) · [角色](modules/roles.md) · [部门](modules/departments.md) · [岗位](modules/positions.md)
 - [菜单](modules/menus.md) · [字典](modules/dictionaries.md)
 - [接口日志](modules/api-logs.md)
 - [前端导航](modules/navigation.md) · [前端运行时多语言](modules/localization.md) · [标签历史](modules/tag-view.md) · [系统设置](modules/settings.md) · [工作台](modules/home.md) · [关于项目](modules/about.md) · [错误页面](modules/errors.md)

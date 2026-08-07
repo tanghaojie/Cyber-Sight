@@ -23,6 +23,7 @@ updated: 2026-07-30
 
 - `auth` 只确认会话身份并提供当前用户，不把权限写入 JWT。
 - `roles` 拥有角色定义，`users` 拥有用户及角色/部门归属，`departments` 拥有组织树。
+- `positions` 拥有岗位定义和用户岗位归属；岗位是组织主数据，不是授权主体，不能授予功能权限或数据范围。
 - `authorization` 拥有物理表 `sys_permissions`、`sys_role_permissions`、`sys_data_policy_rules` 和 `sys_data_policy_departments`，并读取有效角色和部门上下文完成决策。
 - `sys_menus` 保存可选的 `required_permission_key`，导航通过本模块返回的有效权限过滤，不再把 `sys_role_menus` 作为运行时授权来源。
 - 业务资源拥有自己的 Drizzle 表和数据范围编译器；本模块只返回受限的中立计划，不接收或保存原始 SQL。

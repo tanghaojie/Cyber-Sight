@@ -16,6 +16,8 @@ updated: 2026-07-31
 
 功能权限是数据权限的前置条件，但二者使用不同关系表和查询路径。当前只有 users 数据资源启用数据范围；其他系统模块目前只检查功能权限。
 
+岗位模块的 `sys_positions` 和 `sys_user_positions` 属于组织主数据，不属于本授权模型。岗位不能作为角色、权限或数据策略主体；第一版岗位接口只受 `positions.manage` 功能权限保护。
+
 所有物理表为应用系统表，使用 sys_ 前缀。Drizzle 导出名与物理表名的完整映射见[数据库 Schema 与迁移基线](database-schema-and-migrations.md)。
 
 ```mermaid

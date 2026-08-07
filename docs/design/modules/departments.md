@@ -13,12 +13,13 @@ updated: 2026-07-31
 
 ## 范围与非目标
 
-模块包括部门树 CRUD、部门闭包关系、部门选项 API、管理页面以及用户部门上下文查询。第一版不实现岗位、部门负责人、组织租户、虚拟团队或跨组织关系。
+模块包括部门树 CRUD、部门闭包关系、部门选项 API、管理页面以及用户部门上下文查询。部门不拥有岗位定义、部门负责人、组织租户、虚拟团队或跨组织关系；岗位由独立的 `positions` 模块管理。
 
 ## 职责与边界
 
 - `departments` 拥有 `sys_departments` 部门记录和 `sys_department_closure`。
 - `users` 拥有用户与部门的归属关系 `sys_user_departments`，并保证每个有效用户恰有一个主部门。
+- `positions` 拥有岗位定义和用户岗位关系；部门不直接读写岗位表，岗位对部门的依赖通过岗位模块消费部门公共查询实现。
 - `authorization` 只能通过本模块公开的部门上下文和后代查询消费组织关系，不修改部门树。
 - 部门管理页面编辑本模块数据，并通过 authorization 公共 API 编辑该部门作为授权主体的数据策略。
 
@@ -39,16 +40,17 @@ updated: 2026-07-31
 
 父部门编辑器使用同一树结构展示虚拟根节点和可选部门。编辑已有部门时，当前部门及其全部后代不进入候选树，禁用部门保留层级上下文但不可选；后端闭包校验仍是防止环和无效父节点的最终边界。
 
-创建或更新拒绝自引用、父节点不存在、父节点禁用以及把部门移动到自己的后代。存在有效子部门、有效用户归属或自定义数据策略引用时禁止删除。
+创建或更新拒绝自引用、父节点不存在、父节点禁用以及把部门移动到自己的后代。存在有效子部门、有效用户归属或自定义数据策略引用时禁止删除；部门软删除不会硬删除岗位，岗位在有效性查询中随已删除部门失效。
 
 ## 依赖关系
 
-`departments` 依赖数据库和共享 HTTP 能力；删除校验通过 `users.access.ts` 和 `authorization.references.ts` 检查成员与策略引用。`users` 通过部门选项 API 选择归属；`authorization` 通过 `departments.access.ts` 获取候选部门的有效 ID、祖先和后代。
+`departments` 依赖数据库和共享 HTTP 能力；删除校验通过 `users.access.ts` 和 `authorization.references.ts` 检查成员与策略引用。`users` 通过部门选项 API 选择归属；`positions` 单向消费 `departments.access.ts` 校验岗位所属部门；`authorization` 通过 `departments.access.ts` 获取候选部门的有效 ID、祖先和后代。
 
 ## 失败模式与安全考虑
 
 - 无法构成完整无环树时事务回滚，不留下部分闭包。
 - 禁用部门不会参与新授权决策，但历史归属保留。
+- 部门软删除不会级联删除岗位；岗位查询同时过滤部门的 `is_deleted`/`enabled`，因此相关岗位和任职会保留历史但不作为有效上下文。
 - 部门选项只向具备用户、角色或部门管理权限的已认证用户开放；存在子部门、有效用户归属或自定义策略引用时拒绝删除。
 
 ## 测试与验证策略
@@ -71,3 +73,5 @@ updated: 2026-07-31
 - [部门树形展示实施计划](../../archive/plans/2026-07-30-department-tree-view.md)
 - [授权与部门 AI 协作记录](../../archive/ai-logs/2026/07/2026-07-30-pluggable-authorization.md)
 - [部门树形展示 AI 协作记录](../../archive/ai-logs/2026/07/2026-07-30-department-tree-view.md)
+- [岗位模块](positions.md)
+- [岗位与组织归属 ADR](../../decisions/ADR-0034-position-organization-ownership.md)
