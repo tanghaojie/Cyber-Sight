@@ -2,9 +2,9 @@
   "version": 1,
   "scopes": {
     "repository": {
-      "lastReviewedCommit": "7bd762d89b0def6f4c7446469c39a25951bb4004",
-      "lastReviewedAt": "2026-08-07T23:49:40+08:00",
-      "reviewId": "health-status-failure-archive-review"
+      "lastReviewedCommit": "9aef7a30703d03167c584c66baffee60536588b4",
+      "lastReviewedAt": "2026-08-08T01:53:31+08:00",
+      "reviewId": "injectable-backend-runtime-archive-review"
     }
   }
 }
