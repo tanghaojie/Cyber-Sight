@@ -117,10 +117,12 @@
 
 ## 跨 AI 文档归档启动协议
 
-- 每次 AI 开始仓库任务时，先运行 `pnpm docs:archive:check`。
+- AI 开始仓库任务时先判断任务范围。只读问答、代码浏览、格式化、注释和单文件机械改动可以跳过归档审计；涉及业务行为、API、数据模型、模块边界、架构、迁移、ADR、计划或文档治理的任务，必须在首次修改文件前运行 `pnpm docs:archive:check`。
+- 如果任务开始时范围不明确，或实施过程中扩大到上述范围，必须在首次修改相关文件前补运行归档审计。
 - 若结果为 `DUE`，必须创建或继续 `docs/plans/active/` 下 `type: documentation-archive-review` 的计划。
 - 若结果为 `IN_PROGRESS`，优先继续已有归档审查计划，不得创建重复计划。
 - 若结果为 `BLOCKED`，保留现有文档和证据，向维护者报告具体冲突，不得猜测后归档。
+- 合并前或 CI 必须运行 `pnpm docs:archive:check:ci`；没有 CI 的任务在最终验证阶段运行同一命令。
 - 归档触发、基线和阈值使用 `docs/archive/archive-policy.json` 与 `docs/archive/archive-ledger.json`；禁止使用 Codex、Claude 或其他单一 AI 平台的私有状态文件作为仓库协议。
 - 归档审查必须先根据当前代码、测试、契约、迁移和 Git 历史补充当前 Design/ADR，再归档已经被取代的历史内容。
 

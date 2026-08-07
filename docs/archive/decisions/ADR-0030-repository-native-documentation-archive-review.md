@@ -1,10 +1,13 @@
 ---
 title: ADR-0030 Repository-native documentation reconstruction and archive review
-status: accepted
+status: superseded
 date: 2026-08-06
+superseded_by: ADR-0033
 ---
 
 # ADR-0030 Repository-native documentation reconstruction and archive review
+
+> This decision is superseded by [ADR-0033](../../decisions/ADR-0033-task-scoped-documentation-archive-audit.md).
 
 ## Context
 
@@ -18,7 +21,7 @@ without requiring a particular AI runtime or background daemon.
 
 ## Decision
 
-Use a repository-native, startup-time audit protocol:
+Use a repository-native audit command and active plan protocol:
 
 - `pnpm docs:archive:check` computes archive-review status from Git history, current documents,
   active plans, and the versioned archive ledger.
@@ -36,28 +39,7 @@ that starts the review creates the active plan after applying the normal staged-
 
 ## Trigger policy
 
-The default review thresholds are:
-
-- 20 effective code commits within the same scope;
-- 3 newly accepted ADRs;
-- 3 completed feature plans;
-- 30 days since the last review.
-
-Architecture changes, broken current-document links, and superseded ADRs trigger an immediate
-review. Formatting-only, documentation-only, merge, generated-output, and lockfile-only changes
-do not count as effective code commits.
-
-## Evidence and uncertainty
-
-Current code, tests, contracts, migrations, and Git diffs may establish implementation facts.
-Commit messages may provide design rationale. An agent must not invent intent that cannot be
-supported by repository evidence; unresolved intent is recorded for maintainer confirmation.
-
-## Consequences
-
-All AI agents share the same trigger and task queue. The protocol works during ordinary task
-startup and does not require a platform-specific daemon. The audit is intentionally separate from
-the AI execution step, so Git hooks remain fast and deterministic.
-
-The ledger and archive-review plan become additional repository governance artifacts. They must
-be kept consistent with the current documentation indexes and the archive lifecycle.
+The original startup rule was replaced by ADR-0033. The archive thresholds remain 20 effective
+code commits within the same scope, 3 newly accepted ADRs, 3 completed feature plans, or 30 days
+since the last review. Architecture changes, broken current-document links, and superseded ADRs
+remain immediate triggers.

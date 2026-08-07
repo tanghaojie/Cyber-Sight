@@ -40,6 +40,7 @@
 | 软删除、审计和有效记录唯一性 | ADR-0014、ADR-0015 | [后端](../design/modules/backend.md)及用户、角色、菜单、字典模块设计 |
 | 分层文档和工程工作流 | ADR-0016、ADR-0021 至 ADR-0023 | [文档治理](../design/documentation-governance.md)、[开发工作流](../design/developer-workflow.md)与[验证策略](../design/testing-strategy.md) |
 | JWT 会话和 LRU 读缓存 | ADR-0019、ADR-0020 | [认证模块](../design/modules/auth.md) |
+| 文档归档触发协议 | ADR-0030 | [按任务范围触发文档归档审计](../decisions/ADR-0033-task-scoped-documentation-archive-audit.md) |
 
 ## 完成计划与 AI 协作记录
 
@@ -47,12 +48,16 @@
   [AI 协作记录](ai-logs/2026/08/2026-08-07-nestjs-fastify-migration.md)。
 - 2026-08-07：[架构变更后的文档归档审查计划](plans/2026-08-07-documentation-archive-review.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-07-documentation-archive-review.md)。
+- 2026-08-07：[按任务范围触发文档归档审查计划](plans/2026-08-07-archive-check-trigger-policy.md)及其
+  [AI 协作记录](ai-logs/2026/08/2026-08-07-archive-check-trigger-policy.md)。
 - 2026-08-07：[前端主题色一致性修复计划](plans/2026-08-07-theme-color-consistency.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-07-theme-color-consistency.md)。
 
 - 2026-08-07：[关于项目页与品牌入口计划](plans/2026-08-07-about-project.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-07-about-project.md)。
 - 2026-08-07：[登录页主题外观入口计划](plans/2026-08-07-login-appearance-entry.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-07-login-appearance-entry.md)。
 - 2026-08-07：[Cyber AI Forge 品牌与项目标识改名](plans/2026-08-07-cyber-ai-forge-renaming.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-07-cyber-ai-forge-renaming.md)。
 - 2026-08-07：[Cyber AI Forge 改名后的文档归档审查](plans/2026-08-07-cyber-ai-forge-archive-review.md)。
+- 2026-08-07：[岗位管理模块设计计划](plans/2026-08-07-job-positions-design.md)及其
+  [AI 协作记录](ai-logs/2026/08/2026-08-07-job-positions-design.md)。
 - 2026-08-06：[登录页与工作台首屏信息重设计计划](plans/2026-08-06-auth-home-visual-refresh.md)及其 [AI 协作记录](ai-logs/2026/08/2026-08-06-auth-home-visual-refresh.md)。
 - 2026-08-05：[个人资料页首页导航高亮修复计划](plans/2026-08-05-profile-navigation-highlight.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-05-profile-navigation-highlight.md)。

@@ -52,17 +52,23 @@ docs/
 - ADR：`ADR-NNNN-<topic>.md`，编号递增且不复用。
 - 正文默认中文，代码标识保持原样。
 
-## AI 启动归档审查
+## AI 任务范围归档审查
 
-所有 AI 智能体进入仓库任务时都应运行：
+涉及业务行为、API、数据模型、模块边界、架构、迁移、ADR、计划或文档治理的 AI 任务，首次修改文件前运行：
 
 ```text
 pnpm docs:archive:check
 ```
 
-命令只读检查 Git 历史、当前文档、活动计划和归档基线，不依赖任何特定 AI 平台。若结果为
+只读问答、代码浏览、格式化、注释和单文件机械改动可以跳过。若任务范围中途扩大，必须在修改相关文件前补运行。命令只读检查 Git 历史、当前文档、活动计划和归档基线，不依赖任何特定 AI 平台。若结果为
 `DUE`，AI 应在 `plans/active/` 创建或继续带有 `type: documentation-archive-review` 的归档审查计划；
 `IN_PROGRESS` 表示已有智能体创建了共享任务，`BLOCKED` 表示必须请求维护者确认。
+
+合并前或 CI 使用以下入口，将 `DUE`/`BLOCKED` 转换为失败状态：
+
+```text
+pnpm docs:archive:check:ci
+```
 
 归档审查不是单纯移动旧文件。AI 必须先通过代码、测试、API 契约、数据库迁移和 Git 历史补充当前
 Design/ADR，再将已被当前事实取代的 Design、文档、ADR、计划和 AI 协作记录归入 `archive/`。

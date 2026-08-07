@@ -91,12 +91,14 @@ docs/
 
 ### 仓库级协议
 
-- 所有 AI 任务启动时运行 `pnpm docs:archive:check`。
+- AI 任务按范围触发归档审计：只读问答、代码浏览、格式化、注释和单文件机械改动可以跳过；涉及业务行为、API、数据模型、模块边界、架构、迁移、ADR、计划或文档治理的任务，在首次修改文件前运行 `pnpm docs:archive:check`。
+- 如果任务范围中途扩大，必须在修改相关文件前补运行归档审计。
 - 审计脚本只读计算 Git 提交、当前文档、活动计划和归档基线，不启动 AI，也不写工作区。
 - `docs/archive/archive-policy.json` 定义阈值和立即触发条件。
 - `docs/archive/archive-ledger.json` 记录每个范围最近一次审查的 Git 基线。
 - 需要处理的任务使用 `docs/plans/active/` 下带有 `type: documentation-archive-review` 的普通计划表示。
 - 归档完成后，计划进入 `docs/archive/plans/`，并更新归档台账与索引。
+- 合并前或 CI 使用 `pnpm docs:archive:check:ci`；没有 CI 的任务在最终验证阶段运行同一入口。该入口通过 `--fail-on-due` 将 `DUE` 和 `BLOCKED` 转换为失败状态。
 
 ### 默认触发条件
 

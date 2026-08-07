@@ -15,6 +15,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "docs:archive:check": "node scripts/docs/archive-audit.mjs",
+    "docs:archive:check:ci": "node scripts/docs/archive-audit.mjs --fail-on-due",
     "lint-staged": "lint-staged",
     "prepare": "simple-git-hooks",
     "preinstall": "npx only-allow pnpm"

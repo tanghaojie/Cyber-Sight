@@ -10,8 +10,9 @@
 - [ADR-0027](ADR-0027-system-and-business-module-classification.md)：前后端模块按 `system` 与 `biz` 分类，公共契约路径保持稳定。
 - [ADR-0028](ADR-0028-product-and-creator-brand-separation.md)：使用 CYBER 作为产品品牌，并把 JTLab 限定为明确、独立的创作者署名。
 - [ADR-0029](ADR-0029-frontend-runtime-localization.md)：使用独立前端模块提供运行时中英文切换，以模块资源和严格默认菜单指纹保护用户录入数据。
-- [ADR-0030](ADR-0030-repository-native-documentation-archive-review.md)：使用仓库原生审计命令和活动计划作为跨 AI 的文档重建与归档审查协议。
+- [ADR-0033](ADR-0033-task-scoped-documentation-archive-audit.md)：按任务范围触发归档审计，并以合并前检查作为跨 AI 的共享兜底协议；取代已归档的 ADR-0030。
 - [ADR-0031](ADR-0031-cyber-ai-forge-brand.md)：将正式产品名更新为 Cyber AI Forge，并同步项目级认证与浏览器存储标识。
 - [ADR-0032](ADR-0032-nestjs-fastify-adapter.md)：后端迁移到 NestJS 11，继续使用 Fastify 5 adapter，并保留共享 Zod 契约为唯一 HTTP 数据源。
+- [ADR-0034](ADR-0034-position-organization-ownership.md)：岗位作为按部门归属的组织主数据，由独立 `positions` 模块拥有用户岗位关系，不参与授权。
 
 新增 ADR 时使用 [ADR 模板](../templates/adr-template.md)和下一个连续编号。ADR 被取代或被后续基线吸收后更新替代关系并移入 `docs/archive/decisions/`，编号不得复用。
