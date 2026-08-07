@@ -1,4 +1,4 @@
-import type { FastifyInstance } from 'fastify'
+import type { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 import { describe, expect, it, vi } from 'vitest'
 import { PasswordUpdateSchema, PersonalProfileUpdateSchema } from '@scaffold/api-contract'
 import {
@@ -51,7 +51,7 @@ describe('personal profile repository', () => {
     }
     const app = {
       db: { select: vi.fn(() => selectResult([profile])) },
-    } as unknown as FastifyInstance
+    } as unknown as BackendRuntime
 
     await expect(personalProfileForUser(app, profile.id)).resolves.toEqual(profile)
   })
@@ -67,7 +67,7 @@ describe('personal profile repository', () => {
     const set = vi.fn(() => ({ where: vi.fn(() => ({ returning })) }))
     const app = {
       db: { update: vi.fn(() => ({ set })) },
-    } as unknown as FastifyInstance
+    } as unknown as BackendRuntime
 
     await expect(
       updatePersonalProfile(app, profile.id, {
@@ -91,7 +91,7 @@ describe('personal profile repository', () => {
         select: vi.fn(() => selectResult([{ passwordHash }])),
         update: vi.fn(),
       },
-    } as unknown as FastifyInstance
+    } as unknown as BackendRuntime
 
     await expect(
       changePersonalPassword(app, 4, {
@@ -111,7 +111,7 @@ describe('personal profile repository', () => {
         select: vi.fn(() => selectResult([{ passwordHash }])),
         update: vi.fn(() => ({ set: vi.fn(() => ({ where: vi.fn(() => ({ returning })) })) })),
       },
-    } as unknown as FastifyInstance
+    } as unknown as BackendRuntime
 
     await expect(
       changePersonalPassword(app, 4, {

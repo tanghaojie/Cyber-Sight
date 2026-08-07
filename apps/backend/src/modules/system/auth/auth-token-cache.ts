@@ -187,9 +187,3 @@ export class JwtTokenCache {
     }
   }
 }
-
-declare module 'fastify' {
-  interface FastifyInstance {
-    authTokens: JwtTokenCache
-  }
-}

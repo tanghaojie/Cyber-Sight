@@ -85,16 +85,16 @@
 
 - 所有业务能力必须按模块组织在独立的 `<module>/` 文件夹中；前后端内置系统能力放入 `src/modules/system/<module>/`，后续产品业务能力放入 `src/modules/biz/<module>/`，禁止在 `src/modules/` 下新增与 `system`、`biz` 平级的模块，也禁止把两个无直接内聚关系的业务能力混放在同一目录或只以散落在 `views/`、`routes/`、`services/`、`stores/`、`db/` 等技术目录中的文件冒充模块。
 - 同一业务能力在前端、后端和 API 契约中应使用一致、稳定的模块名；前后端分别放入对应类别的 `src/modules/system/<module>/` 或 `src/modules/biz/<module>/`，API 契约继续放入 `packages/api-contract/src/modules/<module>/`。模块不存在于某一层时无需创建空目录。
-- 模块对外能力必须通过设计文档登记的表意文件暴露，优先使用 `<module>.routes.ts`、`<module>.store.ts`、`<module>.api.ts` 等能说明职责的文件名，避免使用 `index.ts` 和聚合式 barrel；其他模块只能依赖已登记的公共文件，禁止跨模块导入未登记的内部文件、数据库实现、页面组件或私有状态。
+- 模块对外能力必须通过设计文档登记的表意文件暴露，后端优先使用 `<module>.module.ts`、`<module>.controller.ts`、`<module>.service.ts`，前端优先使用 `<module>.routes.ts`、`<module>.store.ts`、`<module>.api.ts`，避免使用 `index.ts` 和聚合式 barrel；其他模块只能依赖已登记的公共文件，禁止跨模块导入未登记的内部文件、数据库实现、页面组件或私有状态。
 - 模块依赖必须单向、显式且无循环。业务模块可依赖领域无关的 `shared`/平台能力；`shared` 不得反向依赖业务模块，也不得成为放置无法归类业务代码的兜底目录。
 - 跨模块协作必须通过公共类型、应用服务、事件或端口接口完成；禁止直接读写其他模块的内部状态、仓储、数据表或私有 Schema。确需共享的业务规则必须明确归属一个模块，或经设计评审后提取为有清晰职责的新模块。
 - 应用入口、路由注册和依赖注入层只负责组装模块，不承载业务规则；删除一个模块时，除组装点、明确依赖方和迁移记录外，不应要求修改无关模块。
 - 新模块以及被实质修改的存量模块必须遵守 `docs/design/module-boundaries.md`，并在 `docs/design/modules/` 记录职责、边界、公共接口、依赖、数据流、失败模式和适用的测试或验证策略。若现有结构不合规，功能开发前应把本次触及的部分迁入模块目录，不得继续扩大遗留耦合。
-- `packages/api-contract` 中的 Zod 4 运行时 Schema 是当前前后端 HTTP 数据契约来源；类型通过 `z.infer` 推导，Fastify 路由只使用 `toFastifySchema()` 派生的 Draft 7 JSON Schema。
+- `packages/api-contract` 中的 Zod 4 运行时 Schema 是当前前后端 HTTP 数据契约来源；类型通过 `z.infer` 推导，Nest Controller 使用 `ZodValidationPipe` 校验输入、`ContractRoute` 绑定响应与 OpenAPI。
 - API 数据结构变化必须先更新共享 Schema；请求、查询和路径参数必须由后端在运行时校验，禁止只写会在编译后擦除的 TypeScript 类型。
-- Swagger/OpenAPI 由 Fastify 路由 Schema 生成，用于本地调试和按需互操作；没有现实跨语言或外部 API 需求时，不维护第二份手写 OpenAPI。
-- TypeScript/Fastify 是默认后端实现。只有明确的生态、运行时、性能或组织约束才引入 Java 实现。
-- 业务规则不得只存在于 Vue 组件或 Fastify 路由中，应放在可测试、与传输层解耦的模块内。
+- Swagger/OpenAPI 由 Nest Controller 的契约元数据生成，用于本地调试和按需互操作；没有现实跨语言或外部 API 需求时，不维护第二份手写 OpenAPI。
+- TypeScript/NestJS 与 Fastify adapter 是默认后端实现。只有明确的生态、运行时、性能或组织约束才引入 Java 实现。
+- 业务规则不得只存在于 Vue 组件或 Nest Controller 中，应放在可测试、与传输层解耦的模块内。
 - 数据库专属实现必须隔离在基础设施层；不得宣称只换 import 就能切换数据库。
 - 新模块必须同时说明职责、边界、公共接口、依赖、数据流、失败模式和适用的测试或验证策略。
 - 有名称的函数优先使用 `function name() {}` 或 `async function name() {}` 声明；只有短小回调、闭包或必须保持词法 `this` 时使用箭头函数。

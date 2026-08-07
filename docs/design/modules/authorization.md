@@ -15,7 +15,7 @@ updated: 2026-07-30
 
 ## 范围与非目标
 
-当前范围包括权限目录、角色功能授权、用户/角色/部门数据策略、有效权限解析、数据查询计划、Fastify 路由门禁、管理 API 和前端策略编辑器。
+当前范围包括权限目录、角色功能授权、用户/角色/部门数据策略、有效权限解析、数据查询计划、Nest 全局路由门禁、管理 API 和前端策略编辑器。
 
 第一版不实现 deny、优先级、角色继承、字段级脱敏、租户、通用资源 ACL、PostgreSQL RLS 或 Cerbos 运行时。多角色和多策略按 allow 并集计算；无匹配规则默认拒绝。
 
@@ -56,7 +56,7 @@ HTTP API：
 
 菜单可引用一个权限键。当前用户拥有该权限时菜单节点可见，目录祖先仅作为结构节点自动补齐。没有权限键的菜单对所有已认证用户可见。管理接口使用与对应页面相同的模块级权限键；后续可增加 `users.read`、`users.delete` 等细分键而无需替换数据模型。
 
-Fastify 路由必须声明：
+Nest Controller 处理器必须声明：
 
 ```text
 public
@@ -72,7 +72,7 @@ permission(anyOf: [...])
 
 ```mermaid
 flowchart TD
-    A[客户端请求业务接口] --> B[Fastify 匹配目标路由]
+    A[客户端请求业务接口] --> B[Nest 匹配目标 Controller]
     B --> C[preHandler: authorizeRequest]
     C --> D[读取 routeOptions.config.authorization]
     D --> E{授权模式}

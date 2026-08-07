@@ -1,5 +1,5 @@
 import { and, eq, or } from 'drizzle-orm'
-import type { FastifyInstance } from 'fastify'
+import type { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 import type { DepartmentRequest } from '@scaffold/api-contract'
 import type { Database } from '@/db/index.js'
 import { departmentClosure, departments } from '@/db/schema.js'
@@ -65,7 +65,7 @@ async function rebuildDepartmentClosure(tx: Transaction, actorId: number): Promi
   }
 }
 
-export async function listDepartments(app: FastifyInstance) {
+export async function listDepartments(app: BackendRuntime) {
   const rows = await app.db
     .select()
     .from(departments)
@@ -74,7 +74,7 @@ export async function listDepartments(app: FastifyInstance) {
   return rows.map(departmentSummary)
 }
 
-export async function listDepartmentOptions(app: FastifyInstance) {
+export async function listDepartmentOptions(app: BackendRuntime) {
   // 选项接口只返回启用节点；禁用部门可保留在历史树中，但不能成为新的归属或策略目标。
   return app.db
     .select({
@@ -88,7 +88,7 @@ export async function listDepartmentOptions(app: FastifyInstance) {
 }
 
 export async function validateDepartmentParent(
-  app: FastifyInstance,
+  app: BackendRuntime,
   parentId: number,
   currentId?: number,
 ): Promise<boolean> {
@@ -133,7 +133,7 @@ export async function validateDepartmentParent(
 }
 
 export async function createDepartment(
-  app: FastifyInstance,
+  app: BackendRuntime,
   input: DepartmentRequest,
   actorId: number,
 ): Promise<number> {
@@ -149,7 +149,7 @@ export async function createDepartment(
 }
 
 export async function updateDepartment(
-  app: FastifyInstance,
+  app: BackendRuntime,
   id: number,
   input: DepartmentRequest,
   actorId: number,
@@ -169,7 +169,7 @@ export async function updateDepartment(
   })
 }
 
-export async function canDeleteDepartment(app: FastifyInstance, id: number): Promise<boolean> {
+export async function canDeleteDepartment(app: BackendRuntime, id: number): Promise<boolean> {
   // 删除前同时保护树结构、用户归属和授权策略引用。
   const [child] = await app.db
     .select({ id: departments.id })
@@ -187,7 +187,7 @@ export async function canDeleteDepartment(app: FastifyInstance, id: number): Pro
 }
 
 export async function softDeleteDepartment(
-  app: FastifyInstance,
+  app: BackendRuntime,
   id: number,
   actorId: number,
 ): Promise<boolean> {

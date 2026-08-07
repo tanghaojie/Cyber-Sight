@@ -24,10 +24,10 @@ packages/api-contract
         |                  |
         v                  v
 apps/frontend          apps/backend
-Vue 3 + fetch Client   Fastify 校验 + Swagger
+Vue 3 + fetch Client   Nest Pipe + Fastify adapter + Swagger
 ```
 
-最重要的原则是“可执行契约优先”：接口数据变化先改共享 Zod Schema，后端使用由它生成的 JSON Schema 校验真实请求，前后端类型从它推导。不要分别手写相似 interface，再靠人脑保持同步。
+最重要的原则是“可执行契约优先”：接口数据变化先改共享 Zod Schema，后端通过 Nest Pipe 校验真实请求并由同一 Schema 生成 OpenAPI，前后端类型从它推导。不要分别手写相似 interface，再靠人脑保持同步。
 
 ## 3. 开发环境与首次启动
 
@@ -82,25 +82,26 @@ pnpm dev
 
 ### 4.3 `apps/backend`
 
-| 路径                           | 作用                                                   |
-| ------------------------------ | ------------------------------------------------------ |
-| `src/server.ts`                | 读取环境配置并监听端口，只负责进程启动                 |
-| `src/app.ts`                   | 组装 Fastify 插件和业务模块，测试直接调用 `buildApp()` |
-| `src/config/env.ts`            | 加载和校验环境变量                                     |
-| `src/plugins/`                 | Swagger、数据库、统一响应等横切能力                    |
-| `src/modules/system/<module>/` | 脚手架内置系统能力的路由入口                           |
-| `src/modules/biz/<module>/`    | 产品业务能力的路由入口                                 |
-| `src/shared/http/`             | 响应包装、分页默认值等公共 HTTP 规则                   |
-| `src/shared/errors/`           | 可执行错误码常量                                       |
-| `src/db/schema.ts`             | Drizzle 数据模型的稳定聚合入口                         |
-| `src/db/schema/`               | 按数据所有权拆分的表、枚举与共享字段定义               |
-| `src/db/index.ts`              | PostgreSQL 客户端和 Drizzle 实例                       |
-| `drizzle/`                     | 已生成并需要提交的 SQL 迁移和快照                      |
-| `test/`                        | Fastify 路由、契约和公共辅助函数测试                   |
+| 路径                           | 作用                                                    |
+| ------------------------------ | ------------------------------------------------------- |
+| `src/server.ts`                | 读取环境配置并监听端口，只负责进程启动                  |
+| `src/app.ts`                   | 组装 Nest 应用与 Fastify adapter，测试调用 `buildApp()` |
+| `src/app.module.ts`            | 注册 Nest 模块及全局 Guard、Filter、Interceptor         |
+| `src/config/env.ts`            | 加载和校验环境变量                                      |
+| `src/shared/runtime/`          | 数据库、令牌缓存与授权 Provider 运行时依赖              |
+| `src/modules/system/<module>/` | 脚手架内置系统能力的 Nest Module 与 Controller          |
+| `src/modules/biz/<module>/`    | 产品业务能力的 Nest Module 与 Controller                |
+| `src/shared/http/`             | Zod Pipe、契约装饰器、Filter、Interceptor 与响应规则    |
+| `src/shared/errors/`           | 可执行错误码常量                                        |
+| `src/db/schema.ts`             | Drizzle 数据模型的稳定聚合入口                          |
+| `src/db/schema/`               | 按数据所有权拆分的表、枚举与共享字段定义                |
+| `src/db/index.ts`              | PostgreSQL 客户端和 Drizzle 实例                        |
+| `drizzle/`                     | 已生成并需要提交的 SQL 迁移和快照                       |
+| `test/`                        | Nest/Fastify adapter 路由、契约和公共辅助函数测试       |
 
-`app.ts` 与 `server.ts` 必须保持分离。否则测试导入应用时会直接占用端口，无法使用 Fastify `inject` 进行快速测试。
+`app.ts` 与 `server.ts` 必须保持分离。否则测试导入应用时会直接占用端口，无法使用底层 Fastify `inject` 对完整 Nest 应用进行快速测试。
 
-业务模块必须在所属类别下拥有独立的 `src/modules/system/<module>/` 或 `src/modules/biz/<module>/` 目录，并以 `<module>.routes.ts`、`<module>.service.ts`、`<module>.api.ts` 等表意文件公开稳定能力，避免创建 `index.ts` barrel。路由、应用服务、领域规则、仓储和业务数据模型放在该模块目录内；`app.ts` 只从设计中登记的公共文件注册模块。不得导入其他模块未登记的内部文件，也不得直接访问其他模块的仓储或数据表。
+业务模块必须在所属类别下拥有独立的 `src/modules/system/<module>/` 或 `src/modules/biz/<module>/` 目录，并以 `<module>.module.ts`、`<module>.controller.ts`、`<module>.service.ts` 等表意文件公开稳定能力，避免创建 `index.ts` barrel。Controller、应用服务、领域规则、仓储和业务数据模型放在该模块目录内；`app.module.ts` 只从设计中登记的公共文件注册模块。不得导入其他模块未登记的内部文件，也不得直接访问其他模块的仓储或数据表。
 
 ### 4.4 `apps/frontend`
 
@@ -146,18 +147,19 @@ export const UserRequestSchema = z.strictObject({
 export type UserRequest = z.infer<typeof UserRequestSchema>
 ```
 
-Fastify 路由挂载由这个 Schema 派生的 JSON Schema：
+Nest Controller 直接使用这个 Schema 进行输入和响应约束：
 
 ```typescript
-import { toFastifySchema } from '@scaffold/api-contract'
-
-app.post<{ Body: UserRequest }>(
-  '/users',
-  { schema: { body: toFastifySchema(UserRequestSchema) } },
-  async function createUser(request) {
-    // request.body 已通过真实运行时校验
-  },
-)
+@Post('/users')
+@ContractRoute({
+  operationId: 'createUser',
+  tags: ['Users'],
+  body: UserRequestSchema,
+  response: UserResponseSchema,
+})
+createUser(@Body(new ZodValidationPipe(UserRequestSchema)) body: UserRequest) {
+  // body 已通过真实运行时校验
+}
 ```
 
 关键规则：
@@ -165,9 +167,9 @@ app.post<{ Body: UserRequest }>(
 - 请求对象使用 `z.strictObject()`，生成 `additionalProperties: false`。
 - 必填、长度、范围、格式和枚举写在 Schema 中。
 - 类型始终从 Schema 推导，不再平行手写。
-- 路由通过 `toFastifySchema()` 生成 Draft 7 JSON Schema；不要手写转换结果。
+- Controller 通过 `ZodValidationPipe` 校验输入，通过 `ContractRoute` 绑定响应和 OpenAPI；不要手写 DTO 或第二份 Schema。
 - HTTP 契约不得使用无法转换为 JSON Schema 的 `transform`、`Date`、`Map`、`Set` 等能力。
-- `/docs/json` 由 Fastify 路由生成 OpenAPI，用于调试；不再编辑第二份 YAML。
+- `/docs/json` 由 Nest Swagger 从 Controller 契约元数据生成，用于调试；不再编辑第二份 YAML。
 
 修改后执行：
 
@@ -254,7 +256,7 @@ interface PaginationRequest {
 3. 确认前端、后端分别使用 `src/modules/system/users/`，契约使用 `src/modules/users/`，并只依赖已登记的表意公共文件。
 4. 在 `@scaffold/api-contract` 的用户模块中定义请求、路径和响应 Schema，并从模块入口导出推导类型。
 5. 在后端用户模块中编写命名处理函数，使用 `success()` 或 `failure()`。
-6. 在 Fastify 路由中直接挂载共享运行时 Schema。
+6. 在 Nest Controller 中使用 `ZodValidationPipe` 和 `ContractRoute` 挂载共享运行时 Schema。
 7. 在前端用户模块中以契约类型调用共享 Client。
 8. 前端业务模块处理 HTTP 200 中的非零 `response.status`；401、404、500 的全局动作由共享拦截器处理。
 9. 添加合法/非法输入路由测试和 Swagger 生成测试，列出前端成功、失败与交互验收场景。
@@ -378,7 +380,7 @@ pnpm --filter @scaffold/frontend build # 前端类型检查和生产构建，不
 
 ### TypeScript 已通过，为什么非法请求仍进入处理函数
 
-类型不会执行运行时校验。检查 Fastify 路由是否通过 `toFastifySchema()` 真正设置了 `schema.body`、`schema.querystring` 或 `schema.params`，并添加 `inject` 非法输入测试。
+类型不会执行运行时校验。检查 Nest Controller 参数是否使用对应的 `ZodValidationPipe`，响应是否通过 `ContractRoute` 声明，并添加 `inject` 非法输入测试。
 
 ### 数据库迁移没有生成
 
@@ -386,7 +388,7 @@ pnpm --filter @scaffold/frontend build # 前端类型检查和生产构建，不
 
 ### 测试不应连接数据库，为什么仍需要 DATABASE_URL
 
-应用组装会注册数据库插件，但 PostgreSQL 客户端是延迟连接的。Vitest 配置提供了不会实际访问的测试 URL；只有显式数据库测试才连接真实 PostgreSQL。
+应用组装会通过全局 Runtime Module 提供数据库，但 PostgreSQL 客户端是延迟连接的。Vitest 配置提供了不会实际访问的测试 URL；只有显式数据库测试才连接真实 PostgreSQL。
 
 ### 构建后源码目录出现 `.js`
 

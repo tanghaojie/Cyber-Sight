@@ -7,11 +7,11 @@ import {
 
 /** 接口日志查询只接受可索引的最小筛选条件，不暴露请求内容或敏感 HTTP 元数据。 */
 export const ApiLogQuerySchema = PaginationRequestSchema.extend({
-  actorUserId: z.number().int().min(1).optional(),
+  actorUserId: z.coerce.number().int().min(1).optional(),
   actorUsername: z.string().min(1).max(50).optional(),
   method: z.string().min(1).max(10).optional(),
   routePattern: z.string().min(1).max(160).optional(),
-  httpStatus: z.number().int().min(100).max(599).optional(),
+  httpStatus: z.coerce.number().int().min(100).max(599).optional(),
   retention: z.enum(['permanent', 'temporary']).optional(),
   occurredFrom: z.iso.datetime().optional(),
   occurredTo: z.iso.datetime().optional(),

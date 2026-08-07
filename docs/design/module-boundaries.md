@@ -50,7 +50,7 @@ packages/api-contract/src/modules/<module>/
 传输层 -> 应用层 -> 领域规则 -> 基础设施适配器
 ```
 
-小模块可以合并层次，但 Vue 页面和 Fastify 路由不能长期承载全部业务规则。
+小模块可以合并层次，但 Vue 页面和 Nest Controller 不能长期承载全部业务规则。
 
 ## 变更门禁
 

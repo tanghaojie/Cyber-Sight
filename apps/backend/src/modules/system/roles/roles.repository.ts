@@ -1,11 +1,11 @@
 import { and, count, eq, ilike } from 'drizzle-orm'
-import type { FastifyInstance } from 'fastify'
+import type { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 import type { RoleRequest } from '@scaffold/api-contract'
 import { roles } from '@/db/schema.js'
 import { auditView, pageOffset, type RepositoryListQuery } from '@/shared/database/pagination.js'
 
 /** 角色仓储统一过滤软删除记录，并在写操作中维护操作者审计字段。 */
-export async function listRoles(app: FastifyInstance, query: RepositoryListQuery) {
+export async function listRoles(app: BackendRuntime, query: RepositoryListQuery) {
   const keyword = query.keyword?.trim()
   const predicate = and(
     eq(roles.isDeleted, false),
@@ -32,7 +32,7 @@ export async function listRoles(app: FastifyInstance, query: RepositoryListQuery
 }
 
 export async function createRole(
-  app: FastifyInstance,
+  app: BackendRuntime,
   input: RoleRequest,
   actorId: number,
 ): Promise<number> {
@@ -44,7 +44,7 @@ export async function createRole(
 }
 
 export async function updateRole(
-  app: FastifyInstance,
+  app: BackendRuntime,
   id: number,
   input: RoleRequest,
   actorId: number,
@@ -61,7 +61,7 @@ export async function updateRole(
 }
 
 export async function softDeleteRole(
-  app: FastifyInstance,
+  app: BackendRuntime,
   id: number,
   actorId: number,
 ): Promise<boolean> {

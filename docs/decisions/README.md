@@ -12,5 +12,6 @@
 - [ADR-0029](ADR-0029-frontend-runtime-localization.md)：使用独立前端模块提供运行时中英文切换，以模块资源和严格默认菜单指纹保护用户录入数据。
 - [ADR-0030](ADR-0030-repository-native-documentation-archive-review.md)：使用仓库原生审计命令和活动计划作为跨 AI 的文档重建与归档审查协议。
 - [ADR-0031](ADR-0031-cyber-ai-forge-brand.md)：将正式产品名更新为 Cyber AI Forge，并同步项目级认证与浏览器存储标识。
+- [ADR-0032](ADR-0032-nestjs-fastify-adapter.md)：后端迁移到 NestJS 11，继续使用 Fastify 5 adapter，并保留共享 Zod 契约为唯一 HTTP 数据源。
 
 新增 ADR 时使用 [ADR 模板](../templates/adr-template.md)和下一个连续编号。ADR 被取代或被后续基线吸收后更新替代关系并移入 `docs/archive/decisions/`，编号不得复用。

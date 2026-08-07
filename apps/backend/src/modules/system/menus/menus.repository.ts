@@ -1,5 +1,5 @@
 import { and, count, eq, ilike } from 'drizzle-orm'
-import type { FastifyInstance } from 'fastify'
+import type { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 import type { CurrentUser, MenuRequest, NavigationMenu } from '@scaffold/api-contract'
 import { menus } from '@/db/schema.js'
 import { auditView, pageOffset, type RepositoryListQuery } from '@/shared/database/pagination.js'
@@ -106,7 +106,7 @@ export function buildNavigationTree(
   return roots
 }
 
-export async function listMenus(app: FastifyInstance, query: RepositoryListQuery) {
+export async function listMenus(app: BackendRuntime, query: RepositoryListQuery) {
   const keyword = query.keyword?.trim()
   const predicate = and(
     eq(menus.isDeleted, false),
@@ -126,7 +126,7 @@ export async function listMenus(app: FastifyInstance, query: RepositoryListQuery
   }
 }
 
-export async function listAllMenus(app: FastifyInstance) {
+export async function listAllMenus(app: BackendRuntime) {
   const rows = await app.db
     .select()
     .from(menus)
@@ -136,7 +136,7 @@ export async function listAllMenus(app: FastifyInstance) {
 }
 
 export async function listNavigationMenus(
-  app: FastifyInstance,
+  app: BackendRuntime,
   user: CurrentUser,
 ): Promise<NavigationMenu[]> {
   const rows = await app.db
@@ -158,7 +158,7 @@ export async function listNavigationMenus(
 }
 
 export async function validateMenuParent(
-  app: FastifyInstance,
+  app: BackendRuntime,
   parentId: number,
   currentId?: number,
 ): Promise<boolean> {
@@ -198,7 +198,7 @@ export async function validateMenuParent(
 }
 
 export async function createMenu(
-  app: FastifyInstance,
+  app: BackendRuntime,
   input: MenuRequest,
   actorId: number,
 ): Promise<number> {
@@ -210,7 +210,7 @@ export async function createMenu(
 }
 
 export async function updateMenu(
-  app: FastifyInstance,
+  app: BackendRuntime,
   id: number,
   input: MenuRequest,
   actorId: number,
@@ -223,7 +223,7 @@ export async function updateMenu(
   return result.length > 0
 }
 
-export async function hasActiveMenuChildren(app: FastifyInstance, id: number): Promise<boolean> {
+export async function hasActiveMenuChildren(app: BackendRuntime, id: number): Promise<boolean> {
   const [child] = await app.db
     .select({ id: menus.id })
     .from(menus)
@@ -233,7 +233,7 @@ export async function hasActiveMenuChildren(app: FastifyInstance, id: number): P
 }
 
 export async function softDeleteMenu(
-  app: FastifyInstance,
+  app: BackendRuntime,
   id: number,
   actorId: number,
 ): Promise<boolean> {

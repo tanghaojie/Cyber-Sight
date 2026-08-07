@@ -24,7 +24,7 @@ updated: 2026-08-07
 ## 公共接口
 
 - HTTP：`POST /auth/login`、`POST /auth/logout`、`GET /auth/me`。除登录外的认证请求使用 Bearer token。
-- 后端公共文件：`auth.routes.ts` 暴露 `authRoutes`；`auth.service.ts` 暴露 `requireCurrentUser`、`currentUserFromRequest`、`invalidateUserTokenCache`、`revokeUserTokens`、`invalidateAllTokenCache`；`auth.security.ts` 暴露 `hashPassword` 与 `verifyPassword`。`sys_auth_sessions` 当前与其他系统表统一登记在 `src/db/schema.ts`，只有 auth 模块读写。
+- 后端公共文件：`auth.module.ts` 与 `auth.controller.ts` 暴露认证 HTTP 能力；`auth.service.ts` 暴露 `requireCurrentUser`、`currentUserFromAuthorization`、`invalidateUserTokenCache`、`revokeUserTokens`、`invalidateAllTokenCache`；`auth.security.ts` 暴露 `hashPassword` 与 `verifyPassword`。`sys_auth_sessions` 当前与其他系统表统一登记在 `src/db/schema.ts`，只有 auth 模块读写。
 - 前端公共文件：`auth.api.ts` 封装认证 HTTP 调用；`auth.store.ts` 暴露 `useAuthStore`；`auth.routes.ts` 暴露登录页面懒加载器 `loginPage`。
 
 ## 登录页面组合

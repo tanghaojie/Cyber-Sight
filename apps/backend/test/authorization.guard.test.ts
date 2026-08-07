@@ -1,0 +1,75 @@
+import { describe, expect, it } from 'vitest'
+import { buildApp } from '@/app.js'
+import {
+  Authenticated,
+  Public,
+  RequirePermissions,
+  routeAuthorizationKey,
+} from '@/modules/system/authorization/authorization.guard.js'
+import { ErrorCode } from '@/shared/errors/error-codes.js'
+import { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
+
+describe('authorization route declarations', () => {
+  it('stores all three explicit authorization modes as Nest metadata', () => {
+    class Routes {
+      @Public()
+      publicRoute() {}
+
+      @Authenticated()
+      authenticatedRoute() {}
+
+      @RequirePermissions('system:user:list')
+      permissionRoute() {}
+    }
+
+    expect(Reflect.getMetadata(routeAuthorizationKey, Routes.prototype.publicRoute)).toEqual({
+      mode: 'public',
+    })
+    expect(Reflect.getMetadata(routeAuthorizationKey, Routes.prototype.authenticatedRoute)).toEqual(
+      {
+        mode: 'authenticated',
+      },
+    )
+    expect(Reflect.getMetadata(routeAuthorizationKey, Routes.prototype.permissionRoute)).toEqual({
+      mode: 'permission',
+      anyOf: ['system:user:list'],
+    })
+  })
+})
+
+describe('authorization provider boundary', () => {
+  it('rejects an authenticated request when the provider grants no matching permission', async () => {
+    const app = await buildApp(
+      { logger: false },
+      {
+        authorizationProvider: {
+          async effectivePermissionKeys() {
+            return []
+          },
+          async resolveDataAccess() {
+            return { unrestricted: false, ownerUserIds: [], departmentIds: [] }
+          },
+        },
+      },
+    )
+    const runtime = app.get(BackendRuntime)
+    const issued = await runtime.authTokens.issue({
+      id: 8,
+      username: 'operator',
+      displayName: 'Operator',
+      roles: [{ id: 2, name: 'Operator' }],
+    })
+    const response = await app
+      .getHttpAdapter()
+      .getInstance()
+      .inject({
+        method: 'GET',
+        url: '/admin/users',
+        headers: { authorization: `Bearer ${issued.token}` },
+      })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.json()).toEqual({ status: ErrorCode.FORBIDDEN, err: 'Permission required' })
+    await app.close()
+  })
+})

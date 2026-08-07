@@ -16,7 +16,7 @@ updated: 2026-08-05
 ## 职责与边界
 
 - 模块拥有 `sys_api_request_logs` 表、日志保留期、后台批量持久化和管理员查询 API。
-- Fastify Hook 只采集生命周期元数据，并把事件交给模块的有界队列；不把数据库写入、筛选规则或保留策略散落到业务路由。
+- Fastify adapter Hook 只采集生命周期元数据，并把事件交给模块的有界队列；不把数据库写入、筛选规则或保留策略散落到 Nest Controller。
 - `auth` 路由通过显式审计配置声明登录的永久保留和用户名提取规则，不直接写日志表。
 - `authorization` 只负责 `api_logs.read` 功能权限；它不读取日志表。
 - 模块不负责外部日志采集、监控平台、消息队列、全文检索、请求体/响应体留存或用户可编辑的日志。
@@ -24,7 +24,7 @@ updated: 2026-08-05
 ## 公共接口
 
 - 后端 `api-logs.plugin.ts`：注册请求采集 Hook、声明审计路由配置类型。
-- 后端 `api-logs.routes.ts`：注册 `GET /admin/api-logs`。
+- 后端 `api-logs.module.ts` 与 `api-logs.controller.ts`：注册 `GET /admin/api-logs`。
 - 后端 `api-logs.service.ts`：封装入队、批量落库、关闭时有限 flush 和保留期清理。
 - 契约 `api-logs.schema.ts`：导出查询与分页响应 Schema。
 - 前端 `api-logs.api.ts`：封装接口日志分页查询。
@@ -41,7 +41,7 @@ updated: 2026-08-05
 
 ```mermaid
 flowchart LR
-    A[Fastify request] --> B[api-logs hooks]
+    A[Fastify adapter request] --> B[api-logs hooks]
     B --> C{审计范围与保留策略}
     C -->|排除| D[不记录]
     C -->|记录| E[有界内存队列]

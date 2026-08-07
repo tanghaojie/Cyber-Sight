@@ -1,5 +1,5 @@
 import { and, count, eq, ilike, inArray, or, sql } from 'drizzle-orm'
-import type { FastifyInstance } from 'fastify'
+import type { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 import type {
   PasswordUpdate,
   PersonalProfile,
@@ -39,7 +39,7 @@ function userAccessPredicate(plan: DataAccessPlan) {
 }
 
 export async function listUsers(
-  app: FastifyInstance,
+  app: BackendRuntime,
   query: RepositoryListQuery,
   access: DataAccessPlan,
 ) {
@@ -145,7 +145,7 @@ async function replaceUserDepartments(
 }
 
 export async function canAssignUserDepartments(
-  app: FastifyInstance,
+  app: BackendRuntime,
   departmentIds: number[],
   access: DataAccessPlan,
   targetUserId?: number,
@@ -205,7 +205,7 @@ async function replaceUserRoles(
 }
 
 export async function createUser(
-  app: FastifyInstance,
+  app: BackendRuntime,
   input: UserCreate,
   actorId: number,
 ): Promise<number> {
@@ -237,7 +237,7 @@ export async function createUser(
 }
 
 export async function updateUser(
-  app: FastifyInstance,
+  app: BackendRuntime,
   id: number,
   input: UserUpdate,
   actorId: number,
@@ -268,7 +268,7 @@ export async function updateUser(
 }
 
 export async function personalProfileForUser(
-  app: FastifyInstance,
+  app: BackendRuntime,
   userId: number,
 ): Promise<PersonalProfile | null> {
   // 个人资料只读取当前用户自己的可编辑字段，角色、部门和状态必须通过管理接口维护。
@@ -287,7 +287,7 @@ export async function personalProfileForUser(
 }
 
 export async function updatePersonalProfile(
-  app: FastifyInstance,
+  app: BackendRuntime,
   userId: number,
   input: PersonalProfileUpdate,
 ): Promise<PersonalProfile | null> {
@@ -312,7 +312,7 @@ export async function updatePersonalProfile(
 }
 
 export async function changePersonalPassword(
-  app: FastifyInstance,
+  app: BackendRuntime,
   userId: number,
   input: PasswordUpdate,
 ): Promise<'updated' | 'invalid-current-password' | 'not-found'> {
@@ -341,7 +341,7 @@ export async function changePersonalPassword(
 }
 
 export async function softDeleteUser(
-  app: FastifyInstance,
+  app: BackendRuntime,
   id: number,
   actorId: number,
   access: DataAccessPlan,

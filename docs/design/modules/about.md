@@ -35,7 +35,7 @@ sys_menus(关于项目)
 
 - Hero 使用深色 CYBER 视觉、网格、轨道、节点和渐进式入场动画，突出“工程蓝图”概念。
 - 通过核心亮点、适用人群、典型场景和“从零搭建 vs 基于基座”的对比表，把 README 的产品价值转译成可扫读的展示面。
-- 通过五层架构流和前端、服务、数据三组技术栈卡片，明确 Vue 3/Vite、共享 Zod 运行时契约、Fastify/Drizzle 与 PostgreSQL 的协作关系。
+- 通过五层架构流和前端、服务、数据三组技术栈卡片，明确 Vue 3/Vite、共享 Zod 运行时契约、NestJS/Fastify adapter/Drizzle 与 PostgreSQL 的协作关系。
 - 页面不追求复刻 README 全文；详细安装、开发约定和边界仍以仓库 README 与 `docs/` 为准。
 - GitHub CTA 和 Logo 链接均使用新窗口安全属性；卡片和节点仅增强层次，不改变导航语义。
 - `prefers-reduced-motion: reduce` 时关闭连续动画，保留静态结构和可读性。

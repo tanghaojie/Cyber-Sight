@@ -1,10 +1,10 @@
 import { and, eq, inArray } from 'drizzle-orm'
-import type { FastifyInstance } from 'fastify'
+import type { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 import { departmentClosure, departments } from '@/db/schema.js'
 
 // 授权和用户模块通过这些只读函数消费部门状态与闭包关系，不直接拼接部门内部查询。
 export async function departmentExists(
-  app: FastifyInstance,
+  app: BackendRuntime,
   departmentId: number,
 ): Promise<boolean> {
   const [row] = await app.db
@@ -16,7 +16,7 @@ export async function departmentExists(
 }
 
 export async function enabledDepartmentIds(
-  app: FastifyInstance,
+  app: BackendRuntime,
   candidateIds: number[],
 ): Promise<number[]> {
   if (candidateIds.length === 0) {
@@ -36,7 +36,7 @@ export async function enabledDepartmentIds(
 }
 
 export async function ancestorDepartmentIds(
-  app: FastifyInstance,
+  app: BackendRuntime,
   departmentIds: number[],
 ): Promise<number[]> {
   if (departmentIds.length === 0) {
@@ -56,7 +56,7 @@ export async function ancestorDepartmentIds(
 }
 
 export async function descendantDepartmentIds(
-  app: FastifyInstance,
+  app: BackendRuntime,
   departmentIds: number[],
 ): Promise<number[]> {
   if (departmentIds.length === 0) {

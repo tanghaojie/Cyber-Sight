@@ -83,7 +83,7 @@ AI 可以继续完成数据库设计、Schema 定义、后端路由、前端页�
 
 - 前端使用 Schema 推导类型
 - 后端在 HTTP 边界执行运行时校验
-- Fastify Schema 从共享契约派生
+- Nest Pipe、响应校验与 OpenAPI Schema 从共享 Zod 契约派生
 - Swagger/OpenAPI 可以从后端路由 Schema 生成
 
 这让 AI 和人类都能围绕同一份接口事实进行开发，减少前后端失同步。
@@ -288,7 +288,7 @@ Vue 3 前端
     ↓
 共享 Zod 运行时 API 契约
     ↓
-Fastify 后端 + Swagger
+NestJS 后端 + Fastify adapter + Swagger
     ↓
 Drizzle ORM
     ↓
@@ -298,8 +298,8 @@ PostgreSQL
 | 层级     | 技术与职责                                                 |
 | -------- | ---------------------------------------------------------- |
 | 前端     | Vue 3、Vite、Vue Router、Pinia、Element Plus、Tailwind CSS |
-| 后端     | TypeScript、Fastify、认证与管理 API                        |
-| API 契约 | Zod 运行时 Schema、推导类型、Fastify Schema                |
+| 后端     | TypeScript、NestJS、Fastify adapter、认证与管理 API        |
+| API 契约 | Zod 运行时 Schema、推导类型、Nest Pipe 与 OpenAPI Schema   |
 | 数据访问 | Drizzle ORM                                                |
 | 数据库   | PostgreSQL                                                 |
 | 仓库管理 | pnpm monorepo                                              |
@@ -309,7 +309,7 @@ PostgreSQL
 ```text
 apps/
 ├── frontend/                 # Vue 前端和管理后台
-└── backend/                  # Fastify 服务、数据库和迁移
+└── backend/                  # NestJS/Fastify 服务、数据库和迁移
 packages/
 └── api-contract/             # 前后端共享的 API 契约
 docs/

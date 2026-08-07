@@ -1,13 +1,13 @@
 import { and, eq, gt } from 'drizzle-orm'
-import type { FastifyInstance, FastifyRequest } from 'fastify'
 import type { CurrentUser, LoginData } from '@scaffold/api-contract'
 import { authSessions, roles, userRoles, users } from '@/db/schema.js'
+import type { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
+import { unauthorized } from '@/shared/errors/http-errors.js'
 import type { LoadedTokenSession, VerifiedJwt } from './auth-token-cache.js'
 import { hashSessionToken, verifyPassword } from './auth.security.js'
 
 /** 只接受标准的单个 Bearer Token，不容忍额外空白或其他认证方案。 */
-function bearerToken(request: FastifyRequest): string | null {
-  const authorization = request.headers.authorization
+function bearerToken(authorization?: string): string | null {
   if (!authorization) {
     return null
   }
@@ -15,7 +15,7 @@ function bearerToken(request: FastifyRequest): string | null {
   return match?.[1] ?? null
 }
 
-async function rolesForUser(app: FastifyInstance, userId: number): Promise<CurrentUser['roles']> {
+async function rolesForUser(app: BackendRuntime, userId: number): Promise<CurrentUser['roles']> {
   // 会话身份只包含仍有效角色，禁用/软删除角色不会继续影响授权判定。
   const rows = await app.db
     .select({ id: roles.id, name: roles.name })
@@ -31,7 +31,7 @@ async function rolesForUser(app: FastifyInstance, userId: number): Promise<Curre
  * 缓存未命中时从数据库恢复身份。有效 JWT 只是必要条件，仍必须匹配未撤销、未过期的 tokenHash 会话。
  */
 async function loadPersistedSession(
-  app: FastifyInstance,
+  app: BackendRuntime,
   token: string,
   verified: VerifiedJwt,
 ): Promise<LoadedTokenSession | null> {
@@ -79,7 +79,7 @@ async function loadPersistedSession(
 }
 
 export async function authenticateCredentials(
-  app: FastifyInstance,
+  app: BackendRuntime,
   username: string,
   password: string,
 ): Promise<LoginData | null> {
@@ -131,12 +131,12 @@ export async function authenticateCredentials(
   }
 }
 
-export async function currentUserFromRequest(
-  app: FastifyInstance,
-  request: FastifyRequest,
+export async function currentUserFromAuthorization(
+  app: BackendRuntime,
+  authorization?: string,
 ): Promise<CurrentUser | null> {
   // 路由层只获得统一的当前用户结果，不接触 Bearer 解析、JWT 校验和持久会话查询细节。
-  const token = bearerToken(request)
+  const token = bearerToken(authorization)
   if (!token) {
     return null
   }
@@ -148,22 +148,22 @@ export async function currentUserFromRequest(
 }
 
 export async function requireCurrentUser(
-  app: FastifyInstance,
-  request: FastifyRequest,
+  app: BackendRuntime,
+  authorization?: string,
 ): Promise<CurrentUser> {
-  const user = await currentUserFromRequest(app, request)
+  const user = await currentUserFromAuthorization(app, authorization)
   if (!user) {
-    throw app.httpErrors.unauthorized('Authentication required')
+    throw unauthorized()
   }
   return user
 }
 
 export async function revokeCurrentToken(
-  app: FastifyInstance,
-  request: FastifyRequest,
+  app: BackendRuntime,
+  authorization: string | undefined,
   actorId: number,
 ): Promise<void> {
-  const token = bearerToken(request)
+  const token = bearerToken(authorization)
   if (token) {
     // 先软删除持久会话，再清理本进程缓存，确保重启和其他实例也不能恢复该令牌。
     await app.db
@@ -176,12 +176,12 @@ export async function revokeCurrentToken(
   }
 }
 
-export function invalidateUserTokenCache(app: FastifyInstance, userId: number): number {
+export function invalidateUserTokenCache(app: BackendRuntime, userId: number): number {
   return app.authTokens.invalidateUser(userId)
 }
 
 export async function revokeUserTokens(
-  app: FastifyInstance,
+  app: BackendRuntime,
   userId: number,
   actorId: number,
 ): Promise<void> {
@@ -193,6 +193,6 @@ export async function revokeUserTokens(
     .where(and(eq(authSessions.userId, userId), eq(authSessions.isDeleted, false)))
 }
 
-export function invalidateAllTokenCache(app: FastifyInstance): void {
+export function invalidateAllTokenCache(app: BackendRuntime): void {
   app.authTokens.clear()
 }

@@ -1,11 +1,11 @@
 import { and, count, eq, ilike, or } from 'drizzle-orm'
-import type { FastifyInstance } from 'fastify'
+import type { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 import type { DictionaryRequest } from '@scaffold/api-contract'
 import { dictionaries } from '@/db/schema.js'
 import { auditView, pageOffset, type RepositoryListQuery } from '@/shared/database/pagination.js'
 
 /** 字典仓储按 type、sortOrder、id 稳定排序，并统一过滤软删除记录。 */
-export async function listDictionaries(app: FastifyInstance, query: RepositoryListQuery) {
+export async function listDictionaries(app: BackendRuntime, query: RepositoryListQuery) {
   const keyword = query.keyword?.trim()
   const predicate = and(
     eq(dictionaries.isDeleted, false),
@@ -44,7 +44,7 @@ export async function listDictionaries(app: FastifyInstance, query: RepositoryLi
 }
 
 export async function createDictionary(
-  app: FastifyInstance,
+  app: BackendRuntime,
   input: DictionaryRequest,
   actorId: number,
 ): Promise<number> {
@@ -56,7 +56,7 @@ export async function createDictionary(
 }
 
 export async function updateDictionary(
-  app: FastifyInstance,
+  app: BackendRuntime,
   id: number,
   input: DictionaryRequest,
   actorId: number,
@@ -70,7 +70,7 @@ export async function updateDictionary(
 }
 
 export async function softDeleteDictionary(
-  app: FastifyInstance,
+  app: BackendRuntime,
   id: number,
   actorId: number,
 ): Promise<boolean> {

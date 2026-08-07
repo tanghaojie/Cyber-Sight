@@ -1,9 +1,9 @@
 import { and, eq, inArray } from 'drizzle-orm'
-import type { FastifyInstance } from 'fastify'
+import type { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 import { roles } from '@/db/schema.js'
 
 // 供用户分配和授权决策复用的最小角色查询，不公开角色管理仓储。
-export async function roleExists(app: FastifyInstance, roleId: number): Promise<boolean> {
+export async function roleExists(app: BackendRuntime, roleId: number): Promise<boolean> {
   const [row] = await app.db
     .select({ id: roles.id })
     .from(roles)
@@ -13,7 +13,7 @@ export async function roleExists(app: FastifyInstance, roleId: number): Promise<
 }
 
 export async function enabledRoleIds(
-  app: FastifyInstance,
+  app: BackendRuntime,
   candidateIds: number[],
 ): Promise<number[]> {
   if (candidateIds.length === 0) {

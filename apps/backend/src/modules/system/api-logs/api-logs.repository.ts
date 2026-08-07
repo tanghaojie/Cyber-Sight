@@ -1,5 +1,5 @@
 import { and, count, desc, eq, inArray, isNotNull, isNull, lte, gte, sql } from 'drizzle-orm'
-import type { FastifyInstance } from 'fastify'
+import type { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 import { apiRequestLogs } from '@/db/schema.js'
 import { pageOffset } from '@/shared/database/pagination.js'
 import type { ApiLogEvent } from './api-logs.service.js'
@@ -22,7 +22,7 @@ export interface NormalizedApiLogQuery {
 
 /** 仅由日志服务调用的批量追加写入，不使用用户事务或外键约束。 */
 export async function insertApiLogEvents(
-  app: FastifyInstance,
+  app: BackendRuntime,
   events: ApiLogEvent[],
 ): Promise<void> {
   if (events.length === 0) {
@@ -50,7 +50,7 @@ export async function insertApiLogEvents(
  * 过期清理使用事务级 advisory lock 串行化多实例执行，并限制每次删除的行数以缩短锁持有时间。
  */
 export async function deleteExpiredApiLogs(
-  app: FastifyInstance,
+  app: BackendRuntime,
   batchSize: number,
 ): Promise<number> {
   return app.db.transaction(async function deleteWithLock(tx) {
@@ -81,7 +81,7 @@ export async function deleteExpiredApiLogs(
 }
 
 /** 管理查询只读取最小日志元数据；保留期字段本身用于区分永久与临时记录。 */
-export async function listApiLogs(app: FastifyInstance, query: NormalizedApiLogQuery) {
+export async function listApiLogs(app: BackendRuntime, query: NormalizedApiLogQuery) {
   // rows 与 total 共用完全相同的谓词，避免分页总数与当前页筛选条件不一致。
   const predicate = and(
     eq(apiRequestLogs.isDeleted, false),

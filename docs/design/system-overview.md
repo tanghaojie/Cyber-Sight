@@ -19,22 +19,22 @@ CYBER（正式名称 `Cyber AI Forge`）是用于快速生成企业应用模块�
 Vue 3 frontend
     -> inferred TypeScript types
 Zod 4 runtime contract
-    -> Draft 7 JSON Schema
-Fastify 4 + Swagger + Drizzle
+    -> Nest validation and OpenAPI metadata
+NestJS 11 + Fastify 5 adapter + Drizzle
     -> PostgreSQL
 ```
 
 - `apps/frontend`：Vue Router、Pinia、Tailwind CSS、Element Plus 和响应式管理端。
-- `apps/backend`：Fastify 服务、认证、管理 API、Drizzle 仓储和数据库迁移。
-- `packages/api-contract`：HTTP Zod Schema、推导类型与 `toFastifySchema()`。
+- `apps/backend`：NestJS 服务、Fastify adapter、认证、管理 API、Drizzle 仓储和数据库迁移。
+- `packages/api-contract`：HTTP Zod Schema、推导类型与适配器无关的 JSON Schema 转换。
 
 现有业务包括健康检查、会话认证、接口日志、工作台、用户、角色、数据库动态菜单和字典。脚手架自带的 15 张 PostgreSQL 表统一使用 `sys_` 物理前缀、软删除及五项生命周期审计字段；`0000` 初始迁移只面向全新数据库，后续 Schema 通过追加迁移演进。
 
 ## 不可绕过的边界
 
-- HTTP 结构先写共享 Zod Schema；Fastify 在边界执行运行时校验。
+- HTTP 结构先写共享 Zod Schema；Nest Pipe 在输入边界执行运行时校验，Interceptor 校验输出契约。
 - 前后端内置系统能力按 `src/modules/system/<module>/` 组织，产品业务能力按 `src/modules/biz/<module>/` 组织；共享契约继续按 `src/modules/<module>/` 组织，跨模块只依赖已登记的表意公共文件。
-- Fastify 是当前唯一后端；没有现实跨语言需求时不维护手写 OpenAPI 或 Java 双实现。
+- NestJS + Fastify adapter 是当前唯一后端；没有现实跨语言需求时不维护手写 OpenAPI 或 Java 双实现。
 - PostgreSQL 专属 Schema、迁移和查询留在基础设施层，不能宣称只换 import 即可切库。
 - 非简单变更同步更新设计、计划、适用的测试或验收边界和 AI 协作记录。
 

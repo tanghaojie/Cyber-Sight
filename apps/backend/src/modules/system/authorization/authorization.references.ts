@@ -1,10 +1,10 @@
 import { and, eq } from 'drizzle-orm'
-import type { FastifyInstance } from 'fastify'
+import type { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 import { dataPolicyDepartments, permissions } from '@/db/schema.js'
 
 // 面向其他模块公开最小引用查询，避免菜单或部门模块穿透授权内部表结构。
 export async function activePermissionKeyExists(
-  app: FastifyInstance,
+  app: BackendRuntime,
   permissionKey: string,
 ): Promise<boolean> {
   const [row] = await app.db
@@ -22,7 +22,7 @@ export async function activePermissionKeyExists(
 }
 
 export async function hasActiveDepartmentPolicyReference(
-  app: FastifyInstance,
+  app: BackendRuntime,
   departmentId: number,
 ): Promise<boolean> {
   const [row] = await app.db

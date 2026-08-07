@@ -1,5 +1,5 @@
 import { and, eq, inArray, or } from 'drizzle-orm'
-import type { FastifyInstance } from 'fastify'
+import type { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 import type {
   AuthorizationSubjectType,
   DataAction,
@@ -61,7 +61,7 @@ export function mergeDataAccessPlans(plans: DataAccessPlan[]): DataAccessPlan {
   }
 }
 
-export async function listPermissions(app: FastifyInstance): Promise<PermissionSummary[]> {
+export async function listPermissions(app: BackendRuntime): Promise<PermissionSummary[]> {
   // 权限目录只公开当前可授予的键；已禁用或软删除键不能被新的主体策略引用。
   return app.db
     .select({
@@ -76,7 +76,7 @@ export async function listPermissions(app: FastifyInstance): Promise<PermissionS
 }
 
 export async function effectivePermissionKeys(
-  app: FastifyInstance,
+  app: BackendRuntime,
   userId: number,
 ): Promise<string[]> {
   // 用户权限只由当前有效角色和当前有效权限共同决定。
@@ -101,7 +101,7 @@ export async function effectivePermissionKeys(
 }
 
 export async function hasAnyPermission(
-  app: FastifyInstance,
+  app: BackendRuntime,
   userId: number,
   requiredKeys: readonly string[],
 ): Promise<boolean> {
@@ -113,7 +113,7 @@ export async function hasAnyPermission(
 }
 
 export async function getSubjectAccess(
-  app: FastifyInstance,
+  app: BackendRuntime,
   subjectType: AuthorizationSubjectType,
   subjectId: number,
 ): Promise<SubjectAccessRequest> {
@@ -186,7 +186,7 @@ export async function getSubjectAccess(
 }
 
 export async function authorizationSubjectExists(
-  app: FastifyInstance,
+  app: BackendRuntime,
   subjectType: AuthorizationSubjectType,
   subjectId: number,
 ): Promise<boolean> {
@@ -201,7 +201,7 @@ export async function authorizationSubjectExists(
 }
 
 async function validateSubjectAccess(
-  app: FastifyInstance,
+  app: BackendRuntime,
   subjectType: AuthorizationSubjectType,
   input: SubjectAccessRequest,
 ): Promise<boolean> {
@@ -261,7 +261,7 @@ async function validateSubjectAccess(
  * 以一个事务整体替换主体的功能权限和数据策略；任一写入失败都不能留下半套授权配置。
  */
 export async function replaceSubjectAccess(
-  app: FastifyInstance,
+  app: BackendRuntime,
   subjectType: AuthorizationSubjectType,
   subjectId: number,
   input: SubjectAccessRequest,
@@ -417,7 +417,7 @@ export async function replaceSubjectAccess(
 }
 
 export async function resolveDataAccess(
-  app: FastifyInstance,
+  app: BackendRuntime,
   userId: number,
   resourceKey: string,
   action: DataAction,

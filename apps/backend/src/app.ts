@@ -1,73 +1,68 @@
 import { randomBytes } from 'node:crypto'
-import Fastify, { type FastifyServerOptions } from 'fastify'
-import sensible from '@fastify/sensible'
-import { registerSwagger } from './plugins/swagger.js'
-import { registerResponseHandling } from './plugins/response.js'
-import dbPlugin from './plugins/db.js'
-import { healthRoutes } from './modules/system/health/index.js'
-import { authRoutes } from './modules/system/auth/auth.routes.js'
-import { JwtTokenCache } from './modules/system/auth/auth-token-cache.js'
-import { userRoutes } from './modules/system/users/index.js'
-import { roleRoutes } from './modules/system/roles/index.js'
-import { menuRoutes } from './modules/system/menus/menus.route.js'
-import { dictionaryRoutes } from './modules/system/dictionaries/index.js'
-import { authorizationRoutes } from './modules/system/authorization/authorization.route.js'
-import { registerAuthorization } from './modules/system/authorization/authorization.plugin.js'
-import type { AuthorizationProvider } from './modules/system/authorization/authorization.provider.js'
-import { departmentRoutes } from './modules/system/departments/departments.route.js'
-import apiLogsPlugin from './modules/system/api-logs/api-logs.plugin.js'
-import { apiLogRoutes } from './modules/system/api-logs/api-logs.routes.js'
+import 'reflect-metadata'
+import { NestFactory } from '@nestjs/core'
+import type { Type } from '@nestjs/common'
+import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import type { FastifyServerOptions } from 'fastify'
+import { AppModule } from './app.module.js'
+import {
+  createApiLogWriter,
+  registerApiLogHooks,
+} from './modules/system/api-logs/api-logs.hooks.js'
+import type { ApiLogWriter } from './modules/system/api-logs/api-logs.service.js'
+import { BackendRuntime } from './shared/runtime/backend-runtime.js'
+import type { RuntimeDependencies } from './shared/runtime/runtime.module.js'
 
-/**
- * 组合根允许测试替换外部边界；业务模块仍只通过 Fastify 实例上的公开能力协作。
- */
-interface AppDependencies {
+export interface AppDependencies extends Partial<Omit<RuntimeDependencies, 'jwtSecret'>> {
   jwtSecret?: string
-  authorizationProvider?: AuthorizationProvider
+  apiLogWriter?: ApiLogWriter
+  controllers?: Type<unknown>[]
 }
 
-/**
- * 创建完整 Fastify 应用的组合根。测试可注入密钥和授权提供器，生产入口则使用环境配置。
- */
+function registerSwagger(app: NestFastifyApplication): void {
+  const config = new DocumentBuilder()
+    .setTitle('Cyber AI Forge API')
+    .setVersion('0.1.0')
+    .setDescription('CYBER management scaffold — runtime-safe, modular, and AI-native')
+    .addBearerAuth(undefined, 'bearerAuth')
+    .addSecurityRequirements('bearerAuth')
+    .build()
+  const document = SwaggerModule.createDocument(app, config)
+  SwaggerModule.setup('/docs', app, document, {
+    jsonDocumentUrl: '/docs/json',
+  })
+}
+
+/** 创建可通过 Fastify inject 验证的 Nest 应用，不占用真实端口。 */
 export async function buildApp(
   options: FastifyServerOptions = {},
   dependencies: AppDependencies = {},
-) {
-  const app = Fastify({
-    logger: true,
-    ajv: {
-      customOptions: {
-        // 非法字段必须由 strictObject Schema 明确拒绝，不能在校验时静默删除。
-        removeAdditional: false,
-      },
-    },
-    ...options,
-  })
-
-  // 随机密钥只服务于未传依赖的隔离测试；生产 server.ts 始终传入环境密钥。
+): Promise<NestFastifyApplication> {
   const jwtSecret = dependencies.jwtSecret ?? randomBytes(32).toString('base64url')
-  app.decorate('authTokens', new JwtTokenCache(jwtSecret))
-
-  // 先注册框架通用能力和全局错误处理，再装配数据库与业务路由，保证异常始终使用统一响应外壳。
-  app.register(sensible)
-  await registerResponseHandling(app)
-  await registerSwagger(app)
-  await app.register(dbPlugin)
-  // 审计 Hook 位于路由封装域之外，才能观察到业务路由、404 和认证失败的最终响应。
-  await app.register(apiLogsPlugin)
-  app.register(async function applicationRoutes(router) {
-    // 授权插件先于路由注册，保证每条后续路由都经过元数据门禁和请求前检查。
-    await registerAuthorization(router, dependencies.authorizationProvider)
-    router.register(healthRoutes)
-    router.register(authRoutes)
-    router.register(apiLogRoutes)
-    router.register(authorizationRoutes)
-    router.register(userRoutes)
-    router.register(roleRoutes)
-    router.register(departmentRoutes)
-    router.register(menuRoutes)
-    router.register(dictionaryRoutes)
-  })
-
+  const adapter = new FastifyAdapter({ logger: true, ...options })
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule.register({
+      jwtSecret,
+      authorizationProvider: dependencies.authorizationProvider,
+      database: dependencies.database,
+      closeDatabase: dependencies.closeDatabase,
+      controllers: dependencies.controllers,
+    }),
+    adapter,
+    {
+      logger: options.logger === false ? false : ['log', 'error', 'warn'],
+      abortOnError: false,
+    },
+  )
+  app.enableShutdownHooks()
+  const fastify = app.getHttpAdapter().getInstance()
+  registerApiLogHooks(
+    fastify,
+    dependencies.apiLogWriter ?? createApiLogWriter(fastify, app.get(BackendRuntime)),
+  )
+  await app.init()
+  registerSwagger(app)
+  await fastify.ready()
   return app
 }

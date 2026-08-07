@@ -1,9 +1,9 @@
 import { and, eq } from 'drizzle-orm'
-import type { FastifyInstance } from 'fastify'
+import type { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 import { userDepartments, userRoles, users } from '@/db/schema.js'
 
 // 向授权等模块公开只读访问查询，调用方无需依赖用户模块的仓储实现细节。
-export async function userExists(app: FastifyInstance, userId: number): Promise<boolean> {
+export async function userExists(app: BackendRuntime, userId: number): Promise<boolean> {
   const [row] = await app.db
     .select({ id: users.id })
     .from(users)
@@ -12,7 +12,7 @@ export async function userExists(app: FastifyInstance, userId: number): Promise<
   return Boolean(row)
 }
 
-export async function assignedRoleIds(app: FastifyInstance, userId: number): Promise<number[]> {
+export async function assignedRoleIds(app: BackendRuntime, userId: number): Promise<number[]> {
   const rows = await app.db
     .select({ id: userRoles.roleId })
     .from(userRoles)
@@ -21,7 +21,7 @@ export async function assignedRoleIds(app: FastifyInstance, userId: number): Pro
 }
 
 export async function assignedDepartmentIds(
-  app: FastifyInstance,
+  app: BackendRuntime,
   userId: number,
 ): Promise<number[]> {
   const rows = await app.db
@@ -32,7 +32,7 @@ export async function assignedDepartmentIds(
 }
 
 export async function hasActiveDepartmentMembership(
-  app: FastifyInstance,
+  app: BackendRuntime,
   departmentId: number,
 ): Promise<boolean> {
   const [row] = await app.db

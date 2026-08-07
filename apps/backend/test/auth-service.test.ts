@@ -1,11 +1,11 @@
-import type { FastifyInstance, FastifyRequest } from 'fastify'
 import { describe, expect, it, vi } from 'vitest'
 import {
   authenticateCredentials,
-  currentUserFromRequest,
+  currentUserFromAuthorization,
 } from '@/modules/system/auth/auth.service.js'
 import { JwtTokenCache } from '@/modules/system/auth/auth-token-cache.js'
 import { hashPassword, hashSessionToken } from '@/modules/system/auth/auth.security.js'
+import type { BackendRuntime } from '@/shared/runtime/backend-runtime.js'
 
 const SECRET = 'test-only-jwt-secret-at-least-32-characters'
 
@@ -45,7 +45,7 @@ describe('authentication service persistence cache', () => {
           set: vi.fn(() => ({ where: vi.fn().mockResolvedValue([]) })),
         })),
       },
-    } as unknown as FastifyInstance
+    } as unknown as BackendRuntime
 
     const result = await authenticateCredentials(app, userRow.username, password)
 
@@ -107,15 +107,13 @@ describe('authentication service persistence cache', () => {
     const app = {
       authTokens: cache,
       db: { select },
-    } as unknown as FastifyInstance
-    const request = {
-      headers: { authorization: `Bearer ${issued.token}` },
-    } as FastifyRequest
+    } as unknown as BackendRuntime
+    const authorization = `Bearer ${issued.token}`
 
-    await expect(currentUserFromRequest(app, request)).resolves.toEqual(currentUser)
+    await expect(currentUserFromAuthorization(app, authorization)).resolves.toEqual(currentUser)
     expect(select).toHaveBeenCalledTimes(2)
 
-    await expect(currentUserFromRequest(app, request)).resolves.toEqual(currentUser)
+    await expect(currentUserFromAuthorization(app, authorization)).resolves.toEqual(currentUser)
     expect(select).toHaveBeenCalledTimes(2)
   })
 })
