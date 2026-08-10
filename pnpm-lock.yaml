@@ -29,6 +29,9 @@ importers:
 
   apps/backend:
     dependencies:
+      '@cyber-ai-forge/api-contract':
+        specifier: workspace:*
+        version: link:../../packages/api-contract
       '@fastify/static':
         specifier: 9.3.0
         version: 9.3.0
@@ -47,9 +50,6 @@ importers:
       '@nestjs/swagger':
         specifier: ^11.2.0
         version: 11.4.6(@fastify/static@9.3.0)(@nestjs/common@11.1.28(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.28(@nestjs/common@11.1.28(reflect-metadata@0.2.2)(rxjs@7.8.2))(reflect-metadata@0.2.2)(rxjs@7.8.2))(reflect-metadata@0.2.2)
-      '@cyber-ai-forge/api-contract':
-        specifier: workspace:*
-        version: link:../../packages/api-contract
       dotenv:
         specifier: ^16.4.5
         version: 16.6.1
@@ -96,12 +96,12 @@ importers:
 
   apps/frontend:
     dependencies:
-      '@element-plus/icons-vue':
-        specifier: ^2.3.2
-        version: 2.3.2(vue@3.5.35(typescript@5.9.3))
       '@cyber-ai-forge/api-contract':
         specifier: workspace:*
         version: link:../../packages/api-contract
+      '@element-plus/icons-vue':
+        specifier: ^2.3.2
+        version: 2.3.2(vue@3.5.35(typescript@5.9.3))
       element-plus:
         specifier: ^2.14.3
         version: 2.14.3(vue@3.5.35(typescript@5.9.3))
@@ -160,6 +160,9 @@ importers:
 
   apps/website:
     dependencies:
+      '@vue/server-renderer':
+        specifier: ^3.5.35
+        version: 3.5.35(vue@3.5.35(typescript@5.9.3))
       vue:
         specifier: ^3.4.0
         version: 3.5.35(typescript@5.9.3)

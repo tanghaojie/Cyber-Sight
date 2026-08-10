@@ -246,7 +246,10 @@ svg {
   transform: translateX(44px);
 }
 
-.language-switcher button {
+.language-switcher a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
   z-index: 1;
   min-width: 44px;
@@ -261,17 +264,18 @@ svg {
   font-weight: 700;
   letter-spacing: 0.08em;
   line-height: 1;
+  text-decoration: none;
   transition:
     color 180ms ease,
     text-shadow 180ms ease;
 }
 
-.language-switcher button.is-active {
+.language-switcher a.is-active {
   color: #06100b;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-.language-switcher button:not(.is-active):hover {
+.language-switcher a:not(.is-active):hover {
   color: var(--text);
 }
 

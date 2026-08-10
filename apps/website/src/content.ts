@@ -105,9 +105,9 @@ export const GITHUB_URL = 'https://github.com/tanghaojie/Cyber-AI-Forge'
 export const content: Record<Locale, SiteContent> = {
   en: {
     meta: {
-      title: 'Cyber AI Forge — Build clearly. Evolve safely.',
+      title: 'Open-Source AI Development & Admin Scaffold | Cyber AI Forge',
       description:
-        'An AI-native enterprise application scaffold for humans and AI to build maintainable full-stack systems together.',
+        'Open-source AI development and enterprise admin scaffold for Vue, NestJS, and PostgreSQL applications with auth, RBAC, users, roles, menus, and API logs.',
     },
     skip: 'Skip to main content',
     header: {
@@ -122,10 +122,10 @@ export const content: Record<Locale, SiteContent> = {
       github: 'GitHub',
     },
     hero: {
-      eyebrow: 'OPEN SOURCE / AI-NATIVE / ENTERPRISE READY',
-      titleTop: 'BUILD CLEARLY.',
-      titleBottom: 'EVOLVE SAFELY.',
-      lead: 'A shared engineering blueprint for humans and AI to build real enterprise applications—without losing structure after the first demo.',
+      eyebrow: 'OPEN SOURCE / AI DEVELOPMENT / ADMIN READY',
+      titleTop: 'OPEN-SOURCE AI',
+      titleBottom: 'ADMIN SCAFFOLD.',
+      lead: 'A full-stack enterprise admin scaffold for AI-assisted development with authentication, RBAC, users, roles, menus, and API logs—without losing structure after the first demo.',
       source: 'View source',
       explore: 'Explore the system',
       signal: 'SYSTEM ONLINE / READY TO EXTEND',
@@ -223,8 +223,9 @@ export const content: Record<Locale, SiteContent> = {
         },
         {
           code: 'FOUNDATION',
-          title: 'Enterprise essentials',
-          description: 'Authentication, users, roles, menus, dictionaries, and logs.',
+          title: 'Enterprise admin foundation',
+          description:
+            'Authentication, users, roles, menus, dictionaries, and API logs for an admin dashboard.',
           detail: 'Start with the repetitive foundation already working.',
         },
         {
@@ -325,8 +326,9 @@ export const content: Record<Locale, SiteContent> = {
   },
   zh: {
     meta: {
-      title: 'Cyber AI Forge — 让复杂系统清晰生长',
-      description: '面向人类与 AI 共同构建可维护全栈系统的 AI 原生企业应用脚手架。',
+      title: 'AI开发脚手架与后台管理系统脚手架 | Cyber AI Forge',
+      description:
+        '开源 AI 开发脚手架与全栈后台管理系统脚手架，内置登录、用户、角色、权限、菜单、字典和接口日志，支持 Vue 3、NestJS 与 PostgreSQL。',
     },
     skip: '跳到主要内容',
     header: {
@@ -341,10 +343,10 @@ export const content: Record<Locale, SiteContent> = {
       github: 'GitHub',
     },
     hero: {
-      eyebrow: '开源 / AI 原生 / 企业级基础',
-      titleTop: '让复杂系统',
-      titleBottom: '清晰生长。',
-      lead: '为人类与 AI 提供同一张工程蓝图，从数据库、接口到页面持续构建真实企业应用，而不是停在第一版 Demo。',
+      eyebrow: '开源 / AI 开发 / 后台管理基础',
+      titleTop: '开源 AI 开发',
+      titleBottom: '后台管理脚手架。',
+      lead: '面向 AI 辅助开发的全栈后台管理系统脚手架，内置登录、用户、角色、权限、菜单、字典和接口日志，帮助人类与 AI 持续构建真实企业应用。',
       source: '查看源码',
       explore: '探索技术体系',
       signal: '系统在线 / 已准备扩展',
@@ -436,8 +438,8 @@ export const content: Record<Locale, SiteContent> = {
         },
         {
           code: '基础',
-          title: '企业应用基础能力',
-          description: '认证、用户、角色、菜单、字典和日志。',
+          title: '企业后台基础能力',
+          description: '认证、用户、角色、权限、菜单、字典和接口日志，组成可扩展的管理后台。',
           detail: '从已经可运行的重复基础工作开始。',
         },
         {

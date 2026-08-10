@@ -3,13 +3,16 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import ProductScene from './components/ProductScene.vue'
 import { content, GITHUB_URL, type Locale } from './content'
 
-const LOCALE_STORAGE_KEY = 'cyber_ai_forge_site_locale:v1'
 const commands = `pnpm install
 Copy-Item apps/backend/.env.example apps/backend/.env
 pnpm db:migrate
 pnpm dev`
 
-const locale = ref<Locale>('en')
+const props = defineProps<{
+  initialLocale: Locale
+}>()
+
+const locale = ref<Locale>(props.initialLocale)
 const mobileMenuOpen = ref(false)
 const headerScrolled = ref(false)
 const showcaseSection = ref<HTMLElement | null>(null)
@@ -27,54 +30,15 @@ let revealObserver: IntersectionObserver | undefined
 let reducedMotionQuery: MediaQueryList | undefined
 let compactQuery: MediaQueryList | undefined
 
-function getInitialLocale(): Locale {
-  const queryLocale = new URLSearchParams(window.location.search).get('lang')
-  if (queryLocale === 'zh' || queryLocale === 'en') {
-    return queryLocale
+const languageLinks = computed(function () {
+  return {
+    en: locale.value === 'zh' ? '../' : './',
+    zh: locale.value === 'zh' ? './' : 'zh/',
   }
-
-  try {
-    const storedLocale = window.localStorage.getItem(LOCALE_STORAGE_KEY)
-    if (storedLocale === 'zh' || storedLocale === 'en') {
-      return storedLocale
-    }
-  } catch {
-    // A blocked storage API should not prevent the public site from loading.
-  }
-
-  return navigator.language.toLowerCase().startsWith('zh') ? 'zh' : 'en'
-}
-
-function updateDocumentMetadata(): void {
-  document.documentElement.lang = locale.value === 'zh' ? 'zh-CN' : 'en'
-  document.title = t.value.meta.title
-  document
-    .querySelector('meta[name="description"]')
-    ?.setAttribute('content', t.value.meta.description)
-  document.querySelector('meta[property="og:title"]')?.setAttribute('content', t.value.meta.title)
-  document
-    .querySelector('meta[property="og:description"]')
-    ?.setAttribute('content', t.value.meta.description)
-}
-
-function setLocale(nextLocale: Locale, updateUrl = true): void {
-  locale.value = nextLocale
-  mobileMenuOpen.value = false
-
-  try {
-    window.localStorage.setItem(LOCALE_STORAGE_KEY, nextLocale)
-  } catch {
-    // URL state still preserves the selected locale when storage is unavailable.
-  }
-
-  if (updateUrl) {
-    const url = new URL(window.location.href)
-    url.searchParams.set('lang', nextLocale)
-    window.history.replaceState({}, '', url)
-  }
-
-  nextTick(updateDocumentMetadata)
-}
+})
+const publicAssetPrefix = computed(function () {
+  return locale.value === 'zh' ? '../' : './'
+})
 
 function updateRingMode(): void {
   ringEnabled.value = !(reducedMotionQuery?.matches ?? false) && !(compactQuery?.matches ?? false)
@@ -195,7 +159,7 @@ onMounted(function () {
   window.addEventListener('scroll', requestScrollUpdate, { passive: true })
   window.addEventListener('resize', requestScrollUpdate, { passive: true })
 
-  setLocale(getInitialLocale(), false)
+  document.documentElement.lang = locale.value === 'zh' ? 'zh-CN' : 'en'
   updateRingMode()
   requestScrollUpdate()
   nextTick(observeReveals)
@@ -218,7 +182,7 @@ onBeforeUnmount(function () {
   <header class="site-header" :class="{ 'is-scrolled': headerScrolled, 'is-open': mobileMenuOpen }">
     <div class="header-inner">
       <a class="brand-lockup" href="#top" aria-label="Cyber AI Forge home" @click="closeMobileMenu">
-        <img src="/cyber-mark.svg" alt="" width="42" height="42" />
+        <img :src="`${publicAssetPrefix}cyber-mark.svg`" alt="" width="42" height="42" />
         <span><strong>CYBER</strong><small>AI FORGE</small></span>
       </a>
 
@@ -233,24 +197,22 @@ onBeforeUnmount(function () {
           :aria-label="t.header.languageLabel"
           role="group"
         >
-          <button
-            type="button"
+          <a
             :class="{ 'is-active': locale === 'en' }"
-            :aria-pressed="locale === 'en'"
+            :aria-current="locale === 'en' ? 'page' : undefined"
             aria-label="English"
-            @click="setLocale('en')"
+            :href="languageLinks.en"
           >
             EN
-          </button>
-          <button
-            type="button"
+          </a>
+          <a
             :class="{ 'is-active': locale === 'zh' }"
-            :aria-pressed="locale === 'zh'"
+            :aria-current="locale === 'zh' ? 'page' : undefined"
             aria-label="中文"
-            @click="setLocale('zh')"
+            :href="languageLinks.zh"
           >
             中
-          </button>
+          </a>
         </div>
 
         <a class="header-github" :href="GITHUB_URL" target="_blank" rel="noreferrer">
@@ -319,7 +281,13 @@ onBeforeUnmount(function () {
           <div class="orbit orbit-middle"><i></i><i></i></div>
           <div class="orbit orbit-inner"></div>
           <div class="machine-crosshair"><span></span><span></span></div>
-          <img class="machine-logo" src="/cyber-mark.svg" alt="" width="112" height="112" />
+          <img
+            class="machine-logo"
+            :src="`${publicAssetPrefix}cyber-mark.svg`"
+            alt=""
+            width="112"
+            height="112"
+          />
           <div class="machine-node node-a"></div>
           <div class="machine-node node-b"></div>
           <div class="machine-node node-c"></div>
@@ -611,7 +579,7 @@ onBeforeUnmount(function () {
   <footer class="site-footer">
     <div class="container footer-inner">
       <div class="brand-lockup">
-        <img src="/cyber-mark.svg" alt="" width="42" height="42" /><span
+        <img :src="`${publicAssetPrefix}cyber-mark.svg`" alt="" width="42" height="42" /><span
           ><strong>CYBER</strong><small>AI FORGE</small></span
         >
       </div>

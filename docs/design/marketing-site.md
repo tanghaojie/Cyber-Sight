@@ -28,8 +28,8 @@ Cyber AI Forge 需要一个部署到 GitHub Pages 的静态推广站，把仓库
 
 - 页面锚点：`#showcase`、`#features`、`#system`、`#start`。
 - GitHub 入口：`https://github.com/tanghaojie/Cyber-AI-Forge`。
-- 语言 URL 参数：`?lang=zh` 或 `?lang=en`；偏好存入 `cyber_ai_forge_site_locale:v1`。
-- 语言切换必须位于 Header，以具备明确选中状态的紧凑分段控件呈现，不在 Footer 重复放置交互入口。
+- 语言 URL：根路径 `/` 提供英文版本，`/zh/` 提供简体中文版本；语言切换使用真实链接。
+- 语言切换位于 Header，以具备明确选中状态的紧凑分段控件呈现，不在 Footer 重复放置交互入口。
 
 ## 视觉与交互系统
 
@@ -41,13 +41,14 @@ Cyber AI Forge 需要一个部署到 GitHub Pages 的静态推广站，把仓库
 
 ## 数据模型与数据流
 
-中英文内容保存在站点本地 TypeScript 资源中：
+中英文内容保存在站点本地 TypeScript 资源中，构建时以同一套 Vue 源码生成两个语言入口：
 
 ```text
-URL lang / localStorage / browser language
-    -> locale state
-    -> document lang + title + description
-    -> header、章节、场景说明与 CTA
+content.ts
+    -> Vite client bundle
+    -> Vue SSR pre-render
+    -> /index.html 与 /zh/index.html
+    -> hydration + locale-specific metadata
 ```
 
 双语数组中同一位置的条目表示同一个页面实体。带进入动画的重复组件必须使用与语言无关的稳定 `key`，确保切换语言只更新文本，不销毁已经通过显现观察器激活的 DOM 节点。
@@ -63,22 +64,31 @@ passive scroll event
 
 ## 依赖关系
 
-站点依赖 Vue 3、Vite、TypeScript 与 `@vitejs/plugin-vue`。不增加动画、三维、组件库或国际化运行时依赖；动效与本地化由浏览器 API 和 Vue 状态完成，以控制 GitHub Pages 资源体积。
+站点依赖 Vue 3、Vite、TypeScript、`@vitejs/plugin-vue` 与 `@vue/server-renderer`。不增加动画、三维、组件库或国际化运行时依赖；动效与本地化由浏览器 API 和 Vue 状态完成，预渲染只在构建阶段运行，以控制 GitHub Pages 资源体积。
 
 ## 失败模式与安全考虑
 
 - GitHub Pages 子路径变化：Vite 使用相对资源基址，避免仓库名变化导致静态资源 404。
-- JavaScript 禁用：首屏仍保留默认英文文案和 GitHub 链接，但语言切换与轮播增强不可用。
+- JavaScript 禁用：预渲染后的语言页面仍保留完整首屏内容、导航、产品说明和 GitHub 链接；语言切换与轮播增强不可用。
 - 过度动效：不得阻止原生滚动；减少动效设置下取消平滑滚动、视差和三维旋转。
 - 外部字体不可达：提供紧缩无衬线、中文无衬线和等宽系统回退栈。
 - 外部链接使用安全的 `rel="noreferrer"`，所有交互具备键盘焦点和可读标签。
 - 产品截图包含管理端示例数据，发布前由维护者确认其中不含令牌、真实个人信息或生产数据。
 - 本地化内容不得作为带显现动画节点的组件身份；否则切换语言可能重建节点并使其停留在隐藏初始态。
 
+## SEO 与多语言交付
+
+- 保持单一 Vue 源码和单一 `content.ts`，构建时生成 `/` 与 `/zh/` 两个静态 HTML，不维护两套页面逻辑。
+- 每个语言页面拥有独立的 `title`、description、canonical、Open Graph、Twitter Card 和 JSON-LD；页面互相通过 `hreflang` 与 Header 真实链接关联。
+- SEO 首屏明确覆盖 `AI development scaffold`、`admin dashboard scaffold`、`AI 开发脚手架`、`后台管理系统脚手架` 等产品意图词，并以自然正文解释认证、用户、角色、权限、菜单、日志和 Vue/NestJS/PostgreSQL 技术栈。
+- `robots.txt` 声明 sitemap，`sitemap.xml` 只列出可收录的语言规范 URL；分享图继续复用仓库内 SVG 资产，后续可根据社交平台抓取结果补充 PNG 版本。
+- 预渲染 HTML 是爬虫和无 JavaScript 客户端的内容基线，客户端 hydration 只负责交互增强，不负责首次生成主要文案。
+
 ## 测试与验证策略
 
 - 执行 `pnpm format`、`pnpm format:check`、`pnpm lint`、`pnpm build` 和 `pnpm docs:archive:check:ci`。
-- 检查生成的 `apps/website/dist` 包含入口、品牌图标和相对静态资源。
+- 检查生成的 `apps/website/dist` 包含 `/index.html`、`/zh/index.html`、`robots.txt`、`sitemap.xml`、品牌图标、分享图、可见预渲染正文和相对静态资源。
+- 检查两种 HTML 的语言、title、description、canonical、hreflang、结构化数据和语言切换链接；使用 Search Console 人工检查收录状态与实际搜索词。
 - 维护者人工验收 375、768、1024 和 1440 像素宽度下的 Header、语言切换、锚点、三维轮播、键盘操作、减少动效模式和 GitHub 跳转；自动检查不能替代该人工验收。
 
 2026-08-10 已完成 `pnpm format`、`pnpm format:check`、`pnpm lint`、`pnpm build` 和 `pnpm docs:archive:check:ci`；推广站 Vue TypeScript 检查与生产构建、主应用和契约/后端构建均通过。推广站产物包含相对路径入口、品牌图标与分享图，JavaScript 和 CSS 合计 gzip 后约 49 KB。按照仓库边界未创建或运行前端自动化/浏览器测试；上述桌面、窄屏、语言切换、三维滚动、键盘与减少动效场景仍需维护者人工验收。
@@ -86,6 +96,8 @@ passive scroll event
 2026-08-10 的视觉优化使用维护者提供的六张 PNG 替换合成产品场景，并完成语言切换与核心卡片网格修正。格式检查、全仓 Lint、生产构建和文档归档 CI 检查通过，Vite 为六张截图生成带哈希的 Pages 资源；截图总计约 3.1 MB。浏览器视觉与交互仍需维护者人工验收。
 
 2026-08-10 已修复核心卡片以本地化文案作为 Vue `key` 导致的语言切换后隐藏问题；卡片改用稳定位置身份，Lint 与生产构建通过。
+
+2026-08-10 已完成中英文 SEO 增强：推广站保留单一 Vue 源码，构建时生成 `/` 与 `/zh/` 两个带完整预渲染正文的静态入口；两个入口均包含语言级 canonical、hreflang、Open Graph、Twitter Card、JSON-LD、robots 和 sitemap。首屏文案补充 AI 开发脚手架、后台管理脚手架及认证、权限、用户、角色、菜单、日志和技术栈语义。最终验证通过 website 生产构建、全仓 Lint、格式检查和文档归档 CI；Search Console 收录、排名和浏览器人工验收仍需发布后完成。
 
 ## 兼容性与迁移
 
@@ -102,3 +114,5 @@ passive scroll event
 - [视觉优化计划](../archive/plans/2026-08-10-marketing-site-visual-refinement.md)
 - [核心卡片语言切换显现修复](../archive/plans/2026-08-10-feature-locale-reveal.md)
 - [AI 协作记录](../archive/ai-logs/2026/08/2026-08-10-marketing-site-visual-refinement.md)
+- [中英文静态入口与 SEO 增强计划](../archive/plans/2026-08-10-website-seo.md)
+- [中英文静态入口与 SEO 增强 AI 协作记录](../archive/ai-logs/2026/08/2026-08-10-website-seo.md)

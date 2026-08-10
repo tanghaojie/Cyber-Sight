@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "vue-tsc && vite build",
+    "build": "vue-tsc && vite build && vite build --ssr src/entry-server.ts --outDir .ssr && node scripts/prerender.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vue/server-renderer": "^3.5.35",
     "vue": "^3.4.0"
   },
   "devDependencies": {

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tanghaojie.github.io/Cyber-AI-Forge/sitemap.xml
