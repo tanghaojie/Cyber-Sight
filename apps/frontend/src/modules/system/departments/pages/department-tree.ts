@@ -1,18 +1,18 @@
-import type { DepartmentSummary } from '@cyber-ai-forge/api-contract'
+import type { DepartmentSummary, EntityId } from '@cyber-ai-forge/api-contract'
 
 export interface DepartmentTreeNode extends DepartmentSummary {
   children: DepartmentTreeNode[]
 }
 
 export interface DepartmentTreeOption {
-  value: number
+  value: EntityId | null
   label: string
   disabled?: boolean
   children?: DepartmentTreeOption[]
 }
 
 function compareDepartments(left: DepartmentSummary, right: DepartmentSummary): number {
-  return left.sortOrder - right.sortOrder || left.id - right.id
+  return left.sortOrder - right.sortOrder || left.id.localeCompare(right.id)
 }
 
 function sortDepartmentTree(nodes: DepartmentTreeNode[]): void {
@@ -25,9 +25,9 @@ function sortDepartmentTree(nodes: DepartmentTreeNode[]): void {
 /** 把接口的邻接表快照组装为树；缺失父节点的记录提升为根节点，避免管理页面静默丢行。 */
 export function buildDepartmentTree(
   records: DepartmentSummary[],
-  excludedIds: ReadonlySet<number> = new Set<number>(),
+  excludedIds: ReadonlySet<EntityId> = new Set<EntityId>(),
 ): DepartmentTreeNode[] {
-  const nodes = new Map<number, DepartmentTreeNode>()
+  const nodes = new Map<EntityId, DepartmentTreeNode>()
   for (const record of records) {
     if (!excludedIds.has(record.id)) {
       nodes.set(record.id, { ...record, children: [] })
@@ -36,7 +36,7 @@ export function buildDepartmentTree(
 
   const roots: DepartmentTreeNode[] = []
   for (const node of nodes.values()) {
-    const parent = node.parentId > 0 ? nodes.get(node.parentId) : undefined
+    const parent = node.parentId === null ? undefined : nodes.get(node.parentId)
     if (parent && parent.id !== node.id) {
       parent.children.push(node)
     } else {
@@ -75,16 +75,16 @@ export function filterDepartmentTree(
 /** 编辑节点不能移动到自身或任一后代；前端先隐藏这些候选，后端仍执行最终闭包校验。 */
 export function collectDepartmentSubtreeIds(
   records: DepartmentSummary[],
-  rootId: number,
-): Set<number> {
-  const childrenByParent = new Map<number, number[]>()
+  rootId: EntityId,
+): Set<EntityId> {
+  const childrenByParent = new Map<EntityId | null, EntityId[]>()
   for (const record of records) {
     const children = childrenByParent.get(record.parentId) ?? []
     children.push(record.id)
     childrenByParent.set(record.parentId, children)
   }
 
-  const ids = new Set<number>()
+  const ids = new Set<EntityId>()
   const pending = [rootId]
   while (pending.length > 0) {
     const currentId = pending.pop()!

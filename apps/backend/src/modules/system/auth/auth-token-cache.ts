@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { randomUUID } from 'node:crypto'
-import type { CurrentUser } from '@cyber-ai-forge/api-contract'
+import { EntityIdSchema, type CurrentUser, type EntityId } from '@cyber-ai-forge/api-contract'
 
 const DEFAULT_CAPACITY = 100
 const DEFAULT_TTL_MS = 7 * 24 * 60 * 60 * 1000
@@ -19,7 +19,7 @@ interface TokenEntry {
 export interface VerifiedJwt {
   expiresAt: number
   jti: string
-  subject: string
+  subject: EntityId
 }
 
 export interface LoadedTokenSession {
@@ -92,7 +92,7 @@ export class JwtTokenCache {
         audience: JWT_AUDIENCE,
         issuer: JWT_ISSUER,
         jwtid: jti,
-        subject: String(user.id),
+        subject: user.id,
       },
     )
 
@@ -112,7 +112,7 @@ export class JwtTokenCache {
 
     const entry = this.entries.get(verified.jti)
     if (entry) {
-      if (entry.expiresAt <= this.now() || String(entry.user.id) !== verified.subject) {
+      if (entry.expiresAt <= this.now() || entry.user.id !== verified.subject) {
         this.entries.delete(verified.jti)
         return null
       }
@@ -124,7 +124,7 @@ export class JwtTokenCache {
     }
 
     const loaded = await loadSession(verified)
-    if (!loaded || loaded.expiresAt <= this.now() || String(loaded.user.id) !== verified.subject) {
+    if (!loaded || loaded.expiresAt <= this.now() || loaded.user.id !== verified.subject) {
       return null
     }
 
@@ -143,7 +143,7 @@ export class JwtTokenCache {
     return verified ? this.entries.delete(verified.jti) : false
   }
 
-  invalidateUser(userId: number): number {
+  invalidateUser(userId: EntityId): number {
     // 用户资料、角色或状态改变时调用；只清理本实例，下一次请求会重新读取持久会话快照。
     let invalidated = 0
     for (const [jti, entry] of this.entries) {
@@ -185,13 +185,14 @@ export class JwtTokenCache {
         clockTimestamp: Math.floor(this.now() / 1000),
         issuer: JWT_ISSUER,
       })
-      if (!payload.jti || !payload.sub || typeof payload.exp !== 'number') {
+      const subject = EntityIdSchema.safeParse(payload.sub)
+      if (!payload.jti || !subject.success || typeof payload.exp !== 'number') {
         return null
       }
       return {
         expiresAt: payload.exp * 1000,
         jti: payload.jti,
-        subject: payload.sub,
+        subject: subject.data,
       }
     } catch {
       // 外部令牌错误是正常认证失败，不把 jsonwebtoken 的细节暴露给路由层。

@@ -133,6 +133,7 @@ describe('system table naming and lifecycle fields', () => {
       'userPositions',
       'userRoles',
       'users',
+      'uuidv7PrimaryKey',
     ])
   })
 
@@ -149,6 +150,43 @@ describe('system table naming and lifecycle fields', () => {
     expect(columns).toHaveProperty('createdBy')
     expect(columns).toHaveProperty('updatedAt')
     expect(columns).toHaveProperty('updatedBy')
+    expect(columns.id.getSQLType()).toBe('uuid')
+    expect(columns.id.primary).toBe(true)
+    expect(columns.id.hasDefault).toBe(true)
+    expect(columns.createdBy.getSQLType()).toBe('uuid')
+    expect(columns.createdBy.notNull).toBe(false)
+    expect(columns.updatedBy.getSQLType()).toBe('uuid')
+    expect(columns.updatedBy.notNull).toBe(false)
+  })
+})
+
+describe('identifier relationships', () => {
+  it('stores roots as null and all entity references as UUIDs', () => {
+    expect(getTableColumns(departments).parentId.getSQLType()).toBe('uuid')
+    expect(getTableColumns(departments).parentId.notNull).toBe(false)
+    expect(getTableColumns(menus).parentId.getSQLType()).toBe('uuid')
+    expect(getTableColumns(menus).parentId.notNull).toBe(false)
+
+    for (const column of [
+      getTableColumns(authSessions).userId,
+      getTableColumns(dataPolicyRules).subjectId,
+      getTableColumns(dataPolicyDepartments).ruleId,
+      getTableColumns(dataPolicyDepartments).departmentId,
+      getTableColumns(departmentClosure).ancestorId,
+      getTableColumns(departmentClosure).descendantId,
+      getTableColumns(userDepartments).userId,
+      getTableColumns(userDepartments).departmentId,
+      getTableColumns(userPositions).userId,
+      getTableColumns(userPositions).positionId,
+      getTableColumns(userRoles).userId,
+      getTableColumns(userRoles).roleId,
+      getTableColumns(rolePermissions).roleId,
+      getTableColumns(roleMenus).roleId,
+      getTableColumns(roleMenus).menuId,
+      getTableColumns(apiRequestLogs).actorUserId,
+    ]) {
+      expect(column.getSQLType()).toBe('uuid')
+    }
   })
 })
 

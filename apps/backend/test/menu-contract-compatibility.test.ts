@@ -5,20 +5,23 @@ import {
   MenuRequestSchema,
 } from '@cyber-ai-forge/api-contract'
 
+const rootId = '0198f31a-0000-7000-8000-000000000001'
+const menuId = '0198f31a-0000-7000-8000-000000000006'
+
 const auditFields = {
   isDeleted: false,
   createdAt: '2026-07-27T00:00:00.000Z',
-  createdBy: 1,
+  createdBy: rootId,
   updatedAt: '2026-07-27T00:00:00.000Z',
-  updatedBy: 1,
+  updatedBy: rootId,
 }
 
 // 读取契约兼容可修复的遗留记录，写入契约仍严格限制布局、外链和根路径。
 describe('legacy menu response compatibility', () => {
   it('reads an old invalid button so an administrator can repair it', () => {
     const legacyButton = {
-      id: 6,
-      parentId: 0,
+      id: menuId,
+      parentId: null,
       name: 'test',
       path: '/qqqq',
       component: '',
@@ -40,7 +43,7 @@ describe('legacy menu response compatibility', () => {
 
   it('accepts layouts for directories and menus but not external buttons', () => {
     const common = {
-      parentId: 0,
+      parentId: null,
       name: '测试',
       icon: '',
       sortOrder: 0,
@@ -60,7 +63,7 @@ describe('legacy menu response compatibility', () => {
       MenuRequestSchema.safeParse({
         ...common,
         type: 'menu',
-        parentId: 1,
+        parentId: rootId,
         path: 'test',
         component: 'test',
         layout: 'AdminLayout',
@@ -91,14 +94,14 @@ describe('legacy menu response compatibility', () => {
   })
 
   it('requires absolute root paths and allows relative descendant paths', () => {
-    expect(isValidMenuPath({ type: 'directory', parentId: 0, path: '/system' })).toBe(true)
-    expect(isValidMenuPath({ type: 'directory', parentId: 0, path: 'system' })).toBe(false)
-    expect(isValidMenuPath({ type: 'directory', parentId: 0, path: '' })).toBe(false)
-    expect(isValidMenuPath({ type: 'menu', parentId: 0, path: '/users' })).toBe(true)
-    expect(isValidMenuPath({ type: 'menu', parentId: 0, path: 'users' })).toBe(false)
-    expect(isValidMenuPath({ type: 'menu', parentId: 0, path: '' })).toBe(false)
-    expect(isValidMenuPath({ type: 'menu', parentId: 1, path: 'users' })).toBe(true)
-    expect(isValidMenuPath({ type: 'menu', parentId: 1, path: '/users' })).toBe(true)
-    expect(isValidMenuPath({ type: 'button', parentId: 0, path: '' })).toBe(true)
+    expect(isValidMenuPath({ type: 'directory', parentId: null, path: '/system' })).toBe(true)
+    expect(isValidMenuPath({ type: 'directory', parentId: null, path: 'system' })).toBe(false)
+    expect(isValidMenuPath({ type: 'directory', parentId: null, path: '' })).toBe(false)
+    expect(isValidMenuPath({ type: 'menu', parentId: null, path: '/users' })).toBe(true)
+    expect(isValidMenuPath({ type: 'menu', parentId: null, path: 'users' })).toBe(false)
+    expect(isValidMenuPath({ type: 'menu', parentId: null, path: '' })).toBe(false)
+    expect(isValidMenuPath({ type: 'menu', parentId: rootId, path: 'users' })).toBe(true)
+    expect(isValidMenuPath({ type: 'menu', parentId: rootId, path: '/users' })).toBe(true)
+    expect(isValidMenuPath({ type: 'button', parentId: null, path: '' })).toBe(true)
   })
 })

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, eq, gt } from 'drizzle-orm'
-import type { CurrentUser, LoginData } from '@cyber-ai-forge/api-contract'
+import type { CurrentUser, EntityId, LoginData } from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import { authSessions, roles, userRoles, users } from '@/db/schema.js'
 import { DATABASE } from '@/shared/database/database.provider.js'
@@ -26,7 +26,7 @@ export class AuthService {
     private readonly authTokens: JwtTokenCache,
   ) {}
 
-  private async rolesForUser(userId: number): Promise<CurrentUser['roles']> {
+  private async rolesForUser(userId: EntityId): Promise<CurrentUser['roles']> {
     // 会话身份只包含仍有效角色，禁用/软删除角色不会继续影响授权判定。
     const rows = await this.db
       .select({ id: roles.id, name: roles.name })
@@ -45,10 +45,7 @@ export class AuthService {
     token: string,
     verified: VerifiedJwt,
   ): Promise<LoadedTokenSession | null> {
-    const userId = Number(verified.subject)
-    if (!Number.isSafeInteger(userId) || userId < 1) {
-      return null
-    }
+    const userId = verified.subject
 
     const [row] = await this.db
       .select({
@@ -155,7 +152,7 @@ export class AuthService {
     return user
   }
 
-  async revokeCurrentToken(authorization: string | undefined, actorId: number): Promise<void> {
+  async revokeCurrentToken(authorization: string | undefined, actorId: EntityId): Promise<void> {
     const token = bearerToken(authorization)
     if (token) {
       // 先软删除持久会话，再清理本进程缓存，确保重启和其他实例也不能恢复该令牌。
@@ -172,11 +169,11 @@ export class AuthService {
     }
   }
 
-  invalidateUserTokenCache(userId: number): number {
+  invalidateUserTokenCache(userId: EntityId): number {
     return this.authTokens.invalidateUser(userId)
   }
 
-  async revokeUserTokens(userId: number, actorId: number): Promise<void> {
+  async revokeUserTokens(userId: EntityId, actorId: EntityId): Promise<void> {
     // 用户禁用、删除或权限敏感变更时，同时撤销全部持久会话和内存快照。
     this.authTokens.invalidateUser(userId)
     await this.db

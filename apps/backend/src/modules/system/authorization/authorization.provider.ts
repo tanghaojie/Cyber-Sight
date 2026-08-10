@@ -3,6 +3,7 @@ import type {
   AuthorizationSubjectType,
   CurrentUser,
   DataAction,
+  EntityId,
   SubjectAccessRequest,
 } from '@cyber-ai-forge/api-contract'
 import {
@@ -24,20 +25,20 @@ export interface AuthorizationProvider {
   canAccessSubject(
     user: CurrentUser,
     subjectType: AuthorizationSubjectType,
-    subjectId: number,
+    subjectId: EntityId,
     operation: SubjectAccessOperation,
   ): Promise<boolean>
   canDelegateSubjectAccess(
     user: CurrentUser,
     subjectType: AuthorizationSubjectType,
-    subjectId: number,
+    subjectId: EntityId,
     access: SubjectAccessRequest,
   ): Promise<boolean>
   canManageUserAuthorizationContext(
     user: CurrentUser,
-    targetUserId: number | null,
-    roleIds: number[],
-    departmentIds: number[],
+    targetUserId: EntityId | null,
+    roleIds: EntityId[],
+    departmentIds: EntityId[],
   ): Promise<boolean>
 }
 
@@ -61,7 +62,7 @@ export class LocalAuthorizationProvider implements AuthorizationProvider {
   canAccessSubject(
     user: CurrentUser,
     subjectType: AuthorizationSubjectType,
-    subjectId: number,
+    subjectId: EntityId,
     operation: SubjectAccessOperation,
   ): Promise<boolean> {
     return this.service.canAccessSubject(user.id, subjectType, subjectId, operation)
@@ -70,7 +71,7 @@ export class LocalAuthorizationProvider implements AuthorizationProvider {
   canDelegateSubjectAccess(
     user: CurrentUser,
     subjectType: AuthorizationSubjectType,
-    subjectId: number,
+    subjectId: EntityId,
     access: SubjectAccessRequest,
   ): Promise<boolean> {
     return this.service.canDelegateSubjectAccess(user.id, subjectType, subjectId, access)
@@ -78,9 +79,9 @@ export class LocalAuthorizationProvider implements AuthorizationProvider {
 
   canManageUserAuthorizationContext(
     user: CurrentUser,
-    targetUserId: number | null,
-    roleIds: number[],
-    departmentIds: number[],
+    targetUserId: EntityId | null,
+    roleIds: EntityId[],
+    departmentIds: EntityId[],
   ): Promise<boolean> {
     return this.service.canManageUserAuthorizationContext(
       user.id,

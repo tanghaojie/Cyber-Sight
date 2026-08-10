@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { buildNavigationTree } from '@/modules/system/menus/menus.repository.js'
 
+const rootId = '0198f31a-0000-7000-8000-000000000001'
+const userMenuId = '0198f31a-0000-7000-8000-000000000002'
+const docsMenuId = '0198f31a-0000-7000-8000-000000000003'
+
 const rows = [
   {
-    id: 1,
-    parentId: 0,
+    id: rootId,
+    parentId: null,
     name: '组织与权限',
     icon: 'layers',
     sortOrder: 10,
@@ -15,8 +19,8 @@ const rows = [
     externalUrl: '',
   },
   {
-    id: 2,
-    parentId: 1,
+    id: userMenuId,
+    parentId: rootId,
     name: '用户管理',
     icon: 'users',
     sortOrder: 10,
@@ -27,8 +31,8 @@ const rows = [
     externalUrl: '',
   },
   {
-    id: 3,
-    parentId: 1,
+    id: docsMenuId,
+    parentId: rootId,
     name: '文档',
     icon: 'external',
     sortOrder: 20,
@@ -45,30 +49,30 @@ describe('navigation menu tree', () => {
   it('builds stable directory children in sort order', () => {
     const tree = buildNavigationTree(rows)
     expect(tree).toHaveLength(1)
-    expect(tree[0].children.map((item) => item.id)).toEqual([2, 3])
+    expect(tree[0].children.map((item) => item.id)).toEqual([userMenuId, docsMenuId])
   })
 
   it('includes an assigned menu ancestor directory', () => {
-    const tree = buildNavigationTree(rows, new Set([2]))
+    const tree = buildNavigationTree(rows, new Set([userMenuId]))
     expect(tree).toHaveLength(1)
-    expect(tree[0].id).toBe(1)
-    expect(tree[0].children.map((item) => item.id)).toEqual([2])
+    expect(tree[0].id).toBe(rootId)
+    expect(tree[0].children.map((item) => item.id)).toEqual([userMenuId])
   })
 
   it('promotes a cyclic node instead of recursing forever', () => {
-    const cyclic = [{ ...rows[0], parentId: 1 }]
-    expect(buildNavigationTree(cyclic)[0].id).toBe(1)
+    const cyclic = [{ ...rows[0], parentId: rootId }]
+    expect(buildNavigationTree(cyclic)[0].id).toBe(rootId)
   })
 
   it('keeps legacy invalid records out of executable navigation', () => {
     const legacyRows = [
       ...rows,
-      { ...rows[1], id: 4, component: '' },
-      { ...rows[2], id: 5, externalUrl: '' },
+      { ...rows[1], id: '0198f31a-0000-7000-8000-000000000004', component: '' },
+      { ...rows[2], id: '0198f31a-0000-7000-8000-000000000005', externalUrl: '' },
     ]
 
     const tree = buildNavigationTree(legacyRows)
 
-    expect(tree[0].children.map((item) => item.id)).toEqual([2, 3])
+    expect(tree[0].children.map((item) => item.id)).toEqual([userMenuId, docsMenuId])
   })
 })

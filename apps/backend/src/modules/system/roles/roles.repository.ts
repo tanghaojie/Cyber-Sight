@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, count, eq, ilike } from 'drizzle-orm'
-import type { RoleRequest } from '@cyber-ai-forge/api-contract'
+import type { EntityId, RoleRequest } from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import { roles } from '@/db/schema.js'
 import { DATABASE } from '@/shared/database/database.provider.js'
@@ -37,7 +37,7 @@ export class RolesRepository {
     }
   }
 
-  async createRole(input: RoleRequest, actorId: number): Promise<number> {
+  async createRole(input: RoleRequest, actorId: EntityId): Promise<EntityId> {
     const [created] = await this.db
       .insert(roles)
       .values({ ...input, createdBy: actorId, updatedBy: actorId })
@@ -45,7 +45,7 @@ export class RolesRepository {
     return created.id
   }
 
-  async updateRole(id: number, input: RoleRequest, actorId: number): Promise<boolean> {
+  async updateRole(id: EntityId, input: RoleRequest, actorId: EntityId): Promise<boolean> {
     const updated = await this.db
       .update(roles)
       .set({ ...input, updatedAt: new Date(), updatedBy: actorId })
@@ -54,7 +54,7 @@ export class RolesRepository {
     return updated.length > 0
   }
 
-  async softDeleteRole(id: number, actorId: number): Promise<boolean> {
+  async softDeleteRole(id: EntityId, actorId: EntityId): Promise<boolean> {
     const result = await this.db
       .update(roles)
       .set({ isDeleted: true, updatedAt: new Date(), updatedBy: actorId })

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, eq, or } from 'drizzle-orm'
-import type { DepartmentRequest } from '@cyber-ai-forge/api-contract'
+import type { DepartmentRequest, EntityId } from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import {
   dataPolicyDepartments,
@@ -28,20 +28,20 @@ function departmentSummary(row: typeof departments.$inferSelect) {
 export class DepartmentsRepository {
   constructor(@Inject(DATABASE) private readonly db: Database) {}
 
-  private async rebuildDepartmentClosure(tx: Transaction, actorId: number): Promise<void> {
+  private async rebuildDepartmentClosure(tx: Transaction, actorId: EntityId): Promise<void> {
     // 以邻接表为事实来源重建闭包：每个节点先记录到自身 depth=0，再沿父链记录全部祖先。
     const rows = await tx
       .select({ id: departments.id, parentId: departments.parentId })
       .from(departments)
       .where(eq(departments.isDeleted, false))
     const byId = new Map(rows.map((row) => [row.id, row]))
-    const paths: Array<{ ancestorId: number; descendantId: number; depth: number }> = []
+    const paths: Array<{ ancestorId: EntityId; descendantId: EntityId; depth: number }> = []
     for (const row of rows) {
       paths.push({ ancestorId: row.id, descendantId: row.id, depth: 0 })
       const visited = new Set([row.id])
       let parentId = row.parentId
       let depth = 1
-      while (parentId > 0) {
+      while (parentId !== null) {
         // 重建阶段再次保护环和缺失父节点，避免错误层级扩散成不可用的数据范围。
         if (visited.has(parentId)) {
           throw new Error('Department hierarchy contains a cycle')
@@ -91,8 +91,11 @@ export class DepartmentsRepository {
       .orderBy(departments.sortOrder, departments.id)
   }
 
-  async validateDepartmentParent(parentId: number, currentId?: number): Promise<boolean> {
-    if (parentId === 0) {
+  async validateDepartmentParent(
+    parentId: EntityId | null,
+    currentId?: EntityId,
+  ): Promise<boolean> {
+    if (parentId === null) {
       return true
     }
     if (parentId === currentId) {
@@ -132,7 +135,7 @@ export class DepartmentsRepository {
     return true
   }
 
-  async createDepartment(input: DepartmentRequest, actorId: number): Promise<number> {
+  async createDepartment(input: DepartmentRequest, actorId: EntityId): Promise<EntityId> {
     // 新节点与重建后的闭包必须同事务提交，授权查询不会看到只有一半的组织树状态。
     return this.db.transaction(async (tx) => {
       const [created] = await tx
@@ -144,7 +147,11 @@ export class DepartmentsRepository {
     })
   }
 
-  async updateDepartment(id: number, input: DepartmentRequest, actorId: number): Promise<boolean> {
+  async updateDepartment(
+    id: EntityId,
+    input: DepartmentRequest,
+    actorId: EntityId,
+  ): Promise<boolean> {
     // 父级调整会影响整棵子树的祖先路径，因此成功更新后统一重建闭包而非尝试局部拼接。
     return this.db.transaction(async (tx) => {
       const rows = await tx
@@ -160,7 +167,7 @@ export class DepartmentsRepository {
     })
   }
 
-  async canDeleteDepartment(id: number): Promise<boolean> {
+  async canDeleteDepartment(id: EntityId): Promise<boolean> {
     // 删除前同时保护树结构、用户归属和授权策略引用。
     const [child] = await this.db
       .select({ id: departments.id })
@@ -190,7 +197,7 @@ export class DepartmentsRepository {
     return !membership[0] && !policyAssignment[0]
   }
 
-  async softDeleteDepartment(id: number, actorId: number): Promise<boolean> {
+  async softDeleteDepartment(id: EntityId, actorId: EntityId): Promise<boolean> {
     return this.db.transaction(async (tx) => {
       const now = new Date()
       const rows = await tx

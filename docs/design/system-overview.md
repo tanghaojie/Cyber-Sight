@@ -2,7 +2,7 @@
 title: 系统概览
 status: accepted
 owner: project maintainers
-updated: 2026-08-07
+updated: 2026-08-10
 ---
 
 # 系统概览
@@ -29,7 +29,7 @@ NestJS 11 + Fastify 5 adapter + Drizzle
 - `apps/website`：独立 Vite + Vue 3 中英文静态推广站，通过 GitHub Actions 发布到 GitHub Pages，不依赖管理端运行时或后端。
 - `packages/api-contract`：HTTP Zod Schema、推导类型与适配器无关的 JSON Schema 转换。
 
-现有业务包括健康检查、会话认证、接口日志、工作台、用户、角色、数据库动态菜单和字典。脚手架自带的 15 张 PostgreSQL 表统一使用 `sys_` 物理前缀、软删除及五项生命周期审计字段；`0000` 初始迁移只面向全新数据库，后续 Schema 通过追加迁移演进。
+现有业务包括健康检查、会话认证、接口日志、工作台、用户、角色、部门、岗位、数据库动态菜单和字典。脚手架自带的 17 张 PostgreSQL 表统一使用 `sys_` 物理前缀、UUIDv7 主键、软删除及五项生命周期审计字段；当前单一 `0000` 初始迁移只面向全新 PostgreSQL 18 数据库，后续 Schema 通过追加迁移演进。
 
 ## 不可绕过的边界
 

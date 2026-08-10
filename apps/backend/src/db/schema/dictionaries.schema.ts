@@ -1,12 +1,12 @@
 import { sql } from 'drizzle-orm'
-import { boolean, integer, pgTable, serial, uniqueIndex, varchar } from 'drizzle-orm/pg-core'
-import { auditColumns } from './common.schema.js'
+import { boolean, integer, pgTable, uniqueIndex, varchar } from 'drizzle-orm/pg-core'
+import { auditColumns, uuidv7PrimaryKey } from './common.schema.js'
 
 // 字典条目的业务身份是 type + value；label 和 remark 可随展示需求调整而不改变引用值。
 export const dictionaries = pgTable(
   'sys_dictionaries',
   {
-    id: serial('id').primaryKey(),
+    id: uuidv7PrimaryKey(),
     type: varchar('type', { length: 80 }).notNull(),
     label: varchar('label', { length: 80 }).notNull(),
     value: varchar('value', { length: 120 }).notNull(),

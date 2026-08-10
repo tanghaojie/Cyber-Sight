@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, eq, inArray } from 'drizzle-orm'
+import type { EntityId } from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import { departmentClosure, departments } from '@/db/schema.js'
 import { DATABASE } from '@/shared/database/database.provider.js'
@@ -9,7 +10,7 @@ import { DATABASE } from '@/shared/database/database.provider.js'
 export class DepartmentsAccess {
   constructor(@Inject(DATABASE) private readonly db: Database) {}
 
-  async departmentExists(departmentId: number): Promise<boolean> {
+  async departmentExists(departmentId: EntityId): Promise<boolean> {
     const [row] = await this.db
       .select({ id: departments.id })
       .from(departments)
@@ -18,7 +19,7 @@ export class DepartmentsAccess {
     return Boolean(row)
   }
 
-  async enabledDepartmentIds(candidateIds: number[]): Promise<number[]> {
+  async enabledDepartmentIds(candidateIds: EntityId[]): Promise<EntityId[]> {
     if (candidateIds.length === 0) {
       return []
     }
@@ -35,7 +36,7 @@ export class DepartmentsAccess {
     return rows.map((row) => row.id)
   }
 
-  async ancestorDepartmentIds(departmentIds: number[]): Promise<number[]> {
+  async ancestorDepartmentIds(departmentIds: EntityId[]): Promise<EntityId[]> {
     if (departmentIds.length === 0) {
       return []
     }
@@ -52,7 +53,7 @@ export class DepartmentsAccess {
     return [...new Set(rows.map((row) => row.id))]
   }
 
-  async descendantDepartmentIds(departmentIds: number[]): Promise<number[]> {
+  async descendantDepartmentIds(departmentIds: EntityId[]): Promise<EntityId[]> {
     if (departmentIds.length === 0) {
       return []
     }

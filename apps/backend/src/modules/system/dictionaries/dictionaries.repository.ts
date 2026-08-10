@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, count, eq, ilike, or } from 'drizzle-orm'
-import type { DictionaryRequest } from '@cyber-ai-forge/api-contract'
+import type { DictionaryRequest, EntityId } from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import { dictionaries } from '@/db/schema.js'
 import { DATABASE } from '@/shared/database/database.provider.js'
@@ -49,7 +49,7 @@ export class DictionariesRepository {
     }
   }
 
-  async createDictionary(input: DictionaryRequest, actorId: number): Promise<number> {
+  async createDictionary(input: DictionaryRequest, actorId: EntityId): Promise<EntityId> {
     const [created] = await this.db
       .insert(dictionaries)
       .values({ ...input, createdBy: actorId, updatedBy: actorId })
@@ -57,7 +57,11 @@ export class DictionariesRepository {
     return created.id
   }
 
-  async updateDictionary(id: number, input: DictionaryRequest, actorId: number): Promise<boolean> {
+  async updateDictionary(
+    id: EntityId,
+    input: DictionaryRequest,
+    actorId: EntityId,
+  ): Promise<boolean> {
     const result = await this.db
       .update(dictionaries)
       .set({ ...input, updatedAt: new Date(), updatedBy: actorId })
@@ -66,7 +70,7 @@ export class DictionariesRepository {
     return result.length > 0
   }
 
-  async softDeleteDictionary(id: number, actorId: number): Promise<boolean> {
+  async softDeleteDictionary(id: EntityId, actorId: EntityId): Promise<boolean> {
     const result = await this.db
       .update(dictionaries)
       .set({ isDeleted: true, updatedAt: new Date(), updatedBy: actorId })

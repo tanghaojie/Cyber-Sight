@@ -12,7 +12,7 @@
         </el-form-item>
         <el-form-item :label="t('menus.fields.parent')">
           <el-select v-model="form.parentId" class="w-full">
-            <el-option :label="t('menus.dialog.root')" :value="0" />
+            <el-option :label="t('menus.dialog.root')" :value="null" />
             <el-option
               v-for="directory in directoryOptions"
               :key="directory.id"
@@ -131,7 +131,12 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import type { MenuRequest, MenuSummary, PermissionSummary } from '@cyber-ai-forge/api-contract'
+import type {
+  EntityId,
+  MenuRequest,
+  MenuSummary,
+  PermissionSummary,
+} from '@cyber-ai-forge/api-contract'
 import { listAuthorizationPermissions } from '@/modules/system/authorization/authorization.api'
 import AppIcon from '@/components/AppIcon.vue'
 import { menuPathError } from '@/modules/system/menus/menu-form'
@@ -144,7 +149,7 @@ import { useLocalization } from '@/modules/system/localization/localization'
 
 type MenuType = MenuSummary['type']
 interface MenuForm {
-  parentId: number
+  parentId: EntityId | null
   name: string
   path: string
   component: string
@@ -159,7 +164,7 @@ interface MenuForm {
 
 const props = defineProps<{
   menu: MenuSummary | null
-  parentId: number
+  parentId: EntityId | null
   records: MenuSummary[]
 }>()
 const emit = defineEmits<{
@@ -173,7 +178,7 @@ const navigation = useNavigationStore()
 const permissions = ref<PermissionSummary[]>([])
 const { resolveLocalizedLabel, t } = useLocalization()
 const form = reactive<MenuForm>({
-  parentId: 0,
+  parentId: null,
   name: '',
   path: '',
   component: '',
@@ -195,12 +200,12 @@ const directoryOptions = computed(() =>
   props.records.filter((record) => record.type === 'directory'),
 )
 const routePlaceholder = computed(() =>
-  form.parentId === 0
+  form.parentId === null
     ? t('menus.dialog.rootRoutePlaceholder')
     : t('menus.dialog.childRoutePlaceholder'),
 )
 const routeHint = computed(() =>
-  form.parentId === 0 ? t('menus.dialog.rootRouteHint') : t('menus.dialog.childRouteHint'),
+  form.parentId === null ? t('menus.dialog.rootRouteHint') : t('menus.dialog.childRouteHint'),
 )
 
 function permissionLabel(permission: PermissionSummary): string {

@@ -1,13 +1,13 @@
 import { sql } from 'drizzle-orm'
-import { boolean, integer, pgTable, serial, uniqueIndex, varchar } from 'drizzle-orm/pg-core'
-import { auditColumns, menuType } from './common.schema.js'
+import { boolean, integer, pgTable, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core'
+import { auditColumns, menuType, uuidv7PrimaryKey } from './common.schema.js'
 import { permissions } from './authorization.schema.js'
 import { roles } from './roles.schema.js'
 
 // 菜单保存导航元数据，权限授予仍由 authorization 模块的 rolePermissions 决定。
 export const menus = pgTable('sys_menus', {
-  id: serial('id').primaryKey(),
-  parentId: integer('parent_id').default(0).notNull(),
+  id: uuidv7PrimaryKey(),
+  parentId: uuid('parent_id'),
   name: varchar('name', { length: 80 }).notNull(),
   path: varchar('path', { length: 160 }).default('').notNull(),
   component: varchar('component', { length: 160 }).default('').notNull(),
@@ -28,11 +28,11 @@ export const menus = pgTable('sys_menus', {
 export const roleMenus = pgTable(
   'sys_role_menus',
   {
-    id: serial('id').primaryKey(),
-    roleId: integer('role_id')
+    id: uuidv7PrimaryKey(),
+    roleId: uuid('role_id')
       .notNull()
       .references(() => roles.id),
-    menuId: integer('menu_id')
+    menuId: uuid('menu_id')
       .notNull()
       .references(() => menus.id),
     ...auditColumns(),

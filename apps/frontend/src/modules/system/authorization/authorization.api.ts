@@ -1,6 +1,7 @@
 import type {
   AuthorizationSubjectType,
   DataResourceListResponse,
+  EntityId,
   PermissionListResponse,
   SubjectAccessRequest,
   SubjectAccessResponse,
@@ -37,7 +38,7 @@ export async function listDataResources() {
 
 export async function getSubjectAccess(
   subjectType: AuthorizationSubjectType,
-  id: number,
+  id: EntityId,
 ): Promise<SubjectAccessRequest> {
   // subjectType 只来自共享枚举，可安全映射到后端约定的复数路径。
   const { data, error } = await apiClient.GET<SubjectAccessResponse>(
@@ -48,7 +49,7 @@ export async function getSubjectAccess(
 
 export async function replaceSubjectAccess(
   subjectType: AuthorizationSubjectType,
-  id: number,
+  id: EntityId,
   payload: SubjectAccessRequest,
 ): Promise<ApiMutationResult> {
   const { data, error } = await apiClient.PUT<IdResponse, SubjectAccessRequest>(

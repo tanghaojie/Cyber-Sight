@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, eq, inArray } from 'drizzle-orm'
+import type { EntityId } from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import { departments, positions, userPositions } from '@/db/schema.js'
 import { DATABASE } from '@/shared/database/database.provider.js'
@@ -9,7 +10,7 @@ import { DATABASE } from '@/shared/database/database.provider.js'
 export class PositionsAccess {
   constructor(@Inject(DATABASE) private readonly db: Database) {}
 
-  async enabledPositionIds(candidateIds: number[]): Promise<number[]> {
+  async enabledPositionIds(candidateIds: EntityId[]): Promise<EntityId[]> {
     if (candidateIds.length === 0) {
       return []
     }
@@ -31,8 +32,8 @@ export class PositionsAccess {
 
   /** 校验岗位均启用且岗位所属部门包含在用户最终部门集合中。 */
   async positionAssignmentsAreValid(
-    positionIds: number[],
-    departmentIds: number[],
+    positionIds: EntityId[],
+    departmentIds: EntityId[],
   ): Promise<boolean> {
     if (positionIds.length === 0) {
       return true
@@ -59,8 +60,8 @@ export class PositionsAccess {
 
   /** 返回用户当前真正生效的岗位关联，停用岗位和失效部门不会出现在用户摘要中。 */
   async activePositionAssignments(
-    userIds: number[],
-  ): Promise<Array<{ userId: number; positionId: number }>> {
+    userIds: EntityId[],
+  ): Promise<Array<{ userId: EntityId; positionId: EntityId }>> {
     if (userIds.length === 0) {
       return []
     }

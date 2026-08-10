@@ -5,24 +5,25 @@ interface MigrationJournal {
   entries: Array<{ tag: string }>
 }
 
-const legacyTableNames = [
-  'auth_sessions',
-  'data_policy_departments',
-  'data_policy_rules',
-  'department_closure',
-  'departments',
-  'dictionaries',
-  'menus',
-  'permissions',
-  'role_menus',
-  'role_permissions',
-  'roles',
-  'user_departments',
-  'user_roles',
-  'users',
+const systemTableNames = [
+  'sys_api_request_logs',
+  'sys_auth_sessions',
+  'sys_data_policy_departments',
+  'sys_data_policy_rules',
+  'sys_department_closure',
+  'sys_departments',
+  'sys_dictionaries',
+  'sys_menus',
+  'sys_permissions',
+  'sys_positions',
+  'sys_role_menus',
+  'sys_role_permissions',
+  'sys_roles',
+  'sys_user_departments',
+  'sys_user_positions',
+  'sys_user_roles',
+  'sys_users',
 ]
-const systemTableNames = legacyTableNames.map((name) => `sys_${name}`)
-const positionTableNames = ['sys_positions', 'sys_user_positions']
 
 function migrationJournal(): MigrationJournal {
   const journalUrl = new URL('../drizzle/meta/_journal.json', import.meta.url)
@@ -49,93 +50,59 @@ function baselineMigrationSql(): string {
   return readFileSync(new URL(`../drizzle/${entry.tag}.sql`, import.meta.url), 'utf8')
 }
 
-function apiLogMigrationSql(): string {
-  return readFileSync(new URL('../drizzle/0001_luxuriant_violations.sql', import.meta.url), 'utf8')
-}
-
-function apiLogNavigationMigrationSql(): string {
-  return readFileSync(
-    new URL('../drizzle/0002_api_log_operations_menu.sql', import.meta.url),
-    'utf8',
-  )
-}
-
-function aboutProjectMigrationSql(): string {
-  return readFileSync(new URL('../drizzle/0003_about_project_menu.sql', import.meta.url), 'utf8')
-}
-
-function positionMigrationSql(): string {
-  return readFileSync(new URL('../drizzle/0004_positions_management.sql', import.meta.url), 'utf8')
-}
-
-function dynamicHomeMigrationSql(): string {
-  return readFileSync(new URL('../drizzle/0005_dynamic_home_menu.sql', import.meta.url), 'utf8')
-}
-
-describe('database migration baseline', () => {
-  it('keeps the initial baseline and appends later schema changes', () => {
+describe('UUIDv7 database migration baseline', () => {
+  it('contains one fresh migration and one matching snapshot', () => {
     const journal = migrationJournal()
 
-    expect(journal.entries).toHaveLength(6)
-    expect(journal.entries.map(({ tag }) => tag)).toEqual([
-      '0000_initial_system_schema',
-      '0001_luxuriant_violations',
-      '0002_api_log_operations_menu',
-      '0003_about_project_menu',
-      '0004_positions_management',
-      '0005_dynamic_home_menu',
-    ])
-    expect(migrationFiles()).toEqual([
-      '0000_initial_system_schema.sql',
-      '0001_luxuriant_violations.sql',
-      '0002_api_log_operations_menu.sql',
-      '0003_about_project_menu.sql',
-      '0004_positions_management.sql',
-      '0005_dynamic_home_menu.sql',
-    ])
-    expect(journal.entries.map(({ tag }) => `${tag}.sql`)).toEqual(migrationFiles())
-    expect(snapshotFiles()).toEqual(['0000_snapshot.json', '0001_snapshot.json'])
+    expect(journal.entries.map(({ tag }) => tag)).toEqual(['0000_initial_uuidv7_system_schema'])
+    expect(migrationFiles()).toEqual(['0000_initial_uuidv7_system_schema.sql'])
+    expect(snapshotFiles()).toEqual(['0000_snapshot.json'])
   })
 
-  it('creates every application table with the sys_ prefix', () => {
+  it('creates all application tables directly in the single baseline', () => {
     const migrationSql = baselineMigrationSql()
 
     for (const tableName of systemTableNames) {
-      expect(migrationSql).toContain(`CREATE TABLE IF NOT EXISTS "${tableName}"`)
+      expect(migrationSql).toContain(`CREATE TABLE "${tableName}"`)
     }
-    for (const tableName of legacyTableNames) {
-      expect(migrationSql).not.toContain(`"${tableName}"`)
-    }
+    expect(migrationSql.match(/CREATE TABLE "sys_/g)).toHaveLength(systemTableNames.length)
   })
 
-  it('appends the position tables and organization-management seed data', () => {
-    const migrationSql = positionMigrationSql()
-
-    for (const tableName of positionTableNames) {
-      expect(migrationSql).toContain(`CREATE TABLE IF NOT EXISTS "${tableName}"`)
-    }
-    expect(migrationSql).toContain('"sys_positions_department_name_active_unique"')
-    expect(migrationSql).toContain('"sys_user_positions_user_position_active_unique"')
-    expect(migrationSql).toContain("'positions.manage'")
-    expect(migrationSql).toContain("'岗位管理'")
-    expect(migrationSql).not.toContain('岗位编码')
-    expect(migrationSql).not.toContain('"code"')
-  })
-
-  it('contains the final menu and soft-delete uniqueness model directly', () => {
+  it('uses PostgreSQL-native UUIDv7 primary keys without numeric identity columns', () => {
     const migrationSql = baselineMigrationSql()
 
-    expect(migrationSql).toContain('"layout" varchar(160) DEFAULT \'\' NOT NULL')
-    expect(migrationSql).toContain('"required_permission_key" varchar(100)')
-    expect(migrationSql).not.toContain('"code" varchar(80)')
-    expect(migrationSql).not.toContain('"sys_departments_code_active_unique"')
-    expect(migrationSql).not.toContain('"sys_roles_code_active_unique"')
-    expect(migrationSql).toContain('"sys_auth_sessions_token_hash_unique"')
-    expect(migrationSql.match(/CREATE UNIQUE INDEX IF NOT EXISTS "sys_/g)).toHaveLength(11)
-    expect(migrationSql.match(/WHERE "sys_[^"]+"\."is_deleted" = false/g)).toHaveLength(11)
+    expect(migrationSql.match(/"id" uuid PRIMARY KEY DEFAULT uuidv7\(\) NOT NULL/g)).toHaveLength(
+      systemTableNames.length,
+    )
+    expect(migrationSql).not.toMatch(/\b(?:smallserial|serial|bigserial)\b/i)
+    expect(migrationSql).not.toMatch(/"[a-z_]+_id" integer/)
+    expect(migrationSql).not.toContain('"parent_id" uuid DEFAULT')
+    expect(migrationSql).not.toContain('"created_by" uuid DEFAULT')
+    expect(migrationSql).not.toContain('"updated_by" uuid DEFAULT')
   })
 
-  it('seeds the fresh database with framework administration data', () => {
+  it('uses null roots and nullable UUID audit actors', () => {
+    const migrationSql = baselineMigrationSql()
+
+    expect(migrationSql).toContain('"parent_id" uuid,')
+    expect(migrationSql).toContain("VALUES (NULL, '默认部门', 10, true)")
+    expect(migrationSql).toContain("(NULL, '首页', '/', 'home', 'AdminLayout'")
+    expect(migrationSql).toContain('"created_by" uuid,')
+    expect(migrationSql).toContain('"updated_by" uuid')
+    expect(migrationSql).not.toContain('"created_by" uuid NOT NULL')
+    expect(migrationSql).not.toContain('"updated_by" uuid NOT NULL')
+  })
+
+  it('keeps the final soft-delete uniqueness and log indexes', () => {
+    const migrationSql = baselineMigrationSql()
+
+    expect(migrationSql.match(/CREATE UNIQUE INDEX "sys_/g)).toHaveLength(13)
+    expect(migrationSql.match(/WHERE "sys_[^"]+"\."is_deleted" = false/g)).toHaveLength(15)
+    expect(migrationSql).toContain('"sys_api_request_logs_expires_at_index"')
+    expect(migrationSql).toContain('"sys_auth_sessions_token_hash_unique"')
+  })
+
+  it('seeds a complete administration baseline using generated UUIDs', () => {
     const migrationSql = baselineMigrationSql()
 
     for (const tableName of [
@@ -154,78 +121,39 @@ describe('database migration baseline', () => {
     ]) {
       expect(migrationSql).toContain(`INSERT INTO "${tableName}"`)
     }
-    expect(migrationSql).not.toContain("'SUPER_ADMIN'")
-    expect(migrationSql).not.toContain("'DEFAULT'")
-    expect(migrationSql).toContain("'admin'")
-    expect(migrationSql).toContain("'departments.manage'")
+    for (const permissionKey of [
+      'users.manage',
+      'roles.manage',
+      'departments.manage',
+      'positions.manage',
+      'menus.manage',
+      'dictionaries.manage',
+      'api_logs.read',
+      'home.read',
+    ]) {
+      expect(migrationSql).toContain(`'${permissionKey}'`)
+    }
     expect(migrationSql).toContain("('read'), ('create'), ('update'), ('delete')")
   })
 
-  it('seeds only layout roots and relative management child paths', () => {
+  it('seeds root and child navigation with UUID relationships', () => {
     const migrationSql = baselineMigrationSql()
 
-    expect(migrationSql).toContain(
-      "(0, '组织与权限', '/sys', '', 'AdminLayout', '', 'layers', 20, 'directory', true)",
-    )
-    expect(migrationSql).toContain(
-      "(0, '系统配置', '/config', '', 'AdminLayout', '', 'settings', 30, 'directory', true)",
-    )
-    for (const [parentName, name, path, component] of [
-      ['组织与权限', '用户管理', 'users', 'users'],
-      ['组织与权限', '角色管理', 'roles', 'roles'],
-      ['组织与权限', '部门管理', 'departments', 'departments'],
-      ['组织与权限', '菜单管理', 'menus', 'menus'],
-      ['系统配置', '字典管理', 'dictionaries', 'dictionaries'],
-    ]) {
-      expect(migrationSql).toContain(`('${parentName}', '${name}', '${path}', '${component}'`)
+    for (const rootPath of ['/', '/sys', '/config', '/ops', '/about']) {
+      expect(migrationSql).toContain(`'${rootPath}'`)
     }
-    expect(migrationSql).not.toContain("'工作台'")
-    expect(migrationSql).not.toContain("'首页'")
-  })
-
-  it('adds persistent API request logs and the administrator read permission', () => {
-    const migrationSql = apiLogMigrationSql()
-
-    expect(migrationSql).toContain('CREATE TABLE IF NOT EXISTS "sys_api_request_logs"')
-    expect(migrationSql).toContain('"expires_at" timestamp with time zone')
-    expect(migrationSql).toContain('"sys_api_request_logs_expires_at_index"')
-    expect(migrationSql).toContain("'api_logs.read'")
-    expect(migrationSql).not.toContain('DROP COLUMN')
-  })
-
-  it('adds the operations monitoring menu and administrator access to API logs', () => {
-    const migrationSql = apiLogNavigationMigrationSql()
-
-    expect(migrationSql).toContain("'运维监控', '/ops', '', 'AdminLayout'")
-    expect(migrationSql).toContain("'接口日志', 'api-logs', 'api-logs'")
-    expect(migrationSql).toContain("'api_logs.read'")
-    expect(migrationSql).toContain('INSERT INTO "sys_role_menus"')
-    expect(migrationSql).toContain('INSERT INTO "sys_role_permissions"')
-    expect(migrationSql).not.toContain('DROP')
-  })
-
-  it('appends the about project menu after the existing root menus', () => {
-    const migrationSql = aboutProjectMigrationSql()
-
-    expect(migrationSql).toContain("'/about', 'about', 'AdminLayout'")
-    expect(migrationSql).toContain("'关于项目'")
-    expect(migrationSql).toContain("'book', 999, 'menu', true")
-    expect(migrationSql).toContain('WHERE NOT EXISTS')
-    expect(migrationSql).not.toContain('required_permission_key')
-    expect(migrationSql).not.toContain('DROP')
-  })
-
-  it('adds a permission-controlled dynamic home without overwriting existing navigation', () => {
-    const migrationSql = dynamicHomeMigrationSql()
-
-    expect(migrationSql).toContain("'home.read'")
-    expect(migrationSql).toContain("'首页', '/', 'home', 'AdminLayout'")
-    expect(migrationSql).toContain('INSERT INTO "sys_role_permissions"')
-    expect(migrationSql).toContain('INSERT INTO "sys_role_menus"')
-    expect(migrationSql).toContain('WHERE NOT EXISTS')
-    expect(migrationSql).toContain('ON CONFLICT ("key") DO NOTHING')
-    expect(migrationSql).not.toContain('DO UPDATE')
-    expect(migrationSql).not.toContain('UPDATE "sys_menus"')
-    expect(migrationSql).not.toContain('DROP')
+    for (const childPath of [
+      'users',
+      'roles',
+      'departments',
+      'positions',
+      'menus',
+      'dictionaries',
+      'api-logs',
+    ]) {
+      expect(migrationSql).toContain(`'${childPath}'`)
+    }
+    expect(migrationSql).toContain('parent."id"')
+    expect(migrationSql).not.toContain('(0,')
   })
 })

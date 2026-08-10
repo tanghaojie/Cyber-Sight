@@ -1,4 +1,4 @@
-import type { CurrentUser } from '@cyber-ai-forge/api-contract'
+import { EntityIdSchema, type CurrentUser } from '@cyber-ai-forge/api-contract'
 import type { FastifyInstance, FastifyRequest } from 'fastify'
 import { ApiLogsRepository } from './api-logs.repository.js'
 import { ApiLogWriter } from './api-logs.service.js'
@@ -35,8 +35,12 @@ function captureLoginActor(request: AuditedRequest, payload: Record<string, unkn
     return
   }
   const user = payload.data.user
-  if (isObject(user) && typeof user.id === 'number' && typeof user.username === 'string') {
-    request.apiLogContext!.actor = { id: user.id, username: user.username }
+  if (!isObject(user)) {
+    return
+  }
+  const userId = EntityIdSchema.safeParse(user.id)
+  if (userId.success && typeof user.username === 'string') {
+    request.apiLogContext!.actor = { id: userId.data, username: user.username }
   }
 }
 

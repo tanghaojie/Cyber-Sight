@@ -92,7 +92,7 @@
 import { onMounted, ref } from 'vue'
 import { Delete, EditPen, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { DepartmentOption, UserSummary } from '@cyber-ai-forge/api-contract'
+import type { DepartmentOption, EntityId, UserSummary } from '@cyber-ai-forge/api-contract'
 import type { PositionOption } from '@/modules/system/positions/positions.api'
 import type { RoleOption } from '@/modules/system/roles/roles.api'
 import { deleteUser, listUsers } from '@/modules/system/users/users.api'
@@ -141,20 +141,20 @@ function search(): void {
   void load()
 }
 
-function roleName(id: number): string {
+function roleName(id: EntityId): string {
   return (
     props.roleOptions.find((role) => role.id === id)?.name ?? t('users.list.unknownRole', { id })
   )
 }
 
-function departmentName(id: number): string {
+function departmentName(id: EntityId): string {
   return (
     props.departmentOptions.find((department) => department.id === id)?.name ??
     t('users.list.unknownDepartment', { id })
   )
 }
 
-function positionName(id: number): string {
+function positionName(id: EntityId): string {
   return (
     props.positionOptions.find((position) => position.id === id)?.name ??
     t('users.list.unknownPosition', { id })

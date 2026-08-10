@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, count, desc, eq, gte, inArray, isNotNull, isNull, lte, sql } from 'drizzle-orm'
+import type { EntityId } from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import { apiRequestLogs } from '@/db/schema.js'
 import { DATABASE } from '@/shared/database/database.provider.js'
@@ -12,7 +13,7 @@ const retentionLockId = 529_843_201
 export interface NormalizedApiLogQuery {
   pageNum: number
   pageSize: number
-  actorUserId?: number
+  actorUserId?: EntityId
   actorUsername?: string
   method?: string
   routePattern?: string
@@ -43,8 +44,8 @@ export class ApiLogsRepository {
         httpStatus: event.httpStatus,
         businessStatus: event.businessStatus,
         durationMs: event.durationMs,
-        createdBy: 0,
-        updatedBy: 0,
+        createdBy: null,
+        updatedBy: null,
       })),
     )
   }

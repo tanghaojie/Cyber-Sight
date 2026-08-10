@@ -4,6 +4,7 @@ import type {
   PasswordUpdate,
   PersonalProfile,
   PersonalProfileUpdate,
+  EntityId,
   UserCreate,
   UserUpdate,
 } from '@cyber-ai-forge/api-contract'
@@ -57,7 +58,7 @@ export class UsersRepository {
     private readonly roles: RolesAccess,
   ) {}
 
-  async userExistsWithinAccess(userId: number, access: DataAccessPlan): Promise<boolean> {
+  async userExistsWithinAccess(userId: EntityId, access: DataAccessPlan): Promise<boolean> {
     const [row] = await this.db
       .select({ id: users.id })
       .from(users)
@@ -137,9 +138,9 @@ export class UsersRepository {
   }
 
   async hasValidAssignments(
-    roleIds: number[],
-    departmentIds: number[],
-    positionIds: number[],
+    roleIds: EntityId[],
+    departmentIds: EntityId[],
+    positionIds: EntityId[],
   ): Promise<boolean> {
     const [validRoleIds, validDepartmentIds, validPositions] = await Promise.all([
       this.roles.enabledRoleIds(roleIds),
@@ -155,10 +156,10 @@ export class UsersRepository {
 
   private async replaceUserDepartments(
     tx: Transaction,
-    userId: number,
-    departmentIds: number[],
-    primaryDepartmentId: number,
-    actorId: number,
+    userId: EntityId,
+    departmentIds: EntityId[],
+    primaryDepartmentId: EntityId,
+    actorId: EntityId,
   ): Promise<void> {
     const now = new Date()
     // 先软删除旧集合，再恢复已有关系或新增关系，实现带审计历史的整体替换。
@@ -193,9 +194,9 @@ export class UsersRepository {
   }
 
   async canAssignUserDepartments(
-    departmentIds: number[],
+    departmentIds: EntityId[],
     access: DataAccessPlan,
-    targetUserId?: number,
+    targetUserId?: EntityId,
   ): Promise<boolean> {
     if (access.unrestricted) {
       return true
@@ -218,9 +219,9 @@ export class UsersRepository {
 
   private async replaceUserRoles(
     tx: Transaction,
-    userId: number,
-    roleIds: number[],
-    actorId: number,
+    userId: EntityId,
+    roleIds: EntityId[],
+    actorId: EntityId,
   ): Promise<void> {
     const now = new Date()
     // 与部门关系使用相同的软删除/恢复策略，防止重复关系并保留审计记录。
@@ -251,7 +252,7 @@ export class UsersRepository {
     }
   }
 
-  async createUser(input: UserCreate, actorId: number): Promise<number> {
+  async createUser(input: UserCreate, actorId: EntityId): Promise<EntityId> {
     // 密码哈希在事务外完成，缩短数据库事务持锁时间。
     const passwordHash = await hashPassword(input.password)
     return this.db.transaction(async (tx) => {
@@ -287,9 +288,9 @@ export class UsersRepository {
   }
 
   async updateUser(
-    id: number,
+    id: EntityId,
     input: UserUpdate,
-    actorId: number,
+    actorId: EntityId,
     access: DataAccessPlan,
   ): Promise<boolean> {
     const passwordHash = input.password ? await hashPassword(input.password) : undefined
@@ -329,7 +330,7 @@ export class UsersRepository {
     })
   }
 
-  async personalProfileForUser(userId: number): Promise<PersonalProfile | null> {
+  async personalProfileForUser(userId: EntityId): Promise<PersonalProfile | null> {
     // 个人资料只读取当前用户自己的可编辑字段，角色、部门和状态必须通过管理接口维护。
     const [profile] = await this.db
       .select({
@@ -346,7 +347,7 @@ export class UsersRepository {
   }
 
   async updatePersonalProfile(
-    userId: number,
+    userId: EntityId,
     input: PersonalProfileUpdate,
   ): Promise<PersonalProfile | null> {
     // enabled 条件避免已禁用账户借持有的旧会话继续修改资料。
@@ -370,7 +371,7 @@ export class UsersRepository {
   }
 
   async changePersonalPassword(
-    userId: number,
+    userId: EntityId,
     input: PasswordUpdate,
   ): Promise<'updated' | 'invalid-current-password' | 'not-found'> {
     const [account] = await this.db
@@ -397,7 +398,7 @@ export class UsersRepository {
     return updated.length ? 'updated' : 'not-found'
   }
 
-  async softDeleteUser(id: number, actorId: number, access: DataAccessPlan): Promise<boolean> {
+  async softDeleteUser(id: EntityId, actorId: EntityId, access: DataAccessPlan): Promise<boolean> {
     return this.db.transaction(async (tx) => {
       const result = await tx
         .update(users)

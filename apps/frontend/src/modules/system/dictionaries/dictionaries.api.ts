@@ -2,6 +2,7 @@ import type {
   DictionaryRequest,
   DictionarySummary,
   EmptySuccessResponse,
+  EntityId,
   IdResponse,
   PaginatedResponse,
 } from '@cyber-ai-forge/api-contract'
@@ -26,7 +27,7 @@ export async function createDictionary(payload: DictionaryRequest): Promise<ApiM
 }
 
 export async function updateDictionary(
-  id: number,
+  id: EntityId,
   payload: DictionaryRequest,
 ): Promise<ApiMutationResult> {
   const { data, error } = await apiClient.PUT<IdResponse, DictionaryRequest>(
@@ -36,7 +37,7 @@ export async function updateDictionary(
   return apiResult(data, error)
 }
 
-export async function deleteDictionary(id: number) {
+export async function deleteDictionary(id: EntityId) {
   const { data, error } = await apiClient.DELETE<EmptySuccessResponse>(`/admin/dictionaries/${id}`)
   return apiResult(data, error)
 }

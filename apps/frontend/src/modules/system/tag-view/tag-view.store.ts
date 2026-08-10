@@ -1,8 +1,9 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
+import { EntityIdSchema, type EntityId } from '@cyber-ai-forge/api-contract'
 import { browserStorage } from '@/shared/browserStorage'
 
-const STORAGE_KEY_PREFIX = 'cyber_ai_forge_tag_view_history:v1:'
+const STORAGE_KEY_PREFIX = 'cyber_ai_forge_tag_view_history:v2:'
 
 export interface TagViewItem {
   path: string
@@ -28,7 +29,7 @@ function normalizeTag(value: unknown): TagViewItem | undefined {
   return { path, title }
 }
 
-function restoreTags(userId: number): TagViewItem[] {
+function restoreTags(userId: EntityId): TagViewItem[] {
   try {
     const raw = browserStorage()?.getItem(`${STORAGE_KEY_PREFIX}${userId}`)
     if (!raw) {
@@ -59,7 +60,7 @@ function restoreTags(userId: number): TagViewItem[] {
 
 /** 管理账号隔离的页面标签历史，并把每次变更同步到浏览器持久化。 */
 export const useTagViewStore = defineStore('tag-view', () => {
-  const activeUserId = ref<number | null>(null)
+  const activeUserId = ref<EntityId | null>(null)
   const items = ref<TagViewItem[]>([])
   const tags = computed<readonly TagViewItem[]>(() => items.value)
 
@@ -77,8 +78,8 @@ export const useTagViewStore = defineStore('tag-view', () => {
     }
   }
 
-  function activate(userId: number): void {
-    if (!Number.isInteger(userId) || userId <= 0) {
+  function activate(userId: EntityId): void {
+    if (!EntityIdSchema.safeParse(userId).success) {
       deactivate()
       return
     }

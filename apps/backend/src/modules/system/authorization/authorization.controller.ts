@@ -8,6 +8,7 @@ import {
   SubjectAccessResultSchema,
   type AuthorizationSubjectType,
   type CurrentUser,
+  type EntityId,
   type IdParams,
   type SubjectAccessRequest,
 } from '@cyber-ai-forge/api-contract'
@@ -162,7 +163,7 @@ export class AuthorizationController {
     return this.replaceAccess(actor, 'department', params.id, body)
   }
 
-  private async getAccess(actor: CurrentUser, subjectType: AuthorizationSubjectType, id: number) {
+  private async getAccess(actor: CurrentUser, subjectType: AuthorizationSubjectType, id: EntityId) {
     if (
       !(await this.authorization.authorizationSubjectExists(subjectType, id)) ||
       !(await this.provider.canAccessSubject(actor, subjectType, id, 'read'))
@@ -175,7 +176,7 @@ export class AuthorizationController {
   private async replaceAccess(
     actor: CurrentUser,
     subjectType: AuthorizationSubjectType,
-    id: number,
+    id: EntityId,
     body: SubjectAccessRequest,
   ) {
     if (

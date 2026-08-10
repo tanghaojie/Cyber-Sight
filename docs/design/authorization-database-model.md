@@ -2,7 +2,7 @@
 title: 授权数据库模型
 status: active
 owner: project maintainers
-updated: 2026-07-31
+updated: 2026-08-10
 ---
 
 # 授权数据库模型
@@ -18,7 +18,7 @@ updated: 2026-07-31
 
 岗位模块的 `sys_positions` 和 `sys_user_positions` 属于组织主数据，不属于本授权模型。岗位不能作为角色、权限或数据策略主体；第一版岗位接口只受 `positions.manage` 功能权限保护。
 
-所有物理表为应用系统表，使用 sys_ 前缀。Drizzle 导出名与物理表名的完整映射见[数据库 Schema 与迁移基线](database-schema-and-migrations.md)。
+所有物理表为应用系统表，使用 sys_ 前缀。应用表主键与实体引用统一使用数据库生成的 UUIDv7；HTTP 和 TypeScript 使用 UUID 字符串。Drizzle 导出名与物理表名的完整映射见[数据库 Schema 与迁移基线](database-schema-and-migrations.md)。
 
 ```mermaid
 erDiagram
@@ -41,8 +41,8 @@ erDiagram
 | 字段                   | 含义                                                              |
 | ---------------------- | ----------------------------------------------------------------- |
 | is_deleted             | 软删除标记。运行时仅使用 false 的记录；取消授权不会抹掉审计历史。 |
-| created_at、created_by | 创建时间与创建者 ID。                                             |
-| updated_at、updated_by | 最近更新时间与操作者 ID。                                         |
+| created_at、created_by | 创建时间与可空 UUID 创建者；系统主体使用 `NULL`。                 |
+| updated_at、updated_by | 最近更新时间与可空 UUID 操作者；系统主体使用 `NULL`。             |
 
 关系表的唯一约束几乎都采用 WHERE is_deleted = false 的部分唯一索引。这样可保留历史关联，并在再次授予相同角色、部门或策略时恢复旧记录，同时避免两条相同关系并存为有效状态。
 
@@ -86,7 +86,7 @@ WHERE ur.user_id = :current_user_id
 
 ### 初始数据
 
-初始迁移 apps/backend/drizzle/0000_initial_system_schema.sql 会创建权限目录、超级管理员角色及归属，并授予该初始角色当时已登记的功能权限；后续追加迁移以同一关系模型登记新能力，例如 `0005_dynamic_home_menu.sql` 为超级管理员追加 `home.read`。超级管理员不依赖运行时用户 ID 或角色编码绕过；其能力同样来自上述关系表。
+唯一初始迁移 `apps/backend/drizzle/0000_initial_uuidv7_system_schema.sql` 会创建完整权限目录、超级管理员角色及归属，并授予该角色当前全部初始功能权限。超级管理员不依赖固定用户 UUID、运行时用户 ID 或角色编码绕过；其能力同样来自上述关系表。
 
 ## 数据权限
 
@@ -96,11 +96,11 @@ WHERE ur.user_id = :current_user_id
 
 | 物理表                 | 作用                   | 关键字段与约束                                                                                                                 |
 | ---------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| sys_departments        | 部门邻接表             | id 用于部门关联；parent_id 保存直接父部门，根部门为 0；name 为展示名称；enabled 控制部门是否参与有效范围。                     |
+| sys_departments        | 部门邻接表             | id 为 UUIDv7；parent_id 保存直接父部门，根部门为 `NULL`；name 为展示名称；enabled 控制部门是否参与有效范围。                   |
 | sys_department_closure | 部门闭包表             | ancestor_id、descendant_id 均外键指向部门；depth = 0 表示本部门到自身；有效路径 (ancestor_id, descendant_id) 唯一。            |
 | sys_user_departments   | 用户与部门的多对多归属 | user_id、department_id 均为外键；is_primary 标记主部门。有效 (user_id, department_id) 唯一，且一个用户最多一条有效主部门记录。 |
 
-sys_departments.parent_id 保存树的直接关系，sys_department_closure 保存全部路径。例如 (10, 35, 2) 表示部门 35 是部门 10 的两级下属。这样，“部门及其下级”可按 ancestor_id 直接查询，不需要在每个授权请求中递归遍历树。部门创建、移动或删除时在同一事务中重建或失效对应闭包路径。
+sys_departments.parent_id 保存树的直接关系，sys_department_closure 保存全部路径。例如 `(ancestor_uuid, descendant_uuid, 2)` 表示 descendant 是 ancestor 的两级下属。这样，“部门及其下级”可按 ancestor_id 直接查询，不需要在每个授权请求中递归遍历树。部门创建、移动或删除时在同一事务中重建或失效对应闭包路径。
 
 ### 策略表与字段
 
@@ -166,8 +166,8 @@ department:U 的任一祖先部门，且 inherit_to_children = true
 ```text
 DataAccessPlan {
   unrestricted: boolean
-  ownerUserIds: number[]
-  departmentIds: number[]
+  ownerUserIds: EntityId[]
+  departmentIds: EntityId[]
 }
 ```
 

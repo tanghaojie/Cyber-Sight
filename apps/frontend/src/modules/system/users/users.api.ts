@@ -1,6 +1,7 @@
 import type {
   ApiResponse,
   EmptySuccessResponse,
+  EntityId,
   IdResponse,
   PersonalProfile,
   PersonalProfileResponse,
@@ -29,14 +30,14 @@ export async function createUser(payload: UserCreate): Promise<ApiMutationResult
   return apiResult(data, error)
 }
 
-export async function updateUser(id: number, payload: UserUpdate): Promise<ApiMutationResult> {
+export async function updateUser(id: EntityId, payload: UserUpdate): Promise<ApiMutationResult> {
   const { data, error } = await apiClient.PUT<IdResponse, UserUpdate>(`/admin/users/${id}`, {
     body: payload,
   })
   return apiResult(data, error)
 }
 
-export async function deleteUser(id: number) {
+export async function deleteUser(id: EntityId) {
   const { data, error } = await apiClient.DELETE<EmptySuccessResponse>(`/admin/users/${id}`)
   return apiResult(data, error)
 }

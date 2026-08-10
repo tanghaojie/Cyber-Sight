@@ -62,7 +62,7 @@
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue'
-import type { NavigationMenu } from '@cyber-ai-forge/api-contract'
+import type { EntityId, NavigationMenu } from '@cyber-ai-forge/api-contract'
 import AppIcon from '@/components/AppIcon.vue'
 import { navigationLabel } from '@/modules/system/navigation/navigation.labels'
 import { useLocalization } from '@/modules/system/localization/localization'
@@ -72,11 +72,11 @@ defineEmits<{ navigate: [] }>()
 
 const { resolveLocalizedLabel, t } = useLocalization()
 
-const expanded = reactive<Record<number, boolean>>({})
+const expanded = reactive<Record<EntityId, boolean>>({})
 
 const indentStyle = computed(() => ({ paddingLeft: `${14 + props.depth * 14}px` }))
 
-function toggle(id: number): void {
+function toggle(id: EntityId): void {
   expanded[id] = expanded[id] === false
 }
 </script>

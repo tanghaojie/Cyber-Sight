@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, eq } from 'drizzle-orm'
+import type { EntityId } from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import { dataPolicyDepartments, permissions } from '@/db/schema.js'
 import { DATABASE } from '@/shared/database/database.provider.js'
@@ -24,7 +25,7 @@ export class AuthorizationReferences {
     return Boolean(row)
   }
 
-  async hasActiveDepartmentPolicyReference(departmentId: number): Promise<boolean> {
+  async hasActiveDepartmentPolicyReference(departmentId: EntityId): Promise<boolean> {
     const [row] = await this.db
       .select({ id: dataPolicyDepartments.id })
       .from(dataPolicyDepartments)

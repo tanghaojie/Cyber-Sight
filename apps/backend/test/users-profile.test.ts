@@ -3,6 +3,8 @@ import { PasswordUpdateSchema, PersonalProfileUpdateSchema } from '@cyber-ai-for
 import { UsersRepository } from '@/modules/system/users/users.repository.js'
 import { hashPassword } from '@/modules/system/auth/auth.security.js'
 
+const aliceId = '0198f31a-0000-7000-8000-000000000004'
+
 function selectResult<T>(rows: T[]) {
   return {
     from: vi.fn(() => ({
@@ -43,7 +45,7 @@ describe('personal profile contracts', () => {
 describe('personal profile repository', () => {
   it('loads only the self-service profile projection', async () => {
     const profile = {
-      id: 4,
+      id: aliceId,
       username: 'alice',
       displayName: 'Alice',
       email: 'alice@example.com',
@@ -55,7 +57,7 @@ describe('personal profile repository', () => {
 
   it('updates profile fields with the current user as audit actor', async () => {
     const profile = {
-      id: 4,
+      id: aliceId,
       username: 'alice',
       displayName: 'Alice Updated',
       email: 'alice.updated@example.com',
@@ -88,7 +90,7 @@ describe('personal profile repository', () => {
     const users = repository(db)
 
     await expect(
-      users.changePersonalPassword(4, {
+      users.changePersonalPassword(aliceId, {
         currentPassword: 'Incorrect!123',
         newPassword: 'NewPassword!123',
       }),
@@ -99,7 +101,7 @@ describe('personal profile repository', () => {
   it('hashes and persists a verified new password', async () => {
     const oldPassword = 'Correct!123'
     const passwordHash = await hashPassword(oldPassword)
-    const returning = vi.fn().mockResolvedValue([{ id: 4 }])
+    const returning = vi.fn().mockResolvedValue([{ id: aliceId }])
     const db = {
       select: vi.fn(() => selectResult([{ passwordHash }])),
       update: vi.fn(() => ({ set: vi.fn(() => ({ where: vi.fn(() => ({ returning })) })) })),
@@ -107,7 +109,7 @@ describe('personal profile repository', () => {
     const users = repository(db)
 
     await expect(
-      users.changePersonalPassword(4, {
+      users.changePersonalPassword(aliceId, {
         currentPassword: oldPassword,
         newPassword: 'NewPassword!123',
       }),

@@ -1,7 +1,7 @@
 <template>
   <section class="management-page" aria-labelledby="menus-title">
     <header class="page-intro">
-      <el-button type="primary" :icon="Plus" size="large" @click="openCreate(0)">
+      <el-button type="primary" :icon="Plus" size="large" @click="openCreate(null)">
         {{ t('menus.page.add') }}
       </el-button>
     </header>
@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
-import type { MenuSummary } from '@cyber-ai-forge/api-contract'
+import type { EntityId, MenuSummary } from '@cyber-ai-forge/api-contract'
 import MenuDialog from './components/MenuDialog.vue'
 import MenusList from './components/MenusList.vue'
 import { useLocalization } from '@/modules/system/localization/localization'
@@ -30,10 +30,10 @@ const { t } = useLocalization()
 const menusList = ref<InstanceType<typeof MenusList> | null>(null)
 const records = ref<MenuSummary[]>([])
 const editingMenu = ref<MenuSummary | null>(null)
-const parentId = ref(0)
+const parentId = ref<EntityId | null>(null)
 const dialogOpen = ref(false)
 
-function openCreate(selectedParentId: number): void {
+function openCreate(selectedParentId: EntityId | null): void {
   // 从目录行新增时预选父目录，页头新增传入 0 创建根节点。
   editingMenu.value = null
   parentId.value = selectedParentId

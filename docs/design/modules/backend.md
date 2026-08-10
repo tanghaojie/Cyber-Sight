@@ -46,7 +46,7 @@
 
 Nest Controller 必须通过 `ZodValidationPipe` 使用 `@cyber-ai-forge/api-contract` 提供的请求体、查询参数和路径参数 Schema，并通过 `ContractRoute` 绑定响应 Schema 与 OpenAPI 元数据。参数类型必须从相同 Schema 推导；类型标注不能替代运行时校验。
 
-共享请求 Schema 使用严格对象；未声明字段必须由 Zod Pipe 触发统一参数错误，不能被静默删除后继续执行处理函数。HTTP 查询和路径中的数字由契约中的 `z.coerce.number()` 在边界转换。
+共享请求 Schema 使用严格对象；未声明字段必须由 Zod Pipe 触发统一参数错误，不能被静默删除后继续执行处理函数。分页等 HTTP 数字查询由契约中的 `z.coerce.number()` 在边界转换；实体路径参数必须通过 `EntityIdSchema` 校验为 UUID 字符串，禁止转回数字。
 
 响应由 `ContractResponseInterceptor` 使用同一 Zod Schema 校验；OpenAPI Schema 由契约包转换生成。Fastify Zod Type Provider 不进入 Controller 主链路，避免形成与 Nest Pipe/Interceptor 并行的第二套校验生命周期。
 
@@ -67,8 +67,8 @@ Java 引入不是简单代码生成，需要独立的设计、ADR、迁移计划
 - Drizzle 迁移文件进入版本控制，数据库结构变化通过迁移执行。
 - 默认单元和路由测试不得依赖本机数据库；数据库集成验证使用独立命令显式运行。
 - 所有业务表包含 `is_deleted`、`created_at`、`created_by`、`updated_at`、`updated_by`；仓储查询显式过滤软删除数据。
-- 14 张脚手架表使用 `sys_` 物理前缀，映射和例外见[数据库 Schema 与迁移基线](../database-schema-and-migrations.md)。
-- 当前 `0000_initial_system_schema` 单一基线只面向全新空数据库；旧库数据保留或搬迁必须另写方案。
+- 17 张脚手架表使用 `sys_` 物理前缀和数据库生成的 UUIDv7 主键，映射和例外见[数据库 Schema 与迁移基线](../database-schema-and-migrations.md)。
+- 当前 `0000_initial_uuidv7_system_schema` 单一基线只面向全新 PostgreSQL 18 空数据库；旧库数据保留或搬迁必须另写方案。
 - `src/db/schema.ts` 是稳定聚合入口，具体表定义位于 `src/db/schema/`。分片按表的数据所有权组织，外键依赖通过显式 `.js` 导入表达；迁移生成必须能加载完整聚合入口且不产生无关 DDL。
 
 ## 可维护性说明

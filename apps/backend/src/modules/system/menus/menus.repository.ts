@@ -1,6 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, count, eq, ilike } from 'drizzle-orm'
-import type { CurrentUser, MenuRequest, NavigationMenu } from '@cyber-ai-forge/api-contract'
+import type {
+  CurrentUser,
+  EntityId,
+  MenuRequest,
+  NavigationMenu,
+} from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import { menus } from '@/db/schema.js'
 import { authorizationProviderToken } from '@/modules/system/authorization/authorization.guard.js'
@@ -38,19 +43,21 @@ function menuSummary(row: typeof menus.$inferSelect) {
 
 function orderedRows(rows: NavigationRow[]): NavigationRow[] {
   // sortOrder 相同时按 ID 兜底，保证数据库返回顺序变化不会造成导航抖动。
-  return [...rows].sort((left, right) => left.sortOrder - right.sortOrder || left.id - right.id)
+  return [...rows].sort(
+    (left, right) => left.sortOrder - right.sortOrder || left.id.localeCompare(right.id),
+  )
 }
 
-function hasParentCycle(row: NavigationRow, rowsById: Map<number, NavigationRow>): boolean {
+function hasParentCycle(row: NavigationRow, rowsById: Map<EntityId, NavigationRow>): boolean {
   // 对遗留或异常数据做防御性检测，构建导航时不让循环父链造成递归死循环。
   const visited = new Set([row.id])
   let parentId = row.parentId
-  while (parentId > 0) {
+  while (parentId !== null) {
     if (visited.has(parentId)) {
       return true
     }
     visited.add(parentId)
-    parentId = rowsById.get(parentId)?.parentId ?? 0
+    parentId = rowsById.get(parentId)?.parentId ?? null
   }
   return false
 }
@@ -67,7 +74,7 @@ function isUsableNavigationRow(row: NavigationRow): boolean {
 
 export function buildNavigationTree(
   rows: NavigationRow[],
-  allowedMenuIds?: ReadonlySet<number>,
+  allowedMenuIds?: ReadonlySet<EntityId>,
 ): NavigationMenu[] {
   // 该函数容忍历史脏数据：异常节点降级为根，不影响其他用户可访问菜单的渲染。
   // 先丢弃无法导航的残缺节点，再基于权限决定初始可见集合。
@@ -80,9 +87,9 @@ export function buildNavigationTree(
   if (allowedMenuIds) {
     // 子菜单可见时补齐全部祖先目录，否则前端无法从根节点进入该菜单。
     for (const id of allowedMenuIds) {
-      const visited = new Set<number>()
+      const visited = new Set<EntityId>()
       let current = allRowsById.get(id)
-      while (current && current.parentId > 0 && !visited.has(current.id)) {
+      while (current && current.parentId !== null && !visited.has(current.id)) {
         visited.add(current.id)
         visibleIds.add(current.parentId)
         current = allRowsById.get(current.parentId)
@@ -92,14 +99,14 @@ export function buildNavigationTree(
 
   const visibleRows = orderedRows(usableRows.filter((row) => visibleIds.has(row.id)))
   const visibleRowsById = new Map(visibleRows.map((row) => [row.id, row]))
-  const nodesById = new Map<number, NavigationMenu>(
+  const nodesById = new Map<EntityId, NavigationMenu>(
     visibleRows.map((row) => [row.id, { ...row, children: [] }]),
   )
   const roots: NavigationMenu[] = []
 
   for (const row of visibleRows) {
     const node = nodesById.get(row.id)!
-    const parent = nodesById.get(row.parentId)
+    const parent = row.parentId === null ? undefined : nodesById.get(row.parentId)
     if (parent && parent.type === 'directory' && !hasParentCycle(row, visibleRowsById)) {
       parent.children.push(node)
     } else {
@@ -165,8 +172,8 @@ export class MenusRepository {
     return buildNavigationTree(rows.map(navigationRow), allowedMenuIds)
   }
 
-  async validateMenuParent(parentId: number, currentId?: number): Promise<boolean> {
-    if (parentId === 0) {
+  async validateMenuParent(parentId: EntityId | null, currentId?: EntityId): Promise<boolean> {
+    if (parentId === null) {
       return true
     }
     if (parentId === currentId) {
@@ -184,10 +191,10 @@ export class MenusRepository {
       return false
     }
 
-    const visited = new Set<number>()
+    const visited = new Set<EntityId>()
     let cursor = parent
     // 从候选父级向上追溯，拒绝把当前节点或其后代放到自身下面。
-    while (cursor.parentId > 0 && !visited.has(cursor.id)) {
+    while (cursor.parentId !== null && !visited.has(cursor.id)) {
       if (cursor.parentId === currentId) {
         return false
       }
@@ -201,7 +208,7 @@ export class MenusRepository {
     return !visited.has(cursor.id)
   }
 
-  async createMenu(input: MenuRequest, actorId: number): Promise<number> {
+  async createMenu(input: MenuRequest, actorId: EntityId): Promise<EntityId> {
     const [created] = await this.db
       .insert(menus)
       .values({ ...input, createdBy: actorId, updatedBy: actorId })
@@ -209,7 +216,7 @@ export class MenusRepository {
     return created.id
   }
 
-  async updateMenu(id: number, input: MenuRequest, actorId: number): Promise<boolean> {
+  async updateMenu(id: EntityId, input: MenuRequest, actorId: EntityId): Promise<boolean> {
     const result = await this.db
       .update(menus)
       .set({ ...input, updatedAt: new Date(), updatedBy: actorId })
@@ -218,7 +225,7 @@ export class MenusRepository {
     return result.length > 0
   }
 
-  async hasActiveMenuChildren(id: number): Promise<boolean> {
+  async hasActiveMenuChildren(id: EntityId): Promise<boolean> {
     const [child] = await this.db
       .select({ id: menus.id })
       .from(menus)
@@ -227,7 +234,7 @@ export class MenusRepository {
     return Boolean(child)
   }
 
-  async softDeleteMenu(id: number, actorId: number): Promise<boolean> {
+  async softDeleteMenu(id: EntityId, actorId: EntityId): Promise<boolean> {
     const result = await this.db
       .update(menus)
       .set({ isDeleted: true, updatedAt: new Date(), updatedBy: actorId })

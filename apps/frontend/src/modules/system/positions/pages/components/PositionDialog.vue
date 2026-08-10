@@ -60,6 +60,7 @@ import { reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import type {
   DepartmentOption,
+  EntityId,
   PositionRequest,
   PositionSummary,
 } from '@cyber-ai-forge/api-contract'
@@ -75,8 +76,14 @@ const dialogOpen = defineModel<boolean>({ required: true })
 const { t } = useLocalization()
 const saving = ref(false)
 const formError = ref('')
-const form = reactive<PositionRequest>({
-  departmentId: 0,
+const form = reactive<{
+  departmentId: EntityId | null
+  name: string
+  description: string
+  sortOrder: number
+  enabled: boolean
+}>({
+  departmentId: null,
   name: '',
   description: '',
   sortOrder: 10,
@@ -95,7 +102,7 @@ function resetForm(): void {
           enabled: props.position.enabled,
         }
       : {
-          departmentId: props.departmentOptions[0]?.id ?? 0,
+          departmentId: props.departmentOptions[0]?.id ?? null,
           name: '',
           description: '',
           sortOrder: 10,
@@ -112,7 +119,7 @@ async function submit(): Promise<void> {
     if (!form.departmentId || !form.name) {
       throw new Error(t('positions.errors.invalidForm'))
     }
-    const payload: PositionRequest = { ...form }
+    const payload: PositionRequest = { ...form, departmentId: form.departmentId }
     const result = props.position
       ? await updatePosition(props.position.id, payload)
       : await createPosition(payload)

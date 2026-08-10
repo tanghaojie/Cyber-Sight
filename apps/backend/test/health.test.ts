@@ -236,10 +236,10 @@ describe('Nest application HTTP compatibility', () => {
 
   it('authenticates with and revokes a bearer token', async () => {
     const currentUser = {
-      id: 2,
+      id: '0198f31a-0000-7000-8000-000000000002',
       username: 'operator',
       displayName: 'Operator',
-      roles: [{ id: 2, name: 'User' }],
+      roles: [{ id: '0198f31a-0000-7000-8000-000000000012', name: 'User' }],
     }
     const issued = await authTokens.issue(currentUser)
     const headers = { authorization: `Bearer ${issued.token}` }
@@ -261,7 +261,7 @@ describe('Nest application HTTP compatibility', () => {
     expect(undeclared.json()).toEqual({ status: ErrorCode.INVALID_REQUEST, err: 'Invalid request' })
 
     const issued = await authTokens.issue({
-      id: 3,
+      id: '0198f31a-0000-7000-8000-000000000003',
       username: 'reader',
       displayName: 'Reader',
       roles: [],

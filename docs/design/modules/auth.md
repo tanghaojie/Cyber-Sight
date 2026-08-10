@@ -2,7 +2,7 @@
 title: 认证模块
 status: active
 owner: maintainers
-updated: 2026-08-08
+updated: 2026-08-10
 ---
 
 # 认证模块
@@ -13,7 +13,7 @@ updated: 2026-08-08
 
 ## 数据流与会话生命周期
 
-1. 登录在数据库中校验用户凭据并读取角色，签发 issuer 为 `cyber-ai-forge`、audience 为 `cyber-ai-forge-api`、7 天有效的 HS256 JWT，把 token 的 SHA-256 哈希、用户和过期时间写入 `sys_auth_sessions`，再把 token 标识与当前用户快照写入容量为 100 的进程内 LRU 缓存。数据库不保存可直接复用的明文 token。
+1. 登录在数据库中校验用户凭据并读取角色，签发 issuer 为 `cyber-ai-forge`、audience 为 `cyber-ai-forge-api`、subject 为用户 UUID、7 天有效的 HS256 JWT，把 token 的 SHA-256 哈希、用户和过期时间写入 `sys_auth_sessions`，再把 token 标识与当前用户快照写入容量为 100 的进程内 LRU 缓存。数据库不保存可直接复用的明文 token。
 2. 登录响应返回 `{ status: 0, data: { user, issued: { token, expiresAt } } }`。`auth.api.ts` 封装登录、当前用户和退出请求，`auth.store.ts` 负责会话状态，并通过 `shared/accessToken.ts` 把 token 写入键为 `cyber_ai_forge_access_token`、到期时间来自 `expiresAt` 的浏览器 cookie。共享 API Client 为请求附加 `Authorization: Bearer <token>`；清会话时同时清理当前 cookie、旧 `cyber_access_token` 和 `jtlib_access_token` cookie 及对应 `localStorage` 键。
 3. 鉴权先严格解析 Bearer 头并校验 JWT 签名、issuer、audience、算法和过期时间，再按 token 标识读取 LRU；缓存命中会刷新最近使用顺序，不查询数据库。
 4. 缓存未命中时，以 token 哈希查询未撤销且未过期的 `sys_auth_sessions`，联查启用用户和角色后回填 LRU。第 101 个 token 只淘汰最久未使用的缓存项，不撤销数据库会话；该 token 下次请求会回源后继续有效。进程重启同样只产生冷缓存。
@@ -43,7 +43,7 @@ updated: 2026-08-08
 
 ## 失败模式与测试
 
-缺少 Bearer 头、格式错误、签名错误、过期、数据库会话不存在或已撤销均返回 HTTP 401；单纯缓存未命中会回源数据库。前端全局处理器同时清除用户、token、导航与动态路由。后端自动化测试覆盖密码、JWT 完整性与过期、LRU 容量和最近使用顺序、淘汰后回源与显式清会话；Bearer 注入、登录状态持久化、清状态和路由保护，以及登录前主题入口由维护者人工验收。
+缺少 Bearer 头、格式错误、签名错误、过期、数字或非法 UUID subject、数据库会话不存在或已撤销均返回 HTTP 401；单纯缓存未命中会回源数据库。前端全局处理器同时清除用户、token、导航与动态路由。后端自动化测试覆盖密码、JWT 完整性与过期、UUID subject、LRU 容量和最近使用顺序、淘汰后回源与显式清会话；Bearer 注入、登录状态持久化、清状态和路由保护，以及登录前主题入口由维护者人工验收。
 
 `sys_auth_sessions.token_hash` 全表唯一并保留软删除与审计字段。过期或撤销记录仍是历史安全标识，不重新使用；后续可增加独立清理策略，但清理不能改变仍有效 token 的鉴权语义。
 

@@ -1,9 +1,14 @@
 import { z } from 'zod'
-import { AuditFieldsSchema, ErrorResponseSchema, paginatedResponseSchema } from '@/shared/http.js'
+import {
+  AuditFieldsSchema,
+  EntityIdSchema,
+  ErrorResponseSchema,
+  paginatedResponseSchema,
+} from '@/shared/http.js'
 
 /** 字典项由 type 分组，value 供业务保存，label 供界面展示。 */
 export const DictionarySummarySchema = AuditFieldsSchema.extend({
-  id: z.number().int(),
+  id: EntityIdSchema,
   type: z.string(),
   label: z.string(),
   value: z.string(),

@@ -1,25 +1,30 @@
 import { z } from 'zod'
-import { apiResponseSchema, AuditFieldsSchema, ErrorResponseSchema } from '@/shared/http.js'
+import {
+  apiResponseSchema,
+  AuditFieldsSchema,
+  EntityIdSchema,
+  ErrorResponseSchema,
+} from '@/shared/http.js'
 
-/** 部门契约以 parentId 表达树关系；0 是约定的虚拟根节点。 */
+/** 部门契约以 parentId 表达树关系；null 是唯一的根节点标识。 */
 export const DepartmentSummarySchema = AuditFieldsSchema.extend({
-  id: z.number().int(),
-  parentId: z.number().int().min(0),
+  id: EntityIdSchema,
+  parentId: EntityIdSchema.nullable(),
   name: z.string(),
   sortOrder: z.number().int().min(0),
   enabled: z.boolean(),
 })
 
 export const DepartmentRequestSchema = z.strictObject({
-  parentId: z.number().int().min(0),
+  parentId: EntityIdSchema.nullable(),
   name: z.string().min(1).max(80),
   sortOrder: z.number().int().min(0),
   enabled: z.boolean(),
 })
 
 export const DepartmentOptionSchema = z.strictObject({
-  id: z.number().int(),
-  parentId: z.number().int().min(0),
+  id: EntityIdSchema,
+  parentId: EntityIdSchema.nullable(),
   name: z.string(),
 })
 

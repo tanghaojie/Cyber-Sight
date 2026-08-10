@@ -103,7 +103,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { Delete, EditPen, Plus, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { MenuSummary } from '@cyber-ai-forge/api-contract'
+import type { EntityId, MenuSummary } from '@cyber-ai-forge/api-contract'
 import AppIcon from '@/components/AppIcon.vue'
 import { useNavigationStore } from '@/modules/system/navigation/navigation.store'
 import { buildMenuTree, type MenuTreeRecord } from '@/modules/system/menus/menu-tree'
@@ -113,7 +113,7 @@ import { useLocalization } from '@/modules/system/localization/localization'
 type MenuType = MenuSummary['type']
 
 const emit = defineEmits<{
-  create: [parentId: number]
+  create: [parentId: EntityId]
   edit: [menu: MenuSummary]
   loaded: [records: MenuSummary[]]
 }>()
@@ -130,7 +130,7 @@ const treeRecords = computed(() => {
     return buildMenuTree(records.value)
   }
   const byId = new Map(records.value.map((record) => [record.id, record]))
-  const visibleIds = new Set<number>()
+  const visibleIds = new Set<EntityId>()
   // 搜索命中子节点时补齐祖先目录，保持结果仍是一棵可理解的树。
   for (const record of records.value) {
     if (!record.name.toLowerCase().includes(query)) {
@@ -138,9 +138,9 @@ const treeRecords = computed(() => {
     }
     visibleIds.add(record.id)
     let currentParentId = record.parentId
-    while (currentParentId > 0 && !visibleIds.has(currentParentId)) {
+    while (currentParentId !== null && !visibleIds.has(currentParentId)) {
       visibleIds.add(currentParentId)
-      currentParentId = byId.get(currentParentId)?.parentId ?? 0
+      currentParentId = byId.get(currentParentId)?.parentId ?? null
     }
   }
   return buildMenuTree(records.value.filter((record) => visibleIds.has(record.id)))

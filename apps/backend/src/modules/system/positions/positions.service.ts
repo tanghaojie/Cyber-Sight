@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, count, eq, inArray } from 'drizzle-orm'
-import type { PositionRequest } from '@cyber-ai-forge/api-contract'
+import type { EntityId, PositionRequest } from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import { departments, positions, userPositions } from '@/db/schema.js'
 import { DATABASE } from '@/shared/database/database.provider.js'
@@ -36,16 +36,16 @@ export class PositionsService {
     return this.repository.listPositions(query)
   }
 
-  async listPositionOptions(departmentIds?: number[]) {
+  async listPositionOptions(departmentIds?: EntityId[]) {
     return this.repository.listPositionOptions(departmentIds)
   }
 
-  async canUseDepartment(departmentId: number): Promise<boolean> {
+  async canUseDepartment(departmentId: EntityId): Promise<boolean> {
     const ids = await this.departments.enabledDepartmentIds([departmentId])
     return ids.includes(departmentId)
   }
 
-  async positionExists(id: number): Promise<boolean> {
+  async positionExists(id: EntityId): Promise<boolean> {
     const [row] = await this.db
       .select({ id: positions.id })
       .from(positions)
@@ -54,7 +54,7 @@ export class PositionsService {
     return Boolean(row)
   }
 
-  async canChangePositionDepartment(id: number, departmentId: number): Promise<boolean> {
+  async canChangePositionDepartment(id: EntityId, departmentId: EntityId): Promise<boolean> {
     const [position] = await this.db
       .select({ departmentId: positions.departmentId })
       .from(positions)
@@ -71,7 +71,7 @@ export class PositionsService {
     return assignment.value === 0
   }
 
-  async hasActivePositionAssignments(id: number): Promise<boolean> {
+  async hasActivePositionAssignments(id: EntityId): Promise<boolean> {
     const [assignment] = await this.db
       .select({ value: count() })
       .from(userPositions)
@@ -80,24 +80,24 @@ export class PositionsService {
     return (assignment?.value ?? 0) > 0
   }
 
-  async createPosition(input: PositionRequest, actorId: number): Promise<number> {
+  async createPosition(input: PositionRequest, actorId: EntityId): Promise<EntityId> {
     return this.repository.createPosition(input, actorId)
   }
 
-  async updatePosition(id: number, input: PositionRequest, actorId: number): Promise<boolean> {
+  async updatePosition(id: EntityId, input: PositionRequest, actorId: EntityId): Promise<boolean> {
     return this.repository.updatePosition(id, input, actorId)
   }
 
-  async softDeletePosition(id: number, actorId: number): Promise<boolean> {
+  async softDeletePosition(id: EntityId, actorId: EntityId): Promise<boolean> {
     return this.repository.softDeletePosition(id, actorId)
   }
 
   async replaceUserPositionsInTransaction(
     tx: PositionTransaction,
-    userId: number,
-    positionIds: number[],
-    departmentIds: number[],
-    actorId: number,
+    userId: EntityId,
+    positionIds: EntityId[],
+    departmentIds: EntityId[],
+    actorId: EntityId,
   ): Promise<void> {
     const uniquePositionIds = [...new Set(positionIds)]
     if (uniquePositionIds.length !== positionIds.length) {
@@ -154,8 +154,8 @@ export class PositionsService {
 
   async softDeleteUserPositionsInTransaction(
     tx: PositionTransaction,
-    userId: number,
-    actorId: number,
+    userId: EntityId,
+    actorId: EntityId,
   ): Promise<void> {
     await tx
       .update(userPositions)

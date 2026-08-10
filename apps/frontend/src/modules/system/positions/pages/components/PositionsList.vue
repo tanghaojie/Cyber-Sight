@@ -96,7 +96,7 @@
 import { onMounted, ref } from 'vue'
 import { Delete, EditPen, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { DepartmentOption, PositionSummary } from '@cyber-ai-forge/api-contract'
+import type { DepartmentOption, EntityId, PositionSummary } from '@cyber-ai-forge/api-contract'
 import { deletePosition, listPositions } from '@/modules/system/positions/positions.api'
 import { useLocalization } from '@/modules/system/localization/localization'
 
@@ -113,7 +113,7 @@ const total = ref(0)
 const pageNum = ref(1)
 const pageSize = 10
 const keyword = ref('')
-const departmentId = ref<number | undefined>()
+const departmentId = ref<EntityId | undefined>()
 const loading = ref(false)
 const errorMessage = ref('')
 const { formatDateTime, t } = useLocalization()
@@ -144,7 +144,7 @@ function search(): void {
   void load()
 }
 
-function departmentName(id: number): string {
+function departmentName(id: EntityId): string {
   return props.departmentOptions.find((department) => department.id === id)?.name ?? `#${id}`
 }
 

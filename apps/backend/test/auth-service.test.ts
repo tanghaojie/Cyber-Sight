@@ -5,6 +5,10 @@ import { JwtTokenCache } from '@/modules/system/auth/auth-token-cache.js'
 import { hashPassword, hashSessionToken } from '@/modules/system/auth/auth.security.js'
 
 const SECRET = 'test-only-jwt-secret-at-least-32-characters'
+const operatorId = '0198f31a-0000-7000-8000-000000000007'
+const cachedUserId = '0198f31a-0000-7000-8000-000000000009'
+const userRoleId = '0198f31a-0000-7000-8000-000000000003'
+const adminRoleId = '0198f31a-0000-7000-8000-000000000004'
 
 function tokenCache() {
   return new JwtTokenCache(new JwtService({ secret: SECRET }), {})
@@ -15,7 +19,7 @@ describe('authentication service persistence cache', () => {
   it('persists a one-way token hash when credentials are authenticated', async () => {
     const password = 'StrongPassword!123'
     const userRow = {
-      id: 7,
+      id: operatorId,
       username: 'operator',
       displayName: 'Operator',
       passwordHash: await hashPassword(password),
@@ -32,7 +36,9 @@ describe('authentication service persistence cache', () => {
       .mockReturnValueOnce({
         from: vi.fn(() => ({
           innerJoin: vi.fn(() => ({
-            where: vi.fn(() => ({ orderBy: vi.fn().mockResolvedValue([{ id: 3, name: '用户' }]) })),
+            where: vi.fn(() => ({
+              orderBy: vi.fn().mockResolvedValue([{ id: userRoleId, name: '用户' }]),
+            })),
           })),
         })),
       })
@@ -49,15 +55,15 @@ describe('authentication service persistence cache', () => {
     const result = await service.authenticateCredentials(userRow.username, password)
 
     expect(result?.user).toEqual({
-      id: 7,
+      id: operatorId,
       username: 'operator',
       displayName: 'Operator',
-      roles: [{ id: 3, name: '用户' }],
+      roles: [{ id: userRoleId, name: '用户' }],
     })
     expect(result?.issued?.token).toEqual(expect.any(String))
     expect(insertValues).toHaveBeenCalledWith(
       expect.objectContaining({
-        userId: 7,
+        userId: operatorId,
         tokenHash: hashSessionToken(result?.issued?.token ?? ''),
         expiresAt: expect.any(Date),
       }),
@@ -67,10 +73,10 @@ describe('authentication service persistence cache', () => {
 
   it('loads an evicted token from persistence once and then serves the cache', async () => {
     const currentUser = {
-      id: 9,
+      id: cachedUserId,
       username: 'cached-user',
       displayName: 'Cached User',
-      roles: [{ id: 4, name: '管理员' }],
+      roles: [{ id: adminRoleId, name: '管理员' }],
     }
     const cache = tokenCache()
     const issued = await cache.issue(currentUser)
@@ -98,7 +104,7 @@ describe('authentication service persistence cache', () => {
         from: vi.fn(() => ({
           innerJoin: vi.fn(() => ({
             where: vi.fn(() => ({
-              orderBy: vi.fn().mockResolvedValue([{ id: 4, name: '管理员' }]),
+              orderBy: vi.fn().mockResolvedValue([{ id: adminRoleId, name: '管理员' }]),
             })),
           })),
         })),

@@ -17,6 +17,7 @@
 - [ADR-0035](ADR-0035-permission-controlled-root-entry.md)：首页回归权限控制的动态菜单，并以根入口解析器统一选择根页面、首个可访问页面或无权限页。
 - [ADR-0036](ADR-0036-nest-provider-dependency-boundary.md)：以 Nest Provider 作为后端依赖边界，移除 `BackendRuntime`，并将认证、授权、repository、access 与 application service 纳入 `@Injectable()` 生命周期。
 - [ADR-0038](ADR-0038-bounded-authorization-delegation.md)：授权主体配置和用户角色、部门变更采用有界委托，当前与目标授权都不得超过操作者自身权限和数据范围。
+- [ADR-0039](ADR-0039-single-uuidv7-identifiers.md)：全部应用实体使用数据库生成的 UUIDv7，并以 PostgreSQL 18 空库重建单一迁移基线。
 - [ADR-0037](ADR-0037-static-marketing-site.md)：使用独立 Vite + Vue 静态应用构建中英文开源推广站，并通过 GitHub Actions 发布到 GitHub Pages。
 
 新增 ADR 时使用 [ADR 模板](../templates/adr-template.md)和下一个连续编号。ADR 被取代或被后续基线吸收后更新替代关系并移入 `docs/archive/decisions/`，编号不得复用。

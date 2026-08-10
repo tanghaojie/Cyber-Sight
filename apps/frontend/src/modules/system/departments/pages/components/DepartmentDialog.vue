@@ -54,6 +54,7 @@ import { ElMessage } from 'element-plus'
 import type {
   DepartmentRequest,
   DepartmentSummary,
+  EntityId,
   SubjectAccessRequest,
 } from '@cyber-ai-forge/api-contract'
 import DataPolicyEditor from '@/modules/system/authorization/components/DataPolicyEditor.vue'
@@ -72,7 +73,7 @@ import { useLocalization } from '@/modules/system/localization/localization'
 
 const props = defineProps<{
   department: DepartmentSummary | null
-  parentId: number
+  parentId: EntityId | null
   records: DepartmentSummary[]
 }>()
 const emit = defineEmits<{ saved: [] }>()
@@ -82,7 +83,7 @@ const accessReady = ref(true)
 const formError = ref('')
 const { t } = useLocalization()
 const form = reactive<DepartmentRequest>({
-  parentId: 0,
+  parentId: null,
   name: '',
   sortOrder: 0,
   enabled: true,
@@ -91,9 +92,11 @@ const access = reactive<SubjectAccessRequest>({ permissionKeys: [], dataPolicies
 const parentTreeOptions = computed<DepartmentTreeOption[]>(() => {
   const excludedIds = props.department
     ? collectDepartmentSubtreeIds(props.records, props.department.id)
-    : new Set<number>()
+    : new Set<EntityId>()
   const children = toDepartmentTreeOptions(buildDepartmentTree(props.records, excludedIds))
-  return [{ value: 0, label: t('departments.root'), ...(children.length > 0 ? { children } : {}) }]
+  return [
+    { value: null, label: t('departments.root'), ...(children.length > 0 ? { children } : {}) },
+  ]
 })
 
 function resetForm(): void {

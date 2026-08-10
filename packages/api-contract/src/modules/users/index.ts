@@ -2,19 +2,20 @@ import { z } from 'zod'
 import {
   apiResponseSchema,
   AuditFieldsSchema,
+  EntityIdSchema,
   ErrorResponseSchema,
   paginatedResponseSchema,
 } from '@/shared/http.js'
 
 /** 用户可关联多个角色和部门，但必须且只能从已关联部门中指定一个主部门。 */
-const integerArray = z.array(z.number().int().min(1))
+const entityIdArray = z.array(EntityIdSchema)
 
 function validateDepartments(
   input: {
-    departmentIds: number[]
-    primaryDepartmentId: number
-    roleIds: number[]
-    positionIds: number[]
+    departmentIds: string[]
+    primaryDepartmentId: string
+    roleIds: string[]
+    positionIds: string[]
   },
   context: z.RefinementCtx,
 ): void {
@@ -50,15 +51,15 @@ function validateDepartments(
 }
 
 export const UserSummarySchema = AuditFieldsSchema.extend({
-  id: z.number().int(),
+  id: EntityIdSchema,
   username: z.string(),
   displayName: z.string(),
   email: z.email(),
   enabled: z.boolean(),
-  roleIds: integerArray,
-  positionIds: integerArray,
-  departmentIds: integerArray,
-  primaryDepartmentId: z.number().int().min(1),
+  roleIds: entityIdArray,
+  positionIds: entityIdArray,
+  departmentIds: entityIdArray,
+  primaryDepartmentId: EntityIdSchema,
   lastLoginAt: z.iso.datetime().nullable().optional(),
 })
 
@@ -69,10 +70,10 @@ export const UserCreateSchema = z
     email: z.email(),
     password: z.string().min(8).max(128),
     enabled: z.boolean(),
-    roleIds: integerArray,
-    positionIds: integerArray.default([]),
-    departmentIds: integerArray.min(1),
-    primaryDepartmentId: z.number().int().min(1),
+    roleIds: entityIdArray,
+    positionIds: entityIdArray.default([]),
+    departmentIds: entityIdArray.min(1),
+    primaryDepartmentId: EntityIdSchema,
   })
   .superRefine(validateDepartments)
 
@@ -82,16 +83,16 @@ export const UserUpdateSchema = z
     email: z.email(),
     password: z.string().min(8).max(128).optional(),
     enabled: z.boolean(),
-    roleIds: integerArray,
-    positionIds: integerArray.default([]),
-    departmentIds: integerArray.min(1),
-    primaryDepartmentId: z.number().int().min(1),
+    roleIds: entityIdArray,
+    positionIds: entityIdArray.default([]),
+    departmentIds: entityIdArray.min(1),
+    primaryDepartmentId: EntityIdSchema,
   })
   .superRefine(validateDepartments)
 
 /** 当前登录用户可自助维护的资料；不暴露角色、部门或账号管理字段。 */
 export const PersonalProfileSchema = z.strictObject({
-  id: z.number().int(),
+  id: EntityIdSchema,
   username: z.string(),
   displayName: z.string(),
   email: z.email(),

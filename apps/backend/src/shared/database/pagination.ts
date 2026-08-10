@@ -1,3 +1,5 @@
+import type { EntityId } from '@cyber-ai-forge/api-contract'
+
 export interface RepositoryListQuery {
   pageNum: number
   pageSize: number
@@ -13,9 +15,9 @@ export function pageOffset(query: RepositoryListQuery): number {
 export function auditView(row: {
   isDeleted: boolean
   createdAt: Date
-  createdBy: number
+  createdBy: EntityId | null
   updatedAt: Date
-  updatedBy: number
+  updatedBy: EntityId | null
 }) {
   // 数据库使用 Date，HTTP 契约统一传输带时区的 ISO 字符串。
   // 此处只负责序列化审计字段，业务摘要函数决定是否公开其他领域字段。

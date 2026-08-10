@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, count, eq, ilike, inArray } from 'drizzle-orm'
-import type { PositionRequest } from '@cyber-ai-forge/api-contract'
+import type { EntityId, PositionRequest } from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import { departments, positions } from '@/db/schema.js'
 import { DATABASE } from '@/shared/database/database.provider.js'
@@ -10,7 +10,7 @@ export interface PositionListQuery {
   pageNum: number
   pageSize: number
   keyword?: string
-  departmentId?: number
+  departmentId?: EntityId
   enabled?: boolean
 }
 
@@ -52,7 +52,7 @@ export class PositionsRepository {
     return { total, list: rows.map(positionSummary) }
   }
 
-  async listPositionOptions(departmentIds?: number[]) {
+  async listPositionOptions(departmentIds?: EntityId[]) {
     const predicate = and(
       eq(positions.enabled, true),
       eq(positions.isDeleted, false),
@@ -68,7 +68,7 @@ export class PositionsRepository {
       .orderBy(positions.departmentId, positions.sortOrder, positions.id)
   }
 
-  async createPosition(input: PositionRequest, actorId: number): Promise<number> {
+  async createPosition(input: PositionRequest, actorId: EntityId): Promise<EntityId> {
     const [created] = await this.db
       .insert(positions)
       .values({ ...input, createdBy: actorId, updatedBy: actorId })
@@ -76,7 +76,7 @@ export class PositionsRepository {
     return created.id
   }
 
-  async updatePosition(id: number, input: PositionRequest, actorId: number): Promise<boolean> {
+  async updatePosition(id: EntityId, input: PositionRequest, actorId: EntityId): Promise<boolean> {
     const updated = await this.db
       .update(positions)
       .set({ ...input, updatedAt: new Date(), updatedBy: actorId })
@@ -85,7 +85,7 @@ export class PositionsRepository {
     return updated.length > 0
   }
 
-  async softDeletePosition(id: number, actorId: number): Promise<boolean> {
+  async softDeletePosition(id: EntityId, actorId: EntityId): Promise<boolean> {
     const deleted = await this.db
       .update(positions)
       .set({ isDeleted: true, updatedAt: new Date(), updatedBy: actorId })

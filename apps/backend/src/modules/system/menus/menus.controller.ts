@@ -10,6 +10,7 @@ import {
   NavigationMenuResponseSchema,
   isValidMenuPath,
   type CurrentUser,
+  type EntityId,
   type IdParams,
   type ListQuery,
   type MenuRequest,
@@ -138,7 +139,7 @@ export class MenusController {
     return success()
   }
 
-  private async validateMenu(body: MenuRequest, currentId?: number) {
+  private async validateMenu(body: MenuRequest, currentId?: EntityId) {
     if (!isValidMenuPath(body)) {
       return failure(ErrorCode.INVALID_REQUEST, 'Root menu path must start with /')
     }

@@ -1,13 +1,14 @@
 import { z } from 'zod'
 import {
   ErrorResponseSchema,
+  EntityIdSchema,
   PaginationRequestSchema,
   paginatedResponseSchema,
 } from '@/shared/http.js'
 
 /** 接口日志查询只接受可索引的最小筛选条件，不暴露请求内容或敏感 HTTP 元数据。 */
 export const ApiLogQuerySchema = PaginationRequestSchema.extend({
-  actorUserId: z.coerce.number().int().min(1).optional(),
+  actorUserId: EntityIdSchema.optional(),
   actorUsername: z.string().min(1).max(50).optional(),
   method: z.string().min(1).max(10).optional(),
   routePattern: z.string().min(1).max(160).optional(),
@@ -18,11 +19,11 @@ export const ApiLogQuerySchema = PaginationRequestSchema.extend({
 })
 
 export const ApiLogItemSchema = z.strictObject({
-  id: z.number().int(),
+  id: EntityIdSchema,
   occurredAt: z.iso.datetime(),
   expiresAt: z.iso.datetime().nullable(),
   requestId: z.string(),
-  actorUserId: z.number().int().nullable(),
+  actorUserId: EntityIdSchema.nullable(),
   actorUsername: z.string().nullable(),
   method: z.string(),
   routePattern: z.string(),

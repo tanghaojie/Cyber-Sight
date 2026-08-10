@@ -1,5 +1,6 @@
 import type {
   EmptySuccessResponse,
+  EntityId,
   IdResponse,
   PaginatedResponse,
   RoleRequest,
@@ -11,7 +12,7 @@ import { translate } from '@/modules/system/localization/localization'
 
 // 角色模块同时提供管理分页和用户表单所需的轻量选项映射。
 export interface RoleOption {
-  id: number
+  id: EntityId
   name: string
 }
 
@@ -38,14 +39,14 @@ export async function createRole(payload: RoleRequest): Promise<ApiMutationResul
   return apiResult(data, error)
 }
 
-export async function updateRole(id: number, payload: RoleRequest): Promise<ApiMutationResult> {
+export async function updateRole(id: EntityId, payload: RoleRequest): Promise<ApiMutationResult> {
   const { data, error } = await apiClient.PUT<IdResponse, RoleRequest>(`/admin/roles/${id}`, {
     body: payload,
   })
   return apiResult(data, error)
 }
 
-export async function deleteRole(id: number) {
+export async function deleteRole(id: EntityId) {
   const { data, error } = await apiClient.DELETE<EmptySuccessResponse>(`/admin/roles/${id}`)
   return apiResult(data, error)
 }

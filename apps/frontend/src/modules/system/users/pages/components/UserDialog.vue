@@ -126,6 +126,7 @@ import { computed, reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import type {
   DepartmentOption,
+  EntityId,
   PositionOption,
   SubjectAccessRequest,
   UserCreate,
@@ -162,10 +163,10 @@ const form = reactive({
   displayName: '',
   email: '',
   password: '',
-  roleIds: [] as number[],
-  departmentIds: [] as number[],
-  positionIds: [] as number[],
-  primaryDepartmentId: 0,
+  roleIds: [] as EntityId[],
+  departmentIds: [] as EntityId[],
+  positionIds: [] as EntityId[],
+  primaryDepartmentId: null as EntityId | null,
   enabled: true,
 })
 const access = reactive<SubjectAccessRequest>({ permissionKeys: [], dataPolicies: [] })
@@ -206,7 +207,7 @@ function resetForm(): void {
           roleIds: [],
           departmentIds: props.departmentOptions[0] ? [props.departmentOptions[0].id] : [],
           positionIds: [],
-          primaryDepartmentId: props.departmentOptions[0]?.id ?? 0,
+          primaryDepartmentId: props.departmentOptions[0]?.id ?? null,
           enabled: true,
         },
   )
@@ -225,7 +226,11 @@ async function submit(): Promise<void> {
     ) {
       throw new Error(t('users.errors.invalidForm'))
     }
-    if (form.departmentIds.length === 0 || !form.departmentIds.includes(form.primaryDepartmentId)) {
+    if (
+      form.primaryDepartmentId === null ||
+      form.departmentIds.length === 0 ||
+      !form.departmentIds.includes(form.primaryDepartmentId)
+    ) {
       throw new Error(t('users.errors.invalidDepartment'))
     }
     const result = props.user
@@ -306,8 +311,8 @@ watch(
   () => form.departmentIds,
   function keepPrimaryDepartmentValid(departmentIds) {
     // 删除当前主部门时自动选择剩余第一项；无所属部门则回到占位 0 等待校验。
-    if (!departmentIds.includes(form.primaryDepartmentId)) {
-      form.primaryDepartmentId = departmentIds[0] ?? 0
+    if (form.primaryDepartmentId === null || !departmentIds.includes(form.primaryDepartmentId)) {
+      form.primaryDepartmentId = departmentIds[0] ?? null
     }
   },
   { deep: true },

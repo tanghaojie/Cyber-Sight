@@ -5,6 +5,7 @@ import type {
   AuthorizationSubjectType,
   DataAction,
   DataPolicyInput,
+  EntityId,
   PermissionSummary,
   SubjectAccessRequest,
 } from '@cyber-ai-forge/api-contract'
@@ -26,12 +27,12 @@ import { isRegisteredDataPolicy } from './authorization.resources.js'
  */
 export interface DataAccessPlan {
   unrestricted: boolean
-  ownerUserIds: number[]
-  departmentIds: number[]
+  ownerUserIds: EntityId[]
+  departmentIds: EntityId[]
 }
 
 interface PolicyRow {
-  id: number
+  id: EntityId
   resourceKey: string
   action: string
   scopeType: DataPolicyInput['scopeType']
@@ -40,14 +41,14 @@ interface PolicyRow {
 export type SubjectAccessOperation = 'read' | 'update'
 
 interface DelegationAuthority {
-  actorId: number
+  actorId: EntityId
   permissionKeys: Set<string>
   plans: Map<string, DataAccessPlan>
 }
 
 interface DelegationTargetContext {
-  userId: number | null
-  departmentIds: number[]
+  userId: EntityId | null
+  departmentIds: EntityId[]
 }
 
 interface PolicyCoverage {
@@ -56,7 +57,7 @@ interface PolicyCoverage {
 }
 
 /** 去重时保留首次出现顺序，便于生成稳定的数据访问计划。 */
-function unique(values: number[]): number[] {
+function unique(values: EntityId[]): EntityId[] {
   return [...new Set(values)]
 }
 
@@ -98,7 +99,7 @@ export class AuthorizationService {
       .orderBy(permissions.module, permissions.key)
   }
 
-  async effectivePermissionKeys(userId: number): Promise<string[]> {
+  async effectivePermissionKeys(userId: EntityId): Promise<string[]> {
     // 用户权限只由当前有效角色和当前有效权限共同决定。
     const roleIds = await this.roles.enabledRoleIds(await this.users.assignedRoleIds(userId))
     if (roleIds.length === 0) {
@@ -120,7 +121,7 @@ export class AuthorizationService {
     return [...new Set(rows.map((row) => row.key))]
   }
 
-  async hasAnyPermission(userId: number, requiredKeys: readonly string[]): Promise<boolean> {
+  async hasAnyPermission(userId: EntityId, requiredKeys: readonly string[]): Promise<boolean> {
     if (requiredKeys.length === 0) {
       return false
     }
@@ -130,7 +131,7 @@ export class AuthorizationService {
 
   async getSubjectAccess(
     subjectType: AuthorizationSubjectType,
-    subjectId: number,
+    subjectId: EntityId,
   ): Promise<SubjectAccessRequest> {
     // 功能权限当前只支持角色分配；用户和部门主体只保存数据范围策略。
     const permissionRows =
@@ -202,7 +203,7 @@ export class AuthorizationService {
 
   async authorizationSubjectExists(
     subjectType: AuthorizationSubjectType,
-    subjectId: number,
+    subjectId: EntityId,
   ): Promise<boolean> {
     switch (subjectType) {
       case 'user':
@@ -243,7 +244,7 @@ export class AuthorizationService {
     }
 
     const policyIdentities = new Set<string>()
-    const departmentIds: number[] = []
+    const departmentIds: EntityId[] = []
     for (const policy of input.dataPolicies) {
       if (
         !isRegisteredDataPolicy(policy.resourceKey, policy.action, policy.scopeType) ||
@@ -275,9 +276,9 @@ export class AuthorizationService {
    */
   async replaceSubjectAccess(
     subjectType: AuthorizationSubjectType,
-    subjectId: number,
+    subjectId: EntityId,
     input: SubjectAccessRequest,
-    actorId: number,
+    actorId: EntityId,
   ): Promise<boolean> {
     if (!(await this.validateSubjectAccess(subjectType, input))) {
       return false
@@ -361,7 +362,7 @@ export class AuthorizationService {
             ),
           )
           .limit(1)
-        let ruleId: number
+        let ruleId: EntityId
         if (existing) {
           // 复用历史软删除记录，避免部分唯一索引和审计历史产生重复身份。
           ruleId = existing.id
@@ -428,7 +429,7 @@ export class AuthorizationService {
     return true
   }
 
-  private async delegationAuthority(actorId: number): Promise<DelegationAuthority> {
+  private async delegationAuthority(actorId: EntityId): Promise<DelegationAuthority> {
     return {
       actorId,
       permissionKeys: new Set(await this.effectivePermissionKeys(actorId)),
@@ -452,9 +453,9 @@ export class AuthorizationService {
   }
 
   private async userIsWithinPlan(
-    userId: number,
+    userId: EntityId,
     plan: DataAccessPlan,
-    knownDepartmentIds?: number[],
+    knownDepartmentIds?: EntityId[],
   ): Promise<boolean> {
     if (plan.unrestricted || plan.ownerUserIds.includes(userId)) {
       return true
@@ -585,7 +586,7 @@ export class AuthorizationService {
     return true
   }
 
-  private async departmentAccesses(departmentIds: number[]): Promise<SubjectAccessRequest[]> {
+  private async departmentAccesses(departmentIds: EntityId[]): Promise<SubjectAccessRequest[]> {
     const directIds = unique(departmentIds)
     const directSet = new Set(directIds)
     const ancestorIds = await this.departments.enabledDepartmentIds(
@@ -610,9 +611,9 @@ export class AuthorizationService {
 
   private async userAuthorizationContextIsDelegable(
     authority: DelegationAuthority,
-    userId: number | null,
-    roleIds: number[],
-    departmentIds: number[],
+    userId: EntityId | null,
+    roleIds: EntityId[],
+    departmentIds: EntityId[],
     directAccess?: SubjectAccessRequest,
   ): Promise<boolean> {
     const uniqueRoleIds = unique(roleIds)
@@ -652,9 +653,9 @@ export class AuthorizationService {
   }
 
   async canAccessSubject(
-    actorId: number,
+    actorId: EntityId,
     subjectType: AuthorizationSubjectType,
-    subjectId: number,
+    subjectId: EntityId,
     operation: SubjectAccessOperation,
   ): Promise<boolean> {
     const authority = await this.delegationAuthority(actorId)
@@ -673,9 +674,9 @@ export class AuthorizationService {
   }
 
   async canDelegateSubjectAccess(
-    actorId: number,
+    actorId: EntityId,
     subjectType: AuthorizationSubjectType,
-    subjectId: number,
+    subjectId: EntityId,
     access: SubjectAccessRequest,
   ): Promise<boolean> {
     const authority = await this.delegationAuthority(actorId)
@@ -696,10 +697,10 @@ export class AuthorizationService {
   }
 
   async canManageUserAuthorizationContext(
-    actorId: number,
-    targetUserId: number | null,
-    roleIds: number[],
-    departmentIds: number[],
+    actorId: EntityId,
+    targetUserId: EntityId | null,
+    roleIds: EntityId[],
+    departmentIds: EntityId[],
   ): Promise<boolean> {
     const authority = await this.delegationAuthority(actorId)
     if (targetUserId !== null) {
@@ -722,7 +723,7 @@ export class AuthorizationService {
   }
 
   async resolveDataAccess(
-    userId: number,
+    userId: EntityId,
     resourceKey: string,
     action: DataAction,
   ): Promise<DataAccessPlan> {
@@ -786,7 +787,7 @@ export class AuthorizationService {
       return mergeDataAccessPlans([{ unrestricted: true, ownerUserIds: [], departmentIds: [] }])
     }
 
-    const resultDepartments: number[] = []
+    const resultDepartments: EntityId[] = []
     // 各条策略按 allow 并集合并，不存在显式 deny；树范围通过部门闭包表展开。
     if (rules.some((rule) => rule.scopeType === 'own_department')) {
       resultDepartments.push(...ownDepartmentIds)

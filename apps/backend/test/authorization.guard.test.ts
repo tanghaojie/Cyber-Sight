@@ -63,10 +63,10 @@ describe('authorization provider boundary', () => {
     )
     const authTokens = app.get(JwtTokenCache)
     const issued = await authTokens.issue({
-      id: 8,
+      id: '0198f31a-0000-7000-8000-000000000008',
       username: 'operator',
       displayName: 'Operator',
-      roles: [{ id: 2, name: 'Operator' }],
+      roles: [{ id: '0198f31a-0000-7000-8000-000000000002', name: 'Operator' }],
     })
     const response = await app
       .getHttpAdapter()

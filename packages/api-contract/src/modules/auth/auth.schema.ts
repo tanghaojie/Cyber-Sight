@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { apiResponseSchema, ErrorResponseSchema } from '@/shared/http.js'
+import { apiResponseSchema, EntityIdSchema, ErrorResponseSchema } from '@/shared/http.js'
 
 /** 认证模块契约：登录签发令牌，并以同一用户结构返回当前会话身份。 */
 export const LoginRequestSchema = z.strictObject({
@@ -8,12 +8,12 @@ export const LoginRequestSchema = z.strictObject({
 })
 
 export const CurrentUserSchema = z.strictObject({
-  id: z.number().int(),
+  id: EntityIdSchema,
   username: z.string(),
   displayName: z.string(),
   roles: z.array(
     z.strictObject({
-      id: z.number().int(),
+      id: EntityIdSchema,
       name: z.string(),
     }),
   ),

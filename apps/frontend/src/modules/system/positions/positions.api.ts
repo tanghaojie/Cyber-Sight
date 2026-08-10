@@ -1,5 +1,6 @@
 import type {
   EmptySuccessResponse,
+  EntityId,
   IdResponse,
   PaginatedResponse,
   PositionOption,
@@ -17,7 +18,7 @@ export async function listPositions(
   pageNum: number,
   pageSize: number,
   keyword = '',
-  departmentId?: number,
+  departmentId?: EntityId,
 ) {
   const { data, error } = await apiClient.GET<PaginatedResponse<PositionSummary>>(
     '/admin/positions',
@@ -52,7 +53,7 @@ export async function createPosition(payload: PositionRequest): Promise<ApiMutat
 }
 
 export async function updatePosition(
-  id: number,
+  id: EntityId,
   payload: PositionRequest,
 ): Promise<ApiMutationResult> {
   const { data, error } = await apiClient.PUT<IdResponse, PositionRequest>(
@@ -62,7 +63,7 @@ export async function updatePosition(
   return apiResult(data, error)
 }
 
-export async function deletePosition(id: number) {
+export async function deletePosition(id: EntityId) {
   const { data, error } = await apiClient.DELETE<EmptySuccessResponse>(`/admin/positions/${id}`)
   return apiResult(data, error)
 }

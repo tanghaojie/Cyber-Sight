@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, eq, inArray } from 'drizzle-orm'
+import type { EntityId } from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import { roles } from '@/db/schema.js'
 import { DATABASE } from '@/shared/database/database.provider.js'
@@ -9,7 +10,7 @@ import { DATABASE } from '@/shared/database/database.provider.js'
 export class RolesAccess {
   constructor(@Inject(DATABASE) private readonly db: Database) {}
 
-  async roleExists(roleId: number): Promise<boolean> {
+  async roleExists(roleId: EntityId): Promise<boolean> {
     const [row] = await this.db
       .select({ id: roles.id })
       .from(roles)
@@ -18,7 +19,7 @@ export class RolesAccess {
     return Boolean(row)
   }
 
-  async enabledRoleIds(candidateIds: number[]): Promise<number[]> {
+  async enabledRoleIds(candidateIds: EntityId[]): Promise<EntityId[]> {
     if (candidateIds.length === 0) {
       return []
     }

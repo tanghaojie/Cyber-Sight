@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type {
   AuthorizationSubjectType,
   CurrentUser,
+  EntityId,
   SubjectAccessRequest,
   UserUpdate,
 } from '@cyber-ai-forge/api-contract'
@@ -11,25 +12,33 @@ import { UsersController } from '@/modules/system/users/users.controller.js'
 import { ErrorCode } from '@/shared/errors/error-codes.js'
 
 const emptyAccess: SubjectAccessRequest = { permissionKeys: [], dataPolicies: [] }
+const actorId = '0198f31a-0000-7000-8000-000000000007'
+const managerRoleId = '0198f31a-0000-7000-8000-000000000002'
+const higherRoleId = '0198f31a-0000-7000-8000-000000000003'
+const actorDepartmentId = '0198f31a-0000-7000-8000-000000000010'
+const otherDepartmentId = '0198f31a-0000-7000-8000-000000000020'
+const targetUserId = '0198f31a-0000-7000-8000-000000000099'
 const actor: CurrentUser = {
-  id: 7,
+  id: actorId,
   username: 'limited-manager',
   displayName: 'Limited Manager',
-  roles: [{ id: 2, name: 'Manager' }],
+  roles: [{ id: managerRoleId, name: 'Manager' }],
 }
 
 function createService() {
   const departments = {
-    enabledDepartmentIds: vi.fn(async (ids: number[]) => [...new Set(ids)]),
-    ancestorDepartmentIds: vi.fn(async (ids: number[]) => [...new Set(ids)]),
-    descendantDepartmentIds: vi.fn(async (ids: number[]) => [...new Set(ids)]),
+    enabledDepartmentIds: vi.fn(async (ids: EntityId[]) => [...new Set(ids)]),
+    ancestorDepartmentIds: vi.fn(async (ids: EntityId[]) => [...new Set(ids)]),
+    descendantDepartmentIds: vi.fn(async (ids: EntityId[]) => [...new Set(ids)]),
   }
   const roles = {
-    enabledRoleIds: vi.fn(async (ids: number[]) => [...new Set(ids)]),
+    enabledRoleIds: vi.fn(async (ids: EntityId[]) => [...new Set(ids)]),
   }
   const users = {
-    assignedRoleIds: vi.fn(async (_userId: number) => [] as number[]),
-    assignedDepartmentIds: vi.fn(async (userId: number) => (userId === 7 ? [10] : [20])),
+    assignedRoleIds: vi.fn(async (_userId: EntityId) => [] as EntityId[]),
+    assignedDepartmentIds: vi.fn(async (userId: EntityId) =>
+      userId === actorId ? [actorDepartmentId] : [otherDepartmentId],
+    ),
   }
   const service = new AuthorizationService(
     {} as never,
@@ -40,11 +49,11 @@ function createService() {
   vi.spyOn(service, 'effectivePermissionKeys').mockResolvedValue(['users.manage'])
   vi.spyOn(service, 'resolveDataAccess').mockResolvedValue({
     unrestricted: false,
-    ownerUserIds: [7],
-    departmentIds: [10],
+    ownerUserIds: [actorId],
+    departmentIds: [actorDepartmentId],
   })
   vi.spyOn(service, 'getSubjectAccess').mockImplementation(
-    async (_subjectType: AuthorizationSubjectType, _subjectId: number) => emptyAccess,
+    async (_subjectType: AuthorizationSubjectType, _subjectId: EntityId) => emptyAccess,
   )
   return { service, departments, roles, users }
 }
@@ -53,14 +62,16 @@ describe('bounded authorization delegation', () => {
   it('hides a user authorization subject outside the actor read range', async () => {
     const { service } = createService()
 
-    await expect(service.canAccessSubject(7, 'user', 99, 'read')).resolves.toBe(false)
+    await expect(service.canAccessSubject(actorId, 'user', targetUserId, 'read')).resolves.toBe(
+      false,
+    )
   })
 
   it('rejects granting all when the actor has a restricted users plan', async () => {
     const { service } = createService()
 
     await expect(
-      service.canDelegateSubjectAccess(7, 'user', 7, {
+      service.canDelegateSubjectAccess(actorId, 'user', actorId, {
         permissionKeys: [],
         dataPolicies: [
           {
@@ -80,7 +91,7 @@ describe('bounded authorization delegation', () => {
     const { service } = createService()
 
     await expect(
-      service.canDelegateSubjectAccess(7, 'user', 7, {
+      service.canDelegateSubjectAccess(actorId, 'user', actorId, {
         permissionKeys: [],
         dataPolicies: [
           {
@@ -88,7 +99,7 @@ describe('bounded authorization delegation', () => {
             action: 'read',
             scopeType: 'custom_departments',
             inheritToChildren: false,
-            departmentIds: [10],
+            departmentIds: [actorDepartmentId],
             includeDescendants: false,
           },
         ],
@@ -99,46 +110,57 @@ describe('bounded authorization delegation', () => {
   it('rejects assigning a role with a permission the actor does not have', async () => {
     const { service } = createService()
     vi.mocked(service.getSubjectAccess).mockImplementation(
-      async (subjectType: AuthorizationSubjectType, subjectId: number) =>
-        subjectType === 'role' && subjectId === 3
+      async (subjectType: AuthorizationSubjectType, subjectId: EntityId) =>
+        subjectType === 'role' && subjectId === higherRoleId
           ? { permissionKeys: ['roles.manage'], dataPolicies: [] }
           : emptyAccess,
     )
 
-    await expect(service.canManageUserAuthorizationContext(7, null, [3], [10])).resolves.toBe(false)
+    await expect(
+      service.canManageUserAuthorizationContext(actorId, null, [higherRoleId], [actorDepartmentId]),
+    ).resolves.toBe(false)
   })
 
   it('preserves a legitimate user assignment contained by the actor authority', async () => {
     const { service } = createService()
     vi.mocked(service.getSubjectAccess).mockImplementation(
-      async (subjectType: AuthorizationSubjectType, subjectId: number) =>
-        subjectType === 'role' && subjectId === 2
+      async (subjectType: AuthorizationSubjectType, subjectId: EntityId) =>
+        subjectType === 'role' && subjectId === managerRoleId
           ? { permissionKeys: ['users.manage'], dataPolicies: [] }
           : emptyAccess,
     )
 
-    await expect(service.canManageUserAuthorizationContext(7, null, [2], [10])).resolves.toBe(true)
+    await expect(
+      service.canManageUserAuthorizationContext(
+        actorId,
+        null,
+        [managerRoleId],
+        [actorDepartmentId],
+      ),
+    ).resolves.toBe(true)
   })
 
   it('does not allow replacing away an existing role above the actor authority', async () => {
     const { service, users } = createService()
-    users.assignedRoleIds.mockResolvedValue([3])
-    users.assignedDepartmentIds.mockResolvedValue([10])
+    users.assignedRoleIds.mockResolvedValue([higherRoleId])
+    users.assignedDepartmentIds.mockResolvedValue([actorDepartmentId])
     vi.mocked(service.getSubjectAccess).mockImplementation(
-      async (subjectType: AuthorizationSubjectType, subjectId: number) =>
-        subjectType === 'role' && subjectId === 3
+      async (subjectType: AuthorizationSubjectType, subjectId: EntityId) =>
+        subjectType === 'role' && subjectId === higherRoleId
           ? { permissionKeys: ['roles.manage'], dataPolicies: [] }
           : emptyAccess,
     )
 
-    await expect(service.canManageUserAuthorizationContext(7, 99, [], [10])).resolves.toBe(false)
+    await expect(
+      service.canManageUserAuthorizationContext(actorId, targetUserId, [], [actorDepartmentId]),
+    ).resolves.toBe(false)
   })
 
   it('rejects a reusable dynamic role policy that cannot be bounded to one target', async () => {
     const { service } = createService()
 
     await expect(
-      service.canDelegateSubjectAccess(7, 'role', 2, {
+      service.canDelegateSubjectAccess(actorId, 'role', managerRoleId, {
         permissionKeys: ['users.manage'],
         dataPolicies: [
           {
@@ -163,7 +185,7 @@ describe('bounded authorization delegation', () => {
     })
 
     await expect(
-      service.canDelegateSubjectAccess(7, 'user', 7, {
+      service.canDelegateSubjectAccess(actorId, 'user', actorId, {
         permissionKeys: [],
         dataPolicies: [
           {
@@ -207,7 +229,9 @@ describe('authorization subject HTTP boundary', () => {
     const { controller, provider } = createController()
     provider.canAccessSubject.mockResolvedValue(false)
 
-    await expect(controller.getUser({ id: 99 }, actor)).rejects.toMatchObject({ status: 404 })
+    await expect(controller.getUser({ id: targetUserId }, actor)).rejects.toMatchObject({
+      status: 404,
+    })
   })
 
   it('stops a self-all payload before the authorization transaction', async () => {
@@ -255,14 +279,18 @@ describe('user assignment HTTP boundary', () => {
     displayName: 'Target User',
     email: 'target@example.com',
     enabled: true,
-    roleIds: [3],
+    roleIds: [higherRoleId],
     positionIds: [],
-    departmentIds: [10],
-    primaryDepartmentId: 10,
+    departmentIds: [actorDepartmentId],
+    primaryDepartmentId: actorDepartmentId,
   }
 
   function createController() {
-    const access = { unrestricted: false, ownerUserIds: [99], departmentIds: [10] }
+    const access = {
+      unrestricted: false,
+      ownerUserIds: [targetUserId],
+      departmentIds: [actorDepartmentId],
+    }
     const repository = {
       userExistsWithinAccess: vi.fn().mockResolvedValue(true),
       hasValidAssignments: vi.fn().mockResolvedValue(true),
@@ -286,7 +314,7 @@ describe('user assignment HTTP boundary', () => {
     const { controller, repository, authorization } = createController()
     repository.userExistsWithinAccess.mockResolvedValue(false)
 
-    await expect(controller.update({ id: 99 }, update, actor)).rejects.toMatchObject({
+    await expect(controller.update({ id: targetUserId }, update, actor)).rejects.toMatchObject({
       status: 404,
     })
     expect(authorization.canManageUserAuthorizationContext).not.toHaveBeenCalled()
@@ -297,7 +325,7 @@ describe('user assignment HTTP boundary', () => {
     const { controller, repository, authorization } = createController()
     authorization.canManageUserAuthorizationContext.mockResolvedValue(false)
 
-    await expect(controller.update({ id: 99 }, update, actor)).resolves.toEqual({
+    await expect(controller.update({ id: targetUserId }, update, actor)).resolves.toEqual({
       status: ErrorCode.FORBIDDEN,
       err: 'Authorization delegation exceeds current access',
     })

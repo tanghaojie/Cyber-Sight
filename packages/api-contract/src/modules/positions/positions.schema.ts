@@ -2,14 +2,15 @@ import { z } from 'zod'
 import {
   apiResponseSchema,
   AuditFieldsSchema,
+  EntityIdSchema,
   ErrorResponseSchema,
   PaginationRequestSchema,
   paginatedResponseSchema,
 } from '@/shared/http.js'
 
 export const PositionSummarySchema = AuditFieldsSchema.extend({
-  id: z.number().int(),
-  departmentId: z.number().int().min(1),
+  id: EntityIdSchema,
+  departmentId: EntityIdSchema,
   name: z.string(),
   description: z.string(),
   sortOrder: z.number().int().min(0),
@@ -17,7 +18,7 @@ export const PositionSummarySchema = AuditFieldsSchema.extend({
 })
 
 export const PositionRequestSchema = z.strictObject({
-  departmentId: z.number().int().min(1),
+  departmentId: EntityIdSchema,
   name: z.string().min(1).max(80),
   description: z.string().max(200),
   sortOrder: z.number().int().min(0),
@@ -26,13 +27,13 @@ export const PositionRequestSchema = z.strictObject({
 
 export const PositionListQuerySchema = PaginationRequestSchema.extend({
   keyword: z.string().max(100).optional(),
-  departmentId: z.coerce.number().int().min(1).optional(),
+  departmentId: EntityIdSchema.optional(),
   enabled: z.enum(['true', 'false']).optional(),
 })
 
 export const PositionOptionSchema = z.strictObject({
-  id: z.number().int(),
-  departmentId: z.number().int().min(1),
+  id: EntityIdSchema,
+  departmentId: EntityIdSchema,
   name: z.string(),
 })
 

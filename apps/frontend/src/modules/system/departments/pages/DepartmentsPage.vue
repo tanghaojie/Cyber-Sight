@@ -1,7 +1,7 @@
 <template>
   <section class="management-page" aria-labelledby="departments-title">
     <header class="page-intro">
-      <el-button type="primary" :icon="Plus" size="large" @click="openCreate(0)">
+      <el-button type="primary" :icon="Plus" size="large" @click="openCreate(null)">
         {{ t('departments.page.add') }}
       </el-button>
     </header>
@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
-import type { DepartmentSummary } from '@cyber-ai-forge/api-contract'
+import type { DepartmentSummary, EntityId } from '@cyber-ai-forge/api-contract'
 import DepartmentDialog from './components/DepartmentDialog.vue'
 import DepartmentsList from './components/DepartmentsList.vue'
 import { useLocalization } from '@/modules/system/localization/localization'
@@ -34,10 +34,10 @@ const { t } = useLocalization()
 const departmentsList = ref<InstanceType<typeof DepartmentsList> | null>(null)
 const records = ref<DepartmentSummary[]>([])
 const editingDepartment = ref<DepartmentSummary | null>(null)
-const parentId = ref(0)
+const parentId = ref<EntityId | null>(null)
 const dialogOpen = ref(false)
 
-function openCreate(selectedParentId: number): void {
+function openCreate(selectedParentId: EntityId | null): void {
   // 从某行“新增子部门”进入时预选该行作为父节点；页头新增则传 0。
   editingDepartment.value = null
   parentId.value = selectedParentId

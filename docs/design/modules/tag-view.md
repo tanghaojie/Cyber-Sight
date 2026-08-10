@@ -2,7 +2,7 @@
 title: 前端标签历史模块
 status: active
 owner: maintainers
-updated: 2026-08-07
+updated: 2026-08-10
 ---
 
 # 前端标签历史模块
@@ -39,7 +39,7 @@ updated: 2026-08-07
 
 每个标签只保存 `{ path, title }`。`path` 使用不含 query 和 hash 的规范路由路径，既作为页面唯一键，也作为重新导航目标；这样不会因筛选条件产生重复标签，也不会把可能敏感的查询参数长期写入浏览器存储。
 
-持久化键为带版本号和数字用户 ID 的 `cyber_ai_forge_tag_view_history:v1:<userId>`。Store 激活账号时解析并校验 JSON，拒绝非绝对路径、空标题和重复路径；后续每次变更同步写回。浏览器不提供 `localStorage`、JSON 损坏或写入失败时，模块降级为当前会话内存状态。
+持久化键为带版本号和 UUID 用户 ID 的 `cyber_ai_forge_tag_view_history:v2:<userId>`。Store 激活账号时先通过 `EntityIdSchema` 校验 UUID，再解析并校验 JSON，拒绝非绝对路径、空标题和重复路径；后续每次变更同步写回。浏览器不提供 `localStorage`、JSON 损坏或写入失败时，模块降级为当前会话内存状态。
 
 `AdminLayout` 在账号或当前路由变化时先激活对应账号，再登记当前页面。关闭当前标签后优先导航到其右侧标签，其次左侧标签；没有相邻标签时回到 `/`。关闭全部后回到 `/`，根入口解析器会选择当前用户仍可访问的动态根页面、首个动态页面或无权限页，并把实际落点重新加入历史。
 
@@ -62,7 +62,7 @@ AdminLayout + Vue Router + auth.user.id
 
 - 持久化不可用或数据损坏：忽略无效数据，保留可用的内存交互，不阻断页面导航。
 - 菜单权限或路由配置变化：历史标签仍可显示；重新打开不可达路径时交由现有 Router 404 流程处理，用户可关闭陈旧标签。
-- 多账号共用浏览器：数字用户 ID 隔离存储键；退出只清空内存，不删除该账号下次登录需要恢复的历史。
+- 多账号共用浏览器：UUID 用户 ID 隔离存储键；退出只清空内存，不删除该账号下次登录需要恢复的历史。
 - 持久化内容不包含 token、用户资料、query 或 hash；页面标题和路径仍属于本地浏览痕迹，清理站点数据即可删除。
 
 ## 测试与验证策略
@@ -77,7 +77,7 @@ AdminLayout + Vue Router + auth.user.id
 
 ## 兼容性与迁移
 
-2026-08-07 品牌切换不迁移旧 `cyber_tag_view_history:v1:<userId>` 或更早的 `jtlab_tag_view_history:v1:<userId>` 数据，Cyber AI Forge 从新的版本化键重新记录标签。未来数据结构变化时递增键版本，并明确迁移或丢弃策略。
+2026-08-10 UUID 基线不迁移数字 ID 使用的 `cyber_ai_forge_tag_view_history:v1:<userId>`、旧 `cyber_tag_view_history:v1:<userId>` 或更早的 `jtlab_tag_view_history:v1:<userId>` 数据；应用从 v2 UUID 键重新记录标签。未来数据结构变化时递增键版本，并明确迁移或丢弃策略。
 
 ## 相关 ADR、计划和 AI 日志
 

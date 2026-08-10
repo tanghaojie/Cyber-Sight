@@ -1,4 +1,4 @@
-import type { ListQuery } from '@cyber-ai-forge/api-contract'
+import type { EntityId, ListQuery } from '@cyber-ai-forge/api-contract'
 import { ErrorCode } from '@/shared/errors/error-codes.js'
 import { notFound } from '@/shared/errors/http-errors.js'
 import { failure, normalizePagination, success } from './response.js'
@@ -13,7 +13,7 @@ export function normalizedListQuery(query: ListQuery) {
   return { ...normalizePagination(query), keyword: query.keyword }
 }
 
-export async function mutationResult(operation: () => Promise<number>) {
+export async function mutationResult(operation: () => Promise<EntityId>) {
   try {
     return success({ id: await operation() })
   } catch (error) {

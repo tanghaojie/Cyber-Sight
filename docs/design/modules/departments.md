@@ -2,7 +2,7 @@
 title: 部门模块
 status: active
 owner: maintainers
-updated: 2026-07-31
+updated: 2026-08-10
 ---
 
 # 部门模块
@@ -32,7 +32,7 @@ updated: 2026-07-31
 
 ## 数据模型与数据流
 
-`sys_departments` 保存 `parent_id`、名称、排序、启用状态及生命周期字段。部门 ID 是层级、归属和数据策略的内部关联标识；名称是面向用户的展示和搜索信息。根节点使用 `parent_id = 0`。
+`sys_departments` 保存 `parent_id`、名称、排序、启用状态及生命周期字段。部门 ID 是数据库生成的 UUIDv7，供层级、归属和数据策略统一关联；名称是面向用户的展示和搜索信息。根节点使用 `parent_id = NULL`，HTTP 契约对应 `parentId: null`，不保留数字 `0` 虚拟根。
 
 `sys_department_closure` 保存 `(ancestor_id, descendant_id, depth)`，包含每个有效部门到自身的深度 0 记录。创建和移动部门在事务中重建有效闭包；软删除部门时同步软删除涉及该部门的闭包关系。
 

@@ -2,6 +2,7 @@ import { z } from 'zod'
 import {
   apiResponseSchema,
   AuditFieldsSchema,
+  EntityIdSchema,
   ErrorResponseSchema,
   paginatedResponseSchema,
 } from '@/shared/http.js'
@@ -9,7 +10,7 @@ import { PermissionKeySchema } from '@/modules/authorization/authorization.schem
 
 /** 菜单三种节点共用的展示、排序和权限字段。 */
 const menuCommonShape = {
-  parentId: z.number().int().min(0),
+  parentId: EntityIdSchema.nullable(),
   name: z.string().min(1).max(80),
   icon: z.string().max(50),
   sortOrder: z.number().int().min(0),
@@ -56,8 +57,8 @@ export const MenuRequestSchema = z.discriminatedUnion('type', [
 ])
 
 export const MenuSummarySchema = AuditFieldsSchema.extend({
-  id: z.number().int(),
-  parentId: z.number().int().min(0),
+  id: EntityIdSchema,
+  parentId: EntityIdSchema.nullable(),
   name: z.string().min(1).max(80),
   path: z.string().max(160),
   component: z.string().max(160),
@@ -75,8 +76,8 @@ export const MenuPageResultSchema = z.union([MenuPageResponseSchema, ErrorRespon
 export const MenuListResponseSchema = apiResponseSchema(z.array(MenuSummarySchema))
 
 const NavigationMenuBaseSchema = z.strictObject({
-  id: z.number().int(),
-  parentId: z.number().int().min(0),
+  id: EntityIdSchema,
+  parentId: EntityIdSchema.nullable(),
   name: z.string(),
   icon: z.string(),
   sortOrder: z.number().int(),
@@ -116,5 +117,5 @@ export function isValidMenuPath(input: Pick<MenuRequest, 'parentId' | 'path' | '
     return true
   }
   const path = input.path.trim()
-  return path.length > 0 && (input.parentId > 0 || path.startsWith('/'))
+  return path.length > 0 && (input.parentId !== null || path.startsWith('/'))
 }

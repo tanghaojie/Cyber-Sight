@@ -15,7 +15,7 @@ date: 2026-08-07
 - 岗位必须表达组织任职，而不是功能授权。
 - 现有用户—部门模型允许多部门归属，岗位任职必须能被严格校验。
 - 模块必须拥有自己的数据和公共接口，不能跨模块直接读写表或仓储。
-- 软删除、审计字段、`sys_` 表前缀和全新基线后的追加迁移必须与现有数据库规则一致。
+- 软删除、审计字段、`sys_` 表前缀和数据库标识符规则必须与现有数据库基线一致。
 - 第一版应保留岗位跨部门复用、主岗位和岗位层级等需求的后续演进空间，但不能为不明确的需求引入多余关系。
 
 ## 考虑的方案
@@ -65,7 +65,7 @@ date: 2026-08-07
 
 ## 实现状态
 
-实现已落在 `apps/backend/src/modules/system/positions/`、`apps/frontend/src/modules/system/positions/` 和 `packages/api-contract/src/modules/positions/`；数据库通过 `apps/backend/drizzle/0004_positions_management.sql` 追加两张岗位表、权限和菜单种子。用户模块通过岗位公共服务在同一事务中替换或失效岗位关系，岗位编码未加入模型。
+实现已落在 `apps/backend/src/modules/system/positions/`、`apps/frontend/src/modules/system/positions/` 和 `packages/api-contract/src/modules/positions/`；两张岗位表、权限和菜单种子现已合并到 `apps/backend/drizzle/0000_initial_uuidv7_system_schema.sql`，其主键和引用统一为 UUID。用户模块通过岗位公共服务在同一事务中替换或失效岗位关系，岗位编码未加入模型。
 
 ## 相关设计
 

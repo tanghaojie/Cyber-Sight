@@ -45,8 +45,13 @@ export const ListQuerySchema = PaginationRequestSchema.extend({
   keyword: z.string().max(100).optional(),
 })
 
+export const NilEntityId = '00000000-0000-0000-0000-000000000000'
+export const EntityIdSchema = z.uuid().refine((value) => value !== NilEntityId, {
+  message: 'Nil UUID is not a valid entity ID',
+})
+
 export const IdParamsSchema = z.strictObject({
-  id: z.coerce.number().int().min(1),
+  id: EntityIdSchema,
 })
 
 export const ErrorResponseSchema = z.strictObject({
@@ -59,7 +64,7 @@ export const EmptySuccessResponseSchema = z.strictObject({
 })
 
 export const IdDataSchema = z.strictObject({
-  id: z.number().int(),
+  id: EntityIdSchema,
 })
 
 export function apiResponseSchema<T extends z.ZodType>(data: T) {
@@ -85,13 +90,14 @@ export const EmptyResultSchema = z.union([EmptySuccessResponseSchema, ErrorRespo
 export const AuditFieldsSchema = z.strictObject({
   isDeleted: z.boolean(),
   createdAt: z.iso.datetime(),
-  createdBy: z.number().int(),
+  createdBy: EntityIdSchema.nullable(),
   updatedAt: z.iso.datetime(),
-  updatedBy: z.number().int(),
+  updatedBy: EntityIdSchema.nullable(),
 })
 
 export type PaginationRequest = z.infer<typeof PaginationRequestSchema>
 export type ListQuery = z.infer<typeof ListQuerySchema>
+export type EntityId = z.infer<typeof EntityIdSchema>
 export type IdParams = z.infer<typeof IdParamsSchema>
 export type ErrorResponse = z.infer<typeof ErrorResponseSchema>
 export type EmptySuccessResponse = z.infer<typeof EmptySuccessResponseSchema>

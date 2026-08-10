@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { apiResponseSchema, ErrorResponseSchema } from '@/shared/http.js'
+import { apiResponseSchema, EntityIdSchema, ErrorResponseSchema } from '@/shared/http.js'
 
 /**
  * 授权模块契约同时描述功能权限和数据范围策略。
@@ -45,7 +45,7 @@ export const DataPolicyInputSchema = z
     action: DataActionSchema,
     scopeType: DataScopeTypeSchema,
     inheritToChildren: z.boolean(),
-    departmentIds: z.array(z.number().int().min(1)),
+    departmentIds: z.array(EntityIdSchema),
     includeDescendants: z.boolean(),
   })
   .superRefine(function validateCustomDepartments(policy, context) {

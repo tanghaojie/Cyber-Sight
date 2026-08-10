@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, eq } from 'drizzle-orm'
+import type { EntityId } from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import { userDepartments, userRoles, users } from '@/db/schema.js'
 import { DATABASE } from '@/shared/database/database.provider.js'
@@ -9,7 +10,7 @@ import { DATABASE } from '@/shared/database/database.provider.js'
 export class UsersAccess {
   constructor(@Inject(DATABASE) private readonly db: Database) {}
 
-  async userExists(userId: number): Promise<boolean> {
+  async userExists(userId: EntityId): Promise<boolean> {
     const [row] = await this.db
       .select({ id: users.id })
       .from(users)
@@ -18,7 +19,7 @@ export class UsersAccess {
     return Boolean(row)
   }
 
-  async assignedRoleIds(userId: number): Promise<number[]> {
+  async assignedRoleIds(userId: EntityId): Promise<EntityId[]> {
     const rows = await this.db
       .select({ id: userRoles.roleId })
       .from(userRoles)
@@ -26,7 +27,7 @@ export class UsersAccess {
     return rows.map((row) => row.id)
   }
 
-  async assignedDepartmentIds(userId: number): Promise<number[]> {
+  async assignedDepartmentIds(userId: EntityId): Promise<EntityId[]> {
     const rows = await this.db
       .select({ id: userDepartments.departmentId })
       .from(userDepartments)
@@ -34,7 +35,7 @@ export class UsersAccess {
     return rows.map((row) => row.id)
   }
 
-  async hasActiveDepartmentMembership(departmentId: number): Promise<boolean> {
+  async hasActiveDepartmentMembership(departmentId: EntityId): Promise<boolean> {
     const [row] = await this.db
       .select({ id: userDepartments.id })
       .from(userDepartments)

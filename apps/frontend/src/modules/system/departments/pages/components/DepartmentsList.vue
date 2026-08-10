@@ -53,13 +53,13 @@
 import { computed, onMounted, ref } from 'vue'
 import { Delete, EditPen, Plus, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { DepartmentSummary } from '@cyber-ai-forge/api-contract'
+import type { DepartmentSummary, EntityId } from '@cyber-ai-forge/api-contract'
 import { deleteDepartment, listDepartments } from '@/modules/system/departments/departments.api'
 import { buildDepartmentTree, filterDepartmentTree } from '../department-tree'
 import { useLocalization } from '@/modules/system/localization/localization'
 
 const emit = defineEmits<{
-  create: [parentId: number]
+  create: [parentId: EntityId]
   edit: [department: DepartmentSummary]
   loaded: [records: DepartmentSummary[]]
 }>()
@@ -72,8 +72,8 @@ const departmentTree = computed(() => buildDepartmentTree(records.value))
 // 部门数量通常较小，搜索在完整树快照上即时执行并保留命中节点的层级上下文。
 const visibleTree = computed(() => filterDepartmentTree(departmentTree.value, keyword.value))
 
-function parentName(parentId: number): string {
-  return parentId === 0
+function parentName(parentId: EntityId | null): string {
+  return parentId === null
     ? t('departments.root')
     : (records.value.find((row) => row.id === parentId)?.name ??
         t('departments.unknown', { id: parentId }))

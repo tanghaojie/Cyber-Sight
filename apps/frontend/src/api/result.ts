@@ -1,4 +1,9 @@
-import type { ApiResponse, ErrorResponse, PaginatedResponse } from '@cyber-ai-forge/api-contract'
+import type {
+  ApiResponse,
+  EntityId,
+  ErrorResponse,
+  PaginatedResponse,
+} from '@cyber-ai-forge/api-contract'
 import { ElMessage } from 'element-plus'
 import { translate } from '@/modules/system/localization/localization'
 
@@ -38,4 +43,4 @@ export function pageResult<T>(
   throw new Error(message)
 }
 
-export type ApiMutationResult = ApiResponse<{ id: number }>
+export type ApiMutationResult = ApiResponse<{ id: EntityId }>

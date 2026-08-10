@@ -1,12 +1,17 @@
 import { sql } from 'drizzle-orm'
-import { boolean, integer, pgTable, serial, uniqueIndex, varchar } from 'drizzle-orm/pg-core'
-import { auditColumns, authorizationSubjectType, dataScopeType } from './common.schema.js'
+import { boolean, pgTable, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core'
+import {
+  auditColumns,
+  authorizationSubjectType,
+  dataScopeType,
+  uuidv7PrimaryKey,
+} from './common.schema.js'
 import { departments } from './departments.schema.js'
 import { roles } from './roles.schema.js'
 
 // 功能权限归授权模块所有，角色通过稳定 permissionKey 建立多对多关系。
 export const permissions = pgTable('sys_permissions', {
-  id: serial('id').primaryKey(),
+  id: uuidv7PrimaryKey(),
   key: varchar('key', { length: 100 }).notNull().unique(),
   module: varchar('module', { length: 80 }).notNull(),
   name: varchar('name', { length: 80 }).notNull(),
@@ -19,8 +24,8 @@ export const permissions = pgTable('sys_permissions', {
 export const rolePermissions = pgTable(
   'sys_role_permissions',
   {
-    id: serial('id').primaryKey(),
-    roleId: integer('role_id')
+    id: uuidv7PrimaryKey(),
+    roleId: uuid('role_id')
       .notNull()
       .references(() => roles.id),
     permissionKey: varchar('permission_key', { length: 100 })
@@ -39,9 +44,9 @@ export const rolePermissions = pgTable(
 export const dataPolicyRules = pgTable(
   'sys_data_policy_rules',
   {
-    id: serial('id').primaryKey(),
+    id: uuidv7PrimaryKey(),
     subjectType: authorizationSubjectType('subject_type').notNull(),
-    subjectId: integer('subject_id').notNull(),
+    subjectId: uuid('subject_id').notNull(),
     resourceKey: varchar('resource_key', { length: 100 }).notNull(),
     action: varchar('action', { length: 50 }).notNull(),
     scopeType: dataScopeType('scope_type').notNull(),
@@ -60,11 +65,11 @@ export const dataPolicyRules = pgTable(
 export const dataPolicyDepartments = pgTable(
   'sys_data_policy_departments',
   {
-    id: serial('id').primaryKey(),
-    ruleId: integer('rule_id')
+    id: uuidv7PrimaryKey(),
+    ruleId: uuid('rule_id')
       .notNull()
       .references(() => dataPolicyRules.id),
-    departmentId: integer('department_id')
+    departmentId: uuid('department_id')
       .notNull()
       .references(() => departments.id),
     includeDescendants: boolean('include_descendants').default(false).notNull(),

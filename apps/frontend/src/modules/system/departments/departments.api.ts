@@ -5,6 +5,7 @@ import type {
   DepartmentRequest,
   DepartmentSummary,
   EmptySuccessResponse,
+  EntityId,
   IdResponse,
 } from '@cyber-ai-forge/api-contract'
 import { apiClient } from '@/api/client'
@@ -43,7 +44,7 @@ export async function createDepartment(payload: DepartmentRequest): Promise<ApiM
 }
 
 export async function updateDepartment(
-  id: number,
+  id: EntityId,
   payload: DepartmentRequest,
 ): Promise<ApiMutationResult> {
   const { data, error } = await apiClient.PUT<IdResponse, DepartmentRequest>(
@@ -53,7 +54,7 @@ export async function updateDepartment(
   return apiResult(data, error)
 }
 
-export async function deleteDepartment(id: number) {
+export async function deleteDepartment(id: EntityId) {
   const { data, error } = await apiClient.DELETE<EmptySuccessResponse>(`/admin/departments/${id}`)
   return apiResult(data, error)
 }

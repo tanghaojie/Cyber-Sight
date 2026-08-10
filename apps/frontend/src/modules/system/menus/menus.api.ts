@@ -1,5 +1,6 @@
 import type {
   EmptySuccessResponse,
+  EntityId,
   IdResponse,
   MenuListResponse,
   MenuRequest,
@@ -35,14 +36,14 @@ export async function createMenu(payload: MenuRequest): Promise<ApiMutationResul
   return apiResult(data, error)
 }
 
-export async function updateMenu(id: number, payload: MenuRequest): Promise<ApiMutationResult> {
+export async function updateMenu(id: EntityId, payload: MenuRequest): Promise<ApiMutationResult> {
   const { data, error } = await apiClient.PUT<IdResponse, MenuRequest>(`/admin/menus/${id}`, {
     body: payload,
   })
   return apiResult(data, error)
 }
 
-export async function deleteMenu(id: number) {
+export async function deleteMenu(id: EntityId) {
   const { data, error } = await apiClient.DELETE<EmptySuccessResponse>(`/admin/menus/${id}`)
   return apiResult(data, error)
 }

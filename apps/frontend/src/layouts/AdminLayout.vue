@@ -181,7 +181,7 @@ function closeSidebarDrawer(): void {
 watch(
   () => auth.user?.id,
   function activateTagHistory(userId) {
-    if (typeof userId === 'number') {
+    if (typeof userId === 'string') {
       tagView.activate(userId)
       syncCurrentTag()
     } else {

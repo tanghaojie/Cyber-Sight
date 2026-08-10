@@ -1,14 +1,14 @@
 import { sql } from 'drizzle-orm'
-import { boolean, index, integer, pgTable, serial, uniqueIndex, varchar } from 'drizzle-orm/pg-core'
-import { auditColumns } from './common.schema.js'
+import { boolean, index, integer, pgTable, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core'
+import { auditColumns, uuidv7PrimaryKey } from './common.schema.js'
 import { departments } from './departments.schema.js'
 import { users } from './users.schema.js'
 
 export const positions = pgTable(
   'sys_positions',
   {
-    id: serial('id').primaryKey(),
-    departmentId: integer('department_id')
+    id: uuidv7PrimaryKey(),
+    departmentId: uuid('department_id')
       .notNull()
       .references(() => departments.id),
     name: varchar('name', { length: 80 }).notNull(),
@@ -27,11 +27,11 @@ export const positions = pgTable(
 export const userPositions = pgTable(
   'sys_user_positions',
   {
-    id: serial('id').primaryKey(),
-    userId: integer('user_id')
+    id: uuidv7PrimaryKey(),
+    userId: uuid('user_id')
       .notNull()
       .references(() => users.id),
-    positionId: integer('position_id')
+    positionId: uuid('position_id')
       .notNull()
       .references(() => positions.id),
     ...auditColumns(),

@@ -44,6 +44,7 @@ TypeScript 只能检查参与编译的源码，类型在运行时会被擦除。
 - HTTP 数据结构必须先用共享 Zod Schema 定义，禁止在前端和后端维护平行 interface。
 - 所有外部请求体、查询参数和路径参数必须由后端运行时 Schema 校验。
 - 请求对象默认使用严格 Zod 对象拒绝未声明字段，避免静默删除后继续处理。字符串长度、数值范围、格式和枚举应在 Schema 中明确表达；HTTP 查询与路径数字使用显式 coercion。
+- 应用实体 ID 统一复用 `EntityIdSchema`/`EntityId`，运行时接受非 nil UUID 字符串；路径参数、响应 ID、关联 ID 和数组不得重新声明为数字或普通无校验字符串。
 - 前端导入契约类型时优先使用 `import type`，不把运行时校验库打入无关业务代码。
 - HTTP 契约只使用可稳定转换为 JSON Schema 的 Zod 子集；`transform`、`Date`、集合和无法表达的自定义规则不进入传输 Schema。
 - Swagger/OpenAPI 由 Nest Controller 的契约元数据生成，禁止再提交手写 YAML 与运行时 Schema 双源。

@@ -2,7 +2,7 @@
 
 ## 适用范围
 
-当前 Drizzle 迁移链已重置为单一初始基线，全部脚手架表使用 `sys_` 物理前缀。该基线只支持全新空 PostgreSQL 数据库，不支持从旧迁移链原地升级。
+当前 Drizzle 迁移链已重置为单一 UUIDv7 初始基线，全部 17 张脚手架表使用 `sys_` 物理前缀。该基线只支持全新空 PostgreSQL 18 数据库，不支持从旧迁移链原地升级。
 
 ## 上线前检查
 
@@ -12,7 +12,7 @@
 
 ## 重建步骤
 
-1. 在 PostgreSQL 中创建新的空数据库，并为应用账号授予建表、建类型和读写权限。
+1. 在 PostgreSQL 18 中创建新的空数据库，并为应用账号授予建表、建类型和读写权限。
 2. 将 `apps/backend/.env` 或部署环境的 `DATABASE_URL` 指向新数据库。
 3. 从仓库根执行：
 
@@ -21,12 +21,12 @@
    pnpm test:db
    ```
 
-4. 确认 `pnpm test:db` 输出包含 `systemUsersTable=sys_users` 和 `migrationsTable=drizzle.__drizzle_migrations`。
+4. 确认 `pnpm test:db` 输出包含 PostgreSQL 18 版本、`systemUsersTable=sys_users`、`migrationsTable=drizzle.__drizzle_migrations` 和 `identifiers=uuidv7`。
 5. 启动新版应用，使用本地初始管理员完成登录检查，并在共享或生产环境立即修改默认凭据。
 
 ## 数据库侧核对
 
-新基线应创建 14 张 `public.sys_*` 表，Drizzle journal 只登记 `0000_initial_system_schema` 对应的一次迁移。可由数据库管理员在新库执行只读核对：
+新基线应创建 17 张 `public.sys_*` 表，Drizzle journal 只登记 `0000_initial_uuidv7_system_schema` 对应的一次迁移。可由数据库管理员在新库执行只读核对：
 
 ```sql
 select tablename
@@ -36,9 +36,13 @@ order by tablename;
 
 select count(*)
 from drizzle.__drizzle_migrations;
+
+select uuid_extract_version(id), count(*)
+from public.sys_users
+group by uuid_extract_version(id);
 ```
 
-第一条查询应返回 14 行，第二条查询应返回 `1`。
+第一条查询应返回 17 行，第二条查询应返回 `1`，第三条查询应只返回 UUID 版本 `7`。
 
 ## 禁止操作
 
@@ -55,3 +59,4 @@ from drizzle.__drizzle_migrations;
 
 - [数据库 Schema 与迁移基线](../design/database-schema-and-migrations.md)
 - [ADR-0026](../decisions/ADR-0026-system-table-prefix-and-fresh-baseline.md)
+- [ADR-0039](../decisions/ADR-0039-single-uuidv7-identifiers.md)

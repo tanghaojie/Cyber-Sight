@@ -1,15 +1,6 @@
 import { sql } from 'drizzle-orm'
-import {
-  boolean,
-  integer,
-  pgTable,
-  serial,
-  text,
-  timestamp,
-  uniqueIndex,
-  varchar,
-} from 'drizzle-orm/pg-core'
-import { auditColumns } from './common.schema.js'
+import { boolean, pgTable, text, timestamp, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core'
+import { auditColumns, uuidv7PrimaryKey } from './common.schema.js'
 import { departments } from './departments.schema.js'
 import { roles } from './roles.schema.js'
 
@@ -17,7 +8,7 @@ import { roles } from './roles.schema.js'
 export const users = pgTable(
   'sys_users',
   {
-    id: serial('id').primaryKey(),
+    id: uuidv7PrimaryKey(),
     username: varchar('username', { length: 50 }).notNull(),
     displayName: varchar('display_name', { length: 80 }).notNull(),
     email: varchar('email', { length: 160 }).notNull(),
@@ -40,11 +31,11 @@ export const users = pgTable(
 export const userRoles = pgTable(
   'sys_user_roles',
   {
-    id: serial('id').primaryKey(),
-    userId: integer('user_id')
+    id: uuidv7PrimaryKey(),
+    userId: uuid('user_id')
       .notNull()
       .references(() => users.id),
-    roleId: integer('role_id')
+    roleId: uuid('role_id')
       .notNull()
       .references(() => roles.id),
     ...auditColumns(),
@@ -59,11 +50,11 @@ export const userRoles = pgTable(
 export const userDepartments = pgTable(
   'sys_user_departments',
   {
-    id: serial('id').primaryKey(),
-    userId: integer('user_id')
+    id: uuidv7PrimaryKey(),
+    userId: uuid('user_id')
       .notNull()
       .references(() => users.id),
-    departmentId: integer('department_id')
+    departmentId: uuid('department_id')
       .notNull()
       .references(() => departments.id),
     // 业务层确保每个有效用户指定一个主部门；部分唯一索引在数据库层防止出现多个活动主部门。

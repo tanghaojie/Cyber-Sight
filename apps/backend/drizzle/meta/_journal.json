@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1785419678915,
-      "tag": "0000_initial_system_schema",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1785866613648,
-      "tag": "0001_luxuriant_violations",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1785901035816,
-      "tag": "0002_api_log_operations_menu",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1786100000000,
-      "tag": "0003_about_project_menu",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1786116837174,
-      "tag": "0004_positions_management",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1786204800000,
-      "tag": "0005_dynamic_home_menu",
+      "when": 1786349565362,
+      "tag": "0000_initial_uuidv7_system_schema",
       "breakpoints": true
     }
   ]

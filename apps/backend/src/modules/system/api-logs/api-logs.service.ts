@@ -1,8 +1,10 @@
+import type { EntityId } from '@cyber-ai-forge/api-contract'
+
 export interface ApiLogEvent {
   occurredAt: Date
   expiresAt: Date | null
   requestId: string
-  actorUserId: number | null
+  actorUserId: EntityId | null
   actorUsername: string | null
   method: string
   routePattern: string
