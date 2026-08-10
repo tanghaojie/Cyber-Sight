@@ -57,7 +57,7 @@
 import { computed, ref } from 'vue'
 import { ArrowDown, Setting, SwitchButton, User } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
-import type { NavigationMenu } from '@scaffold/api-contract'
+import type { NavigationMenu } from '@cyber-ai-forge/api-contract'
 import AppIcon from '@/components/AppIcon.vue'
 import TopNavigation from '@/components/layout/TopNavigation.vue'
 import LanguageSwitcher from '@/modules/system/localization/LanguageSwitcher.vue'

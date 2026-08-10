@@ -1,4 +1,4 @@
-import type { ApiResponse, ErrorResponse, PaginatedResponse } from '@scaffold/api-contract'
+import type { ApiResponse, ErrorResponse, PaginatedResponse } from '@cyber-ai-forge/api-contract'
 import { ElMessage } from 'element-plus'
 import { translate } from '@/modules/system/localization/localization'
 

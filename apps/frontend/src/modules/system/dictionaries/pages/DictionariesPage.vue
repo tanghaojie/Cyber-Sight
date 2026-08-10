@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
-import type { DictionarySummary } from '@scaffold/api-contract'
+import type { DictionarySummary } from '@cyber-ai-forge/api-contract'
 import DictionariesList from './components/DictionariesList.vue'
 import DictionaryDialog from './components/DictionaryDialog.vue'
 import { useLocalization } from '@/modules/system/localization/localization'

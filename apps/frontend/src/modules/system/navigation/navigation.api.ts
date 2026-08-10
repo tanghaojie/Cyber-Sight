@@ -1,4 +1,4 @@
-import type { NavigationMenuResponse } from '@scaffold/api-contract'
+import type { NavigationMenuResponse } from '@cyber-ai-forge/api-contract'
 import { apiClient } from '@/api/client'
 import { translate } from '@/modules/system/localization/localization'
 

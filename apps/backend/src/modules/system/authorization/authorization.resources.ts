@@ -1,4 +1,4 @@
-import type { DataResourceDefinition, DataScopeType } from '@scaffold/api-contract'
+import type { DataResourceDefinition, DataScopeType } from '@cyber-ai-forge/api-contract'
 
 // 功能权限键的代码侧目录，路由和菜单都引用这些稳定值，避免散落字符串。
 export const authorizationPermissionKeys = {

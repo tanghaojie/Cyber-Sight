@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { CurrentUser } from '@scaffold/api-contract'
+import type { CurrentUser } from '@cyber-ai-forge/api-contract'
 import { clearAccessToken, getAccessToken, setAccessToken } from '@/shared/accessToken'
 import { login as apiLogin, getCurrentUser, logout as apiLogout } from './auth.api'
 import { translate } from '@/modules/system/localization/localization'

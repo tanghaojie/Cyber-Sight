@@ -7,7 +7,7 @@ import type {
   DataPolicyInput,
   PermissionSummary,
   SubjectAccessRequest,
-} from '@scaffold/api-contract'
+} from '@cyber-ai-forge/api-contract'
 import {
   dataPolicyDepartments,
   dataPolicyRules,

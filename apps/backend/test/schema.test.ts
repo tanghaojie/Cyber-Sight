@@ -1,7 +1,7 @@
 import { getTableColumns } from 'drizzle-orm'
 import { getTableConfig, type PgTable } from 'drizzle-orm/pg-core'
 import { describe, expect, it } from 'vitest'
-import { PermissionKeySchema } from '@scaffold/api-contract'
+import { PermissionKeySchema } from '@cyber-ai-forge/api-contract'
 import * as schema from '@/db/schema.js'
 import {
   apiRequestLogs,

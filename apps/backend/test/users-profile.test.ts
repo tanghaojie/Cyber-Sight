@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { PasswordUpdateSchema, PersonalProfileUpdateSchema } from '@scaffold/api-contract'
+import { PasswordUpdateSchema, PersonalProfileUpdateSchema } from '@cyber-ai-forge/api-contract'
 import { UsersRepository } from '@/modules/system/users/users.repository.js'
 import { hashPassword } from '@/modules/system/auth/auth.security.js'
 

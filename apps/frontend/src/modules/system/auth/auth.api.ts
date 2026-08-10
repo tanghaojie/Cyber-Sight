@@ -6,7 +6,7 @@ import type {
   LoginData,
   LoginRequest,
   LoginSuccessResponse,
-} from '@scaffold/api-contract'
+} from '@cyber-ai-forge/api-contract'
 import { apiClient } from '@/api/client'
 import { apiResult } from '@/api/result'
 

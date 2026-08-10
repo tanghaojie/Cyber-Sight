@@ -40,7 +40,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build marketing site
-        run: pnpm --filter @scaffold/website build
+        run: pnpm --filter @cyber-ai-forge/website build
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

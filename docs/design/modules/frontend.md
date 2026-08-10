@@ -9,7 +9,7 @@ updated: 2026-08-08
 
 ## 定位与边界
 
-`apps/frontend` 是 Vue 3 单页应用，通过 `@scaffold/api-contract` 推导的 TypeScript 类型访问后端。它拥有应用启动、认证状态、静态与动态路由、响应式管理端外壳和各前端业务模块；不依赖 NestJS 或 Fastify adapter 内部实现，也不把数据库字符串当作任意动态导入路径。
+`apps/frontend` 是 Vue 3 单页应用，通过 `@cyber-ai-forge/api-contract` 推导的 TypeScript 类型访问后端。它拥有应用启动、认证状态、静态与动态路由、响应式管理端外壳和各前端业务模块；不依赖 NestJS 或 Fastify adapter 内部实现，也不把数据库字符串当作任意动态导入路径。
 
 业务页面、API 和状态按类别归属：脚手架内置能力位于 `src/modules/system/<module>/`，后续产品业务位于 `src/modules/biz/<module>/`。`src/router/`、`src/layouts/`、`src/bootstrap/`、`src/api/` 和领域无关的 `src/shared/` 只承担应用组合或平台能力，不承载具体业务规则。
 

@@ -1,4 +1,4 @@
-import type { ApiLogItem, ApiLogQuery, PaginatedResponse } from '@scaffold/api-contract'
+import type { ApiLogItem, ApiLogQuery, PaginatedResponse } from '@cyber-ai-forge/api-contract'
 import { apiClient } from '@/api/client'
 import { pageResult } from '@/api/result'
 

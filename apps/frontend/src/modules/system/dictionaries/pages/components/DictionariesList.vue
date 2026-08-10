@@ -72,7 +72,7 @@
 import { onMounted, ref } from 'vue'
 import { Delete, EditPen, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { DictionarySummary } from '@scaffold/api-contract'
+import type { DictionarySummary } from '@cyber-ai-forge/api-contract'
 import { deleteDictionary, listDictionaries } from '@/modules/system/dictionaries/dictionaries.api'
 import { useLocalization } from '@/modules/system/localization/localization'
 

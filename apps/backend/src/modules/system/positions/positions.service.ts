@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, count, eq, inArray } from 'drizzle-orm'
-import type { PositionRequest } from '@scaffold/api-contract'
+import type { PositionRequest } from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import { departments, positions, userPositions } from '@/db/schema.js'
 import { DATABASE } from '@/shared/database/database.provider.js'

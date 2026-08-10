@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, eq, gt } from 'drizzle-orm'
-import type { CurrentUser, LoginData } from '@scaffold/api-contract'
+import type { CurrentUser, LoginData } from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import { authSessions, roles, userRoles, users } from '@/db/schema.js'
 import { DATABASE } from '@/shared/database/database.provider.js'

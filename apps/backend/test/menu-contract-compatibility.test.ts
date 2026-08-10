@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { isValidMenuPath, MenuListResponseSchema, MenuRequestSchema } from '@scaffold/api-contract'
+import {
+  isValidMenuPath,
+  MenuListResponseSchema,
+  MenuRequestSchema,
+} from '@cyber-ai-forge/api-contract'
 
 const auditFields = {
   isDeleted: false,

@@ -1,4 +1,8 @@
-import type { ApiResponse, PaginatedResponse, PaginationRequest } from '@scaffold/api-contract'
+import type {
+  ApiResponse,
+  PaginatedResponse,
+  PaginationRequest,
+} from '@cyber-ai-forge/api-contract'
 import { ErrorCode } from '@/shared/errors/error-codes.js'
 
 // 重载区分“无 data 的成功写操作”和“带 data 的成功查询”，同时保持统一运行时实现。

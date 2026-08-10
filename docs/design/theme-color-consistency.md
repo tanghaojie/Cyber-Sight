@@ -36,5 +36,5 @@ AI 执行格式检查、格式化、TypeScript 检查和生产构建；不创建
 - `pnpm format:check`：通过。
 - `npx vue-tsc --noEmit`：通过。
 - `pnpm lint`：通过。
-- `pnpm --filter @scaffold/frontend build`：通过；仅有既存 Sass legacy API、依赖注释和布局动态/静态导入提示。
+- `pnpm --filter @cyber-ai-forge/frontend build`：通过；仅有既存 Sass legacy API、依赖注释和布局动态/静态导入提示。
 - 人工验收仍需由维护者完成，重点检查六套主题、深色模式、登录页、应用壳、首页、关于页、404、设置弹窗、Element Plus 组件和窄屏布局。

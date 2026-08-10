@@ -6,7 +6,7 @@ import {
   LoginResultSchema,
   type CurrentUser,
   type LoginRequest,
-} from '@scaffold/api-contract'
+} from '@cyber-ai-forge/api-contract'
 import type { FastifyRequest } from 'fastify'
 import {
   Authenticated,

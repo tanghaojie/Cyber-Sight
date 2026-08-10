@@ -55,7 +55,7 @@ import type {
   DepartmentRequest,
   DepartmentSummary,
   SubjectAccessRequest,
-} from '@scaffold/api-contract'
+} from '@cyber-ai-forge/api-contract'
 import DataPolicyEditor from '@/modules/system/authorization/components/DataPolicyEditor.vue'
 import {
   getSubjectAccess,

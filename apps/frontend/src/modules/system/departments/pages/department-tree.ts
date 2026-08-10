@@ -1,4 +1,4 @@
-import type { DepartmentSummary } from '@scaffold/api-contract'
+import type { DepartmentSummary } from '@cyber-ai-forge/api-contract'
 
 export interface DepartmentTreeNode extends DepartmentSummary {
   children: DepartmentTreeNode[]

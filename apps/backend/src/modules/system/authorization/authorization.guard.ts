@@ -7,7 +7,7 @@ import {
   SetMetadata,
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import type { CurrentUser } from '@scaffold/api-contract'
+import type { CurrentUser } from '@cyber-ai-forge/api-contract'
 import type { FastifyRequest } from 'fastify'
 import { AuthService } from '@/modules/system/auth/auth.service.js'
 import { forbidden, internalError } from '@/shared/errors/http-errors.js'

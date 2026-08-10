@@ -34,7 +34,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
-import type { DepartmentOption, PositionSummary } from '@scaffold/api-contract'
+import type { DepartmentOption, PositionSummary } from '@cyber-ai-forge/api-contract'
 import { listDepartmentOptions } from '@/modules/system/departments/departments.api'
 import PositionDialog from './components/PositionDialog.vue'
 import PositionsList from './components/PositionsList.vue'

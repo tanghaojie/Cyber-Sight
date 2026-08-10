@@ -1,4 +1,4 @@
-import { isValidMenuPath, type MenuSummary } from '@scaffold/api-contract'
+import { isValidMenuPath, type MenuSummary } from '@cyber-ai-forge/api-contract'
 import { translate } from '@/modules/system/localization/localization'
 
 type MenuType = MenuSummary['type']

@@ -65,7 +65,7 @@
 import { onMounted, ref } from 'vue'
 import { Delete, EditPen, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { RoleSummary } from '@scaffold/api-contract'
+import type { RoleSummary } from '@cyber-ai-forge/api-contract'
 import { deleteRole, listRoles } from '@/modules/system/roles/roles.api'
 import { useLocalization } from '@/modules/system/localization/localization'
 

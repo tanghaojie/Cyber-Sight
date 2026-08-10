@@ -58,7 +58,7 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import type { DictionaryRequest, DictionarySummary } from '@scaffold/api-contract'
+import type { DictionaryRequest, DictionarySummary } from '@cyber-ai-forge/api-contract'
 import { createDictionary, updateDictionary } from '@/modules/system/dictionaries/dictionaries.api'
 import { useLocalization } from '@/modules/system/localization/localization'
 

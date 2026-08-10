@@ -45,6 +45,7 @@ Logo 以仓库内 SVG/Vue 组件实现，保证侧栏、移动端、404 和 favi
 默认根包名、浏览器存储键和 JWT 元数据同步采用 CYBER 命名：
 
 - 根包名：`cyber-ai-forge`。
+- workspace 包作用域：`@cyber-ai-forge/*`。
 - 访问令牌键：`cyber_ai_forge_access_token`。
 - 标签历史键：`cyber_ai_forge_tag_view_history:v1:<userId>`。
 - 语言偏好键：`cyber_ai_forge_locale:v1`。
@@ -73,4 +74,5 @@ Logo 以仓库内 SVG/Vue 组件实现，保证侧栏、移动端、404 和 favi
 - [ADR-0028：分离 CYBER 产品品牌与 JTLab 创作者品牌](../decisions/ADR-0028-product-and-creator-brand-separation.md)
 - [ADR-0031：Cyber AI Forge 品牌与项目级技术标识](../decisions/ADR-0031-cyber-ai-forge-brand.md)
 - [实施计划](../archive/plans/2026-08-07-cyber-ai-forge-renaming.md)
+- [workspace 包作用域迁移计划](../archive/plans/2026-08-10-cyber-ai-forge-package-scope.md)
 - [AI 协作记录](../archive/ai-logs/2026/08/2026-08-07-cyber-ai-forge-renaming.md)

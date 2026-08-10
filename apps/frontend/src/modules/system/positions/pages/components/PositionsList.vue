@@ -96,7 +96,7 @@
 import { onMounted, ref } from 'vue'
 import { Delete, EditPen, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { DepartmentOption, PositionSummary } from '@scaffold/api-contract'
+import type { DepartmentOption, PositionSummary } from '@cyber-ai-forge/api-contract'
 import { deletePosition, listPositions } from '@/modules/system/positions/positions.api'
 import { useLocalization } from '@/modules/system/localization/localization'
 

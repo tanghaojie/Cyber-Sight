@@ -6,12 +6,12 @@ import type {
   PositionOptionListResponse,
   PositionRequest,
   PositionSummary,
-} from '@scaffold/api-contract'
+} from '@cyber-ai-forge/api-contract'
 import { apiClient } from '@/api/client'
 import { apiResult, pageResult, type ApiMutationResult } from '@/api/result'
 import { translate } from '@/modules/system/localization/localization'
 
-export type { PositionOption } from '@scaffold/api-contract'
+export type { PositionOption } from '@cyber-ai-forge/api-contract'
 
 export async function listPositions(
   pageNum: number,

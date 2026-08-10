@@ -29,11 +29,11 @@ TypeScript 只能检查参与编译的源码，类型在运行时会被擦除。
 
 ## 当前链路
 
-1. 人或 AI 在 `@scaffold/api-contract` 中定义或修改 Zod 4 Schema。
+1. 人或 AI 在 `@cyber-ai-forge/api-contract` 中定义或修改 Zod 4 Schema。
 2. TypeScript 类型通过 `z.infer<typeof Schema>` 从 Schema 推导。
 3. Nest Controller 通过 `ZodValidationPipe` 直接解析请求，通过 `ContractResponseInterceptor` 校验响应。
 4. 契约包通过 `toOpenApiSchema()` 为 Nest Swagger 派生 OpenAPI Schema；`toJsonSchema()` 仅用于适配器无关的 JSON Schema 输出。
-5. 前后端从 `@scaffold/api-contract` 导入同一组请求和响应类型。
+5. 前后端从 `@cyber-ai-forge/api-contract` 导入同一组请求和响应类型。
 6. 前端业务 API 通过共享 fetch Client 发起请求，并处理统一响应。
 7. Nest Swagger 从 `ContractRoute` 元数据生成 `/docs` 和 `/docs/json`；该 OpenAPI 是调试与互操作产物，不是另一份手写源。
 

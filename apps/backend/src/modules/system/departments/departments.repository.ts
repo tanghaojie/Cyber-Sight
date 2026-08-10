@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, eq, or } from 'drizzle-orm'
-import type { DepartmentRequest } from '@scaffold/api-contract'
+import type { DepartmentRequest } from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import {
   dataPolicyDepartments,

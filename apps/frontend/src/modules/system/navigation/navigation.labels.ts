@@ -1,4 +1,4 @@
-import type { NavigationMenu } from '@scaffold/api-contract'
+import type { NavigationMenu } from '@cyber-ai-forge/api-contract'
 import type { LocalizedLabel } from '@/modules/system/localization/localization'
 
 interface DefaultNavigationFingerprint {

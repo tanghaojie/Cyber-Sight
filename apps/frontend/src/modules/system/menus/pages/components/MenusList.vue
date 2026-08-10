@@ -103,7 +103,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { Delete, EditPen, Plus, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { MenuSummary } from '@scaffold/api-contract'
+import type { MenuSummary } from '@cyber-ai-forge/api-contract'
 import AppIcon from '@/components/AppIcon.vue'
 import { useNavigationStore } from '@/modules/system/navigation/navigation.store'
 import { buildMenuTree, type MenuTreeRecord } from '@/modules/system/menus/menu-tree'

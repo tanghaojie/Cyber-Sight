@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { NavigationMenu } from '@scaffold/api-contract'
+import type { NavigationMenu } from '@cyber-ai-forge/api-contract'
 import { resolveNavigationPaths } from '@/shared/routing/menu-paths'
 import { fetchNavigation } from './navigation.api'
 import { translate } from '@/modules/system/localization/localization'

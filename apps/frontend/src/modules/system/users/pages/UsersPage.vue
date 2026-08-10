@@ -28,7 +28,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
-import type { DepartmentOption, UserSummary } from '@scaffold/api-contract'
+import type { DepartmentOption, UserSummary } from '@cyber-ai-forge/api-contract'
 import { listDepartmentOptions } from '@/modules/system/departments/departments.api'
 import { listPositionOptions, type PositionOption } from '@/modules/system/positions/positions.api'
 import { listRoleOptions, type RoleOption } from '@/modules/system/roles/roles.api'

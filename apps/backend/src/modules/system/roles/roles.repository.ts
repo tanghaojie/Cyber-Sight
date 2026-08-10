@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, count, eq, ilike } from 'drizzle-orm'
-import type { RoleRequest } from '@scaffold/api-contract'
+import type { RoleRequest } from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import { roles } from '@/db/schema.js'
 import { DATABASE } from '@/shared/database/database.provider.js'

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { JwtService } from '@nestjs/jwt'
-import type { CurrentUser } from '@scaffold/api-contract'
+import type { CurrentUser } from '@cyber-ai-forge/api-contract'
 import { JwtTokenCache } from '@/modules/system/auth/auth-token-cache.js'
 
 const SECRET = 'test-only-jwt-secret-at-least-32-characters'

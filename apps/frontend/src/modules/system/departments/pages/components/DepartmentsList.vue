@@ -53,7 +53,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { Delete, EditPen, Plus, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { DepartmentSummary } from '@scaffold/api-contract'
+import type { DepartmentSummary } from '@cyber-ai-forge/api-contract'
 import { deleteDepartment, listDepartments } from '@/modules/system/departments/departments.api'
 import { buildDepartmentTree, filterDepartmentTree } from '../department-tree'
 import { useLocalization } from '@/modules/system/localization/localization'

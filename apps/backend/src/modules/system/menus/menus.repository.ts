@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, count, eq, ilike } from 'drizzle-orm'
-import type { CurrentUser, MenuRequest, NavigationMenu } from '@scaffold/api-contract'
+import type { CurrentUser, MenuRequest, NavigationMenu } from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import { menus } from '@/db/schema.js'
 import { authorizationProviderToken } from '@/modules/system/authorization/authorization.guard.js'

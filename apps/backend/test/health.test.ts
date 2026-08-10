@@ -10,7 +10,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common'
 import type { NestFastifyApplication } from '@nestjs/platform-fastify'
-import { ListQuerySchema, LoginRequestSchema, toJsonSchema } from '@scaffold/api-contract'
+import { ListQuerySchema, LoginRequestSchema, toJsonSchema } from '@cyber-ai-forge/api-contract'
 import { z } from 'zod'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import type { FastifyInstance } from 'fastify'

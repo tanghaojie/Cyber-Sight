@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import type { CurrentUser, DataAction } from '@scaffold/api-contract'
+import type { CurrentUser, DataAction } from '@cyber-ai-forge/api-contract'
 import { AuthorizationService, type DataAccessPlan } from './authorization.service.js'
 
 /**

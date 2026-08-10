@@ -17,7 +17,7 @@ import {
   type PersonalProfileUpdate,
   type UserCreate,
   type UserUpdate,
-} from '@scaffold/api-contract'
+} from '@cyber-ai-forge/api-contract'
 import {
   Authenticated,
   authorizationProviderToken,

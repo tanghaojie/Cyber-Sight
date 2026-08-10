@@ -29,7 +29,7 @@ updated: 2026-07-29
 - `pnpm test:watch`：构建契约包后监听后端测试，不包含前端。
 - `pnpm test:db`：显式运行 PostgreSQL 连接验证。
 - `pnpm build`：执行生产构建和 TypeScript 检查；不是功能测试。
-- `pnpm --filter @scaffold/frontend build`：只执行前端类型检查和生产构建。
+- `pnpm --filter @cyber-ai-forge/frontend build`：只执行前端类型检查和生产构建。
 
 ## AI 约束
 

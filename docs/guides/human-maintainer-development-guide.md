@@ -75,7 +75,7 @@ pnpm dev
 这是 API 数据契约包，不包含业务实现。
 
 - `src/index.ts`：共享 Zod Schema、`z.infer` 推导的请求/响应类型、Draft 7 转换函数和统一响应泛型。
-- `package.json`：让前端和后端通过 `@scaffold/api-contract` 消费同一契约。
+- `package.json`：让前端和后端通过 `@cyber-ai-forge/api-contract` 消费同一契约。
 - `dist/`：构建产物，不作为手工编辑源。
 
 修改接口时先改共享 Schema。后端路由必须直接引用该 Schema，前端业务 API 使用其导出的类型。
@@ -114,7 +114,7 @@ pnpm dev
 | `src/stores/`                                    | 未来的跨页面 Pinia 状态；局部状态不要放入 store  |
 | `vite.config.mts`                                | Vite 构建、源码别名和 SVG 图标插件配置           |
 
-前端不能手写一份与后端相似的接口类型，应从 `@scaffold/api-contract` 获取。
+前端不能手写一份与后端相似的接口类型，应从 `@cyber-ai-forge/api-contract` 获取。
 
 新业务页面、组件、composable、service 和局部 store 都归入对应 `src/modules/system/<module>/` 或 `src/modules/biz/<module>/`，由 `registerViews.ts`、`*.routes.ts`、`*.store.ts` 等表意文件暴露路由或应用壳需要的能力。根级 `views`、`stores` 只保留存量或真正应用级能力；实质修改存量业务时应迁入模块目录。
 
@@ -254,7 +254,7 @@ interface PaginationRequest {
 1. 在 `docs/design/modules/` 更新用户模块设计。
 2. 在 `docs/plans/active/` 创建实施计划并建立 AI 日志。
 3. 确认前端、后端分别使用 `src/modules/system/users/`，契约使用 `src/modules/users/`，并只依赖已登记的表意公共文件。
-4. 在 `@scaffold/api-contract` 的用户模块中定义请求、路径和响应 Schema，并从模块入口导出推导类型。
+4. 在 `@cyber-ai-forge/api-contract` 的用户模块中定义请求、路径和响应 Schema，并从模块入口导出推导类型。
 5. 在后端用户模块中编写命名处理函数，使用 `success()` 或 `failure()`。
 6. 在 Nest Controller 中使用 `ZodValidationPipe` 和 `ContractRoute` 挂载共享运行时 Schema。
 7. 在前端用户模块中以契约类型调用共享 Client。
@@ -355,7 +355,7 @@ AI 不运行这些浏览器场景，除非维护者在具体任务中重新明�
 ```powershell
 pnpm test       # 契约构建校验和后端测试，不包含前端
 pnpm test:watch # 监听后端测试，不包含前端
-pnpm --filter @scaffold/frontend build # 前端类型检查和生产构建，不是功能测试
+pnpm --filter @cyber-ai-forge/frontend build # 前端类型检查和生产构建，不是功能测试
 ```
 
 修复后端缺陷时先写一个能失败的复现测试，再修改实现。测试不能依赖执行顺序、外网或个人
@@ -376,7 +376,7 @@ pnpm --filter @scaffold/frontend build # 前端类型检查和生产构建，不
 
 ### 修改 Schema 后前端类型没有变化
 
-确认类型通过 `z.infer<typeof Schema>` 推导，并从 `@scaffold/api-contract` 导出。不要在前端保留同名的旧 interface。
+确认类型通过 `z.infer<typeof Schema>` 推导，并从 `@cyber-ai-forge/api-contract` 导出。不要在前端保留同名的旧 interface。
 
 ### TypeScript 已通过，为什么非法请求仍进入处理函数
 

@@ -1,5 +1,5 @@
 {
-  "name": "@scaffold/api-contract",
+  "name": "@cyber-ai-forge/api-contract",
   "version": "0.1.0",
   "private": true,
   "type": "module",

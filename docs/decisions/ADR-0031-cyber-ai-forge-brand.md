@@ -20,8 +20,8 @@ date: 2026-08-07
 ## 考虑的方案
 
 1. 只替换 README 和页面标题：改动最小，但运行时配置、Swagger 和技术标识会继续暴露旧名称。
-2. 完全重命名所有内部包作用域、目录和 GitHub URL：一致性最高，但超出本次品牌改名范围并扩大外部兼容性风险。
-3. 采用 `CYBER / Cyber AI Forge` 作为产品品牌，更新根包名、项目级认证和浏览器存储标识，保留 `@scaffold/*` 内部工作区作用域与现有 GitHub URL：在品牌一致性和兼容性之间取得平衡。
+2. 完全重命名所有内部包作用域、目录和 GitHub URL：一致性最高，但会扩大外部兼容性风险。
+3. 采用 `CYBER / Cyber AI Forge` 作为产品品牌，更新根包名、项目级认证和浏览器存储标识，并将内部工作区作用域迁移为 `@cyber-ai-forge/*`，保留现有 GitHub URL：在品牌一致性和迁移范围之间取得平衡。
 
 ## 决策
 
@@ -32,7 +32,7 @@ date: 2026-08-07
 - 根包名改为 `cyber-ai-forge`。
 - JWT issuer 改为 `cyber-ai-forge`，audience 改为 `cyber-ai-forge-api`；旧 JWT 不再通过校验。
 - 访问令牌、语言偏好和标签历史使用新的 `cyber_ai_forge_*` 版本化键；访问令牌清理逻辑同时删除旧 `cyber_access_token` 和 `jtlib_access_token`。
-- `@scaffold/*` 继续作为内部工作区包作用域，GitHub URL 继续指向当前仓库；二者不作为用户界面品牌展示。
+- `@cyber-ai-forge/*` 作为内部工作区包作用域，GitHub URL 继续指向当前仓库；包作用域不作为用户界面品牌展示。
 - JTLab / 桀士实验室只出现在明确的创作者署名中，不进入产品 Logo、侧栏、404、工作台或 Swagger 主品牌。
 
 ## 正面结果
@@ -45,12 +45,13 @@ date: 2026-08-07
 
 - 已有 JWT 会话全部失效，用户需要重新登录。
 - 旧标签历史和语言偏好不迁移；旧访问令牌键只做清理。
-- 内部包仍使用 `@scaffold/*`，源代码导入路径不是正式产品品牌；如未来需要公开包生态，应另立迁移决策。
+- 内部包现使用 `@cyber-ai-forge/*`，源代码导入路径与正式产品品牌一致；此次迁移仅改变 workspace 包标识，不改变 HTTP API、数据库或运行时业务行为。
+- 迁移需要同步更新包元数据、workspace 依赖、源码导入、脚本过滤器、锁文件和现行文档；历史归档保留原始作用域作为过程证据。
 - GitHub 仓库展示名可在外部平台单独修改，本次提交不改变远端资源。
 
 ## 验证和复审条件
 
-- 当前代码和现行文档统一使用 `Cyber AI Forge` 与两条副标题；旧品牌只保留在必要的兼容性或迁移说明中。
+- 当前代码和现行文档统一使用 `Cyber AI Forge`、两条副标题和 `@cyber-ai-forge/*` workspace 作用域；旧作用域只保留在历史归档或必要的迁移说明中。
 - 登录页、工作台、关于页、侧栏、404、HTML 元信息和 Swagger 完成维护者人工验收。
 - 后端 JWT 测试验证新 issuer/audience，静态搜索验证旧项目级键不再作为当前值。
 - 如果未来需要公开发布包、迁移 GitHub 仓库、迁移历史本地数据或更换组织品牌，再单独复审本 ADR。
@@ -59,3 +60,4 @@ date: 2026-08-07
 
 - [CYBER 品牌与视觉系统](../design/branding.md)
 - [Cyber AI Forge 品牌与项目标识改名](../archive/plans/2026-08-07-cyber-ai-forge-renaming.md)
+- [Cyber AI Forge workspace 包作用域迁移](../archive/plans/2026-08-10-cyber-ai-forge-package-scope.md)

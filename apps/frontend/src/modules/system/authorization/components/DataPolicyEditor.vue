@@ -92,7 +92,7 @@ import type {
   DataResourceDefinition,
   DataScopeType,
   DepartmentOption,
-} from '@scaffold/api-contract'
+} from '@cyber-ai-forge/api-contract'
 import { listDataResources } from '@/modules/system/authorization/authorization.api'
 import { listDepartmentOptions } from '@/modules/system/departments/departments.api'
 import { useLocalization } from '@/modules/system/localization/localization'

@@ -1,5 +1,5 @@
 {
-  "name": "@scaffold/frontend",
+  "name": "@cyber-ai-forge/frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
-    "@scaffold/api-contract": "workspace:*",
+    "@cyber-ai-forge/api-contract": "workspace:*",
     "element-plus": "^2.14.3",
     "js-cookie": "^3.0.8",
     "pinia": "^2.2.0",

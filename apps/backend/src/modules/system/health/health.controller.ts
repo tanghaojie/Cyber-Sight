@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common'
-import { HealthResponseSchema, type HealthResponse } from '@scaffold/api-contract'
+import { HealthResponseSchema, type HealthResponse } from '@cyber-ai-forge/api-contract'
 import { Public } from '@/modules/system/authorization/authorization.guard.js'
 import { ContractRoute } from '@/shared/http/contract.js'
 import { success } from '@/shared/http/response.js'

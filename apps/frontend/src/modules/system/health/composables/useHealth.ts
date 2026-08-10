@@ -1,5 +1,5 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import type { HealthResponse } from '@scaffold/api-contract'
+import type { HealthResponse } from '@cyber-ai-forge/api-contract'
 import { apiClient } from '@/api/client'
 import { translate } from '@/modules/system/localization/localization'
 

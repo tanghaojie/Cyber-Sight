@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
-import type { MenuSummary } from '@scaffold/api-contract'
+import type { MenuSummary } from '@cyber-ai-forge/api-contract'
 import MenuDialog from './components/MenuDialog.vue'
 import MenusList from './components/MenusList.vue'
 import { useLocalization } from '@/modules/system/localization/localization'

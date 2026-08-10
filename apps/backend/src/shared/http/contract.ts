@@ -15,7 +15,7 @@ import {
   ApiQuery,
   ApiResponse,
 } from '@nestjs/swagger'
-import { toOpenApiSchema } from '@scaffold/api-contract'
+import { toOpenApiSchema } from '@cyber-ai-forge/api-contract'
 import { map, type Observable } from 'rxjs'
 import { z } from 'zod'
 

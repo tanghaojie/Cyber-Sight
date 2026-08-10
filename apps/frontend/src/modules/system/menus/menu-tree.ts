@@ -1,4 +1,4 @@
-import type { MenuSummary } from '@scaffold/api-contract'
+import type { MenuSummary } from '@cyber-ai-forge/api-contract'
 
 export type MenuTreeRecord = MenuSummary & { children: MenuTreeRecord[] }
 

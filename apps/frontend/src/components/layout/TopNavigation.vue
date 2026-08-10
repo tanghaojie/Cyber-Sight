@@ -87,7 +87,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { NavigationMenu } from '@scaffold/api-contract'
+import type { NavigationMenu } from '@cyber-ai-forge/api-contract'
 import AppIcon from '@/components/AppIcon.vue'
 import { useLocalization } from '@/modules/system/localization/localization'
 import { navigationLabel } from '@/modules/system/navigation/navigation.labels'

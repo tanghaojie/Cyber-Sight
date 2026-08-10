@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
-import type { DepartmentSummary } from '@scaffold/api-contract'
+import type { DepartmentSummary } from '@cyber-ai-forge/api-contract'
 import DepartmentDialog from './components/DepartmentDialog.vue'
 import DepartmentsList from './components/DepartmentsList.vue'
 import { useLocalization } from '@/modules/system/localization/localization'

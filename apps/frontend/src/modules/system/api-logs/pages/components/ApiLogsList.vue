@@ -151,7 +151,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { Refresh, Search, View } from '@element-plus/icons-vue'
-import type { ApiLogItem, ApiLogQuery } from '@scaffold/api-contract'
+import type { ApiLogItem, ApiLogQuery } from '@cyber-ai-forge/api-contract'
 import { listApiLogs } from '@/modules/system/api-logs/api-logs.api'
 import { useLocalization } from '@/modules/system/localization/localization'
 import ApiLogDetailDrawer from './ApiLogDetailDrawer.vue'

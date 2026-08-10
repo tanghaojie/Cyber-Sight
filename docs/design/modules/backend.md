@@ -44,7 +44,7 @@
 
 ## HTTP 边界与运行时校验
 
-Nest Controller 必须通过 `ZodValidationPipe` 使用 `@scaffold/api-contract` 提供的请求体、查询参数和路径参数 Schema，并通过 `ContractRoute` 绑定响应 Schema 与 OpenAPI 元数据。参数类型必须从相同 Schema 推导；类型标注不能替代运行时校验。
+Nest Controller 必须通过 `ZodValidationPipe` 使用 `@cyber-ai-forge/api-contract` 提供的请求体、查询参数和路径参数 Schema，并通过 `ContractRoute` 绑定响应 Schema 与 OpenAPI 元数据。参数类型必须从相同 Schema 推导；类型标注不能替代运行时校验。
 
 共享请求 Schema 使用严格对象；未声明字段必须由 Zod Pipe 触发统一参数错误，不能被静默删除后继续执行处理函数。HTTP 查询和路径中的数字由契约中的 `z.coerce.number()` 在边界转换。
 

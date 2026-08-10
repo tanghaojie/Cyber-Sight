@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { and, count, eq, ilike, or } from 'drizzle-orm'
-import type { DictionaryRequest } from '@scaffold/api-contract'
+import type { DictionaryRequest } from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import { dictionaries } from '@/db/schema.js'
 import { DATABASE } from '@/shared/database/database.provider.js'

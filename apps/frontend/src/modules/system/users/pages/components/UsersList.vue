@@ -92,7 +92,7 @@
 import { onMounted, ref } from 'vue'
 import { Delete, EditPen, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { DepartmentOption, UserSummary } from '@scaffold/api-contract'
+import type { DepartmentOption, UserSummary } from '@cyber-ai-forge/api-contract'
 import type { PositionOption } from '@/modules/system/positions/positions.api'
 import type { RoleOption } from '@/modules/system/roles/roles.api'
 import { deleteUser, listUsers } from '@/modules/system/users/users.api'

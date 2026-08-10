@@ -9,7 +9,7 @@ import {
   type CurrentUser,
   type DepartmentRequest,
   type IdParams,
-} from '@scaffold/api-contract'
+} from '@cyber-ai-forge/api-contract'
 import {
   CurrentAccessUser,
   RequirePermissions,

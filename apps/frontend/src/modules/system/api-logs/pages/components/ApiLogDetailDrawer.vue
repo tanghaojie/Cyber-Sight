@@ -72,7 +72,7 @@
 
 <script setup lang="ts">
 import { ElMessage } from 'element-plus'
-import type { ApiLogItem } from '@scaffold/api-contract'
+import type { ApiLogItem } from '@cyber-ai-forge/api-contract'
 import { useLocalization } from '@/modules/system/localization/localization'
 
 const { log } = defineProps<{ log: ApiLogItem }>()

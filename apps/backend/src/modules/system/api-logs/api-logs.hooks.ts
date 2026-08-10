@@ -1,4 +1,4 @@
-import type { CurrentUser } from '@scaffold/api-contract'
+import type { CurrentUser } from '@cyber-ai-forge/api-contract'
 import type { FastifyInstance, FastifyRequest } from 'fastify'
 import { ApiLogsRepository } from './api-logs.repository.js'
 import { ApiLogWriter } from './api-logs.service.js'

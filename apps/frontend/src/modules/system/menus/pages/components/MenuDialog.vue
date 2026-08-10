@@ -131,7 +131,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import type { MenuRequest, MenuSummary, PermissionSummary } from '@scaffold/api-contract'
+import type { MenuRequest, MenuSummary, PermissionSummary } from '@cyber-ai-forge/api-contract'
 import { listAuthorizationPermissions } from '@/modules/system/authorization/authorization.api'
 import AppIcon from '@/components/AppIcon.vue'
 import { menuPathError } from '@/modules/system/menus/menu-form'

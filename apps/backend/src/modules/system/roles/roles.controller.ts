@@ -10,7 +10,7 @@ import {
   type IdParams,
   type ListQuery,
   type RoleRequest,
-} from '@scaffold/api-contract'
+} from '@cyber-ai-forge/api-contract'
 import {
   CurrentAccessUser,
   RequirePermissions,

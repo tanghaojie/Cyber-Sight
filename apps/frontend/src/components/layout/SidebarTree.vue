@@ -62,7 +62,7 @@
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue'
-import type { NavigationMenu } from '@scaffold/api-contract'
+import type { NavigationMenu } from '@cyber-ai-forge/api-contract'
 import AppIcon from '@/components/AppIcon.vue'
 import { navigationLabel } from '@/modules/system/navigation/navigation.labels'
 import { useLocalization } from '@/modules/system/localization/localization'

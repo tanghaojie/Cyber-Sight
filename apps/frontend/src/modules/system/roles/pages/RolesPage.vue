@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
-import type { RoleSummary } from '@scaffold/api-contract'
+import type { RoleSummary } from '@cyber-ai-forge/api-contract'
 import RoleDialog from './components/RoleDialog.vue'
 import RolesList from './components/RolesList.vue'
 import { useLocalization } from '@/modules/system/localization/localization'

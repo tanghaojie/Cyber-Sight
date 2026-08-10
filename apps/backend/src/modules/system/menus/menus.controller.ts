@@ -13,7 +13,7 @@ import {
   type IdParams,
   type ListQuery,
   type MenuRequest,
-} from '@scaffold/api-contract'
+} from '@cyber-ai-forge/api-contract'
 import {
   Authenticated,
   CurrentAccessUser,

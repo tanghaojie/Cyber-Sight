@@ -1,4 +1,4 @@
-import type { ListQuery } from '@scaffold/api-contract'
+import type { ListQuery } from '@cyber-ai-forge/api-contract'
 import { ErrorCode } from '@/shared/errors/error-codes.js'
 import { notFound } from '@/shared/errors/http-errors.js'
 import { failure, normalizePagination, success } from './response.js'

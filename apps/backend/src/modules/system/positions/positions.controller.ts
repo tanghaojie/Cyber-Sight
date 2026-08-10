@@ -11,7 +11,7 @@ import {
   type IdParams,
   type PositionListQuery,
   type PositionRequest,
-} from '@scaffold/api-contract'
+} from '@cyber-ai-forge/api-contract'
 import {
   CurrentAccessUser,
   RequirePermissions,

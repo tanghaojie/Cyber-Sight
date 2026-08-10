@@ -58,7 +58,11 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import type { DepartmentOption, PositionRequest, PositionSummary } from '@scaffold/api-contract'
+import type {
+  DepartmentOption,
+  PositionRequest,
+  PositionSummary,
+} from '@cyber-ai-forge/api-contract'
 import { createPosition, updatePosition } from '@/modules/system/positions/positions.api'
 import { useLocalization } from '@/modules/system/localization/localization'
 

@@ -5,7 +5,7 @@ import {
   type RouteRecordRaw,
   type Router,
 } from 'vue-router'
-import type { NavigationMenu } from '@scaffold/api-contract'
+import type { NavigationMenu } from '@cyber-ai-forge/api-contract'
 import { layoutRegistry } from '@/shared/routing/layout-registry'
 import { viewRegistry } from '@/shared/routing/view-registry'
 import { navigationLabel } from '@/modules/system/navigation/navigation.labels'

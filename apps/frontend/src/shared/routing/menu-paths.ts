@@ -1,4 +1,4 @@
-import type { NavigationMenu } from '@scaffold/api-contract'
+import type { NavigationMenu } from '@cyber-ai-forge/api-contract'
 
 function normalizeAbsolutePath(path: string): string {
   const segments = path.split('/').filter(Boolean)

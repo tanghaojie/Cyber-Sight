@@ -1,5 +1,9 @@
 import { Controller, Get, Inject, Query } from '@nestjs/common'
-import { ApiLogPageResultSchema, ApiLogQuerySchema, type ApiLogQuery } from '@scaffold/api-contract'
+import {
+  ApiLogPageResultSchema,
+  ApiLogQuerySchema,
+  type ApiLogQuery,
+} from '@cyber-ai-forge/api-contract'
 import { RequirePermissions } from '@/modules/system/authorization/authorization.guard.js'
 import { authorizationPermissionKeys } from '@/modules/system/authorization/authorization.resources.js'
 import { ContractRoute } from '@/shared/http/contract.js'

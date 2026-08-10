@@ -6,7 +6,7 @@ import type {
   PersonalProfileUpdate,
   UserCreate,
   UserUpdate,
-} from '@scaffold/api-contract'
+} from '@cyber-ai-forge/api-contract'
 import type { Database } from '@/db/index.js'
 import { userDepartments, userRoles, users } from '@/db/schema.js'
 import { DepartmentsAccess } from '@/modules/system/departments/departments.access.js'

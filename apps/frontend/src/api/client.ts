@@ -1,4 +1,4 @@
-import type { ErrorResponse } from '@scaffold/api-contract'
+import type { ErrorResponse } from '@cyber-ai-forge/api-contract'
 import { getAccessToken } from '@/shared/accessToken'
 import { handleGlobalHttpError } from './globalHttpError'
 

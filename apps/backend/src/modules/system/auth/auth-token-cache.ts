@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { randomUUID } from 'node:crypto'
-import type { CurrentUser } from '@scaffold/api-contract'
+import type { CurrentUser } from '@cyber-ai-forge/api-contract'
 
 const DEFAULT_CAPACITY = 100
 const DEFAULT_TTL_MS = 7 * 24 * 60 * 60 * 1000

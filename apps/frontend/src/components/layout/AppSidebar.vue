@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import type { NavigationMenu } from '@scaffold/api-contract'
+import type { NavigationMenu } from '@cyber-ai-forge/api-contract'
 import AppIcon from '@/components/AppIcon.vue'
 import CyberLogo from '@/components/brand/CyberLogo.vue'
 import SidebarTree from './SidebarTree.vue'
