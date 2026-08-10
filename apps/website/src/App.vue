@@ -461,7 +461,7 @@ onBeforeUnmount(function () {
         <div class="feature-grid">
           <article
             v-for="(feature, index) in t.features.items"
-            :key="feature.code"
+            :key="index"
             class="feature-card reveal"
           >
             <div class="feature-number">{{ String(index + 1).padStart(2, '0') }}</div>

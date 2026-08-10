@@ -50,6 +50,8 @@ URL lang / localStorage / browser language
     -> header、章节、场景说明与 CTA
 ```
 
+双语数组中同一位置的条目表示同一个页面实体。带进入动画的重复组件必须使用与语言无关的稳定 `key`，确保切换语言只更新文本，不销毁已经通过显现观察器激活的 DOM 节点。
+
 滚动数据流：
 
 ```text
@@ -71,6 +73,7 @@ passive scroll event
 - 外部字体不可达：提供紧缩无衬线、中文无衬线和等宽系统回退栈。
 - 外部链接使用安全的 `rel="noreferrer"`，所有交互具备键盘焦点和可读标签。
 - 产品截图包含管理端示例数据，发布前由维护者确认其中不含令牌、真实个人信息或生产数据。
+- 本地化内容不得作为带显现动画节点的组件身份；否则切换语言可能重建节点并使其停留在隐藏初始态。
 
 ## 测试与验证策略
 
@@ -81,6 +84,8 @@ passive scroll event
 2026-08-10 已完成 `pnpm format`、`pnpm format:check`、`pnpm lint`、`pnpm build` 和 `pnpm docs:archive:check:ci`；推广站 Vue TypeScript 检查与生产构建、主应用和契约/后端构建均通过。推广站产物包含相对路径入口、品牌图标与分享图，JavaScript 和 CSS 合计 gzip 后约 49 KB。按照仓库边界未创建或运行前端自动化/浏览器测试；上述桌面、窄屏、语言切换、三维滚动、键盘与减少动效场景仍需维护者人工验收。
 
 2026-08-10 的视觉优化使用维护者提供的六张 PNG 替换合成产品场景，并完成语言切换与核心卡片网格修正。格式检查、全仓 Lint、生产构建和文档归档 CI 检查通过，Vite 为六张截图生成带哈希的 Pages 资源；截图总计约 3.1 MB。浏览器视觉与交互仍需维护者人工验收。
+
+2026-08-10 已修复核心卡片以本地化文案作为 Vue `key` 导致的语言切换后隐藏问题；卡片改用稳定位置身份，Lint 与生产构建通过。
 
 ## 兼容性与迁移
 
@@ -95,4 +100,5 @@ passive scroll event
 - [ADR-0037：独立静态应用发布开源推广站](../decisions/ADR-0037-static-marketing-site.md)
 - [原始实施计划](../archive/plans/2026-08-10-marketing-site.md)
 - [视觉优化计划](../archive/plans/2026-08-10-marketing-site-visual-refinement.md)
+- [核心卡片语言切换显现修复](../archive/plans/2026-08-10-feature-locale-reveal.md)
 - [AI 协作记录](../archive/ai-logs/2026/08/2026-08-10-marketing-site-visual-refinement.md)
