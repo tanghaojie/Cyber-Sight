@@ -12,10 +12,12 @@ import {
   type SubjectAccessRequest,
 } from '@cyber-ai-forge/api-contract'
 import {
+  authorizationProviderToken,
   CurrentAccessUser,
   RequirePermissions,
 } from '@/modules/system/authorization/authorization.guard.js'
 import { AuthService } from '@/modules/system/auth/auth.service.js'
+import type { AuthorizationProvider } from './authorization.provider.js'
 import { ErrorCode } from '@/shared/errors/error-codes.js'
 import { notFound } from '@/shared/errors/http-errors.js'
 import { ContractRoute } from '@/shared/http/contract.js'
@@ -36,6 +38,8 @@ export class AuthorizationController {
   constructor(
     @Inject(AuthorizationService)
     private readonly authorization: AuthorizationService,
+    @Inject(authorizationProviderToken)
+    private readonly provider: AuthorizationProvider,
     @Inject(AuthService)
     private readonly authService: AuthService,
   ) {}
@@ -70,8 +74,11 @@ export class AuthorizationController {
     params: IdParamsSchema,
     response: SubjectAccessResultSchema,
   })
-  getUser(@Param(new ZodValidationPipe(IdParamsSchema)) params: IdParams) {
-    return this.getAccess('user', params.id)
+  getUser(
+    @Param(new ZodValidationPipe(IdParamsSchema)) params: IdParams,
+    @CurrentAccessUser() actor: CurrentUser,
+  ) {
+    return this.getAccess(actor, 'user', params.id)
   }
 
   @Put('/admin/authorization/users/:id')
@@ -88,7 +95,7 @@ export class AuthorizationController {
     @Body(new ZodValidationPipe(SubjectAccessRequestSchema)) body: SubjectAccessRequest,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    return this.replaceAccess('user', params.id, body, actor.id)
+    return this.replaceAccess(actor, 'user', params.id, body)
   }
 
   @Get('/admin/authorization/roles/:id')
@@ -99,8 +106,11 @@ export class AuthorizationController {
     params: IdParamsSchema,
     response: SubjectAccessResultSchema,
   })
-  getRole(@Param(new ZodValidationPipe(IdParamsSchema)) params: IdParams) {
-    return this.getAccess('role', params.id)
+  getRole(
+    @Param(new ZodValidationPipe(IdParamsSchema)) params: IdParams,
+    @CurrentAccessUser() actor: CurrentUser,
+  ) {
+    return this.getAccess(actor, 'role', params.id)
   }
 
   @Put('/admin/authorization/roles/:id')
@@ -117,7 +127,7 @@ export class AuthorizationController {
     @Body(new ZodValidationPipe(SubjectAccessRequestSchema)) body: SubjectAccessRequest,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    return this.replaceAccess('role', params.id, body, actor.id)
+    return this.replaceAccess(actor, 'role', params.id, body)
   }
 
   @Get('/admin/authorization/departments/:id')
@@ -128,8 +138,11 @@ export class AuthorizationController {
     params: IdParamsSchema,
     response: SubjectAccessResultSchema,
   })
-  getDepartment(@Param(new ZodValidationPipe(IdParamsSchema)) params: IdParams) {
-    return this.getAccess('department', params.id)
+  getDepartment(
+    @Param(new ZodValidationPipe(IdParamsSchema)) params: IdParams,
+    @CurrentAccessUser() actor: CurrentUser,
+  ) {
+    return this.getAccess(actor, 'department', params.id)
   }
 
   @Put('/admin/authorization/departments/:id')
@@ -146,26 +159,35 @@ export class AuthorizationController {
     @Body(new ZodValidationPipe(SubjectAccessRequestSchema)) body: SubjectAccessRequest,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
-    return this.replaceAccess('department', params.id, body, actor.id)
+    return this.replaceAccess(actor, 'department', params.id, body)
   }
 
-  private async getAccess(subjectType: AuthorizationSubjectType, id: number) {
-    if (!(await this.authorization.authorizationSubjectExists(subjectType, id))) {
+  private async getAccess(actor: CurrentUser, subjectType: AuthorizationSubjectType, id: number) {
+    if (
+      !(await this.authorization.authorizationSubjectExists(subjectType, id)) ||
+      !(await this.provider.canAccessSubject(actor, subjectType, id, 'read'))
+    ) {
       throw notFound()
     }
     return success(await this.authorization.getSubjectAccess(subjectType, id))
   }
 
   private async replaceAccess(
+    actor: CurrentUser,
     subjectType: AuthorizationSubjectType,
     id: number,
     body: SubjectAccessRequest,
-    actorId: number,
   ) {
-    if (!(await this.authorization.authorizationSubjectExists(subjectType, id))) {
+    if (
+      !(await this.authorization.authorizationSubjectExists(subjectType, id)) ||
+      !(await this.provider.canAccessSubject(actor, subjectType, id, 'update'))
+    ) {
       throw notFound()
     }
-    if (!(await this.authorization.replaceSubjectAccess(subjectType, id, body, actorId))) {
+    if (!(await this.provider.canDelegateSubjectAccess(actor, subjectType, id, body))) {
+      return failure(ErrorCode.FORBIDDEN, 'Authorization delegation exceeds current access')
+    }
+    if (!(await this.authorization.replaceSubjectAccess(subjectType, id, body, actor.id))) {
       return failure(ErrorCode.INVALID_REQUEST, 'Invalid permission or data policy')
     }
     if (subjectType === 'user') {

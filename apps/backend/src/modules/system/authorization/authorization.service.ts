@@ -37,6 +37,24 @@ interface PolicyRow {
   scopeType: DataPolicyInput['scopeType']
 }
 
+export type SubjectAccessOperation = 'read' | 'update'
+
+interface DelegationAuthority {
+  actorId: number
+  permissionKeys: Set<string>
+  plans: Map<string, DataAccessPlan>
+}
+
+interface DelegationTargetContext {
+  userId: number | null
+  departmentIds: number[]
+}
+
+interface PolicyCoverage {
+  plan: DataAccessPlan
+  prospectiveSelf: boolean
+}
+
 /** 去重时保留首次出现顺序，便于生成稳定的数据访问计划。 */
 function unique(values: number[]): number[] {
   return [...new Set(values)]
@@ -408,6 +426,299 @@ export class AuthorizationService {
       }
     })
     return true
+  }
+
+  private async delegationAuthority(actorId: number): Promise<DelegationAuthority> {
+    return {
+      actorId,
+      permissionKeys: new Set(await this.effectivePermissionKeys(actorId)),
+      plans: new Map(),
+    }
+  }
+
+  private async authorityPlan(
+    authority: DelegationAuthority,
+    resourceKey: string,
+    action: DataAction,
+  ): Promise<DataAccessPlan> {
+    const identity = `${resourceKey}:${action}`
+    const existing = authority.plans.get(identity)
+    if (existing) {
+      return existing
+    }
+    const plan = await this.resolveDataAccess(authority.actorId, resourceKey, action)
+    authority.plans.set(identity, plan)
+    return plan
+  }
+
+  private async userIsWithinPlan(
+    userId: number,
+    plan: DataAccessPlan,
+    knownDepartmentIds?: number[],
+  ): Promise<boolean> {
+    if (plan.unrestricted || plan.ownerUserIds.includes(userId)) {
+      return true
+    }
+    const departmentIds =
+      knownDepartmentIds ??
+      (await this.departments.enabledDepartmentIds(await this.users.assignedDepartmentIds(userId)))
+    const allowedDepartments = new Set(plan.departmentIds)
+    return departmentIds.some((departmentId) => allowedDepartments.has(departmentId))
+  }
+
+  private async policyCoverage(
+    policy: DataPolicyInput,
+    context?: DelegationTargetContext,
+  ): Promise<PolicyCoverage | null> {
+    if (policy.scopeType === 'all') {
+      return {
+        plan: { unrestricted: true, ownerUserIds: [], departmentIds: [] },
+        prospectiveSelf: false,
+      }
+    }
+    if (policy.scopeType === 'self') {
+      if (!context) {
+        return null
+      }
+      return {
+        plan: {
+          unrestricted: false,
+          ownerUserIds: context.userId === null ? [] : [context.userId],
+          departmentIds: [],
+        },
+        prospectiveSelf: context.userId === null,
+      }
+    }
+    if (policy.scopeType === 'own_department') {
+      if (!context) {
+        return null
+      }
+      return {
+        plan: {
+          unrestricted: false,
+          ownerUserIds: [],
+          departmentIds: [...context.departmentIds],
+        },
+        prospectiveSelf: false,
+      }
+    }
+    if (policy.scopeType === 'own_department_tree') {
+      if (!context) {
+        return null
+      }
+      return {
+        plan: {
+          unrestricted: false,
+          ownerUserIds: [],
+          departmentIds: await this.departments.descendantDepartmentIds(context.departmentIds),
+        },
+        prospectiveSelf: false,
+      }
+    }
+
+    const directIds = await this.departments.enabledDepartmentIds(policy.departmentIds)
+    if (new Set(directIds).size !== new Set(policy.departmentIds).size) {
+      return null
+    }
+    const departmentIds = policy.includeDescendants
+      ? unique([...directIds, ...(await this.departments.descendantDepartmentIds(directIds))])
+      : directIds
+    return {
+      plan: { unrestricted: false, ownerUserIds: [], departmentIds },
+      prospectiveSelf: false,
+    }
+  }
+
+  private async coverageIsWithinAuthority(
+    coverage: PolicyCoverage,
+    authorityPlan: DataAccessPlan,
+    context?: DelegationTargetContext,
+  ): Promise<boolean> {
+    if (authorityPlan.unrestricted) {
+      return true
+    }
+    if (coverage.plan.unrestricted) {
+      return false
+    }
+    const allowedDepartments = new Set(authorityPlan.departmentIds)
+    if (coverage.plan.departmentIds.some((departmentId) => !allowedDepartments.has(departmentId))) {
+      return false
+    }
+    for (const userId of coverage.plan.ownerUserIds) {
+      if (!(await this.userIsWithinPlan(userId, authorityPlan, context?.departmentIds))) {
+        return false
+      }
+    }
+    if (coverage.prospectiveSelf) {
+      if (!context || !context.departmentIds.some((id) => allowedDepartments.has(id))) {
+        return false
+      }
+    }
+    return true
+  }
+
+  private async accessIsDelegable(
+    authority: DelegationAuthority,
+    access: SubjectAccessRequest,
+    context?: DelegationTargetContext,
+  ): Promise<boolean> {
+    if (access.permissionKeys.some((key) => !authority.permissionKeys.has(key))) {
+      return false
+    }
+    for (const policy of access.dataPolicies) {
+      const actorPlan = await this.authorityPlan(
+        authority,
+        policy.resourceKey,
+        policy.action as DataAction,
+      )
+      const coverage = await this.policyCoverage(policy, context)
+      if (!coverage) {
+        if (!actorPlan.unrestricted) {
+          return false
+        }
+        continue
+      }
+      if (!(await this.coverageIsWithinAuthority(coverage, actorPlan, context))) {
+        return false
+      }
+    }
+    return true
+  }
+
+  private async departmentAccesses(departmentIds: number[]): Promise<SubjectAccessRequest[]> {
+    const directIds = unique(departmentIds)
+    const directSet = new Set(directIds)
+    const ancestorIds = await this.departments.enabledDepartmentIds(
+      await this.departments.ancestorDepartmentIds(directIds),
+    )
+    const accesses: SubjectAccessRequest[] = []
+    for (const departmentId of directIds) {
+      accesses.push(await this.getSubjectAccess('department', departmentId))
+    }
+    for (const departmentId of ancestorIds) {
+      if (directSet.has(departmentId)) {
+        continue
+      }
+      const access = await this.getSubjectAccess('department', departmentId)
+      accesses.push({
+        permissionKeys: [],
+        dataPolicies: access.dataPolicies.filter((policy) => policy.inheritToChildren),
+      })
+    }
+    return accesses
+  }
+
+  private async userAuthorizationContextIsDelegable(
+    authority: DelegationAuthority,
+    userId: number | null,
+    roleIds: number[],
+    departmentIds: number[],
+    directAccess?: SubjectAccessRequest,
+  ): Promise<boolean> {
+    const uniqueRoleIds = unique(roleIds)
+    const uniqueDepartmentIds = unique(departmentIds)
+    const [enabledRoleIds, enabledDepartmentIds] = await Promise.all([
+      this.roles.enabledRoleIds(uniqueRoleIds),
+      this.departments.enabledDepartmentIds(uniqueDepartmentIds),
+    ])
+    if (
+      enabledRoleIds.length !== uniqueRoleIds.length ||
+      enabledDepartmentIds.length !== uniqueDepartmentIds.length
+    ) {
+      return false
+    }
+
+    const context: DelegationTargetContext = {
+      userId,
+      departmentIds: enabledDepartmentIds,
+    }
+    const accesses: SubjectAccessRequest[] = [
+      directAccess ??
+        (userId === null
+          ? { permissionKeys: [], dataPolicies: [] }
+          : await this.getSubjectAccess('user', userId)),
+    ]
+    for (const roleId of enabledRoleIds) {
+      accesses.push(await this.getSubjectAccess('role', roleId))
+    }
+    accesses.push(...(await this.departmentAccesses(enabledDepartmentIds)))
+
+    for (const access of accesses) {
+      if (!(await this.accessIsDelegable(authority, access, context))) {
+        return false
+      }
+    }
+    return true
+  }
+
+  async canAccessSubject(
+    actorId: number,
+    subjectType: AuthorizationSubjectType,
+    subjectId: number,
+    operation: SubjectAccessOperation,
+  ): Promise<boolean> {
+    const authority = await this.delegationAuthority(actorId)
+    if (subjectType === 'user') {
+      const plan = await this.authorityPlan(authority, 'users', operation)
+      if (!(await this.userIsWithinPlan(subjectId, plan))) {
+        return false
+      }
+      const [roleIds, departmentIds] = await Promise.all([
+        this.roles.enabledRoleIds(await this.users.assignedRoleIds(subjectId)),
+        this.departments.enabledDepartmentIds(await this.users.assignedDepartmentIds(subjectId)),
+      ])
+      return this.userAuthorizationContextIsDelegable(authority, subjectId, roleIds, departmentIds)
+    }
+    return this.accessIsDelegable(authority, await this.getSubjectAccess(subjectType, subjectId))
+  }
+
+  async canDelegateSubjectAccess(
+    actorId: number,
+    subjectType: AuthorizationSubjectType,
+    subjectId: number,
+    access: SubjectAccessRequest,
+  ): Promise<boolean> {
+    const authority = await this.delegationAuthority(actorId)
+    if (subjectType === 'user') {
+      const [roleIds, departmentIds] = await Promise.all([
+        this.roles.enabledRoleIds(await this.users.assignedRoleIds(subjectId)),
+        this.departments.enabledDepartmentIds(await this.users.assignedDepartmentIds(subjectId)),
+      ])
+      return this.userAuthorizationContextIsDelegable(
+        authority,
+        subjectId,
+        roleIds,
+        departmentIds,
+        access,
+      )
+    }
+    return this.accessIsDelegable(authority, access)
+  }
+
+  async canManageUserAuthorizationContext(
+    actorId: number,
+    targetUserId: number | null,
+    roleIds: number[],
+    departmentIds: number[],
+  ): Promise<boolean> {
+    const authority = await this.delegationAuthority(actorId)
+    if (targetUserId !== null) {
+      const [currentRoleIds, currentDepartmentIds] = await Promise.all([
+        this.roles.enabledRoleIds(await this.users.assignedRoleIds(targetUserId)),
+        this.departments.enabledDepartmentIds(await this.users.assignedDepartmentIds(targetUserId)),
+      ])
+      if (
+        !(await this.userAuthorizationContextIsDelegable(
+          authority,
+          targetUserId,
+          currentRoleIds,
+          currentDepartmentIds,
+        ))
+      ) {
+        return false
+      }
+    }
+    return this.userAuthorizationContextIsDelegable(authority, targetUserId, roleIds, departmentIds)
   }
 
   async resolveDataAccess(

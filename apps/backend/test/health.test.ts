@@ -97,6 +97,15 @@ beforeAll(async () => {
         async resolveDataAccess() {
           return { unrestricted: true, ownerUserIds: [], departmentIds: [] }
         },
+        async canAccessSubject() {
+          return true
+        },
+        async canDelegateSubjectAccess() {
+          return true
+        },
+        async canManageUserAuthorizationContext() {
+          return true
+        },
       },
       database: fakeDatabase,
       apiLogWriter,

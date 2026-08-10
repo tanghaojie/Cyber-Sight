@@ -155,6 +155,16 @@ export class UsersController {
     ) {
       return failure(ErrorCode.INVALID_REQUEST, 'Invalid role, department or position assignment')
     }
+    if (
+      !(await this.authorization.canManageUserAuthorizationContext(
+        actor,
+        null,
+        body.roleIds,
+        body.departmentIds,
+      ))
+    ) {
+      return failure(ErrorCode.FORBIDDEN, 'Authorization delegation exceeds current access')
+    }
     const access = await this.authorization.resolveDataAccess(actor, 'users', 'create')
     if (!(await this.repository.canAssignUserDepartments(body.departmentIds, access))) {
       return failure(ErrorCode.FORBIDDEN, 'Data scope does not allow these departments')
@@ -183,6 +193,10 @@ export class UsersController {
     @Body(new ZodValidationPipe(UserUpdateSchema)) body: UserUpdate,
     @CurrentAccessUser() actor: CurrentUser,
   ) {
+    const access = await this.authorization.resolveDataAccess(actor, 'users', 'update')
+    if (!(await this.repository.userExistsWithinAccess(params.id, access))) {
+      throw notFound()
+    }
     if (
       !(await this.repository.hasValidAssignments(
         body.roleIds,
@@ -192,7 +206,16 @@ export class UsersController {
     ) {
       return failure(ErrorCode.INVALID_REQUEST, 'Invalid role, department or position assignment')
     }
-    const access = await this.authorization.resolveDataAccess(actor, 'users', 'update')
+    if (
+      !(await this.authorization.canManageUserAuthorizationContext(
+        actor,
+        params.id,
+        body.roleIds,
+        body.departmentIds,
+      ))
+    ) {
+      return failure(ErrorCode.FORBIDDEN, 'Authorization delegation exceeds current access')
+    }
     if (!(await this.repository.canAssignUserDepartments(body.departmentIds, access, params.id))) {
       return failure(ErrorCode.FORBIDDEN, 'Data scope does not allow these departments')
     }

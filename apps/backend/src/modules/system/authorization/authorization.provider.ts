@@ -1,6 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common'
-import type { CurrentUser, DataAction } from '@cyber-ai-forge/api-contract'
-import { AuthorizationService, type DataAccessPlan } from './authorization.service.js'
+import type {
+  AuthorizationSubjectType,
+  CurrentUser,
+  DataAction,
+  SubjectAccessRequest,
+} from '@cyber-ai-forge/api-contract'
+import {
+  AuthorizationService,
+  type DataAccessPlan,
+  type SubjectAccessOperation,
+} from './authorization.service.js'
 
 /**
  * 授权决策端口。业务路由只依赖该接口，因此本地数据实现可被外部策略服务替换。
@@ -12,6 +21,24 @@ export interface AuthorizationProvider {
     resourceKey: string,
     action: DataAction,
   ): Promise<DataAccessPlan>
+  canAccessSubject(
+    user: CurrentUser,
+    subjectType: AuthorizationSubjectType,
+    subjectId: number,
+    operation: SubjectAccessOperation,
+  ): Promise<boolean>
+  canDelegateSubjectAccess(
+    user: CurrentUser,
+    subjectType: AuthorizationSubjectType,
+    subjectId: number,
+    access: SubjectAccessRequest,
+  ): Promise<boolean>
+  canManageUserAuthorizationContext(
+    user: CurrentUser,
+    targetUserId: number | null,
+    roleIds: number[],
+    departmentIds: number[],
+  ): Promise<boolean>
 }
 
 @Injectable()
@@ -29,5 +56,37 @@ export class LocalAuthorizationProvider implements AuthorizationProvider {
     action: DataAction,
   ): Promise<DataAccessPlan> {
     return this.service.resolveDataAccess(user.id, resourceKey, action)
+  }
+
+  canAccessSubject(
+    user: CurrentUser,
+    subjectType: AuthorizationSubjectType,
+    subjectId: number,
+    operation: SubjectAccessOperation,
+  ): Promise<boolean> {
+    return this.service.canAccessSubject(user.id, subjectType, subjectId, operation)
+  }
+
+  canDelegateSubjectAccess(
+    user: CurrentUser,
+    subjectType: AuthorizationSubjectType,
+    subjectId: number,
+    access: SubjectAccessRequest,
+  ): Promise<boolean> {
+    return this.service.canDelegateSubjectAccess(user.id, subjectType, subjectId, access)
+  }
+
+  canManageUserAuthorizationContext(
+    user: CurrentUser,
+    targetUserId: number | null,
+    roleIds: number[],
+    departmentIds: number[],
+  ): Promise<boolean> {
+    return this.service.canManageUserAuthorizationContext(
+      user.id,
+      targetUserId,
+      roleIds,
+      departmentIds,
+    )
   }
 }

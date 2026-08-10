@@ -57,6 +57,15 @@ export class UsersRepository {
     private readonly roles: RolesAccess,
   ) {}
 
+  async userExistsWithinAccess(userId: number, access: DataAccessPlan): Promise<boolean> {
+    const [row] = await this.db
+      .select({ id: users.id })
+      .from(users)
+      .where(and(eq(users.id, userId), eq(users.isDeleted, false), userAccessPredicate(access)))
+      .limit(1)
+    return Boolean(row)
+  }
+
   async listUsers(query: RepositoryListQuery, access: DataAccessPlan) {
     const keyword = query.keyword?.trim()
     const predicate = and(

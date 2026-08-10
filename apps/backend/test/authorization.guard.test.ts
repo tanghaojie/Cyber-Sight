@@ -49,6 +49,15 @@ describe('authorization provider boundary', () => {
           async resolveDataAccess() {
             return { unrestricted: false, ownerUserIds: [], departmentIds: [] }
           },
+          async canAccessSubject() {
+            return false
+          },
+          async canDelegateSubjectAccess() {
+            return false
+          },
+          async canManageUserAuthorizationContext() {
+            return false
+          },
         },
       },
     )
