@@ -2,9 +2,9 @@
   "version": 1,
   "scopes": {
     "repository": {
-      "lastReviewedCommit": "9aef7a30703d03167c584c66baffee60536588b4",
-      "lastReviewedAt": "2026-08-08T01:53:31+08:00",
-      "reviewId": "injectable-backend-runtime-archive-review"
+      "lastReviewedCommit": "364c016ea5c8c3c062546f3f82f12c65187d0395",
+      "lastReviewedAt": "2026-08-10T13:32:59+08:00",
+      "reviewId": "marketing-site-archive-review"
     }
   }
 }

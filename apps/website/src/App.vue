@@ -227,11 +227,17 @@ onBeforeUnmount(function () {
       </nav>
 
       <div class="header-actions">
-        <div class="language-switcher" :aria-label="t.header.languageLabel" role="group">
+        <div
+          class="language-switcher"
+          :class="{ 'is-zh': locale === 'zh' }"
+          :aria-label="t.header.languageLabel"
+          role="group"
+        >
           <button
             type="button"
             :class="{ 'is-active': locale === 'en' }"
             :aria-pressed="locale === 'en'"
+            aria-label="English"
             @click="setLocale('en')"
           >
             EN
@@ -240,9 +246,10 @@ onBeforeUnmount(function () {
             type="button"
             :class="{ 'is-active': locale === 'zh' }"
             :aria-pressed="locale === 'zh'"
+            aria-label="中文"
             @click="setLocale('zh')"
           >
-            中文
+            中
           </button>
         </div>
 
@@ -400,7 +407,7 @@ onBeforeUnmount(function () {
               :style="sceneCardStyle(index)"
               :aria-hidden="activeScene !== index"
             >
-              <ProductScene :scene="scene" :locale="locale" />
+              <ProductScene :scene="scene" />
             </article>
           </div>
         </div>
@@ -412,7 +419,7 @@ onBeforeUnmount(function () {
             :key="scene.code"
             class="strip-card"
           >
-            <ProductScene :scene="scene" :locale="locale" />
+            <ProductScene :scene="scene" />
             <div class="strip-card-copy">
               <span>{{ scene.code }}</span>
               <h3>{{ scene.title }}</h3>

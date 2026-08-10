@@ -2,7 +2,7 @@ export type Locale = 'en' | 'zh'
 
 export interface SceneContent {
   code: string
-  kind: 'home' | 'users' | 'roles' | 'navigation' | 'contract' | 'docs'
+  kind: 'home' | 'users' | 'roles' | 'navigation' | 'logs' | 'settings'
   title: string
   description: string
 }
@@ -184,17 +184,17 @@ export const content: Record<Locale, SiteContent> = {
         },
         {
           code: 'SURFACE_05',
-          kind: 'contract',
-          title: 'Runtime API contracts',
+          kind: 'logs',
+          title: 'Inspectable API activity',
           description:
-            'One Zod schema drives frontend types, Nest validation, response checks, and OpenAPI metadata.',
+            'Filterable request records make backend behavior, retention, and response timing visible to operators.',
         },
         {
           code: 'SURFACE_06',
-          kind: 'docs',
-          title: 'AI-ready project memory',
+          kind: 'settings',
+          title: 'Operator-controlled workspace',
           description:
-            'Designs, decisions, plans, and verification results survive tool changes and new conversations.',
+            'Navigation, theme, tabs, and brand visibility can be tuned from one focused settings surface.',
         },
       ],
     },
@@ -399,15 +399,15 @@ export const content: Record<Locale, SiteContent> = {
         },
         {
           code: '界面_05',
-          kind: 'contract',
-          title: '运行时 API 契约',
-          description: '同一份 Zod Schema 驱动前端类型、Nest 校验、响应检查与 OpenAPI 元数据。',
+          kind: 'logs',
+          title: '接口活动可追溯',
+          description: '可筛选的请求记录让后端行为、保留策略和响应耗时对维护者清晰可见。',
         },
         {
           code: '界面_06',
-          kind: 'docs',
-          title: 'AI 可读的项目记忆',
-          description: '设计、决策、计划和验证结果不会因为更换工具或开启新对话而消失。',
+          kind: 'settings',
+          title: '可即时生效的工作台偏好',
+          description: '导航布局、主题、标签页和品牌展示可以在一个聚焦的设置界面中调整。',
         },
       ],
     },

@@ -209,34 +209,70 @@ svg {
 }
 
 .language-switcher {
-  display: flex;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, 44px);
   align-items: center;
-  min-height: 44px;
-  padding: 0;
-  border: 1px solid var(--line);
-  background: rgba(246, 245, 239, 0.035);
+  min-height: 50px;
+  padding: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(246, 245, 239, 0.16);
+  border-radius: 999px;
+  background: rgba(5, 9, 11, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 8px 24px rgba(0, 0, 0, 0.18);
+  isolation: isolate;
+}
+
+.language-switcher::before {
+  position: absolute;
+  z-index: 0;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: 44px;
+  border: 1px solid rgba(203, 255, 227, 0.32);
+  border-radius: 999px;
+  background: linear-gradient(145deg, #8ee0b8, #57b98b);
+  box-shadow:
+    0 5px 16px rgba(53, 166, 113, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.46);
+  content: '';
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.language-switcher.is-zh::before {
+  transform: translateX(44px);
 }
 
 .language-switcher button {
-  min-width: 46px;
+  position: relative;
+  z-index: 1;
+  min-width: 44px;
   min-height: 44px;
-  padding: 0 10px;
+  padding: 0;
   border: 0;
   background: transparent;
-  color: var(--text-dim);
+  color: rgba(246, 245, 239, 0.54);
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
   transition:
-    background-color 180ms ease,
-    color 180ms ease;
+    color 180ms ease,
+    text-shadow 180ms ease;
 }
 
 .language-switcher button.is-active {
-  background: var(--paper);
-  color: var(--ink);
+  color: #06100b;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.language-switcher button:not(.is-active):hover {
+  color: var(--text);
 }
 
 .header-github {
@@ -992,9 +1028,9 @@ html[lang='zh-CN'] .manifesto-quote {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 620px;
-  height: 380px;
-  margin: -190px 0 0 -310px;
+  width: 680px;
+  height: 340px;
+  margin: -170px 0 0 -340px;
   transform-style: preserve-3d;
   transition: transform 80ms linear;
   will-change: transform;
@@ -1004,7 +1040,7 @@ html[lang='zh-CN'] .manifesto-quote {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  transform: rotateY(var(--scene-angle)) translateZ(610px);
+  transform: rotateY(var(--scene-angle)) translateZ(650px);
   border: 1px solid rgba(246, 245, 239, 0.24);
   background: #111619;
   box-shadow: 0 36px 90px rgba(0, 0, 0, 0.58);
@@ -1115,7 +1151,7 @@ html[lang='zh-CN'] .manifesto-quote {
 }
 
 .strip-card .product-scene {
-  aspect-ratio: 620 / 380;
+  aspect-ratio: 2 / 1;
   border: 1px solid var(--line);
 }
 
@@ -1146,12 +1182,14 @@ html[lang='zh-CN'] .manifesto-quote {
 }
 
 .feature-card:nth-child(1),
-.feature-card:nth-child(6) {
+.feature-card:nth-child(4),
+.feature-card:nth-child(5) {
   grid-column: span 5;
 }
 
 .feature-card:nth-child(2),
-.feature-card:nth-child(5) {
+.feature-card:nth-child(3),
+.feature-card:nth-child(6) {
   grid-column: span 7;
 }
 
@@ -2602,6 +2640,33 @@ html[lang='zh-CN'] .boundaries h3 {
   background: rgba(255, 255, 255, 0.35);
 }
 
+/* Product screenshots replace the earlier generated interface mockups. */
+.product-scene {
+  position: relative;
+  isolation: isolate;
+  background: #e9efec;
+}
+
+.product-scene::after {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 0 0 1px rgba(8, 25, 18, 0.12),
+    inset 0 -44px 80px rgba(5, 18, 13, 0.08);
+  content: '';
+  pointer-events: none;
+}
+
+.product-screenshot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  user-select: none;
+}
+
 @media (max-width: 1100px) {
   .hero-layout {
     grid-template-columns: 1fr 0.68fr;
@@ -2780,11 +2845,6 @@ html[lang='zh-CN'] .boundaries h3 {
 
   .brand-lockup > span {
     display: none;
-  }
-
-  .language-switcher button {
-    min-width: 42px;
-    padding: 0 8px;
   }
 
   .hero-title {

@@ -15,7 +15,7 @@ Cyber AI Forge 需要一个部署到 GitHub Pages 的静态推广站，把仓库
 
 范围包括独立静态站应用、运行时中英文切换、固定毛玻璃 Header、页内锚点、滚动驱动的三维界面轮播、响应式布局、可访问性降级、SEO 元数据和 GitHub Pages 自动部署。
 
-不接入后端、数据库、登录态或管理端运行时模块；不复用管理端私有组件；不在推广站展示动态生产数据；不创建前端自动化或浏览器测试。界面展示使用由静态 HTML/CSS 构成的产品场景，避免依赖需要维护的远程截图服务，后续可用真实压缩截图替换场景内容而不改变轮播结构。
+不接入后端、数据库、登录态或管理端运行时模块；不复用管理端私有组件；不在推广站展示动态生产数据；不创建前端自动化或浏览器测试。界面展示使用维护者提供并随站点发布的真实产品截图，不依赖远程截图服务；截图只作为公开展示资产，不建立对管理端内部组件的运行时依赖。
 
 ## 职责与边界
 
@@ -29,13 +29,15 @@ Cyber AI Forge 需要一个部署到 GitHub Pages 的静态推广站，把仓库
 - 页面锚点：`#showcase`、`#features`、`#system`、`#start`。
 - GitHub 入口：`https://github.com/tanghaojie/Cyber-AI-Forge`。
 - 语言 URL 参数：`?lang=zh` 或 `?lang=en`；偏好存入 `cyber_ai_forge_site_locale:v1`。
-- 语言切换必须位于 Header，不在 Footer 重复放置交互入口。
+- 语言切换必须位于 Header，以具备明确选中状态的紧凑分段控件呈现，不在 Footer 重复放置交互入口。
 
 ## 视觉与交互系统
 
 页面采用“Forge Blueprint / 工业编辑式系统蓝图”方向：石墨黑为主体、暖白承载长文本、薄荷绿表示结构和可执行动作、电紫表示智能节点。大字号紧缩标题与等宽标签形成技术出版物气质，网格、刻度、节点和环形轨道表达模块边界与受控数据流。
 
-桌面端界面展示区使用自然页面滚动计算三维环形旋转进度，不拦截滚轮。按钮和键盘可以直接选择场景。窄屏、触控优先环境和 `prefers-reduced-motion` 用户降级为水平 `scroll-snap` 列表；所有动效只改变 `transform` 与 `opacity`。
+桌面端界面展示区使用自然页面滚动计算三维环形旋转进度，不拦截滚轮。轮播卡片直接展示 16:9 产品截图，并通过 `object-fit: cover` 保持画面比例。按钮和键盘可以直接选择场景。窄屏、触控优先环境和 `prefers-reduced-motion` 用户降级为水平 `scroll-snap` 列表；所有动效只改变 `transform` 与 `opacity`。
+
+核心体系使用无断层的十二列网格：桌面端每一行的卡片跨度总和必须等于十二，避免 CSS Grid 自动换行产生不可解释的空白；中窄屏统一切换为双列或单列。
 
 ## 数据模型与数据流
 
@@ -68,6 +70,7 @@ passive scroll event
 - 过度动效：不得阻止原生滚动；减少动效设置下取消平滑滚动、视差和三维旋转。
 - 外部字体不可达：提供紧缩无衬线、中文无衬线和等宽系统回退栈。
 - 外部链接使用安全的 `rel="noreferrer"`，所有交互具备键盘焦点和可读标签。
+- 产品截图包含管理端示例数据，发布前由维护者确认其中不含令牌、真实个人信息或生产数据。
 
 ## 测试与验证策略
 
@@ -77,16 +80,19 @@ passive scroll event
 
 2026-08-10 已完成 `pnpm format`、`pnpm format:check`、`pnpm lint`、`pnpm build` 和 `pnpm docs:archive:check:ci`；推广站 Vue TypeScript 检查与生产构建、主应用和契约/后端构建均通过。推广站产物包含相对路径入口、品牌图标与分享图，JavaScript 和 CSS 合计 gzip 后约 49 KB。按照仓库边界未创建或运行前端自动化/浏览器测试；上述桌面、窄屏、语言切换、三维滚动、键盘与减少动效场景仍需维护者人工验收。
 
+2026-08-10 的视觉优化使用维护者提供的六张 PNG 替换合成产品场景，并完成语言切换与核心卡片网格修正。格式检查、全仓 Lint、生产构建和文档归档 CI 检查通过，Vite 为六张截图生成带哈希的 Pages 资源；截图总计约 3.1 MB。浏览器视觉与交互仍需维护者人工验收。
+
 ## 兼容性与迁移
 
 推广站是新增应用，不改变管理端、后端、数据库或 API 契约。GitHub Pages 工作流首次启用后，仓库需要在 GitHub Pages 设置中选择 GitHub Actions 作为来源；删除工作流和站点应用即可回滚，不影响主系统。
 
 ## 未决问题
 
-- 首次发布后由维护者确认 GitHub Pages 自定义域名、Repository Pages 路径和真实产品截图更新节奏。
+- 首次发布后由维护者确认 GitHub Pages 自定义域名、Repository Pages 路径和产品截图更新节奏。
 
 ## 相关 ADR、计划和 AI 日志
 
 - [ADR-0037：独立静态应用发布开源推广站](../decisions/ADR-0037-static-marketing-site.md)
-- [实施计划](../archive/plans/2026-08-10-marketing-site.md)
-- [AI 协作记录](../archive/ai-logs/2026/08/2026-08-10-marketing-site.md)
+- [原始实施计划](../archive/plans/2026-08-10-marketing-site.md)
+- [视觉优化计划](../archive/plans/2026-08-10-marketing-site-visual-refinement.md)
+- [AI 协作记录](../archive/ai-logs/2026/08/2026-08-10-marketing-site-visual-refinement.md)
