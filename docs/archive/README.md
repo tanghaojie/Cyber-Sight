@@ -44,6 +44,8 @@
 
 ## 完成计划与 AI 协作记录
 
+- 2026-08-10：[推广站优化后续文档归档审查](plans/2026-08-10-marketing-site-follow-up-archive-review.md)。
+
 - 2026-08-10：[核心卡片语言切换显现修复](plans/2026-08-10-feature-locale-reveal.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-10-feature-locale-reveal.md)。
 
