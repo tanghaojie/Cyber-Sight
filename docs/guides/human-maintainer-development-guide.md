@@ -270,7 +270,9 @@ interface PaginationRequest {
 有名称、可复用、需要堆栈名称的函数使用声明：
 
 ```typescript
-export async function findUser(id: number): Promise<User | null> {
+import type { EntityId } from '@cyber-ai-forge/api-contract'
+
+export async function findUser(id: EntityId): Promise<User | null> {
   return null
 }
 ```
@@ -278,7 +280,9 @@ export async function findUser(id: number): Promise<User | null> {
 不要默认写成：
 
 ```typescript
-export const findUser = async (id: number) => {
+import type { EntityId } from '@cyber-ai-forge/api-contract'
+
+export const findUser = async (id: EntityId) => {
   return null
 }
 ```
@@ -313,14 +317,14 @@ Drizzle 用 TypeScript 定义数据库结构，并根据 Schema 差异生成 SQL
 - 任何 `DROP`、数据回填或不可逆类型转换都必须单独设计备份和回滚方案。
 - 不得用 `db:push` 代替团队迁移历史。
 - 默认测试不依赖真实数据库；数据库集成验证通过 `pnpm test:db` 或专用测试环境运行。
-- 当前 `0000_initial_system_schema` 是维护者明确批准的一次性历史重置，只能在全新空数据库执行；从该基线开始恢复“已执行迁移不可改写”的常规规则。
+- 当前 `0000_initial_uuidv7_system_schema` 是维护者明确批准的一次性 UUIDv7 空库重置，只能在 PostgreSQL 18 全新空数据库执行；从该基线开始恢复“已执行迁移不可改写”的常规规则。
 
 ### 9.4 常用数据库命令
 
 ```powershell
 pnpm db:generate # 生成迁移
 pnpm db:migrate  # 在全新空数据库应用尚未执行的迁移
-pnpm test:db     # 检查连接、版本、sys_users 表和迁移表
+pnpm test:db     # 检查 PostgreSQL 18、迁移表、17 张 UUIDv7 应用表、审计列、根节点和种子
 ```
 
 ## 10. 测试与前端人工验收

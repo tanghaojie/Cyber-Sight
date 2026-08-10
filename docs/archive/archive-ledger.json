@@ -2,9 +2,9 @@
   "version": 1,
   "scopes": {
     "repository": {
-      "lastReviewedCommit": "7a9fccc91c9f9b19eb919c712f2861ccf22ce382",
-      "lastReviewedAt": "2026-08-10T14:54:37+08:00",
-      "reviewId": "authorization-delegation-boundary-archive-review"
+      "lastReviewedCommit": "5bb94c2154f64a5cdde2d2935fe3d1d7f4e02bf8",
+      "lastReviewedAt": "2026-08-10T16:53:00+08:00",
+      "reviewId": "uuidv7-identifier-archive-review"
     }
   }
 }
