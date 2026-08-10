@@ -5,6 +5,12 @@
 <h1 align="center">Cyber AI Forge</h1>
 
 <p align="center">
+  <a href="https://tanghaojie.github.io/Cyber-AI-Forge/">Project Website</a>
+  ·
+  <a href="./docs/README.md">Documentation</a>
+</p>
+
+<p align="center">
   AI-Native Enterprise Application Scaffold<br />
   AI 驱动的企业应用智能构建平台
 </p>
@@ -309,7 +315,8 @@ PostgreSQL
 ```text
 apps/
 ├── frontend/                 # Vue 前端和管理后台
-└── backend/                  # NestJS/Fastify 服务、数据库和迁移
+├── backend/                  # NestJS/Fastify 服务、数据库和迁移
+└── website/                  # 中英文静态推广站和 GitHub Pages 构建入口
 packages/
 └── api-contract/             # 前后端共享的 API 契约
 docs/
@@ -367,7 +374,7 @@ CYBER 由 JTLab 维护；CYBER / Cyber AI Forge 是项目名称，JTLab 是创�
 
 - 当前数据库实现绑定 PostgreSQL
 - 初始迁移只面向全新空数据库
-- 尚无 CI 和生产部署基线
+- 管理端与后端尚无 CI 和生产部署基线；推广站仅提供 GitHub Pages 自动部署
 - 生产环境仍需由维护者完成密钥、初始密码、部署和安全配置
 - 前端功能和浏览器行为需要人工验收
 

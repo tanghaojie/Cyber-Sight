@@ -44,6 +44,9 @@
 
 ## 完成计划与 AI 协作记录
 
+- 2026-08-10：[Cyber AI Forge 开源推广站](plans/2026-08-10-marketing-site.md)及其
+  [AI 协作记录](ai-logs/2026/08/2026-08-10-marketing-site.md)。
+
 - 2026-08-08：[BackendRuntime 到 Nest Injectable Provider 重构](plans/2026-08-08-injectable-backend-runtime.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-08-injectable-backend-runtime.md)。
 

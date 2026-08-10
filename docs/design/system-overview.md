@@ -26,6 +26,7 @@ NestJS 11 + Fastify 5 adapter + Drizzle
 
 - `apps/frontend`：Vue Router、Pinia、Tailwind CSS、Element Plus 和响应式管理端。
 - `apps/backend`：NestJS 服务、Fastify adapter、认证、管理 API、Drizzle 仓储和数据库迁移。
+- `apps/website`：独立 Vite + Vue 3 中英文静态推广站，通过 GitHub Actions 发布到 GitHub Pages，不依赖管理端运行时或后端。
 - `packages/api-contract`：HTTP Zod Schema、推导类型与适配器无关的 JSON Schema 转换。
 
 现有业务包括健康检查、会话认证、接口日志、工作台、用户、角色、数据库动态菜单和字典。脚手架自带的 15 张 PostgreSQL 表统一使用 `sys_` 物理前缀、软删除及五项生命周期审计字段；`0000` 初始迁移只面向全新数据库，后续 Schema 通过追加迁移演进。
@@ -42,7 +43,7 @@ NestJS 11 + Fastify 5 adapter + Drizzle
 
 ## 已知缺口
 
-- 尚无 CI 和生产部署基线。
+- 管理端与后端尚无 CI 和生产部署基线；当前自动化部署仅覆盖 `apps/website` 的 GitHub Pages 静态产物。
 - 细粒度接口权限、组织/租户、生产级初始密码注入仍未实现。
 - 健康检查是存活检查，不包含数据库 readiness。
 - PostgreSQL/MySQL 可切换仍是愿景，当前实现绑定 PostgreSQL。
