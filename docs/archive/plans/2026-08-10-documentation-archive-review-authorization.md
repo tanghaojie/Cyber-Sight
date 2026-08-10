@@ -1,12 +1,12 @@
 ---
-title: 授权安全修复前的文档归档审查
+title: 授权安全修复文档归档审查
 type: documentation-archive-review
-status: active
+status: completed
 created: 2026-08-10
 updated: 2026-08-10
 ---
 
-# 授权安全修复前的文档归档审查
+# 授权安全修复文档归档审查
 
 ## 目标
 
@@ -14,7 +14,7 @@ updated: 2026-08-10
 
 ## 背景与设计依据
 
-归档台账基线为 `e2f496e285be32c2a78807157315004f269dbd2c`。审计识别到 workspace package scope 架构变更；当前 `HEAD` 为 `abd116ca4193ebe3feeafdfcfb5d4952d2f385e2`，现行设计和 ADR-0031 已随该提交同步。
+审查前归档台账基线为 `e2f496e285be32c2a78807157315004f269dbd2c`。审计识别到 workspace package scope 架构变更；安全修复提交前的 `HEAD` 为 `abd116ca4193ebe3feeafdfcfb5d4952d2f385e2`，现行设计和 ADR-0031 已覆盖 package scope 迁移。
 
 ## 范围
 
@@ -37,23 +37,24 @@ updated: 2026-08-10
 - [x] 运行任务范围归档审计并记录 `DUE` 证据。
 - [x] 复核基线后 package scope 提交及现行文档同步情况。
 - [x] 复核授权安全修复的最终代码、测试、设计和 ADR。
-- [ ] 更新台账、归档计划并通过 `pnpm docs:archive:check:ci`。
+- [x] 更新台账、归档计划并通过 `pnpm docs:archive:check:ci`。
 
 ## 测试与验证
 
-- `pnpm docs:archive:check:ci`
-- `pnpm format:check`
-- 当前文档索引和相对链接检查由仓库现有验证入口覆盖。
+- 安全提交前 `pnpm docs:archive:check:ci` 返回 `IN_PROGRESS` 并通过门禁。
+- 台账指向安全提交后，`pnpm docs:archive:check:ci` 返回 `NOT_DUE`。
+- `pnpm format:check` 和归档索引检查通过。
 
 ## 发布与回滚
 
-台账更新只在对应代码与文档提交存在后生效；若安全修复未提交，本计划保持 active，不提前推进基线。
+台账更新只在对应代码与文档提交存在后生效；回滚安全提交时必须同时把台账恢复到仍代表当前事实的已审查提交。
 
 ## 实际偏差和遗留问题
 
-基线后的 workspace package scope 迁移已经由现行品牌、工程与 ADR 文档覆盖，没有发现需恢复或归档的冲突设计。授权安全修复的代码、139 项后端测试、模块设计和 ADR-0038 已一致；待安全提交生成后更新台账并完成本计划。
+基线后的 workspace package scope 迁移已经由现行品牌、工程与 ADR 文档覆盖，没有发现需恢复或归档的冲突设计。授权安全修复的代码、139 项后端测试、模块设计和 ADR-0038 一致，安全基线为 `7a9fccc91c9f9b19eb919c712f2861ccf22ce382`。没有遗留的归档冲突。
 
 ## 相关设计、ADR 和 AI 日志
 
 - [分层文档与历史归档](../../design/documentation-governance.md)
-- [授权安全修复计划](../../archive/plans/2026-08-10-authorization-delegation-boundary.md)
+- [授权安全修复计划](2026-08-10-authorization-delegation-boundary.md)
+

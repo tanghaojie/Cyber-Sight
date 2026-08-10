@@ -44,6 +44,7 @@
 
 ## 完成计划与 AI 协作记录
 
+- 2026-08-10：[授权安全修复文档归档审查](plans/2026-08-10-documentation-archive-review-authorization.md)。
 - 2026-08-10：[授权委托边界完整修复](plans/2026-08-10-authorization-delegation-boundary.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-10-authorization-delegation-boundary.md)。
 - 2026-08-10：[Cyber AI Forge workspace 包作用域迁移](plans/2026-08-10-cyber-ai-forge-package-scope.md)及其

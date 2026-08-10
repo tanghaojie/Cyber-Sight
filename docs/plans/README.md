@@ -8,7 +8,7 @@
 
 ## 进行中
 
-- [授权安全修复前的文档归档审查](active/2026-08-10-documentation-archive-review-authorization.md)
+无。
 
 ## 生命周期
 

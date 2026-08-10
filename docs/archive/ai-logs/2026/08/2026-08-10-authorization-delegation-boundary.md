@@ -43,4 +43,4 @@ status: completed
 
 - [实施计划](../../../../archive/plans/2026-08-10-authorization-delegation-boundary.md)
 - [ADR-0038](../../../../decisions/ADR-0038-bounded-authorization-delegation.md)
-- 提交：在最终归档审查中登记。
+- 安全提交：`7a9fccc91c9f9b19eb919c712f2861ccf22ce382`。
