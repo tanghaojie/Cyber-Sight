@@ -26,7 +26,7 @@ It gives AI an understandable engineering structure, clear module boundaries, co
 
 Cyber AI Forge is designed and maintained by JTLab (桀士实验室). JTLab is the creator brand, not the product name.
 
-## 💡 Why Cyber AI Forge
+## 01 / Why Cyber AI Forge
 
 AI can already generate large amounts of code, but “can generate code” does not mean “can continuously complete a project.” Without clear structure and rules, AI can easily run into these problems:
 
@@ -38,9 +38,9 @@ AI can already generate large amounts of code, but “can generate code” does 
 
 Cyber AI Forge was created to give people and AI an enterprise application engineering foundation they can understand, use, and evolve together.
 
-## ✨ Core Highlights
+## 02 / Core Highlights
 
-### 🧠 An engineering structure organized for AI
+### 02.1 / An engineering structure organized for AI
 
 Cyber AI Forge is not a standard scaffold with AI connected to it. It organizes the project for AI-assisted development from the very beginning, starting with module boundaries, file responsibilities, interface contracts, and extension workflows.
 
@@ -50,7 +50,7 @@ Cyber AI Forge is not a standard scaffold with AI connected to it. It organizes 
 - New APIs and business modules follow a clear implementation path
 - The project can be continuously modified instead of only generating one-off demos
 
-### 📚 Project documentation shared by people and AI
+### 02.2 / Project documentation shared by people and AI
 
 Cyber AI Forge provides more than development documentation for people. It also maintains project rules, architecture descriptions, design documents, and implementation records for AI collaboration.
 
@@ -61,7 +61,7 @@ Cyber AI Forge provides more than development documentation for people. It also 
 
 This means that even when you switch to another AI or start a new conversation, the project still has a formal set of documents to help AI quickly understand the current facts instead of relying entirely on chat history.
 
-### 🤖 AI can lead or even complete full-stack development
+### 02.3 / AI can lead or even complete full-stack development
 
 People are responsible for expressing ideas, describing requirements, and judging results. AI can take the lead on implementation from the database and API contracts to backend endpoints and frontend pages.
 
@@ -71,7 +71,7 @@ For example, you can tell AI:
 
 AI can then continue with database design, Schema definitions, backend routes, frontend pages, menu registration, permission integration, tests, and builds.
 
-### 🧰 Administration capabilities ready out of the box
+### 02.4 / Administration capabilities ready out of the box
 
 The current version includes:
 
@@ -84,7 +84,7 @@ The current version includes:
 - Runtime multilingual foundations for the frontend
 - Swagger API documentation
 
-### 🔗 Shared runtime contracts between frontend and backend
+### 02.5 / Shared runtime contracts between frontend and backend
 
 The project uses Zod to define API runtime Schemas and shares them between the frontend and backend:
 
@@ -95,9 +95,32 @@ The project uses Zod to define API runtime Schemas and shares them between the f
 
 This allows AI and people to develop around the same interface facts and reduces frontend/backend drift.
 
-## 👥 Who is it for?
+## 03 / System Screenshots
 
-### 🧑‍🎨 People who want to build applications with AI
+The screenshots in this README come from the runnable administration console included in the repository. They cover the login entry point, workbench, user and menu management, role permissions, API logs, and system settings. They illustrate the current capabilities and do not represent a remote demo environment.
+
+<div align="center">
+  <img src="./apps/website/src/assets/screenshots/login.png" alt="Cyber AI Forge login page" width="49%" />
+  <img src="./apps/website/src/assets/screenshots/home.png" alt="Cyber AI Forge workbench" width="49%" />
+</div>
+
+<div align="center">
+  <img src="./apps/website/src/assets/screenshots/users.png" alt="Cyber AI Forge user management" width="49%" />
+  <img src="./apps/website/src/assets/screenshots/menus.png" alt="Cyber AI Forge menu management" width="49%" />
+</div>
+
+<div align="center">
+  <img src="./apps/website/src/assets/screenshots/roles.png" alt="Cyber AI Forge role and data permissions" width="49%" />
+  <img src="./apps/website/src/assets/screenshots/api-logs.png" alt="Cyber AI Forge API logs" width="49%" />
+</div>
+
+<div align="center">
+  <img src="./apps/website/src/assets/screenshots/settings.png" alt="Cyber AI Forge system settings" width="49%" />
+</div>
+
+## 04 / Who is it for?
+
+### 04.1 / People who want to build applications with AI
 
 If you have an application idea but can barely write code, you can use Cyber AI Forge as AI’s workbench:
 
@@ -111,7 +134,7 @@ It is suitable for building personal tools, internal management systems, small S
 
 AI handles implementation; people remain responsible for expressing requirements, judging product direction, and accepting the results. Cyber AI Forge is not intended to remove people from the process, but to make building an enterprise application possible without first requiring people to become professional programmers.
 
-### 👩‍💻 Professional developers
+### 04.2 / Professional developers
 
 If you are a developer, you can use Cyber AI Forge as a full-stack starting point for a real project:
 
@@ -121,7 +144,7 @@ If you are a developer, you can use Cyber AI Forge as a full-stack starting poin
 - Let AI assist development within explicit engineering rules
 - Use existing tests, builds, and design documents to reduce maintenance costs
 
-## 🧩 Typical Use Cases
+## 05 / Typical Use Cases
 
 - Internal enterprise administration consoles
 - Customer relationship management systems
@@ -134,7 +157,7 @@ If you are a developer, you can use Cyber AI Forge as a full-stack starting poin
 
 If your application needs login, permissions, administration, and a database, Cyber AI Forge can be a reliable starting point.
 
-## 🆚 Why not let AI build everything from scratch?
+## 06 / Why not let AI build everything from scratch?
 
 Of course, you can ask AI to build an application from an empty directory. The issue is not whether AI can generate the first version of the code, but whether the project can continue to be developed, maintained, and handed over reliably after that first version.
 
@@ -152,19 +175,19 @@ So Cyber AI Forge does not replace AI; it provides AI with a more reliable worki
 
 > Asking AI to build from scratch solves “can we make a first version?” Cyber AI Forge solves “can we keep building it?”
 
-### 📈 The more complex the project, the clearer Cyber’s value
+### 06.1 / The more complex the project, the clearer Cyber’s value
 
 If you only want a one-off script, simple webpage, or short-term demo, asking AI to build from scratch is perfectly reasonable. Cyber AI Forge is designed to solve the collaboration and integration challenges that appear as enterprise applications grow.
 
-#### 📦 Build complex projects by module
+#### 06.1.1 / Build complex projects by module
 
 Complex applications usually need to split capabilities such as authentication, users, permissions, orders, customers, and reports into separate modules and build them in stages. Without unified module rules, different stages can easily create duplicate code, confused responsibilities, and unintended interactions. Cyber AI Forge provides module boundaries, public interfaces, and a fixed extension path so AI can build one module at a time while keeping the overall project structure stable.
 
-#### 👥 Collaboration between people and multiple AIs
+#### 06.1.2 / Collaboration between people and multiple AIs
 
 When one person, multiple people, or even multiple AIs develop a project at the same time, everyone must share the same project facts: how directories are organized, how APIs are defined, how modules depend on one another, and how the result is verified. Cyber AI Forge records these rules in the engineering structure and project documentation, allowing different people and AIs to divide the work and finally deliver results that can be merged instead of generating mutually incompatible codebases.
 
-#### 🔌 Integrate multiple systems and business capabilities
+#### 06.1.3 / Integrate multiple systems and business capabilities
 
 Integration projects do not only require new features. They must also combine login, permissions, databases, frontend pages, business modules, and external services that may be connected in the future. Cyber AI Forge provides a unified API contract, system modules, and documentation entry points to help AI understand how the pieces connect and reduce the problem of “each module works alone, but the combined system does not.”
 
@@ -172,7 +195,7 @@ You can think of Cyber AI Forge as an engineering blueprint that everyone and ev
 
 > AI can handle its own construction work; Cyber ensures that all construction follows the same blueprint and is ultimately combined into a system that can be used continuously.
 
-## 🧭 If you are not technical, give this README to AI first
+## 07 / If you are not technical, give this README to AI first
 
 If you can barely write code, you do not need to understand technical terms such as `pnpm`, `PostgreSQL`, or `Zod` first. You can give this README and the project to an AI that can access project files, let AI become your technical guide, and then complete development step by step with you.
 
@@ -211,15 +234,15 @@ AI will usually guide you through these stages:
 
 You do not need to describe your requirements professionally all at once. You can start by saying “I want to build a customer management tool,” then work with AI to add users, pages, permissions, and business rules step by step.
 
-## 🚀 Quick Start
+## 08 / Quick Start
 
-### 🛠️ Requirements
+### 08.1 / Requirements
 
 - Node.js
 - pnpm
 - PostgreSQL
 
-### ▶️ Start the project
+### 08.2 / Start the project
 
 ```bash
 pnpm install
@@ -250,13 +273,13 @@ Password: Admin@123456
 
 This credential is for local initialization only. Before entering a shared or production environment, change the password and use secure key configuration.
 
-### 🗄️ Database notes
+### 08.3 / Database notes
 
 The current migration chain targets the system-table baseline of a brand-new empty PostgreSQL database and does not support in-place upgrades of an existing database. An old database cannot be used directly as the new `DATABASE_URL`; if the old data must be kept, first stop using the old database and then design a separate data migration plan.
 
 See the [database baseline rebuild guide](docs/guides/database-baseline-rebuild.md) for details.
 
-## 💬 How to have AI develop your application
+## 09 / How to have AI develop your application
 
 At the beginning of each substantial task, ask AI to read the project documentation and relevant module designs before proposing an implementation plan. For example:
 
@@ -268,7 +291,7 @@ Based on the current project module conventions, add a “customer management”
 
 For ordinary users, requirements can be described entirely in natural language. Developers can add data models, permission rules, interaction details, and acceptance criteria.
 
-## 🧱 How to add a business module
+## 10 / How to add a business module
 
 When adding business capabilities, the recommended path is:
 
@@ -284,7 +307,7 @@ The page loader for database-driven menus is registered in the owning module’s
 
 The scaffold’s built-in system tables consistently use the `sys_` physical prefix, soft deletion, and five lifecycle fields: `is_deleted`, `created_at`, `created_by`, `updated_at`, and `updated_by`.
 
-## 🏗️ Technical Architecture
+## 11 / Technical Architecture
 
 ```text
 Human describes requirements
@@ -311,7 +334,7 @@ PostgreSQL
 | Database              | PostgreSQL                                                                  |
 | Repository management | pnpm monorepo                                                               |
 
-## 🗂️ Project Structure
+## 12 / Project Structure
 
 ```text
 apps/
@@ -329,7 +352,7 @@ docs/
 
 System capabilities and product business capabilities are organized separately under `src/modules/system/<module>/` and `src/modules/biz/<module>/`. Cross-module dependencies must go through registered public interfaces.
 
-## ⌨️ Common Commands
+## 13 / Common Commands
 
 ```bash
 pnpm dev           # Start the frontend, backend, and API contract development workflow
@@ -345,7 +368,7 @@ pnpm test:db       # Check PostgreSQL, system tables, and migration records
 
 The frontend currently does not maintain automated unit, component, or browser tests; frontend features and browser behavior are accepted manually by maintainers. The backend and shared contracts continue to use automated tests for verification.
 
-## 📖 Project Documentation
+## 14 / Project Documentation
 
 The [project documentation entry point](docs/README.md) contains current project knowledge for both human maintainers and AI collaboration:
 
@@ -356,7 +379,7 @@ The [project documentation entry point](docs/README.md) contains current project
 
 The root `AGENTS.md` records the collaboration rules that AI must follow when modifying the project. Important design, implementation, and verification results will continue to be synchronized into project documentation rather than remaining only in chat history.
 
-## 🎨 Branding and white-label configuration
+## 15 / Branding and white-label configuration
 
 CYBER is maintained by JTLab. CYBER / Cyber AI Forge is the project name, and JTLab is the creator brand. The English subtitle is `AI-Native Enterprise Application Scaffold`; the Chinese subtitle is `AI 驱动的企业应用智能构建平台`. The frontend uses a brand system built from graphite black, warm white, mint green `#70CFA2`, and electric-purple nodes by default.
 
@@ -369,7 +392,7 @@ Application text configuration is located in `apps/frontend/src/config/app.confi
 
 For a white-label deployment, also replace `CyberLogo.vue` and `public/cyber-mark.svg` so the product name stays consistent with the default C-shaped product mark.
 
-## ✅ Current Implementation Boundaries
+## 16 / Current Implementation Boundaries
 
 The current version has completed the administration foundation described above and is suitable for adding real business modules. To evaluate the project correctly, also keep these boundaries in mind:
 
@@ -381,12 +404,12 @@ The current version has completed the administration foundation described above 
 
 These boundaries do not prevent the project from serving as a starting point for AI full-stack development, but the corresponding engineering work must be completed separately before entering a shared or production environment.
 
-## 🌱 Project Vision
+## 17 / Project Vision
 
 Cyber AI Forge aims to turn “building an enterprise application” from an ability reserved for professional developers into a creative process that ordinary people can complete with AI.
 
 People bring the ideas, and AI leads the implementation. The project structure and documentation keep AI on track, while clear engineering boundaries let an application grow from an idea into a genuinely usable, maintainable, and extensible system.
 
-## 🤝 Contributing
+## 18 / Contributing
 
 Issues and feature suggestions are welcome, as are stories about applications built with Cyber AI Forge. Before submitting code or making a substantial design change, please read the [project documentation](docs/README.md) and the root [AGENTS.md](AGENTS.md).
