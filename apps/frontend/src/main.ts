@@ -34,7 +34,7 @@ watchEffect(() => {
   // 显式读取当前语言，保证静态和动态路由标题在切换后同步刷新浏览器标签。
   currentLocale.value
   const localizedTitle = router.currentRoute.value.meta.localizedTitle as LocalizedLabel | undefined
-  const pageTitle = localizedTitle ? resolveLocalizedLabel(localizedTitle) : appConfig.productLabel
+  const pageTitle = localizedTitle ? resolveLocalizedLabel(localizedTitle) : appConfig.fullName
   document.title = `${pageTitle} · ${appConfig.name}`
 })
 

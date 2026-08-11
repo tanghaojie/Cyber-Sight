@@ -2,7 +2,7 @@
 title: CYBER 品牌与视觉系统
 status: active
 owner: project maintainers
-updated: 2026-08-07
+updated: 2026-08-11
 ---
 
 # CYBER / Cyber AI Forge 品牌与视觉系统
@@ -26,7 +26,7 @@ updated: 2026-08-07
 - 中文主张：`让复杂系统清晰生长。`。
 - 创作者品牌：`JTLab / 桀士实验室`，只以明确标注 `CREATED BY` 的独立署名出现在登录页、README 作者信息等合适位置，不进入 CYBER Logo、侧栏、404 或工作台产品标识。
 
-部署可以继续通过 `VITE_APP_NAME`、`VITE_APP_FULL_NAME`、`VITE_APP_TAGLINE` 和 `VITE_APP_PRODUCT_LABEL` 覆盖文字；替换图形标志时需要同步替换品牌组件和 favicon，避免非 CYBER 名称继续使用 C 形产品标。
+部署可以继续通过 `VITE_APP_NAME`、`VITE_APP_FULL_NAME` 和 `VITE_APP_TAGLINE` 覆盖文字。`VITE_APP_TAGLINE` 在登录页签名中保持原文，在 Logo 下方的产品描述中转换为大写；没有路由专属标题时，浏览器标题使用 `VITE_APP_FULL_NAME`。替换图形标志时需要同步替换品牌组件和 favicon，避免非 CYBER 名称继续使用 C 形产品标。
 
 ## Logo 与视觉语言
 

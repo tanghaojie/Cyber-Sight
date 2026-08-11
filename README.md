@@ -387,7 +387,8 @@ CYBER 由 JTLab 维护；CYBER / Cyber AI Forge 是项目名称，JTLab 是创�
 - `VITE_APP_NAME`
 - `VITE_APP_FULL_NAME`
 - `VITE_APP_TAGLINE`
-- `VITE_APP_PRODUCT_LABEL`
+
+`VITE_APP_TAGLINE` 在登录页签名中保持原文，在 Logo 下方的产品描述中转换为大写；没有路由专属标题时，浏览器标题使用 `VITE_APP_FULL_NAME`。
 
 白标部署时，还应同步替换 `CyberLogo.vue` 和 `public/cyber-mark.svg`，避免产品名称与默认 C 形产品标不一致。
 

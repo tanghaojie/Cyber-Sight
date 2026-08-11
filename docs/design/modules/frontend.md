@@ -2,7 +2,7 @@
 title: 前端应用与应用壳
 status: active
 owner: maintainers
-updated: 2026-08-08
+updated: 2026-08-11
 ---
 
 # 前端应用与应用壳
@@ -73,7 +73,7 @@ cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie�
 `main.ts` 安装 localization 后再安装 Router；`App.vue` 通过 `LocalizationProvider.vue` 为
 Element Plus 提供当前语言包。登录页与 Header 共用 `LanguageSwitcher.vue`，语言切换立即
 更新固定文案、`<html lang>`、页面标题和本地日期格式，并写入 `cyber_ai_forge_locale:v1`。
-数据库与 API 契约不保存语言偏好。
+数据库与 API 契约不保存语言偏好。动态标题没有路由专属标题时使用 `appConfig.fullName` 与 `appConfig.name` 组合，Logo 下方的产品描述使用 `appConfig.tagline` 的大写形式，登录页签名使用原始 `appConfig.tagline`。
 
 `tag-view` 位于 Header 与主内容之间，历史标签可横向滚动，操作入口提供关闭当前、关闭其他和关闭全部。其版本化 `localStorage` 数据按 UUID 用户 ID 隔离；存储不可用或内容损坏时降级为内存状态，不影响 Router 导航。Header 用户下拉同时提供系统设置入口：该 Dialog 对设备级的导航菜单风格、主题颜色、深色模式、Tags View、侧栏 Logo 和动态标题设置逐项立即保存。导航菜单风格控制桌面导航布局；Tags View 控制标签栏可见性但不清空历史，并把应用主区的标签栏高度归零；侧栏 Logo 控制侧栏品牌区，移动抽屉在隐藏品牌时仍保留可访问的关闭按钮；动态标题打开时按当前路由与语言更新浏览器标题，关闭时始终显示 `appConfig.name`。主题颜色和深色模式会立即控制应用根。具体边界见[系统设置模块](settings.md)。
 

@@ -46,6 +46,8 @@
 
 - 2026-08-11：[动态根路由解析修复](plans/2026-08-11-dynamic-root-route.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-11-dynamic-root-route.md)。
+- 2026-08-11：[前端品牌文字配置收敛](plans/2026-08-11-frontend-brand-text-config.md)及其
+  [AI 协作记录](ai-logs/2026/08/2026-08-11-frontend-brand-text-config.md)。
 - 2026-08-11：[ADR 日期命名归档审查](plans/2026-08-11-adr-filename-archive-review.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-11-adr-filename-archive-review.md)。
 - 2026-08-11：[ADR 日期命名规则](plans/2026-08-11-adr-filename-convention.md)及其

@@ -11,10 +11,6 @@ export const appConfig = Object.freeze({
     import.meta.env.VITE_APP_TAGLINE,
     'AI-Native Enterprise Application Scaffold',
   ),
-  productLabel: configuredValue(
-    import.meta.env.VITE_APP_PRODUCT_LABEL,
-    'AI-NATIVE ENTERPRISE APPLICATION SCAFFOLD',
-  ),
   githubUrl: 'https://github.com/tanghaojie/cyber-scaffold',
   creatorName: 'JTLab',
   creatorFullName: '桀士实验室',

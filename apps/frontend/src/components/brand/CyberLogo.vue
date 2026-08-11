@@ -19,7 +19,7 @@
     </svg>
     <span v-if="!iconOnly" class="cyber-logo__wordmark">
       <strong>{{ appConfig.name }}</strong>
-      <small v-if="showDescriptor">{{ appConfig.productLabel }}</small>
+      <small v-if="showDescriptor">{{ appConfig.tagline.toUpperCase() }}</small>
     </span>
   </span>
 </template>
