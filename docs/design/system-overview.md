@@ -2,12 +2,12 @@
 title: 系统概览
 status: accepted
 owner: project maintainers
-updated: 2026-08-10
+updated: 2026-08-11
 ---
 
 # 系统概览
 
-CYBER（正式名称 `Cyber AI Forge`）是用于快速生成企业应用模块的 pnpm 全栈脚手架，不是某个具体业务系统。它以 `AI-Native Enterprise Application Scaffold` 为英文副标题，以 `AI 驱动的企业应用智能构建平台` 为中文副标题，通过运行时契约、模块边界、后端与契约自动化测试、前端人工验收边界和文档门禁，让人和 AI 在明确约束内持续扩展。产品与创作者品牌边界遵循 [CYBER 品牌与视觉系统](branding.md)、[ADR-0028](../decisions/ADR-0028-product-and-creator-brand-separation.md) 和 [ADR-0031](../decisions/ADR-0031-cyber-ai-forge-brand.md)。
+Cyber-Sight 是基于 Cyber AI Forge 工程基线持续演进的 pnpm 全栈业务应用。它通过运行时契约、模块边界、后端与契约自动化测试、前端人工验收边界和文档门禁，让人和 AI 在明确约束内持续扩展产品能力。用户可见品牌遵循 [Cyber-Sight 品牌与视觉系统](branding.md)；`cyber-ai-forge` 包、JWT 和浏览器存储标识作为兼容层保留。仓库关系和同步边界见 [Cyber AI Forge 上游同步](upstream-synchronization.md)与[下游身份 ADR](../decisions/ADR-20260811-cyber-sight-downstream-identity.md)。
 
 ## 初始版本基线
 
@@ -26,10 +26,10 @@ NestJS 11 + Fastify 5 adapter + Drizzle
 
 - `apps/frontend`：Vue Router、Pinia、Tailwind CSS、Element Plus 和响应式管理端。
 - `apps/backend`：NestJS 服务、Fastify adapter、认证、管理 API、Drizzle 仓储和数据库迁移。
-- `apps/website`：独立 Vite + Vue 3 中英文静态推广站，通过 GitHub Actions 发布到 GitHub Pages，不依赖管理端运行时或后端。
+- `apps/website`：独立 Vite + Vue 3 Cyber-Sight 中英文静态推广站，通过 GitHub Actions 发布到 GitHub Pages，不依赖管理端运行时或后端。
 - `packages/api-contract`：HTTP Zod Schema、推导类型与适配器无关的 JSON Schema 转换。
 
-现有业务包括健康检查、会话认证、接口日志、工作台、用户、角色、部门、岗位、数据库动态菜单和字典。脚手架自带的 17 张 PostgreSQL 表统一使用 `sys_` 物理前缀、UUIDv7 主键、软删除及五项生命周期审计字段；当前单一 `0000` 初始迁移只面向全新 PostgreSQL 18 数据库，后续 Schema 通过追加迁移演进。
+当前系统基线包括健康检查、会话认证、接口日志、工作台、用户、角色、部门、岗位、数据库动态菜单和字典；Cyber-Sight 独立业务能力后续进入 `src/modules/biz/**`。继承的 17 张 PostgreSQL 系统表统一使用 `sys_` 物理前缀、UUIDv7 主键、软删除及五项生命周期审计字段；当前单一 `0000` 初始迁移只面向全新 PostgreSQL 18 数据库，后续 Schema 通过追加迁移演进。
 
 ## 不可绕过的边界
 

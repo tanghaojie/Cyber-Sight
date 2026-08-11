@@ -58,6 +58,6 @@ date: 2026-08-07
 
 ## 相关设计和计划
 
-- [CYBER 品牌与视觉系统](../design/branding.md)
-- [Cyber AI Forge 品牌与项目标识改名](../archive/plans/2026-08-07-cyber-ai-forge-renaming.md)
-- [Cyber AI Forge workspace 包作用域迁移](../archive/plans/2026-08-10-cyber-ai-forge-package-scope.md)
+- [当前品牌与视觉系统](../../design/branding.md)
+- [Cyber AI Forge 品牌与项目标识改名](../plans/2026-08-07-cyber-ai-forge-renaming.md)
+- [Cyber AI Forge workspace 包作用域迁移](../plans/2026-08-10-cyber-ai-forge-package-scope.md)

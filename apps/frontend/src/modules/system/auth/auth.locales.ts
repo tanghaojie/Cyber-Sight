@@ -2,9 +2,9 @@ import { defineLocalizationResource } from '@/shared/localization/localization.r
 
 export const localizationResource = defineLocalizationResource('auth', {
   'zh-CN': {
-    'brand.ariaLabel': 'CYBER 品牌介绍',
-    'brand.githubLabel': '在 GitHub 查看 Cyber AI Forge',
-    'manifesto.kicker': 'AI 驱动的企业应用智能构建平台',
+    'brand.ariaLabel': 'Cyber-Sight 品牌介绍',
+    'brand.githubLabel': '在 GitHub 查看 Cyber-Sight',
+    'manifesto.kicker': '基于 Cyber AI Forge 构建的 AI 原生业务应用',
     'manifesto.lineOne': '让复杂系统，',
     'manifesto.lineTwo': '清晰生长。',
     'manifesto.description':
@@ -36,9 +36,9 @@ export const localizationResource = defineLocalizationResource('auth', {
     'errors.connectionFailed': '无法连接到服务，请检查后端是否已启动',
   },
   'en-US': {
-    'brand.ariaLabel': 'About the CYBER brand',
-    'brand.githubLabel': 'View Cyber AI Forge on GitHub',
-    'manifesto.kicker': 'AI-Native Enterprise Application Scaffold',
+    'brand.ariaLabel': 'About the Cyber-Sight brand',
+    'brand.githubLabel': 'View Cyber-Sight on GitHub',
+    'manifesto.kicker': 'AI-NATIVE BUSINESS APPLICATION · BUILT ON CYBER AI FORGE',
     'manifesto.lineOne': 'Make complexity',
     'manifesto.lineTwo': 'grow clearly.',
     'manifesto.description':

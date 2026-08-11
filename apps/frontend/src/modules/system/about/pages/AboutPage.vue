@@ -50,7 +50,7 @@
           <div class="blueprint-visual__orbit blueprint-visual__orbit--two"><i /></div>
           <div class="blueprint-visual__core">
             <CyberLogo tone="light" icon-only />
-            <span>CYBER</span>
+            <span>CYBER-SIGHT</span>
           </div>
           <div class="blueprint-visual__node blueprint-visual__node--one"><i />01</div>
           <div class="blueprint-visual__node blueprint-visual__node--two"><i />02</div>

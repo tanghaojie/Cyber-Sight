@@ -100,14 +100,14 @@ export interface SiteContent {
   }
 }
 
-export const GITHUB_URL = 'https://github.com/tanghaojie/Cyber-AI-Forge'
+export const GITHUB_URL = 'https://github.com/tanghaojie/Cyber-Sight'
 
 export const content: Record<Locale, SiteContent> = {
   en: {
     meta: {
-      title: 'Open-Source AI Development & Admin Scaffold | Cyber AI Forge',
+      title: 'AI-Native Business Application | Cyber-Sight',
       description:
-        'Open-source AI development and enterprise admin scaffold for Vue, NestJS, and PostgreSQL applications with auth, RBAC, users, roles, menus, and API logs.',
+        'Cyber-Sight is an AI-native business application built on Cyber AI Forge with Vue, NestJS, PostgreSQL, authentication, authorization, and admin foundations.',
     },
     skip: 'Skip to main content',
     header: {
@@ -122,30 +122,30 @@ export const content: Record<Locale, SiteContent> = {
       github: 'GitHub',
     },
     hero: {
-      eyebrow: 'OPEN SOURCE / AI DEVELOPMENT / ADMIN READY',
-      titleTop: 'OPEN-SOURCE AI',
-      titleBottom: 'ADMIN SCAFFOLD.',
-      lead: 'A full-stack enterprise admin scaffold for AI-assisted development with authentication, RBAC, users, roles, menus, and API logs—without losing structure after the first demo.',
+      eyebrow: 'AI-NATIVE BUSINESS APPLICATION / BUILT ON CYBER AI FORGE',
+      titleTop: 'SEE THE SYSTEM.',
+      titleBottom: 'EVOLVE IT CLEARLY.',
+      lead: 'Cyber-Sight is a full-stack business application that inherits authentication, authorization, users, roles, menus, API logs, and clear engineering boundaries from Cyber AI Forge.',
       source: 'View source',
       explore: 'Explore the system',
       signal: 'SYSTEM ONLINE / READY TO EXTEND',
       stats: [
-        { value: '15', label: 'system tables' },
+        { value: '17', label: 'system tables' },
         { value: 'ZOD 4', label: 'runtime contracts' },
-        { value: '121', label: 'backend tests' },
+        { value: '140', label: 'backend tests' },
       ],
     },
     manifesto: {
-      label: '01 / WHY CYBER',
+      label: '01 / WHY CYBER-SIGHT',
       title: 'Generating code is easy. Keeping a system coherent is not.',
       lead: 'The hard part begins after the first prompt: modules drift, APIs diverge, decisions disappear, and every new conversation starts from zero.',
       directTitle: 'AI from zero',
       directText:
         'Fast first output. Context lives in chat. Foundations are rebuilt, boundaries are guessed, and the project becomes harder to continue.',
-      cyberTitle: 'AI with Cyber',
+      cyberTitle: 'AI with Cyber-Sight',
       cyberText:
-        'Start from a working full-stack foundation. Structure, contracts, documentation, and verification give every human and AI the same project truth.',
-      quote: 'Cyber does not replace AI. It gives AI a reliable place to work.',
+        'Build on the Cyber AI Forge foundation. Structure, contracts, documentation, and verification give every human and AI the same project truth.',
+      quote: 'Cyber-Sight gives AI a reliable product context and a structure worth keeping.',
     },
     showcase: {
       label: '02 / PRODUCT SURFACES',
@@ -201,7 +201,7 @@ export const content: Record<Locale, SiteContent> = {
     features: {
       label: '03 / CORE SYSTEM',
       title: 'Built for the work after “generate”.',
-      lead: 'Cyber turns a capable AI into a reliable project collaborator by making the engineering environment explicit.',
+      lead: 'Cyber-Sight turns a capable AI into a reliable project collaborator by making the engineering environment explicit.',
       items: [
         {
           code: 'STRUCTURE',
@@ -316,19 +316,19 @@ export const content: Record<Locale, SiteContent> = {
       ],
     },
     closing: {
-      label: 'OPEN SOURCE / READY TO FORGE',
-      title: 'Give your next AI-built system a structure worth keeping.',
-      lead: 'Start from a full-stack foundation designed for clear growth, shared truth, and continuous work.',
-      github: 'Explore Cyber AI Forge on GitHub',
+      label: 'CYBER-SIGHT / READY TO EVOLVE',
+      title: 'Build the next business capability on a structure worth keeping.',
+      lead: 'Cyber-Sight keeps growing on the full-stack foundation provided by Cyber AI Forge.',
+      github: 'Explore Cyber-Sight on GitHub',
       backTop: 'Back to top',
       creator: 'Created by JTLab / 桀士实验室',
     },
   },
   zh: {
     meta: {
-      title: 'AI开发脚手架与后台管理系统脚手架 | Cyber AI Forge',
+      title: 'AI 原生业务应用 | Cyber-Sight',
       description:
-        '开源 AI 开发脚手架与全栈后台管理系统脚手架，内置登录、用户、角色、权限、菜单、字典和接口日志，支持 Vue 3、NestJS 与 PostgreSQL。',
+        'Cyber-Sight 是基于 Cyber AI Forge 构建的 AI 原生业务应用，采用 Vue 3、NestJS 与 PostgreSQL，并继承认证、授权和管理基础能力。',
     },
     skip: '跳到主要内容',
     header: {
@@ -343,30 +343,30 @@ export const content: Record<Locale, SiteContent> = {
       github: 'GitHub',
     },
     hero: {
-      eyebrow: '开源 / AI 开发 / 后台管理基础',
-      titleTop: '开源 AI 开发',
-      titleBottom: '后台管理脚手架。',
-      lead: '面向 AI 辅助开发的全栈后台管理系统脚手架，内置登录、用户、角色、权限、菜单、字典和接口日志，帮助人类与 AI 持续构建真实企业应用。',
+      eyebrow: 'AI 原生业务应用 / 基于 CYBER AI FORGE 构建',
+      titleTop: '看清系统脉络，',
+      titleBottom: '持续清晰演进。',
+      lead: 'Cyber-Sight 是基于 Cyber AI Forge 构建的全栈业务应用，继承登录、用户、角色、权限、菜单、字典、接口日志和清晰的工程边界。',
       source: '查看源码',
       explore: '探索技术体系',
       signal: '系统在线 / 已准备扩展',
       stats: [
-        { value: '15', label: '张系统数据表' },
+        { value: '17', label: '张系统数据表' },
         { value: 'ZOD 4', label: '运行时契约' },
-        { value: '121', label: '项后端测试' },
+        { value: '140', label: '项后端测试' },
       ],
     },
     manifesto: {
-      label: '01 / 为什么是 CYBER',
+      label: '01 / 为什么是 CYBER-SIGHT',
       title: '生成代码很容易，让系统始终保持清晰并不容易。',
       lead: '真正困难的工作从第一次提示词之后开始：模块逐渐失控、接口彼此偏离、决策遗失，每个新对话又从零理解项目。',
       directTitle: '让 AI 从零搭建',
       directText:
         '第一版很快，上下文却留在聊天里。基础能力反复重建，边界依赖猜测，项目越做越难继续。',
-      cyberTitle: '让 AI 基于 Cyber 构建',
+      cyberTitle: '让 AI 基于 Cyber-Sight 构建',
       cyberText:
-        '从可运行的全栈基础开始。结构、契约、文档与验证让每个人和每个 AI 共享同一份项目事实。',
-      quote: 'Cyber 不替代 AI，它为 AI 提供一个可靠的工作环境。',
+        '在 Cyber AI Forge 工程基线上持续建设。结构、契约、文档与验证让每个人和每个 AI 共享同一份项目事实。',
+      quote: 'Cyber-Sight 为 AI 提供清楚的产品上下文和一套值得保留的工程结构。',
     },
     showcase: {
       label: '02 / 产品界面',
@@ -416,7 +416,7 @@ export const content: Record<Locale, SiteContent> = {
     features: {
       label: '03 / 核心体系',
       title: '为“生成之后”的长期工作而设计。',
-      lead: 'Cyber 把工程环境变得明确，让能力很强的 AI 成为更可靠的项目协作者。',
+      lead: 'Cyber-Sight 把工程环境变得明确，让能力很强的 AI 成为更可靠的项目协作者。',
       items: [
         {
           code: '结构',
@@ -525,10 +525,10 @@ export const content: Record<Locale, SiteContent> = {
       ],
     },
     closing: {
-      label: '开源 / 已准备锻造',
-      title: '为下一个 AI 构建的系统，准备一套值得保留的结构。',
-      lead: '从为清晰生长、共享事实和持续协作设计的全栈基础开始。',
-      github: '在 GitHub 探索 Cyber AI Forge',
+      label: 'CYBER-SIGHT / 已准备演进',
+      title: '在值得保留的结构上，继续建设下一项业务能力。',
+      lead: 'Cyber-Sight 在 Cyber AI Forge 提供的全栈工程基线上持续生长。',
+      github: '在 GitHub 探索 Cyber-Sight',
       backTop: '回到顶部',
       creator: '由 JTLab / 桀士实验室创作',
     },

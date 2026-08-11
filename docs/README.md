@@ -43,6 +43,11 @@ docs/
 
 当前设计始终描述“现在怎样工作”。当前 ADR 只解释仍有效的长期取舍。计划和日志不复制正式结论，任务结束后与历史过程一起归档。详细规则见[分层文档与历史归档](design/documentation-governance.md)。
 
+## 人类维护指南
+
+- [人类维护者开发指南](guides/human-maintainer-development-guide.md)：启动、模块、契约、数据库、测试和交付流程。
+- [Cyber AI Forge 上游同步指南](guides/upstream-sync.md)：双远端安全配置、同步分支、冲突所有权和验证步骤。
+
 ## 强制规则与命名
 
 根目录 [AGENTS.md](../AGENTS.md) 定义 Git 暂存区门禁、文档门禁、归档步骤和 AI 提交标记。

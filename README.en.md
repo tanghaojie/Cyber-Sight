@@ -1,11 +1,13 @@
 <p align="center">
-  <img src="./apps/frontend/public/cyber-mark.svg" alt="CYBER Logo" width="96" />
+  <img src="./apps/frontend/public/cyber-mark.svg" alt="Cyber-Sight Logo" width="96" />
 </p>
 
-<h1 align="center">Cyber AI Forge</h1>
+<h1 align="center">Cyber-Sight</h1>
 
 <p align="center">
-  <a href="https://tanghaojie.github.io/Cyber-AI-Forge/">Project Website</a>
+  <a href="https://tanghaojie.github.io/Cyber-Sight/">Project Website</a>
+  ·
+  <a href="https://github.com/tanghaojie/Cyber-AI-Forge">Cyber AI Forge Upstream</a>
   ·
   <a href="./README.md">中文</a>
   ·
@@ -13,18 +15,19 @@
 </p>
 
 <p align="center">
-  AI-Native Enterprise Application Scaffold
+  AI-Native Business Application
 </p>
 
-> Ordinary scaffolds help people write code; Cyber AI Forge helps people and AI build enterprise applications together.
+> Keep business capabilities growing on a clear engineering foundation.
 
-**Cyber AI Forge** is a pnpm full-stack scaffold positioned as an `AI-Native Enterprise Application Scaffold`.
+**Cyber-Sight** is a full-stack application built on [Cyber AI Forge](https://github.com/tanghaojie/Cyber-AI-Forge) and prepared for independent business capabilities.
 
-It gives AI an understandable engineering structure, clear module boundaries, complete administration capabilities, and project documentation that serves both people and AI. Even if you can barely write code, you can describe your requirements and let AI gradually build a real, runnable application from the database and APIs to the user interface.
+It inherits an engineering structure, module boundaries, admin foundations, and project documentation designed for human–AI collaboration while keeping its product history in an independent repository. Cyber-Sight pushes to `origin` and fetches Cyber AI Forge updates through a fetch-only `upstream`.
 
-> Build clearly. Evolve safely. Let complex systems grow clearly.
+> Build clearly. Evolve safely. Let complex systems grow clearly.  
+> Built on Cyber AI Forge.
 
-## <img src="./apps/website/src/assets/readme-icons/context.svg" alt="" width="20" height="20" /> 01 / Why Cyber AI Forge
+## <img src="./apps/website/src/assets/readme-icons/context.svg" alt="" width="20" height="20" /> 01 / The Cyber-Sight Engineering Baseline
 
 AI can already generate large amounts of code, but “can generate code” does not mean “can continuously complete a project.” Without clear structure and rules, AI can easily run into these problems:
 
@@ -34,9 +37,11 @@ AI can already generate large amounts of code, but “can generate code” does 
 - Causing frontend and backend APIs and data structures to fall out of sync
 - Producing only a one-off demo that cannot continue to evolve
 
-Cyber AI Forge was created to give people and AI an enterprise application engineering foundation they can understand, use, and evolve together.
+Cyber AI Forge gives Cyber-Sight an enterprise application engineering foundation that people and AI can understand, use, and evolve together. Product capabilities belong in `src/modules/biz/**`; reusable scaffold enhancements should land in Cyber AI Forge first and enter this repository through upstream synchronization.
 
 ## <img src="./apps/website/src/assets/readme-icons/highlights.svg" alt="" width="20" height="20" /> 02 / Core Highlights
+
+The following engineering capabilities are inherited from Cyber AI Forge and form the system baseline for Cyber-Sight business development.
 
 ### 02.1 / An engineering structure organized for AI
 
@@ -65,7 +70,7 @@ People are responsible for expressing ideas, describing requirements, and judgin
 
 For example, you can tell AI:
 
-> I want to build a household expense tracking system with user login, bill categories, income and expense records, monthly statistics, and administrator features. Please implement this application based on Cyber AI Forge.
+> I want to build a household expense tracking system with user login, bill categories, income and expense records, monthly statistics, and administrator features. Please implement it in Cyber-Sight.
 
 AI can then continue with database design, Schema definitions, backend routes, frontend pages, menu registration, permission integration, tests, and builds.
 
@@ -98,29 +103,29 @@ This allows AI and people to develop around the same interface facts and reduces
 The screenshots in this README come from the runnable administration console included in the repository. They cover the login entry point, workbench, user and menu management, role permissions, API logs, and system settings. They illustrate the current capabilities and do not represent a remote demo environment.
 
 <div align="center">
-  <img src="./apps/website/src/assets/screenshots/login.png" alt="Cyber AI Forge login page" width="49%" />
-  <img src="./apps/website/src/assets/screenshots/home.png" alt="Cyber AI Forge workbench" width="49%" />
+  <img src="./apps/website/src/assets/screenshots/login.png" alt="Cyber-Sight login page" width="49%" />
+  <img src="./apps/website/src/assets/screenshots/home.png" alt="Cyber-Sight workbench" width="49%" />
 </div>
 
 <div align="center">
-  <img src="./apps/website/src/assets/screenshots/users.png" alt="Cyber AI Forge user management" width="49%" />
-  <img src="./apps/website/src/assets/screenshots/menus.png" alt="Cyber AI Forge menu management" width="49%" />
+  <img src="./apps/website/src/assets/screenshots/users.png" alt="Cyber-Sight user management" width="49%" />
+  <img src="./apps/website/src/assets/screenshots/menus.png" alt="Cyber-Sight menu management" width="49%" />
 </div>
 
 <div align="center">
-  <img src="./apps/website/src/assets/screenshots/roles.png" alt="Cyber AI Forge role and data permissions" width="49%" />
-  <img src="./apps/website/src/assets/screenshots/api-logs.png" alt="Cyber AI Forge API logs" width="49%" />
+  <img src="./apps/website/src/assets/screenshots/roles.png" alt="Cyber-Sight role and data permissions" width="49%" />
+  <img src="./apps/website/src/assets/screenshots/api-logs.png" alt="Cyber-Sight API logs" width="49%" />
 </div>
 
 <div align="center">
-  <img src="./apps/website/src/assets/screenshots/settings.png" alt="Cyber AI Forge system settings" width="49%" />
+  <img src="./apps/website/src/assets/screenshots/settings.png" alt="Cyber-Sight system settings" width="49%" />
 </div>
 
 ## <img src="./apps/website/src/assets/readme-icons/people.svg" alt="" width="20" height="20" /> 04 / Who is it for?
 
 ### 04.1 / People who want to build applications with AI
 
-If you have an application idea but can barely write code, you can use Cyber AI Forge as AI’s workbench:
+If you have an application idea but can barely write code, you can use Cyber-Sight as AI’s workbench:
 
 1. Start the project
 2. Tell AI what you want to build in natural language
@@ -130,11 +135,11 @@ If you have an application idea but can barely write code, you can use Cyber AI 
 
 It is suitable for building personal tools, internal management systems, small SaaS products, operations consoles, and other applications that need login, permissions, a database, and administration pages.
 
-AI handles implementation; people remain responsible for expressing requirements, judging product direction, and accepting the results. Cyber AI Forge is not intended to remove people from the process, but to make building an enterprise application possible without first requiring people to become professional programmers.
+AI handles implementation; people remain responsible for expressing requirements, judging product direction, and accepting the results. Cyber-Sight keeps business ideas moving inside clear product and engineering boundaries.
 
 ### 04.2 / Professional developers
 
-If you are a developer, you can use Cyber AI Forge as a full-stack starting point for a real project:
+If you are a developer, you can use Cyber-Sight as a full-stack starting point for a real project:
 
 - Reuse system capabilities such as login, permissions, menus, users, and roles
 - Use shared API contracts to keep the frontend and backend consistent
@@ -153,13 +158,13 @@ If you are a developer, you can use Cyber AI Forge as a full-stack starting poin
 - Administration consoles for small SaaS products
 - Personal applications rapidly validated with AI
 
-If your application needs login, permissions, administration, and a database, Cyber AI Forge can be a reliable starting point.
+If your application needs login, permissions, administration, and a database, Cyber-Sight already provides a reliable starting point.
 
 ## <img src="./apps/website/src/assets/readme-icons/compare.svg" alt="" width="20" height="20" /> 06 / Why not let AI build everything from scratch?
 
 Of course, you can ask AI to build an application from an empty directory. The issue is not whether AI can generate the first version of the code, but whether the project can continue to be developed, maintained, and handed over reliably after that first version.
 
-| Comparison                     | Ask AI to build from scratch                                                              | Build with Cyber AI Forge                                                                       |
+| Comparison                     | Ask AI to build from scratch                                                              | Build in Cyber-Sight                                                                            |
 | ------------------------------ | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | Starting point                 | An empty directory and a single conversation                                              | A runnable full-stack foundation                                                                |
 | AI context                     | Mainly the current chat history                                                           | The project structure, design documents, and AI collaboration documents together                |
@@ -169,29 +174,29 @@ Of course, you can ask AI to build an application from an empty directory. The i
 | Continuous iteration           | New conversations can forget earlier decisions and the project can gradually lose control | Documents and engineering rules help different AIs or new conversations recover project context |
 | Final result                   | More likely to be a one-off demo                                                          | Better suited as the starting point for a maintainable, extensible real application             |
 
-So Cyber AI Forge does not replace AI; it provides AI with a more reliable working environment:
+So Cyber-Sight does not replace AI; it gives AI a more reliable product and engineering environment:
 
-> Asking AI to build from scratch solves “can we make a first version?” Cyber AI Forge solves “can we keep building it?”
+> Starting from scratch answers “can we make v1?” Cyber-Sight answers “can we keep building from the same product truth?”
 
-### 06.1 / The more complex the project, the clearer Cyber’s value
+### 06.1 / The more complex the project, the clearer Cyber-Sight’s value
 
-If you only want a one-off script, simple webpage, or short-term demo, asking AI to build from scratch is perfectly reasonable. Cyber AI Forge is designed to solve the collaboration and integration challenges that appear as enterprise applications grow.
+If you only want a one-off script, simple webpage, or short-term demo, asking AI to build from scratch is perfectly reasonable. Cyber-Sight focuses on the collaboration and integration challenges that appear as business applications grow.
 
 #### 06.1.1 / Build complex projects by module
 
-Complex applications usually need to split capabilities such as authentication, users, permissions, orders, customers, and reports into separate modules and build them in stages. Without unified module rules, different stages can easily create duplicate code, confused responsibilities, and unintended interactions. Cyber AI Forge provides module boundaries, public interfaces, and a fixed extension path so AI can build one module at a time while keeping the overall project structure stable.
+Complex applications usually need to split capabilities such as authentication, users, permissions, orders, customers, and reports into separate modules and build them in stages. Cyber-Sight inherits clear module boundaries, public interfaces, and extension paths so AI can build one module at a time while keeping the overall structure stable.
 
 #### 06.1.2 / Collaboration between people and multiple AIs
 
-When one person, multiple people, or even multiple AIs develop a project at the same time, everyone must share the same project facts: how directories are organized, how APIs are defined, how modules depend on one another, and how the result is verified. Cyber AI Forge records these rules in the engineering structure and project documentation, allowing different people and AIs to divide the work and finally deliver results that can be merged instead of generating mutually incompatible codebases.
+When one person, multiple people, or multiple AIs develop the project, everyone must share the same facts: how directories are organized, how APIs are defined, how modules depend on one another, and how results are verified. Cyber-Sight records these rules in its engineering structure and documentation so parallel work can be merged.
 
 #### 06.1.3 / Integrate multiple systems and business capabilities
 
-Integration projects do not only require new features. They must also combine login, permissions, databases, frontend pages, business modules, and external services that may be connected in the future. Cyber AI Forge provides a unified API contract, system modules, and documentation entry points to help AI understand how the pieces connect and reduce the problem of “each module works alone, but the combined system does not.”
+Integration projects do not only require new features. They must also combine login, permissions, databases, frontend pages, business modules, and future external services. Cyber-Sight uses a unified API contract, system modules, and documentation entry points so AI can understand how the pieces connect.
 
-You can think of Cyber AI Forge as an engineering blueprint that everyone and every AI can read:
+You can think of Cyber-Sight as an engineering blueprint that humans and AI can read and keep evolving on the Cyber AI Forge baseline:
 
-> AI can handle its own construction work; Cyber ensures that all construction follows the same blueprint and is ultimately combined into a system that can be used continuously.
+> AI can handle its own construction work; Cyber-Sight ensures that all construction follows the same blueprint and is ultimately combined into a system that can be used continuously.
 
 ## <img src="./apps/website/src/assets/readme-icons/guide.svg" alt="" width="20" height="20" /> 07 / If you are not technical, give this README to AI first
 
@@ -202,7 +207,7 @@ If you use an AI that can only chat, you can copy or upload this README directly
 Send the following message to AI, then add the application you want to build:
 
 ```text
-This is the README for the Cyber AI Forge project. Please read it completely first and treat me as someone who can barely write code.
+This is the README for the Cyber-Sight project. Please read it completely first and treat me as someone who can barely write code.
 
 The application I want to build is:
 (Describe your idea here in your own words. For example: I want to build a household expense tracking system.)
@@ -224,7 +229,7 @@ Please do not modify code yet. First complete the project introduction, environm
 AI will usually guide you through these stages:
 
 1. Check and prepare the development environment
-2. Start the foundational systems included with Cyber AI Forge
+2. Start the foundational systems included with Cyber-Sight
 3. Break your idea down into implementable features
 4. Design the database and page structure
 5. Implement features in stages and verify them in a browser
@@ -373,13 +378,16 @@ The [project documentation entry point](docs/README.md) contains current project
 - [Human maintainer development guide](docs/guides/human-maintainer-development-guide.md): directory responsibilities, runtime Schemas, Drizzle, backend tests, manual frontend acceptance, and database maintenance workflows
 - [System and module design](docs/design/README.md): current architecture, module boundaries, public interfaces, data flows, and verification strategies
 - [Database baseline rebuild guide](docs/guides/database-baseline-rebuild.md): creating a database, applying the baseline, verification, and rollback boundaries
+- [Cyber AI Forge upstream synchronization guide](docs/guides/upstream-sync.md): safety configuration, sync branches, conflict ownership, and verification
 - [Error code reference](docs/reference/error-codes.md): unified responses, error-code ranges, and the registration workflow
 
 The root `AGENTS.md` records the collaboration rules that AI must follow when modifying the project. Important design, implementation, and verification results will continue to be synchronized into project documentation rather than remaining only in chat history.
 
 ## <img src="./apps/website/src/assets/readme-icons/brand.svg" alt="" width="20" height="20" /> 15 / Branding and white-label configuration
 
-CYBER is maintained by JTLab. CYBER / Cyber AI Forge is the project name, and JTLab is the creator brand. The English subtitle is `AI-Native Enterprise Application Scaffold`; the Chinese subtitle is `AI 驱动的企业应用智能构建平台`. The frontend uses a brand system built from graphite black, warm white, mint green `#70CFA2`, and electric-purple nodes by default.
+Cyber-Sight is maintained by JTLab and built on Cyber AI Forge. Its formal name is `Cyber-Sight`, its interface wordmark is `CYBER-SIGHT`, its English subtitle is `AI-Native Business Application`, and its Chinese subtitle is `AI 原生业务应用`. The frontend continues to use graphite black, warm white, mint green `#70CFA2`, and electric-purple nodes.
+
+The root package name, `@cyber-ai-forge/*` workspace scope, JWT issuer/audience, and browser storage keys retain Cyber AI Forge technical identifiers for upstream and runtime compatibility. They are not missed product-brand replacements.
 
 Application text configuration is located in `apps/frontend/src/config/app.config.ts`. You can also copy `apps/frontend/.env.example` and override it per deployment environment with these variables:
 
@@ -387,6 +395,7 @@ Application text configuration is located in `apps/frontend/src/config/app.confi
 - `VITE_APP_FULL_NAME`
 - `VITE_APP_TAGLINE`
 - `VITE_APP_PRODUCT_LABEL`
+- `VITE_APP_GITHUB_URL`
 
 For a white-label deployment, also replace `CyberLogo.vue` and `public/cyber-mark.svg` so the product name stays consistent with the default C-shaped product mark.
 
@@ -404,10 +413,10 @@ These boundaries do not prevent the project from serving as a starting point for
 
 ## <img src="./apps/website/src/assets/readme-icons/vision.svg" alt="" width="20" height="20" /> 17 / Project Vision
 
-Cyber AI Forge aims to turn “building an enterprise application” from an ability reserved for professional developers into a creative process that ordinary people can complete with AI.
+Cyber-Sight aims to turn a business idea into a usable, maintainable, and extensible application on a reliable engineering foundation.
 
 People bring the ideas, and AI leads the implementation. The project structure and documentation keep AI on track, while clear engineering boundaries let an application grow from an idea into a genuinely usable, maintainable, and extensible system.
 
 ## <img src="./apps/website/src/assets/readme-icons/contribute.svg" alt="" width="20" height="20" /> 18 / Contributing
 
-Issues and feature suggestions are welcome, as are stories about applications built with Cyber AI Forge. Before submitting code or making a substantial design change, please read the [project documentation](docs/README.md) and the root [AGENTS.md](AGENTS.md).
+Use [Cyber-Sight Issues](https://github.com/tanghaojie/Cyber-Sight/issues) for product problems and business suggestions. Reusable scaffold enhancements should land in [Cyber AI Forge](https://github.com/tanghaojie/Cyber-AI-Forge) first and enter this repository through the [upstream synchronization guide](docs/guides/upstream-sync.md). Before submitting code or making a substantial design change, read the [project documentation](docs/README.md) and root [AGENTS.md](AGENTS.md).

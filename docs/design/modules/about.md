@@ -2,16 +2,16 @@
 title: 关于项目模块
 status: active
 owner: maintainers
-updated: 2026-08-07
+updated: 2026-08-11
 ---
 
 # 关于项目模块
 
 ## 定位与边界
 
-`about` 是脚手架内置的产品介绍页面，负责解释 Cyber AI Forge 的定位、工程蓝图、核心能力和技术基础，并提供项目 GitHub 入口。它只消费品牌配置、图标、固定本地化文案和静态视觉结构，不读取业务数据，也不承载 README 的完整说明、认证状态或后端 API。
+`about` 是系统内置的产品介绍页面，负责解释 Cyber-Sight 的下游产品身份、Cyber AI Forge 工程基线、核心能力和技术基础，并提供 Cyber-Sight GitHub 入口。它只消费品牌配置、图标、固定本地化文案和静态视觉结构，不读取业务数据，也不承载 README 的完整说明、认证状态或后端 API。
 
-页面放在 `apps/frontend/src/modules/system/about/`，因为它属于脚手架系统能力；后续具体产品的“关于我们”或企业资料应放在 `src/modules/biz/<module>/`，不能复用本模块承载业务内容。
+页面放在 `apps/frontend/src/modules/system/about/`，因为它属于应用壳系统能力；后续企业资料或具体业务介绍应放在 `src/modules/biz/<module>/`，不能复用本模块承载业务内容。
 
 ## 公共接口与路由
 
@@ -33,7 +33,7 @@ sys_menus(关于项目)
 
 ## 视觉与交互
 
-- Hero 使用深色 CYBER 视觉、网格、轨道、节点和渐进式入场动画，突出“工程蓝图”概念。
+- Hero 使用深色 Cyber-Sight 视觉、网格、轨道、节点和渐进式入场动画，突出“工程蓝图”概念。
 - 通过核心亮点、适用人群、典型场景和“从零搭建 vs 基于基座”的对比表，把 README 的产品价值转译成可扫读的展示面。
 - 通过五层架构流和前端、服务、数据三组技术栈卡片，明确 Vue 3/Vite、共享 Zod 运行时契约、NestJS/Fastify adapter/Drizzle 与 PostgreSQL 的协作关系。
 - 页面不追求复刻 README 全文；详细安装、开发约定和边界仍以仓库 README 与 `docs/` 为准。

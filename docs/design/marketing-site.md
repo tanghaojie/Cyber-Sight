@@ -1,15 +1,15 @@
 ---
-title: Cyber AI Forge 开源推广站
+title: Cyber-Sight 推广站
 status: accepted
 owner: project maintainers
-updated: 2026-08-10
+updated: 2026-08-11
 ---
 
-# Cyber AI Forge 开源推广站
+# Cyber-Sight 推广站
 
 ## 背景与目标
 
-Cyber AI Forge 需要一个部署到 GitHub Pages 的静态推广站，把仓库 README 中的定位、能力、界面预览、技术架构和启动方式组织成适合浏览与分享的单页体验。页面首先解释“为什么不是让 AI 从零搭建”，再用产品界面和工程结构建立可信度，最终引导访问 GitHub。
+Cyber-Sight 需要一个部署到 GitHub Pages 的静态推广站，把产品身份、继承的 Cyber AI Forge 工程基线、界面预览、技术架构和启动方式组织成适合浏览与分享的单页体验。页面首先说明 Cyber-Sight 是独立下游产品，再用产品界面和工程结构建立可信度，最终引导访问 Cyber-Sight GitHub 仓库。
 
 ## 范围与非目标
 
@@ -27,7 +27,7 @@ Cyber AI Forge 需要一个部署到 GitHub Pages 的静态推广站，把仓库
 ## 公共接口
 
 - 页面锚点：`#showcase`、`#features`、`#system`、`#start`。
-- GitHub 入口：`https://github.com/tanghaojie/Cyber-AI-Forge`。
+- GitHub 入口：`https://github.com/tanghaojie/Cyber-Sight`。
 - 语言 URL：根路径 `/` 提供英文版本，`/zh/` 提供简体中文版本；语言切换使用真实链接。
 - 语言切换位于 Header，以具备明确选中状态的紧凑分段控件呈现，不在 Footer 重复放置交互入口。
 
@@ -80,7 +80,7 @@ passive scroll event
 
 - 保持单一 Vue 源码和单一 `content.ts`，构建时生成 `/` 与 `/zh/` 两个静态 HTML，不维护两套页面逻辑。
 - 每个语言页面拥有独立的 `title`、description、canonical、Open Graph、Twitter Card 和 JSON-LD；页面互相通过 `hreflang` 与 Header 真实链接关联。
-- SEO 首屏明确覆盖 `AI development scaffold`、`admin dashboard scaffold`、`AI 开发脚手架`、`后台管理系统脚手架` 等产品意图词，并以自然正文解释认证、用户、角色、权限、菜单、日志和 Vue/NestJS/PostgreSQL 技术栈。
+- SEO 首屏使用 `Cyber-Sight`、`AI-native business application`、`AI 原生业务应用` 和 `built on Cyber AI Forge` 等准确定位，并以自然正文解释继承的认证、用户、角色、权限、菜单、日志和 Vue/NestJS/PostgreSQL 技术栈；不得把 Cyber-Sight 自称为可复用脚手架。
 - `robots.txt` 声明 sitemap，`sitemap.xml` 只列出可收录的语言规范 URL；分享图继续复用仓库内 SVG 资产，后续可根据社交平台抓取结果补充 PNG 版本。
 - 预渲染 HTML 是爬虫和无 JavaScript 客户端的内容基线，客户端 hydration 只负责交互增强，不负责首次生成主要文案。
 
@@ -99,9 +99,11 @@ passive scroll event
 
 2026-08-10 已完成中英文 SEO 增强：推广站保留单一 Vue 源码，构建时生成 `/` 与 `/zh/` 两个带完整预渲染正文的静态入口；两个入口均包含语言级 canonical、hreflang、Open Graph、Twitter Card、JSON-LD、robots 和 sitemap。首屏文案补充 AI 开发脚手架、后台管理脚手架及认证、权限、用户、角色、菜单、日志和技术栈语义。最终验证通过 website 生产构建、全仓 Lint、格式检查和文档归档 CI；Search Console 收录、排名和浏览器人工验收仍需发布后完成。
 
+2026-08-11 已把推广站当前产品身份迁移为 Cyber-Sight，并保留 `Built on Cyber AI Forge` 工程归属。中英文 title、description、canonical、hreflang、Open Graph、Twitter Card、JSON-LD、robots、sitemap、GitHub URL、图标标题和分享图均已同步；公开统计已按当前实现校准为 17 张系统数据表和 140 项后端测试。生产构建及生成 HTML 静态检查通过，浏览器视觉、交互和发布后收录仍由维护者人工验收。
+
 ## 兼容性与迁移
 
-推广站是新增应用，不改变管理端、后端、数据库或 API 契约。GitHub Pages 工作流首次启用后，仓库需要在 GitHub Pages 设置中选择 GitHub Actions 作为来源；删除工作流和站点应用即可回滚，不影响主系统。
+推广站不改变管理端、后端、数据库或 API 契约。GitHub Pages 使用 Cyber-Sight 仓库路径；仓库需要在 GitHub Pages 设置中选择 GitHub Actions 作为来源。删除工作流和站点应用即可回滚，不影响主系统。
 
 ## 未决问题
 

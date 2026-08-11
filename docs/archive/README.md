@@ -41,9 +41,12 @@
 | 分层文档和工程工作流 | ADR-0016、ADR-0021 至 ADR-0023 | [文档治理](../design/documentation-governance.md)、[开发工作流](../design/developer-workflow.md)与[验证策略](../design/testing-strategy.md) |
 | JWT 会话和 LRU 读缓存 | ADR-0019、ADR-0020 | [认证模块](../design/modules/auth.md) |
 | 文档归档触发协议 | ADR-0030 | [按任务范围触发文档归档审计](../decisions/ADR-0033-task-scoped-documentation-archive-audit.md) |
+| CYBER / Cyber AI Forge 品牌基线 | [ADR-0028](decisions/ADR-0028-product-and-creator-brand-separation.md)、[ADR-0031](decisions/ADR-0031-cyber-ai-forge-brand.md) | [Cyber-Sight 下游身份 ADR](../decisions/ADR-20260811-cyber-sight-downstream-identity.md)与[品牌设计](../design/branding.md)；旧 ADR 因下游产品身份取代而归档 |
 
 ## 完成计划与 AI 协作记录
 
+- 2026-08-11：[Cyber-Sight 下游品牌与上游同步治理](plans/2026-08-11-cyber-sight-downstream-brand-and-sync.md)及其
+  [AI 协作记录](ai-logs/2026/08/2026-08-11-cyber-sight-downstream-brand-and-sync.md)。
 - 2026-08-11：[ADR 日期命名归档审查](plans/2026-08-11-adr-filename-archive-review.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-11-adr-filename-archive-review.md)。
 - 2026-08-11：[ADR 日期命名规则](plans/2026-08-11-adr-filename-convention.md)及其

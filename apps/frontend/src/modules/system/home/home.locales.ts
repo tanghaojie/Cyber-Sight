@@ -3,7 +3,7 @@ import { defineLocalizationResource } from '@/shared/localization/localization.r
 export const localizationResource = defineLocalizationResource('home', {
   'zh-CN': {
     'overview.label': '工作台总览',
-    'hero.kicker': 'CYBER AI FORGE · 工作台简报',
+    'hero.kicker': 'CYBER-SIGHT · 工作台简报',
     'hero.lineOne': '让系统脉络可见，',
     'hero.lineTwo': '让每次变更有据可循。',
     'hero.description':
@@ -16,7 +16,7 @@ export const localizationResource = defineLocalizationResource('home', {
     'hero.stat.structure': '模块化结构',
     'hero.stat.contract': '共享运行时契约',
     'hero.stat.foundation': '管理基础能力',
-    'pillars.label': 'WHY CYBER',
+    'pillars.label': 'WHY CYBER-SIGHT',
     'pillars.title': '为持续建设而生',
     'pillars.structure.title': 'AI 找得到正确位置',
     'pillars.structure.description': '明确的模块边界和公共接口，让复杂项目可以拆开建设、合并交付。',
@@ -35,7 +35,7 @@ export const localizationResource = defineLocalizationResource('home', {
   },
   'en-US': {
     'overview.label': 'Dashboard overview',
-    'hero.kicker': 'CYBER AI FORGE · WORKSPACE BRIEF',
+    'hero.kicker': 'CYBER-SIGHT · WORKSPACE BRIEF',
     'hero.lineOne': 'Make the system visible.',
     'hero.lineTwo': 'Make every change traceable.',
     'hero.description':
@@ -48,7 +48,7 @@ export const localizationResource = defineLocalizationResource('home', {
     'hero.stat.structure': 'MODULAR STRUCTURE',
     'hero.stat.contract': 'SHARED RUNTIME CONTRACT',
     'hero.stat.foundation': 'ADMIN FOUNDATIONS',
-    'pillars.label': 'WHY CYBER',
+    'pillars.label': 'WHY CYBER-SIGHT',
     'pillars.title': 'Built for the next change',
     'pillars.structure.title': 'AI can find the right place',
     'pillars.structure.description':

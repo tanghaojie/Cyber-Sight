@@ -1,11 +1,13 @@
 <p align="center">
-  <img src="./apps/frontend/public/cyber-mark.svg" alt="CYBER Logo" width="96" />
+  <img src="./apps/frontend/public/cyber-mark.svg" alt="Cyber-Sight Logo" width="96" />
 </p>
 
-<h1 align="center">Cyber AI Forge</h1>
+<h1 align="center">Cyber-Sight</h1>
 
 <p align="center">
-  <a href="https://tanghaojie.github.io/Cyber-AI-Forge/">Project Website</a>
+  <a href="https://tanghaojie.github.io/Cyber-Sight/">Project Website</a>
+  ·
+  <a href="https://github.com/tanghaojie/Cyber-AI-Forge">Cyber AI Forge Upstream</a>
   ·
   <a href="./README.en.md">English</a>
   ·
@@ -13,19 +15,20 @@
 </p>
 
 <p align="center">
-  AI-Native Enterprise Application Scaffold<br />
-  AI 驱动的企业应用智能构建平台
+  AI-Native Business Application<br />
+  AI 原生业务应用
 </p>
 
-> 普通脚手架帮助人类写代码，Cyber AI Forge 帮助人类和 AI 一起构建企业应用。
+> 在清晰的工程基线上，让业务能力持续生长。
 
-**Cyber AI Forge** 是一个以 `AI-Native Enterprise Application Scaffold` 为定位的 pnpm 全栈脚手架。
+**Cyber-Sight** 是一个基于 [Cyber AI Forge](https://github.com/tanghaojie/Cyber-AI-Forge) 构建、准备持续增加独立业务能力的全栈应用。
 
-它为 AI 准备了可理解的工程结构、清晰的模块边界、完整的后台基础能力，以及同时服务人类和 AI 的项目文档。即使几乎不会写代码，普通人也可以通过描述需求，让 AI 从数据库、接口到页面，逐步构建真实可运行的应用。
+它继承了适合人类与 AI 协作的工程结构、模块边界、后台基础能力和项目文档，并通过独立仓库持续演进产品能力。Cyber-Sight 使用 `origin` 保存自己的业务历史，通过只读 `upstream` 获取 Cyber AI Forge 更新。
 
-> Build clearly. Evolve safely. 让复杂系统清晰生长。
+> Build clearly. Evolve safely. 让复杂系统清晰生长。  
+> Built on Cyber AI Forge. 基于 Cyber AI Forge 构建。
 
-## <img src="./apps/website/src/assets/readme-icons/context.svg" alt="" width="20" height="20" /> 01 / 为什么需要 Cyber AI Forge
+## <img src="./apps/website/src/assets/readme-icons/context.svg" alt="" width="20" height="20" /> 01 / Cyber-Sight 的工程基线
 
 AI 已经可以生成大量代码，但“能生成代码”不等于“能持续完成一个项目”。当项目缺少清晰的结构和规则时，AI 很容易遇到这些问题：
 
@@ -35,9 +38,11 @@ AI 已经可以生成大量代码，但“能生成代码”不等于“能持�
 - 让前后端接口和数据结构失去同步
 - 只能生成一次性的 Demo，无法持续演进
 
-Cyber AI Forge 的初衷，就是为人类和 AI 提供一个可以共同理解、共同使用、共同演进的企业应用工程基础。
+Cyber AI Forge 为 Cyber-Sight 提供人类和 AI 可以共同理解、共同使用、共同演进的企业应用工程基础。后续产品业务进入 `src/modules/biz/**`，通用脚手架增强优先回到 Cyber AI Forge，再通过上游同步进入本仓库。
 
 ## <img src="./apps/website/src/assets/readme-icons/highlights.svg" alt="" width="20" height="20" /> 02 / 核心亮点
+
+以下工程能力继承自 Cyber AI Forge，并作为 Cyber-Sight 后续业务开发的系统基线。
 
 ### 02.1 / 为 AI 理解而组织的工程结构
 
@@ -66,7 +71,7 @@ Cyber AI Forge 不只提供给人类看的开发文档，也维护面向 AI 协�
 
 例如，你可以告诉 AI：
 
-> 我想做一个家庭记账系统，需要用户登录、账单分类、收入支出记录、月度统计和管理员功能。请基于 Cyber AI Forge 实现这个应用。
+> 我想做一个家庭记账系统，需要用户登录、账单分类、收入支出记录、月度统计和管理员功能。请在 Cyber-Sight 中实现这个应用。
 
 AI 可以继续完成数据库设计、Schema 定义、后端路由、前端页面、菜单注册、权限接入、测试和构建。
 
@@ -99,29 +104,29 @@ AI 可以继续完成数据库设计、Schema 定义、后端路由、前端页�
 README 中展示的截图来自仓库内可运行的管理端界面，覆盖登录入口、工作台、用户与菜单管理、角色权限、接口日志和系统设置。截图仅用于说明当前能力，不代表接入了远程演示环境。
 
 <div align="center">
-  <img src="./apps/website/src/assets/screenshots/login.png" alt="Cyber AI Forge 登录页" width="49%" />
-  <img src="./apps/website/src/assets/screenshots/home.png" alt="Cyber AI Forge 工作台" width="49%" />
+  <img src="./apps/website/src/assets/screenshots/login.png" alt="Cyber-Sight 登录页" width="49%" />
+  <img src="./apps/website/src/assets/screenshots/home.png" alt="Cyber-Sight 工作台" width="49%" />
 </div>
 
 <div align="center">
-  <img src="./apps/website/src/assets/screenshots/users.png" alt="Cyber AI Forge 用户管理" width="49%" />
-  <img src="./apps/website/src/assets/screenshots/menus.png" alt="Cyber AI Forge 菜单管理" width="49%" />
+  <img src="./apps/website/src/assets/screenshots/users.png" alt="Cyber-Sight 用户管理" width="49%" />
+  <img src="./apps/website/src/assets/screenshots/menus.png" alt="Cyber-Sight 菜单管理" width="49%" />
 </div>
 
 <div align="center">
-  <img src="./apps/website/src/assets/screenshots/roles.png" alt="Cyber AI Forge 角色管理与数据权限" width="49%" />
-  <img src="./apps/website/src/assets/screenshots/api-logs.png" alt="Cyber AI Forge 接口日志" width="49%" />
+  <img src="./apps/website/src/assets/screenshots/roles.png" alt="Cyber-Sight 角色管理与数据权限" width="49%" />
+  <img src="./apps/website/src/assets/screenshots/api-logs.png" alt="Cyber-Sight 接口日志" width="49%" />
 </div>
 
 <div align="center">
-  <img src="./apps/website/src/assets/screenshots/settings.png" alt="Cyber AI Forge 系统设置" width="49%" />
+  <img src="./apps/website/src/assets/screenshots/settings.png" alt="Cyber-Sight 系统设置" width="49%" />
 </div>
 
 ## <img src="./apps/website/src/assets/readme-icons/people.svg" alt="" width="20" height="20" /> 04 / 适合谁使用
 
 ### 04.1 / 想通过 AI 做应用的普通人
 
-如果你有一个应用想法，但几乎不会写代码，可以把 Cyber AI Forge 当作 AI 的工作台：
+如果你有一个应用想法，但几乎不会写代码，可以把 Cyber-Sight 当作 AI 的工作台：
 
 1. 启动项目
 2. 用自然语言告诉 AI 你想做什么
@@ -131,11 +136,11 @@ README 中展示的截图来自仓库内可运行的管理端界面，覆盖登�
 
 它适合用来构建个人工具、内部管理系统、小型 SaaS、运营后台和其他需要登录、权限、数据库与管理页面的应用。
 
-AI 负责实现，人类仍然负责表达需求、判断产品方向和验收结果。Cyber AI Forge 的目标不是让人类失去参与，而是让“做一个企业应用”不再要求人类先成为专业程序员。
+AI 负责实现，人类仍然负责表达需求、判断产品方向和验收结果。Cyber-Sight 的目标不是让人类失去参与，而是让业务想法可以在清晰工程边界中持续落地。
 
 ### 04.2 / 专业开发者
 
-如果你是开发者，可以把 Cyber AI Forge 作为真实项目的全栈起点：
+如果你是开发者，可以把 Cyber-Sight 作为真实项目的全栈起点：
 
 - 直接复用登录、权限、菜单、用户和角色等系统能力
 - 使用共享 API 契约保持前后端一致
@@ -154,13 +159,13 @@ AI 负责实现，人类仍然负责表达需求、判断产品方向和验收�
 - 小型 SaaS 产品的管理端
 - 通过 AI 快速验证的个人应用
 
-如果你的应用需要登录、权限、后台管理和数据库，Cyber AI Forge 可以作为一个可靠的起点。
+如果你的应用需要登录、权限、后台管理和数据库，Cyber-Sight 已经提供一个可靠的起点。
 
 ## <img src="./apps/website/src/assets/readme-icons/compare.svg" alt="" width="20" height="20" /> 06 / 为什么不直接让 AI 从零搭建
 
 当然可以直接让 AI 从一个空目录开始搭建应用。问题不在于 AI 能不能生成第一版代码，而在于这个项目能不能在第一版之后继续稳定地开发、维护和交接。
 
-| 对比维度    | 直接让 AI 从零搭建                             | 基于 Cyber AI Forge 开发                         |
+| 对比维度    | 直接让 AI 从零搭建                             | 在 Cyber-Sight 中开发                            |
 | ----------- | ---------------------------------------------- | ------------------------------------------------ |
 | 开始方式    | 从空目录和一次对话开始                         | 从可运行的全栈基础开始                           |
 | AI 的上下文 | 主要依赖当前聊天记录                           | 项目结构、设计文档和 AI 协作文档共同提供上下文   |
@@ -170,29 +175,29 @@ AI 负责实现，人类仍然负责表达需求、判断产品方向和验收�
 | 持续迭代    | 新对话容易遗忘之前的决定，项目逐渐失控         | 文档和工程规则帮助不同 AI 或新对话恢复项目上下文 |
 | 最终结果    | 更容易得到一次性的 Demo                        | 更适合作为可维护、可扩展的真实应用起点           |
 
-所以，Cyber AI Forge 并不是替代 AI，而是为 AI 提供一个更可靠的工作环境：
+所以，Cyber-Sight 并不是替代 AI，而是为 AI 提供一个更可靠的产品与工程环境：
 
-> 直接让 AI 搭建，解决的是“能不能做出第一版”；Cyber AI Forge 解决的是“能不能一直做下去”。
+> 直接让 AI 搭建，解决的是“能不能做出第一版”；Cyber-Sight 解决的是“能不能沿着同一套产品事实继续做下去”。
 
-### 06.1 / 项目越复杂，Cyber 的价值越明显
+### 06.1 / 项目越复杂，Cyber-Sight 的价值越明显
 
-如果你只是想做一个一次性脚本、简单网页或短期 Demo，直接让 AI 从零搭建完全可以。Cyber AI Forge 真正解决的是企业应用不断变大之后的协作和整合问题。
+如果你只是想做一个一次性脚本、简单网页或短期 Demo，直接让 AI 从零搭建完全可以。Cyber-Sight 关注的是业务应用不断变大之后的协作和整合问题。
 
 #### 06.1.1 / 按模块建设复杂项目
 
-复杂应用通常需要把认证、用户、权限、订单、客户、报表等能力拆开，分阶段建设。没有统一的模块规则时，不同阶段很容易出现重复代码、职责混乱和互相影响；Cyber AI Forge 提供模块边界、公共接口和固定的扩展路径，让 AI 可以一次建设一个模块，同时保持整个项目结构稳定。
+复杂应用通常需要把认证、用户、权限、订单、客户、报表等能力拆开，分阶段建设。没有统一的模块规则时，不同阶段很容易出现重复代码、职责混乱和互相影响；Cyber-Sight 继承了明确的模块边界、公共接口和扩展路径，让 AI 可以一次建设一个模块，同时保持整个项目结构稳定。
 
 #### 06.1.2 / 多人和多 AI 协同工作
 
-当一个人、多人，甚至多个 AI 同时开发项目时，大家必须共享同一套项目事实：目录怎么组织、接口怎么定义、模块之间怎么依赖、完成后如何验证。Cyber AI Forge 把这些规则沉淀在工程结构和项目文档中，让不同的人和 AI 可以分工工作，最后交付能够合并的结果，而不是各自生成一套互不兼容的代码。
+当一个人、多人，甚至多个 AI 同时开发项目时，大家必须共享同一套项目事实：目录怎么组织、接口怎么定义、模块之间怎么依赖、完成后如何验证。Cyber-Sight 把这些规则沉淀在工程结构和项目文档中，让不同的人和 AI 可以分工工作，最后交付能够合并的结果，而不是各自生成一套互不兼容的代码。
 
 #### 06.1.3 / 整合多个系统和业务能力
 
-整合型项目不仅要写新功能，还要把登录、权限、数据库、前端页面、业务模块以及未来可能接入的外部服务组合起来。Cyber AI Forge 提供统一的 API 契约、系统模块和文档入口，帮助 AI 理解各部分如何连接，减少“每个模块单独能运行，合在一起却无法工作”的问题。
+整合型项目不仅要写新功能，还要把登录、权限、数据库、前端页面、业务模块以及未来可能接入的外部服务组合起来。Cyber-Sight 使用统一的 API 契约、系统模块和文档入口，帮助 AI 理解各部分如何连接，减少“每个模块单独能运行，合在一起却无法工作”的问题。
 
-可以把 Cyber AI Forge 理解成一张所有人和 AI 都能读懂的工程蓝图：
+可以把 Cyber-Sight 理解成一张所有人和 AI 都能读懂、并在 Cyber AI Forge 基线上持续演进的工程蓝图：
 
-> AI 可以负责各自的施工，Cyber 负责让所有施工遵循同一套图纸，最后组合成一个可以持续使用的系统。
+> AI 可以负责各自的施工，Cyber-Sight 负责让所有施工遵循同一套图纸，最后组合成一个可以持续使用的系统。
 
 ## <img src="./apps/website/src/assets/readme-icons/guide.svg" alt="" width="20" height="20" /> 07 / 如果你不懂技术，先把这份 README 交给 AI
 
@@ -203,7 +208,7 @@ AI 负责实现，人类仍然负责表达需求、判断产品方向和验收�
 把下面这段话发给 AI，然后补充你想做的应用：
 
 ```text
-这是 Cyber AI Forge 项目的 README，请先完整阅读它，并把我当作一个几乎不会写代码的人。
+这是 Cyber-Sight 项目的 README，请先完整阅读它，并把我当作一个几乎不会写代码的人。
 
 我想做的应用是：
 （在这里用自己的话描述想法，例如：我想做一个家庭记账系统。）
@@ -225,7 +230,7 @@ AI 负责实现，人类仍然负责表达需求、判断产品方向和验收�
 通常，AI 会带你依次完成：
 
 1. 检查并准备运行环境
-2. 启动 Cyber AI Forge 自带的基础系统
+2. 启动 Cyber-Sight 自带的基础系统
 3. 把你的想法拆成可以实现的功能
 4. 设计数据库和页面结构
 5. 分阶段实现功能并在浏览器中验收
@@ -374,13 +379,16 @@ pnpm test:db       # 检查 PostgreSQL、系统表和迁移记录
 - [人类维护者开发指南](docs/guides/human-maintainer-development-guide.md)：目录职责、运行时 Schema、Drizzle、后端测试、前端人工验收和数据库维护流程
 - [系统与模块设计](docs/design/README.md)：当前架构、模块边界、公共接口、数据流和验证策略
 - [数据库基线重建指南](docs/guides/database-baseline-rebuild.md)：新建数据库、执行基线、验证与回滚边界
+- [Cyber AI Forge 上游同步指南](docs/guides/upstream-sync.md)：安全配置、同步分支、冲突所有权和验证流程
 - [错误码参考](docs/reference/error-codes.md)：统一响应、错误码区间和登记流程
 
 项目根目录的 `AGENTS.md` 记录 AI 修改项目时必须遵守的协作规则。重要的设计、实施和验证结果会继续同步到项目文档，而不是只留在聊天记录中。
 
 ## <img src="./apps/website/src/assets/readme-icons/brand.svg" alt="" width="20" height="20" /> 15 / 品牌与白标配置
 
-CYBER 由 JTLab 维护；CYBER / Cyber AI Forge 是项目名称，JTLab 是创作者品牌。英文副标题为 `AI-Native Enterprise Application Scaffold`，中文副标题为 `AI 驱动的企业应用智能构建平台`。前端默认使用石墨黑、暖白、薄荷绿 `#70CFA2` 和电紫节点构成的品牌系统。
+Cyber-Sight 由 JTLab 维护，并基于 Cyber AI Forge 构建。正式名称为 `Cyber-Sight`，界面短名称为 `CYBER-SIGHT`；英文副标题为 `AI-Native Business Application`，中文副标题为 `AI 原生业务应用`。前端继续使用石墨黑、暖白、薄荷绿 `#70CFA2` 和电紫节点构成的品牌系统。
+
+根包名、`@cyber-ai-forge/*` workspace 作用域、JWT issuer/audience 和浏览器存储键继续保留 Cyber AI Forge 技术标识，以维持上游同步和运行时兼容；它们不是产品品牌遗漏。
 
 应用文字配置位于 `apps/frontend/src/config/app.config.ts`。也可以复制 `apps/frontend/.env.example`，通过以下变量按部署环境覆盖：
 
@@ -388,6 +396,7 @@ CYBER 由 JTLab 维护；CYBER / Cyber AI Forge 是项目名称，JTLab 是创�
 - `VITE_APP_FULL_NAME`
 - `VITE_APP_TAGLINE`
 - `VITE_APP_PRODUCT_LABEL`
+- `VITE_APP_GITHUB_URL`
 
 白标部署时，还应同步替换 `CyberLogo.vue` 和 `public/cyber-mark.svg`，避免产品名称与默认 C 形产品标不一致。
 
@@ -405,10 +414,10 @@ CYBER 由 JTLab 维护；CYBER / Cyber AI Forge 是项目名称，JTLab 是创�
 
 ## <img src="./apps/website/src/assets/readme-icons/vision.svg" alt="" width="20" height="20" /> 17 / 项目愿景
 
-Cyber AI Forge 希望让“做一个企业应用”从专业开发者的专属能力，变成普通人可以借助 AI 完成的创造过程。
+Cyber-Sight 希望在可靠的工程基线上，把一个业务想法持续建设为真正可用、可维护、可扩展的应用。
 
 人类提出想法，AI 主力实现；项目结构和文档让 AI 不迷路；清晰的工程边界让应用可以从一个想法，逐步成长为真正可用、可维护、可扩展的系统。
 
 ## <img src="./apps/website/src/assets/readme-icons/contribute.svg" alt="" width="20" height="20" /> 18 / 参与项目
 
-欢迎通过 Issue 反馈问题、提出功能建议，或分享你使用 Cyber AI Forge 构建的应用。提交代码或较大的设计变更前，请先阅读 [项目文档](docs/README.md) 和根目录的 [AGENTS.md](AGENTS.md)。
+欢迎通过 [Cyber-Sight Issues](https://github.com/tanghaojie/Cyber-Sight/issues) 反馈产品问题和业务建议。可复用于其他项目的脚手架增强应优先提交到 [Cyber AI Forge](https://github.com/tanghaojie/Cyber-AI-Forge)，再按[上游同步指南](docs/guides/upstream-sync.md)进入本仓库。提交代码或较大的设计变更前，请先阅读[项目文档](docs/README.md)和根目录的 [AGENTS.md](AGENTS.md)。

@@ -2,7 +2,7 @@
 title: 认证模块
 status: active
 owner: maintainers
-updated: 2026-08-10
+updated: 2026-08-11
 ---
 
 # 认证模块
@@ -31,11 +31,11 @@ updated: 2026-08-10
 
 `pages/LoginPage.vue` 只负责桌面双栏与窄屏单栏的页面组装，不承载认证状态或品牌展示细节。其同目录私有组件不属于 auth 模块的公共接口：
 
-- `pages/components/LoginPresentation.vue` 负责左侧 CYBER 品牌、AI 驱动的企业应用智能构建平台主张、三项工程支柱、创作者署名和纯展示性的全息背景。背景使用主题语义令牌构造透视网格、悬浮几何体、轨道与数据节点；它不读取认证状态、不发起请求，也不改变文案键。
+- `pages/components/LoginPresentation.vue` 负责左侧 Cyber-Sight 品牌、AI 原生业务应用与 Cyber AI Forge 工程基线说明、三项工程支柱、创作者署名和纯展示性的全息背景。背景使用主题语义令牌构造透视网格、悬浮几何体、轨道与数据节点；它不读取认证状态、不发起请求，也不改变文案键。
 - `pages/components/LoginInteraction.vue` 负责右侧语言切换、工作台访问环境提示、凭据输入、错误提示、提交状态、本地开发账号提示和登录后的 redirect 恢复。它通过 `useAuthStore().login()` 执行既有认证流程，成功后仍替换到路由 query 中的 `redirect` 或首页。
 - `pages/components/LoginAppearanceControls.vue` 是 `LoginInteraction` 使用的私有视觉偏好入口，消费 settings 模块登记的 Store、主题元数据和本地化键；它只更新设备级深色模式与主题颜色，不读取认证状态，也不改变登录流程。
 
-登录页桌面展示区和窄屏交互区都将 CYBER Logo 作为 GitHub 项目入口，复用 `appConfig.githubUrl` 并以新窗口安全属性打开；该外链不参与登录、redirect 或会话流程。
+登录页桌面展示区和窄屏交互区都将 Cyber-Sight Logo 作为 GitHub 项目入口，复用 `appConfig.githubUrl` 并以新窗口安全属性打开；该外链不参与登录、redirect 或会话流程。
 
 登录页的固定展示文案从 `auth.locales.ts` 提供，首屏明确说明模块边界、共享契约和持续演进三个价值支柱；窄屏隐藏左侧展示区，在交互区保留产品标识、访问环境和创作者署名。展示动画仅使用组件内 CSS，不新增运行时依赖或网络资源；`prefers-reduced-motion: reduce` 时停止连续动画，保留静态空间层次和可读内容。
 
@@ -47,9 +47,9 @@ updated: 2026-08-10
 
 `sys_auth_sessions.token_hash` 全表唯一并保留软删除与审计字段。过期或撤销记录仍是历史安全标识，不重新使用；后续可增加独立清理策略，但清理不能改变仍有效 token 的鉴权语义。
 
-登录页的品牌氛围、表单表面、光晕和 CYBER Logo 强调色消费全局语义主题令牌，并响应设备级主题颜色和深色模式；认证逻辑、凭据与会话数据不依赖主题设置。
+登录页的品牌氛围、表单表面、光晕和 Cyber-Sight Logo 强调色消费全局语义主题令牌，并响应设备级主题颜色和深色模式；认证逻辑、凭据与会话数据不依赖主题设置。
 
-2026-08-07 品牌切换同时更换 JWT issuer/audience 和访问令牌键；旧品牌下签发的令牌不再通过校验，已有用户需要重新登录。该兼容性边界只影响会话，不迁移或删除账号、授权和业务数据。具体命名基线见 ADR-0031。
+2026-08-07 Cyber AI Forge 品牌切换曾同时更换 JWT issuer/audience 和访问令牌键；旧品牌下签发的令牌不再通过校验，已有用户需要重新登录。2026-08-11 Cyber-Sight 下游品牌迁移明确保留这些技术标识，因此本次迁移不会再次使现有会话失效。当前命名与兼容性边界见 [Cyber-Sight 下游身份 ADR](../../decisions/ADR-20260811-cyber-sight-downstream-identity.md)。
 
 认证提供当前身份和角色展示信息。`CurrentUser.roles` 中的每项包含内部关联用的角色 ID 与展示用角色名称；认证接口和前端不传递角色编码，顶部栏按角色 ID 的稳定顺序展示全部角色名称。认证不把功能权限或数据策略写入 JWT。业务路由由 authorization 插件在认证后从 Provider 重新解析权限，因此角色权限和数据策略修改可在下一请求生效；认证缓存中的角色快照不是授权判断来源。
 

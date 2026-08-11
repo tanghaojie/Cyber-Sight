@@ -5,7 +5,8 @@
 ## 系统级
 
 - [系统概览](system-overview.md)：定位、技术链路、当前能力和已知缺口。
-- [CYBER 品牌与视觉系统](branding.md)：Cyber AI Forge 产品与创作者品牌边界、Logo、视觉语言和品牌化技术标识。
+- [Cyber-Sight 品牌与视觉系统](branding.md)：下游产品、Cyber AI Forge 工程基线与创作者品牌边界。
+- [Cyber AI Forge 上游同步](upstream-synchronization.md)：双远端安全配置、文件所有权、同步步骤和验证边界。
 - [开源推广站](marketing-site.md)：GitHub Pages 静态站边界、双语内容、滚动三维展示、视觉系统与部署验证。
 - [模块边界](module-boundaries.md)：独立目录、公共文件、依赖和数据所有权；新模块或跨模块改动必读。
 - [分层文档与历史归档](documentation-governance.md)：最小阅读协议和文档生命周期；文档治理任务必读。

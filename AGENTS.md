@@ -111,6 +111,15 @@
 - 禁止写入密码、令牌、个人隐私、生产数据或其他敏感信息。
 - 聊天中确认的长期决定必须同步到设计文档或 ADR；AI 日志不能代替正式设计。
 
+## Cyber AI Forge 上游同步协议
+
+- Cyber-Sight 是独立下游产品仓库。`origin` 必须指向 `tanghaojie/Cyber-Sight`，`upstream` 只用于获取 `tanghaojie/Cyber-AI-Forge` 更新；AI 只有在用户明确要求检查或同步上游时才能执行该流程，不得在普通业务任务中顺带更新。
+- 开始同步前除执行本文件规定的暂存区门禁外，还必须确认工作区为空、`master` 跟踪 `origin/master`、默认 push remote 为 `origin`，且 `upstream` push URL 为故意无效的 `DISABLED`。任一条件不满足时先修复本地安全配置或报告维护者，不得继续合并。
+- 同步使用 `git fetch upstream --prune`、专用 `sync/forge-YYYY-MM-DD` 分支和保留父提交的 `git merge --no-ff upstream/master`。禁止 `git pull upstream master`、`--allow-unrelated-histories`、整批 squash/cherry-pick、已发布默认分支 rebase 或 force push。
+- `README.md`、`README.en.md`、产品品牌、公开 URL、推广站、`src/modules/biz/**` 和 `docs/design/upstream-synchronization.md` 由 Cyber-Sight 拥有；冲突时保留下游产品事实并人工移植适用的上游内容。未定制系统模块和通用脚手架修复优先采用上游实现。
+- `AGENTS.md`、共享构建、锁文件、契约、迁移、组装点和现行 Design/ADR 必须逐项审查，禁止机械选择 ours/theirs。可复用修复应优先进入 Cyber AI Forge，再同步到 Cyber-Sight。
+- 同步完成后执行适用的完整验证并记录上游 SHA、冲突选择、验证结果和人工验收边界。详细人类步骤见 `docs/guides/upstream-sync.md`，长期设计见 `docs/design/upstream-synchronization.md`。
+
 ## 完成标准
 
 交付非简单改动前，AI 必须确认：代码、契约、适用的自动化测试或人工验收边界、设计、计划和 AI 协作记录彼此一致，并在允许 AI 执行的验证通过后创建带有真实模型名称 trailer 的 Git 提交。无法完成其中一项时，要明确说明原因和后续动作，不能静默跳过。

@@ -24,9 +24,9 @@ export interface AppDependencies extends Partial<Omit<RuntimeDependencies, 'jwtS
 
 function registerSwagger(app: NestFastifyApplication): void {
   const config = new DocumentBuilder()
-    .setTitle('Cyber AI Forge API')
+    .setTitle('Cyber-Sight API')
     .setVersion('0.1.0')
-    .setDescription('CYBER management scaffold — runtime-safe, modular, and AI-native')
+    .setDescription('Cyber-Sight business application — built on Cyber AI Forge')
     .addBearerAuth(undefined, 'bearerAuth')
     .addSecurityRequirements('bearerAuth')
     .build()

@@ -3,7 +3,7 @@ import { createSSRApp } from 'vue'
 import App from './App.vue'
 import { content, GITHUB_URL, type Locale } from './content'
 
-const SITE_ORIGIN = 'https://tanghaojie.github.io/Cyber-AI-Forge'
+const SITE_ORIGIN = 'https://tanghaojie.github.io/Cyber-Sight'
 
 export function getPageUrl(locale: Locale): string {
   return `${SITE_ORIGIN}${locale === 'zh' ? '/zh/' : '/'}`
@@ -23,15 +23,15 @@ export function getSeoData(locale: Locale) {
       '@graph': [
         {
           '@type': 'WebSite',
-          name: 'Cyber AI Forge',
+          name: 'Cyber-Sight',
           url: pageUrl,
           inLanguage: isChinese ? 'zh-CN' : 'en',
         },
         {
           '@type': 'SoftwareApplication',
-          name: 'Cyber AI Forge',
+          name: 'Cyber-Sight',
           description: content[locale].meta.description,
-          applicationCategory: 'DeveloperApplication',
+          applicationCategory: 'BusinessApplication',
           operatingSystem: 'Cross-platform',
           url: pageUrl,
           codeRepository: GITHUB_URL,

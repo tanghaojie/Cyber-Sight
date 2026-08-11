@@ -58,6 +58,12 @@ pnpm dev
 
 本地 `.env` 被 Git 忽略，禁止把真实密码复制到 README、设计文档、测试或提交记录中。
 
+### 3.3 获取 Cyber AI Forge 更新
+
+Cyber-Sight 的 `origin` 是产品仓库，`upstream` 是只获取更新的 Cyber AI Forge 工程基线。不要在普通业务开发中顺带拉取上游，也不要执行 `git push upstream`。每个 clone 先完成默认推送和 fetch-only 安全配置，再使用独立 `sync/forge-YYYY-MM-DD` 分支检查、合并和验证更新。
+
+完整命令、文件所有权和冲突处理见 [Cyber AI Forge 上游同步指南](upstream-sync.md)。
+
 ## 4. 目录和模块职责
 
 ### 4.1 仓库根目录

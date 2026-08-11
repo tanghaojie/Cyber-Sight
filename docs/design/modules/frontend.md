@@ -68,7 +68,7 @@ cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie�
 
 `view-registry.ts` 通过两个 `import.meta.glob` 模式扫描 `@/modules/system/**/registerViews.ts` 与 `@/modules/biz/**/registerViews.ts`，自动发现两个分类下的登记模块。登记 key 必须符合小写字母开头的 kebab-case 约束且全局唯一；页面标签使用 `{ key?, fallback }` 描述，供菜单编辑器按当前语言解析，未提供或找不到翻译 key 时保留回退文案。缺少 `registerViews()`、非法 key 或重复 key 会在注册表构建时失败。
 
-默认产品品牌为 `CYBER / Cyber AI Forge`，英文副标题为 `AI-Native Enterprise Application Scaffold`，中文副标题为 `AI 驱动的企业应用智能构建平台`。`components/brand/CyberLogo.vue` 以可缩放 SVG 实现连续双层 C 和数据节点，供登录页、侧栏和 404 复用；`public/cyber-mark.svg` 提供 favicon。`CreatorCredit.vue` 只在登录页以当前语言的创作者标签展示 JTLab / 桀士实验室，不进入产品 Logo 或应用壳。完整边界见[CYBER 品牌与视觉系统](../branding.md)。
+默认产品品牌为 `CYBER-SIGHT / Cyber-Sight`，英文副标题为 `AI-Native Business Application`，中文副标题为 `AI 原生业务应用`。`components/brand/CyberLogo.vue` 以可缩放 SVG 实现连续双层 C 和数据节点，供登录页、侧栏和 404 复用；`public/cyber-mark.svg` 提供 favicon。`CreatorCredit.vue` 只在登录页以当前语言的创作者标签展示 JTLab / 桀士实验室，不进入产品 Logo 或应用壳。workspace、JWT 和浏览器存储继续使用 Cyber AI Forge 兼容标识。完整边界见[Cyber-Sight 品牌与视觉系统](../branding.md)。
 
 `main.ts` 安装 localization 后再安装 Router；`App.vue` 通过 `LocalizationProvider.vue` 为
 Element Plus 提供当前语言包。登录页与 Header 共用 `LanguageSwitcher.vue`，语言切换立即

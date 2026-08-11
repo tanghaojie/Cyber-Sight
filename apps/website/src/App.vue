@@ -181,9 +181,9 @@ onBeforeUnmount(function () {
 
   <header class="site-header" :class="{ 'is-scrolled': headerScrolled, 'is-open': mobileMenuOpen }">
     <div class="header-inner">
-      <a class="brand-lockup" href="#top" aria-label="Cyber AI Forge home" @click="closeMobileMenu">
+      <a class="brand-lockup" href="#top" aria-label="Cyber-Sight home" @click="closeMobileMenu">
         <img :src="`${publicAssetPrefix}cyber-mark.svg`" alt="" width="42" height="42" />
-        <span><strong>CYBER</strong><small>AI FORGE</small></span>
+        <span><strong>CYBER</strong><small>SIGHT</small></span>
       </a>
 
       <nav class="desktop-nav" :aria-label="t.header.menuLabel">
@@ -296,7 +296,7 @@ onBeforeUnmount(function () {
 
         <div class="hero-status reveal">
           <span><i></i>{{ t.hero.signal }}</span
-          ><b>CYBER / 0.1.0</b>
+          ><b>CYBER-SIGHT / 0.1.0</b>
         </div>
       </div>
 
@@ -580,7 +580,7 @@ onBeforeUnmount(function () {
     <div class="container footer-inner">
       <div class="brand-lockup">
         <img :src="`${publicAssetPrefix}cyber-mark.svg`" alt="" width="42" height="42" /><span
-          ><strong>CYBER</strong><small>AI FORGE</small></span
+          ><strong>CYBER</strong><small>SIGHT</small></span
         >
       </div>
       <p>{{ t.closing.creator }}</p>
