@@ -25,8 +25,6 @@
 
 > Build clearly. Evolve safely. 让复杂系统清晰生长。
 
-Cyber AI Forge 由 JTLab（桀士实验室）设计与维护。JTLab 是创作者品牌，不是产品名称。
-
 ## 💡 为什么需要 Cyber AI Forge
 
 AI 已经可以生成大量代码，但“能生成代码”不等于“能持续完成一个项目”。当项目缺少清晰的结构和规则时，AI 很容易遇到这些问题：
