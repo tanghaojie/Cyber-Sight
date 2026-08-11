@@ -31,6 +31,9 @@ export function dynamicLandingRoute(): RouteLocationRaw | undefined {
 
 function normalizePath(path: string): string {
   // 清理重复斜杠，同时保留相对路径和绝对路径的区别。
+  if (path === '/') {
+    return '/'
+  }
   if (!path.includes('/')) {
     return path
   }
