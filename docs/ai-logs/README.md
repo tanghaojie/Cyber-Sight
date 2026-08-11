@@ -4,7 +4,7 @@
 
 ## 进行中
 
-- [Cyber AI Forge 上游归档审查](2026/08/2026-08-11-cyber-sight-upstream-archive-review.md)
+当前没有进行中的 AI 协作记录。
 
 ## 生命周期
 

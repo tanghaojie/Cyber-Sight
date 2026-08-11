@@ -1,7 +1,7 @@
 ---
 title: Cyber AI Forge 上游归档审查
 type: documentation-archive-review
-status: active
+status: completed
 created: 2026-08-11
 updated: 2026-08-11
 scope: repository
@@ -26,10 +26,22 @@ baseline_commit: 314552225362e7343779ef121b6893a502990a9f
 
 ## 待完成任务
 
-- [ ] 检查当前代码、Design、ADR、README、归档索引和相对链接。
-- [ ] 运行格式、Lint、测试、构建和文档归档 CI。
-- [ ] 记录上游提交、冲突处理、验证结果和人工验收边界。
-- [ ] 完成审查计划与 AI 记录并移入归档目录。
+- [x] 检查当前代码、Design、ADR、README、归档索引和相对链接。
+- [x] 运行格式、Lint、测试、构建和文档归档 CI。
+- [x] 记录上游提交、冲突处理、验证结果和人工验收边界。
+- [x] 完成审查计划与 AI 记录并移入归档目录。
+
+## 验证结果
+
+- 已合并 `upstream/master` 的 `40ab229`，合并提交为 `9834562`，父提交为 Cyber-Sight `3145522` 与 Forge `40ab229`。
+- `pnpm format:check`、`pnpm lint`、`pnpm test`（140 项）和 `pnpm build` 均通过；构建仅有既有 Sass、Rollup 注释和大 chunk 警告。
+- `pnpm docs:archive:check:ci` 在活动审查期间返回 `IN_PROGRESS`，断链已清零；归档计划、AI 记录和台账更新后应恢复 `NOT_DUE`。
+- 前端视觉、登录签名、Logo 文案、动态标题和 GitHub Pages 行为仍需维护者人工验收。
+
+## 实际偏差和遗留问题
+
+- 用户选择保留 Cyber-Sight 的 `SIGHT`/`Cyber Sight`、多域智能平台 tagline 和 7777/7000 端口，同时吸收 Forge 的 tagline 单变量配置与动态标题逻辑。
+- Forge 删除根目录未使用的 `.env.example` 已随同步合并保留。
 
 ## 非目标
 
@@ -41,4 +53,4 @@ baseline_commit: 314552225362e7343779ef121b6893a502990a9f
 
 - [上游同步设计](../../design/upstream-synchronization.md)
 - [上游同步指南](../../guides/upstream-sync.md)
-- [AI 协作记录](../../ai-logs/2026/08/2026-08-11-cyber-sight-upstream-archive-review.md)
+- [AI 协作记录](../ai-logs/2026/08/2026-08-11-cyber-sight-upstream-archive-review.md)

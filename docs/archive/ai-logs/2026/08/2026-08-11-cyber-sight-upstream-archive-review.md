@@ -1,7 +1,7 @@
 ---
 title: Cyber AI Forge 上游归档审查
 date: 2026-08-11
-status: active
+status: completed
 ---
 
 # Cyber AI Forge 上游归档审查
@@ -25,9 +25,17 @@ status: active
 
 ## 当前改动和未决事项
 
-已补正 README 环境变量清单和现行 ADR 索引；待运行完整验证、完成归档审查、创建合并提交、快进本地 `master` 并推送 `origin/master`。
+已补正 README 环境变量清单和现行 ADR 索引。格式、Lint、140 项测试和完整构建通过；合并提交 `9834562` 已保留 Cyber-Sight `3145522` 与 Forge `40ab229` 两个父提交。归档计划、AI 记录和台账已更新，待快进本地 `master` 并推送 `origin/master`。
+
+## 最终验证
+
+- `pnpm format:check` 通过。
+- `pnpm lint` 通过。
+- `pnpm test` 通过：16 个测试文件、140 项测试。
+- `pnpm build` 通过；仅有既有 Sass、Rollup 注释和大 chunk 警告。
+- 活动审查期间 `pnpm docs:archive:check:ci` 返回 `IN_PROGRESS` 且无断链；归档完成后复跑。
 
 ## 相关计划
 
-- [上游归档审查计划](../../../plans/active/2026-08-11-cyber-sight-upstream-archive-review.md)
-- [上游同步设计](../../../design/upstream-synchronization.md)
+- [上游归档审查计划](../../../plans/2026-08-11-cyber-sight-upstream-archive-review.md)
+- [上游同步设计](../../../../design/upstream-synchronization.md)

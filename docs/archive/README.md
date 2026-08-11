@@ -45,6 +45,8 @@
 
 ## 完成计划与 AI 协作记录
 
+- 2026-08-11：[Cyber AI Forge 上游归档审查](plans/2026-08-11-cyber-sight-upstream-archive-review.md)及其
+  [AI 协作记录](ai-logs/2026/08/2026-08-11-cyber-sight-upstream-archive-review.md)。
 - 2026-08-11：[Cyber-Sight 下游品牌与上游同步治理](plans/2026-08-11-cyber-sight-downstream-brand-and-sync.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-11-cyber-sight-downstream-brand-and-sync.md)。
 - 2026-08-11：[动态根路由解析修复](plans/2026-08-11-dynamic-root-route.md)及其
