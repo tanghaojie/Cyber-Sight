@@ -394,8 +394,9 @@ Application text configuration is located in `apps/frontend/src/config/app.confi
 - `VITE_APP_NAME`
 - `VITE_APP_FULL_NAME`
 - `VITE_APP_TAGLINE`
-- `VITE_APP_PRODUCT_LABEL`
 - `VITE_APP_GITHUB_URL`
+
+`VITE_APP_TAGLINE` is shown as-is in the login signature and uppercased below the Logo; when a route has no dedicated title, the browser title uses `VITE_APP_FULL_NAME`.
 
 For a white-label deployment, also replace `CyberLogo.vue` and `public/cyber-mark.svg` so the product name stays consistent with the default C-shaped product mark.
 

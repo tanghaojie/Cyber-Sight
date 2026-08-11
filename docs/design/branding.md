@@ -29,7 +29,7 @@ Cyber-Sight 是以 Cyber AI Forge 为工程基线持续演进的独立产品仓�
 - 工程基线署名：`Built on Cyber AI Forge` / `基于 Cyber AI Forge 构建`。
 - 创作者品牌：`JTLab / 桀士实验室`，只以明确标注 `CREATED BY` 的独立署名出现在登录页、README 作者信息等合适位置，不进入 Cyber-Sight Logo、侧栏、404 或工作台产品标识。
 
-部署可以继续通过 `VITE_APP_NAME`、`VITE_APP_FULL_NAME`、`VITE_APP_TAGLINE`、`VITE_APP_PRODUCT_LABEL` 和 `VITE_APP_GITHUB_URL` 覆盖文字与仓库入口；替换图形标志时需要同步替换品牌组件和 favicon。Cyber-Sight 仍以 C 开头，可以继续使用现有 C 形标志。
+部署可以继续通过 `VITE_APP_NAME`、`VITE_APP_FULL_NAME`、`VITE_APP_TAGLINE` 和 `VITE_APP_GITHUB_URL` 覆盖文字与仓库入口；替换图形标志时需要同步替换品牌组件和 favicon。Cyber-Sight 仍以 C 开头，可以继续使用现有 C 形标志。
 
 ## Logo 与视觉语言
 

@@ -395,8 +395,9 @@ Cyber-Sight 由 JTLab 维护，并基于 Cyber AI Forge 构建。正式名称为
 - `VITE_APP_NAME`
 - `VITE_APP_FULL_NAME`
 - `VITE_APP_TAGLINE`
-- `VITE_APP_PRODUCT_LABEL`
 - `VITE_APP_GITHUB_URL`
+
+`VITE_APP_TAGLINE` 在登录页签名中保持原文，在 Logo 下方的产品描述中转换为大写；没有路由专属标题时，浏览器标题使用 `VITE_APP_FULL_NAME`。
 
 白标部署时，还应同步替换 `CyberLogo.vue` 和 `public/cyber-mark.svg`，避免产品名称与默认 C 形产品标不一致。
 

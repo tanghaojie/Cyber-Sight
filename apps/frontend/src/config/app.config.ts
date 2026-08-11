@@ -8,10 +8,6 @@ export const appConfig = Object.freeze({
   name: configuredValue(import.meta.env.VITE_APP_NAME, 'CYBER-SIGHT'),
   fullName: configuredValue(import.meta.env.VITE_APP_FULL_NAME, 'Cyber-Sight'),
   tagline: configuredValue(import.meta.env.VITE_APP_TAGLINE, 'AI-Native Business Application'),
-  productLabel: configuredValue(
-    import.meta.env.VITE_APP_PRODUCT_LABEL,
-    'AI-NATIVE BUSINESS APPLICATION',
-  ),
   githubUrl: configuredValue(
     import.meta.env.VITE_APP_GITHUB_URL,
     'https://github.com/tanghaojie/Cyber-Sight',

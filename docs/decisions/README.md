@@ -11,6 +11,7 @@
 - [ADR-0027](ADR-0027-system-and-business-module-classification.md)：前后端模块按 `system` 与 `biz` 分类，公共契约路径保持稳定。
 - [ADR-0029](ADR-0029-frontend-runtime-localization.md)：使用独立前端模块提供运行时中英文切换，以模块资源和严格默认菜单指纹保护用户录入数据。
 - [ADR-0033](ADR-0033-task-scoped-documentation-archive-audit.md)：按任务范围触发归档审计，并以合并前检查作为跨 AI 的共享兜底协议；取代已归档的 ADR-0030。
+- [ADR-20260811-frontend-brand-text-config](ADR-20260811-frontend-brand-text-config.md)：收敛前端品牌文字配置，使用 `VITE_APP_TAGLINE` 同时驱动登录签名和 Logo 产品描述，并按展示位置处理大小写。
 - [ADR-0032](ADR-0032-nestjs-fastify-adapter.md)：后端迁移到 NestJS 11，继续使用 Fastify 5 adapter，并保留共享 Zod 契约为唯一 HTTP 数据源。
 - [ADR-0034](ADR-0034-position-organization-ownership.md)：岗位作为按部门归属的组织主数据，由独立 `positions` 模块拥有用户岗位关系，不参与授权。
 - [ADR-0035](ADR-0035-permission-controlled-root-entry.md)：首页回归权限控制的动态菜单，并以根入口解析器统一选择根页面、首个可访问页面或无权限页。

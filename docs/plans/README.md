@@ -8,7 +8,7 @@
 
 ## 进行中
 
-当前没有进行中的实施计划。
+- [Cyber AI Forge 上游归档审查](active/2026-08-11-cyber-sight-upstream-archive-review.md)
 
 ## 生命周期
 

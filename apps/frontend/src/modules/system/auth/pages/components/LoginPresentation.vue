@@ -688,10 +688,9 @@ const { t } = useLocalization()
 
 .signature {
   color: var(--hero-meta);
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 650;
   letter-spacing: 0.16em;
-  text-transform: uppercase;
 }
 
 @keyframes grid-flow {
