@@ -2,9 +2,9 @@
   "version": 1,
   "scopes": {
     "repository": {
-      "lastReviewedCommit": "63cf20a920f2d398dc22ce3340bc1118b1ee1f5e",
-      "lastReviewedAt": "2026-08-11T11:34:19+08:00",
-      "reviewId": "adr-filename-archive-review"
+      "lastReviewedCommit": "2d9b3043f98cb33e074b84e7bee11adfeda7c4fc",
+      "lastReviewedAt": "2026-08-11T18:49:38+08:00",
+      "reviewId": "frontend-brand-text-config-archive-review"
     }
   }
 }
