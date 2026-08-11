@@ -7,6 +7,8 @@
 <p align="center">
   <a href="https://tanghaojie.github.io/Cyber-AI-Forge/">Project Website</a>
   ·
+  <a href="./README.en.md">English</a>
+  ·
   <a href="./docs/README.md">Documentation</a>
 </p>
 
