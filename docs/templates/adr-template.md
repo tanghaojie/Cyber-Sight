@@ -4,7 +4,7 @@ status: proposed
 date: YYYY-MM-DD
 ---
 
-# ADR-NNNN：<决策标题>
+# ADR-YYYYMMDD-<topic>：<决策标题>
 
 ## 背景
 

@@ -7,6 +7,7 @@ const scriptDirectory = dirname(fileURLToPath(import.meta.url))
 const repositoryRoot = resolve(scriptDirectory, '../..')
 const policyPath = join(repositoryRoot, 'docs/archive/archive-policy.json')
 const ledgerPath = join(repositoryRoot, 'docs/archive/archive-ledger.json')
+const adrFilenamePattern = /^ADR-(?:\d{4}|\d{8})-.+\.md$/i
 
 function readJson(filePath) {
   return JSON.parse(readFileSync(filePath, 'utf8'))
@@ -186,7 +187,7 @@ function getScopes(paths) {
 function getNewAcceptedAdrs(baselineCommit) {
   const decisionsDirectory = join(repositoryRoot, 'docs/decisions')
   return listFiles(decisionsDirectory)
-    .filter((filePath) => /^ADR-\d{4}-.+\.md$/i.test(relative(decisionsDirectory, filePath)))
+    .filter((filePath) => adrFilenamePattern.test(relative(decisionsDirectory, filePath)))
     .filter((filePath) => parseFrontMatter(filePath).status === 'accepted')
     .filter((filePath) => !hasPathAtCommit(baselineCommit, toRepositoryPath(filePath)))
     .map(toRepositoryPath)
@@ -234,7 +235,7 @@ function findActiveArchivePlans() {
 function findSupersededAdrs() {
   return listFiles(join(repositoryRoot, 'docs/decisions'))
     .filter((filePath) =>
-      /^ADR-\d{4}-.+\.md$/i.test(relative(join(repositoryRoot, 'docs/decisions'), filePath)),
+      adrFilenamePattern.test(relative(join(repositoryRoot, 'docs/decisions'), filePath)),
     )
     .filter((filePath) =>
       ['superseded', 'replaced', 'retired'].includes(parseFrontMatter(filePath).status),

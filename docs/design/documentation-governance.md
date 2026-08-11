@@ -2,7 +2,7 @@
 title: 分层文档与历史归档
 status: accepted
 owner: project maintainers
-updated: 2026-08-06
+updated: 2026-08-11
 ---
 
 # 分层文档与历史归档
@@ -59,12 +59,22 @@ docs/
 ## 生命周期
 
 - Design：原地维护当前事实；被合并、废弃或大幅重写的旧版本移入 `archive/design/`。
-- ADR：已接受且仍有效的记录留在 `decisions/`；被取代、被初始版本基线吸收或失去现行解释价值后移入 `archive/decisions/`，编号永不复用。
+- ADR：已接受且仍有效的记录留在 `decisions/`；被取代、被初始版本基线吸收或失去现行解释价值后移入 `archive/decisions/`。既有旧格式编号保持稳定；新增 ADR 使用日期命名。
 - Plan：任务期间位于 `plans/active/`；结束后标记最终状态并移入 `archive/plans/`。
 - AI Log：任务期间位于 `ai-logs/YYYY/MM/`；随任务结束移入 `archive/ai-logs/YYYY/MM/`。
 - Guide、Reference、Template：只保留当前可用版本；纯历史版本按内容类型进入归档。
 
 归档迁移必须同步更新当前索引和相对链接。当前文档优先链接现行设计或 ADR；历史计划和日志集中从归档索引查找，避免在每份当前模块设计中重复罗列。
+
+## 文件命名
+
+- 新增 ADR 使用 `ADR-YYYYMMDD-<topic>.md`，其中日期使用创建/接受日期，`<topic>` 使用简短、稳定的小写 kebab-case slug。
+- ADR 文件名中的日期必须与 frontmatter 的 `date: YYYY-MM-DD` 对应；日期和 topic 在 ADR 创建后保持不变。
+- 同一天创建多个 ADR 时通过唯一 topic 区分，不分配顺序号，也不通过顺序号解决并发冲突。
+- 既有 `ADR-NNNN-<topic>.md` 文件作为历史兼容格式保留，不批量重命名；既有引用继续保持原样。
+- 新增文档引用新 ADR 时使用其日期命名路径。计划和 AI 日志继续使用各自的日期命名规则。
+- 归档审计同时识别旧格式和新格式，以免历史 ADR 从治理统计中消失。
+- 本规则由 [ADR-20260811](../decisions/ADR-20260811-adr-filename-convention.md) 正式记录。
 
 ## 压缩规则
 
@@ -77,6 +87,8 @@ docs/
 ## 验证
 
 文档结构调整后至少验证：当前索引无归档项混入、Markdown 相对链接存在、ADR 状态与所在目录一致、`plans/active/` 只含进行中计划，以及默认阅读集的文件数和行数没有反向增长。
+
+2026-08-11 已完成日期命名规则落地：既有 ADR 文件名和引用保持不变，新增 ADR 使用日期命名，归档审计兼容新旧两种格式。`pnpm format`、`pnpm format:check`、`pnpm docs:archive:check` 和 `pnpm docs:archive:check:ci` 均通过；本次没有发现偏差或遗留问题，关联提交为本任务提交。
 
 ## 初始版本基线
 

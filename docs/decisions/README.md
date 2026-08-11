@@ -19,5 +19,6 @@
 - [ADR-0038](ADR-0038-bounded-authorization-delegation.md)：授权主体配置和用户角色、部门变更采用有界委托，当前与目标授权都不得超过操作者自身权限和数据范围。
 - [ADR-0039](ADR-0039-single-uuidv7-identifiers.md)：全部应用实体使用数据库生成的 UUIDv7，并以 PostgreSQL 18 空库重建单一迁移基线。
 - [ADR-0037](ADR-0037-static-marketing-site.md)：使用独立 Vite + Vue 静态应用构建中英文开源推广站，并通过 GitHub Actions 发布到 GitHub Pages。
+- [ADR-20260811](ADR-20260811-adr-filename-convention.md)：新增 ADR 使用日期与主题命名，既有 ADR 文件名和引用保持不变。
 
-新增 ADR 时使用 [ADR 模板](../templates/adr-template.md)和下一个连续编号。ADR 被取代或被后续基线吸收后更新替代关系并移入 `docs/archive/decisions/`，编号不得复用。
+新增 ADR 时使用 [ADR 模板](../templates/adr-template.md)和 `ADR-YYYYMMDD-<topic>.md` 文件名。日期取创建/接受日期，topic 使用小写 kebab-case；同日通过唯一 topic 区分。既有 `ADR-NNNN-<topic>.md` 文件和引用保持不变。ADR 被取代或被后续基线吸收后更新替代关系并移入 `docs/archive/decisions/`。
