@@ -49,7 +49,7 @@ docs/
 
 - 设计：稳定英文小写名称，如 `backend.md`。
 - 计划和日志：`YYYY-MM-DD-<topic>.md`。
-- ADR：`ADR-NNNN-<topic>.md`，编号递增且不复用。
+- 新增 ADR：`ADR-YYYYMMDD-<topic>.md`；日期取创建/接受日期，topic 使用小写 kebab-case。既有 `ADR-NNNN-<topic>.md` 文件和引用保持不变。
 - 正文默认中文，代码标识保持原样。
 
 ## AI 任务范围归档审查
