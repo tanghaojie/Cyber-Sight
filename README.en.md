@@ -24,8 +24,6 @@ It gives AI an understandable engineering structure, clear module boundaries, co
 
 > Build clearly. Evolve safely. Let complex systems grow clearly.
 
-Cyber AI Forge is designed and maintained by JTLab (桀士实验室). JTLab is the creator brand, not the product name.
-
 ## 01 / Why Cyber AI Forge
 
 AI can already generate large amounts of code, but “can generate code” does not mean “can continuously complete a project.” Without clear structure and rules, AI can easily run into these problems:
