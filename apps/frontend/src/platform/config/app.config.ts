@@ -11,9 +11,11 @@ export const appConfig = Object.freeze({
     import.meta.env.VITE_APP_TAGLINE,
     'AI-Native Enterprise Application Scaffold',
   ),
-  githubUrl: 'https://github.com/tanghaojie/cyber-scaffold',
-  creatorName: 'JTLab',
-  creatorFullName: '桀士实验室',
-  primaryColor: '#277A52',
+  githubUrl: configuredValue(
+    import.meta.env.VITE_APP_GITHUB_URL,
+    'https://github.com/tanghaojie/cyber-scaffold',
+  ),
+  creatorName: configuredValue(import.meta.env.VITE_APP_CREATOR_NAME, 'JTLab'),
+  creatorFullName: configuredValue(import.meta.env.VITE_APP_CREATOR_FULL_NAME, '桀士实验室'),
   storagePrefix: configuredValue(import.meta.env.VITE_STORAGE_PREFIX, 'cyber_ai_forge'),
 })

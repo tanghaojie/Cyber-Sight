@@ -2,7 +2,7 @@
 title: 前端应用与应用壳
 status: active
 owner: maintainers
-updated: 2026-08-11
+updated: 2026-08-12
 ---
 
 # 前端应用与应用壳
@@ -68,7 +68,7 @@ cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie�
 
 `view-registry.ts` 扫描 `@/foundation/modules/**/registerViews.ts`；`platform.register.ts` 独立扫描 `@/platform/modules/**/registerViews.ts` 并通过 Foundation 公共注册函数装配。登记 key 必须符合小写字母开头的 kebab-case 约束且全局唯一；页面标签使用 `{ key?, fallback }` 描述，供菜单编辑器按当前语言解析，未提供或找不到翻译 key 时保留回退文案。缺少 `registerViews()`、非法 key 或跨作用域重复 key 会在启动阶段失败。
 
-当前 Platform 默认品牌为 `CYBER / Cyber AI Forge`。`src/platform/brand/` 和 `src/platform/config/` 拥有品牌组件与文字配置；Foundation 只通过 `PlatformDefinition` 注入接口渲染 Logo 和创作者信息，不直接导入 Platform。完整边界见[CYBER 品牌与视觉系统](../../../forge/design/branding.md)。
+当前 Platform 默认品牌为 `CYBER / Cyber AI Forge`。`src/platform/brand/` 和 `src/platform/config/` 拥有品牌组件与文字配置；名称、副标题、项目链接和创作者署名可由 `VITE_APP_*` 环境变量覆盖，缺失或空白时回退默认值。Foundation 只通过 `PlatformDefinition` 注入接口渲染 Logo 和创作者信息，不直接导入 Platform。主题颜色由 settings 模块和语义令牌管理，不属于 `PlatformConfig`。完整边界见[CYBER 品牌与视觉系统](../../../forge/design/branding.md)。
 
 `main.ts` 先调用 `installPlatform()` 登记品牌、Platform 文案和页面，再安装 Pinia、localization 与 Router；`App.vue` 通过 `LocalizationProvider.vue` 为
 Element Plus 提供当前语言包。登录页与 Header 共用 `LanguageSwitcher.vue`，语言切换立即

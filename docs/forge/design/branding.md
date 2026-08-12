@@ -2,7 +2,7 @@
 title: CYBER 品牌与视觉系统
 status: active
 owner: project maintainers
-updated: 2026-08-11
+updated: 2026-08-12
 ---
 
 # CYBER / Cyber AI Forge 品牌与视觉系统
@@ -26,7 +26,7 @@ updated: 2026-08-11
 - 中文主张：`让复杂系统清晰生长。`。
 - 创作者品牌：`JTLab / 桀士实验室`，只以明确标注 `CREATED BY` 的独立署名出现在登录页、README 作者信息等合适位置，不进入 CYBER Logo、侧栏、404 或工作台产品标识。
 
-部署可以继续通过 `VITE_APP_NAME`、`VITE_APP_FULL_NAME` 和 `VITE_APP_TAGLINE` 覆盖文字。`VITE_APP_TAGLINE` 在登录页签名中保持原文，在 Logo 下方的产品描述中转换为大写；没有路由专属标题时，浏览器标题使用 `VITE_APP_FULL_NAME`。替换图形标志时需要同步替换品牌组件和 favicon，避免非 CYBER 名称继续使用 C 形产品标。
+部署可以通过 `VITE_APP_NAME`、`VITE_APP_FULL_NAME`、`VITE_APP_TAGLINE`、`VITE_APP_GITHUB_URL`、`VITE_APP_CREATOR_NAME` 和 `VITE_APP_CREATOR_FULL_NAME` 覆盖品牌文字、项目链接与创作者署名；缺失或空白时回退仓库默认值。`VITE_APP_TAGLINE` 在登录页签名中保持原文，在 Logo 下方的产品描述中转换为大写；没有路由专属标题时，浏览器标题使用 `VITE_APP_FULL_NAME`。替换图形标志时需要同步替换品牌组件和 favicon，避免非 CYBER 名称继续使用 C 形产品标。
 
 ## Logo 与视觉语言
 
@@ -51,6 +51,8 @@ Logo 以仓库内 SVG/Vue 组件实现，保证侧栏、移动端、404 和 favi
 - 语言偏好键：`cyber_ai_forge_locale:v1`。
 - JWT issuer：`cyber-ai-forge`。
 - JWT audience：`cyber-ai-forge-api`。
+
+后端可通过 `API_TITLE`、`API_VERSION`、`API_DESCRIPTION` 覆盖 Swagger 展示信息，并通过 `JWT_ISSUER`、`JWT_AUDIENCE` 覆盖 JWT identity；缺失或空白时使用上述品牌默认值。JWT identity 仍由启动期环境校验和应用组装层单点注入，不维护第二份 Platform 常量文件。
 
 旧 `cyber_access_token` 和 `jtlib_access_token` 会在认证状态清理时一并删除。JWT issuer/audience 切换会使旧令牌失效，用户需要重新登录；数据库账号、菜单、授权和业务数据不迁移也不删除。旧标签历史和语言偏好不迁移，切换后从新的版本化键开始记录。
 

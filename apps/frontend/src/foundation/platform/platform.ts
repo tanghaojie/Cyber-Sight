@@ -8,7 +8,6 @@ export interface PlatformConfig {
   githubUrl: string
   creatorName: string
   creatorFullName: string
-  primaryColor: string
   storagePrefix: string
 }
 

@@ -2,7 +2,7 @@
 title: 认证模块
 status: active
 owner: maintainers
-updated: 2026-08-10
+updated: 2026-08-12
 ---
 
 # 认证模块
@@ -13,13 +13,13 @@ updated: 2026-08-10
 
 ## 数据流与会话生命周期
 
-1. 登录在数据库中校验用户凭据并读取角色，使用 `src/platform/config/platform.config.ts` 注入的 issuer 与 audience 签发 subject 为用户 UUID、7 天有效的 HS256 JWT，把 token 的 SHA-256 哈希、用户和过期时间写入 `sys_auth_sessions`，再把 token 标识与当前用户快照写入容量为 100 的进程内 LRU 缓存。数据库不保存可直接复用的明文 token。
+1. 登录在数据库中校验用户凭据并读取角色，使用 `src/foundation/config/env.ts` 校验并由应用组装层注入的 `JWT_ISSUER` 与 `JWT_AUDIENCE` 签发 subject 为用户 UUID、7 天有效的 HS256 JWT，把 token 的 SHA-256 哈希、用户和过期时间写入 `sys_auth_sessions`，再把 token 标识与当前用户快照写入容量为 100 的进程内 LRU 缓存。数据库不保存可直接复用的明文 token。
 2. 登录响应返回 `{ status: 0, data: { user, issued: { token, expiresAt } } }`。`auth.api.ts` 封装登录、当前用户和退出请求，`auth.store.ts` 负责会话状态，并通过 Foundation 的 `accessToken.ts` 把 token 写入由 Platform `storagePrefix` 派生、到期时间来自 `expiresAt` 的浏览器 cookie。共享 API Client 为请求附加 `Authorization: Bearer <token>`；清会话时同时清理当前 cookie、旧 `cyber_access_token` 和 `jtlib_access_token` cookie 及对应 `localStorage` 键。
 3. 鉴权先严格解析 Bearer 头并校验 JWT 签名、issuer、audience、算法和过期时间，再按 token 标识读取 LRU；缓存命中会刷新最近使用顺序，不查询数据库。
 4. 缓存未命中时，以 token 哈希查询未撤销且未过期的 `sys_auth_sessions`，联查启用用户和角色后回填 LRU。第 101 个 token 只淘汰最久未使用的缓存项，不撤销数据库会话；该 token 下次请求会回源后继续有效。进程重启同样只产生冷缓存。
 5. 显式退出先在数据库软删除当前会话，再删除缓存项。用户资料或角色变更只失效相关缓存，使下一次请求回源获得新快照；删除用户时同时撤销该用户全部数据库会话并失效缓存。
 
-`JWT_SECRET` 是后端必填部署配置，至少 32 个字符，不进入版本控制。数据库会话让 token 跨进程重启并可在多实例上回源验证；当前 LRU 仍是实例本地缓存，多实例中的主动撤销可能在其他实例缓存中持续到该项被淘汰或 token 过期，严格即时撤销需要后续增加跨实例失效通知或共享缓存。
+`JWT_SECRET` 是后端必填部署配置，至少 32 个字符，不进入版本控制。`JWT_ISSUER` 和 `JWT_AUDIENCE` 可由部署环境覆盖，缺失或空白时分别回退为 `cyber-ai-forge` 和 `cyber-ai-forge-api`；修改任一值都会使旧令牌失效。数据库会话让 token 跨进程重启并可在多实例上回源验证；当前 LRU 仍是实例本地缓存，多实例中的主动撤销可能在其他实例缓存中持续到该项被淘汰或 token 过期，严格即时撤销需要后续增加跨实例失效通知或共享缓存。
 
 ## 公共接口
 
