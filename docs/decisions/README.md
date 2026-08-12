@@ -8,6 +8,8 @@
 - [ADR-0025](ADR-0025-pluggable-authorization-and-data-scope.md)：默认使用本地可插拔授权 Provider，以稳定权限键和查询计划实现功能与数据权限。
 - [ADR-0026](ADR-0026-system-table-prefix-and-fresh-baseline.md)：框架表统一使用 `sys_` 物理前缀，并以只面向全新数据库的单一迁移重置早期历史。
 - [ADR-0027](ADR-0027-system-and-business-module-classification.md)：前后端模块按 `system` 与 `biz` 分类，公共契约路径保持稳定。
+- [ADR-20260812-foundation-platform-ownership](ADR-20260812-foundation-platform-ownership.md)：使用 Forge、Foundation 与 Platform 统一表达源码、文档和同步所有权；取代 ADR-0027 的分类方案。
+- [ADR-20260812-foundation-platform-migrations](ADR-20260812-foundation-platform-migrations.md)：Foundation 与 Platform 使用独立 Schema 入口、迁移历史和执行顺序。
 - [ADR-0028](ADR-0028-product-and-creator-brand-separation.md)：使用 CYBER 作为产品品牌，并把 JTLab 限定为明确、独立的创作者署名。
 - [ADR-0029](ADR-0029-frontend-runtime-localization.md)：使用独立前端模块提供运行时中英文切换，以模块资源和严格默认菜单指纹保护用户录入数据。
 - [ADR-0033](ADR-0033-task-scoped-documentation-archive-audit.md)：按任务范围触发归档审计，并以合并前检查作为跨 AI 的共享兜底协议；取代已归档的 ADR-0030。
