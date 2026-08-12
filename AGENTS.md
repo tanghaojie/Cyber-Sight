@@ -33,10 +33,10 @@
 
 ## 开始工作前
 
-1. 阅读 `docs/README.md`。
-2. 按 `docs/README.md` 的最小阅读协议，只阅读与改动直接相关的 `docs/design/` 文档和仍有效的 `docs/decisions/` 记录；禁止为建立背景而递归读取整个 `docs/`。
-3. 检查 `docs/plans/active/` 中是否已有同一事项的实施计划，避免重复规划。
-4. `docs/archive/**` 默认不得读取。只有用户明确要求历史、当前文档明确引用历史证据、排查回归/兼容性或准备恢复旧方案时，才先读 `docs/archive/README.md` 并选择最相关的一至两份文件。
+1. 阅读 `docs/README.md` 并判断任务属于 `foundation`、`forge` 或 `platform`。
+2. 按 `docs/README.md` 的最小阅读协议，只阅读对应作用域中与改动直接相关的 `design/` 文档和仍有效的 `decisions/` 记录；禁止为建立背景而递归读取整个 `docs/`。
+3. 检查对应 `docs/<scope>/plans/active/` 中是否已有同一事项的实施计划，避免重复规划。
+4. 各作用域的 `archive/**` 默认不得读取。只有用户明确要求历史、当前文档明确引用历史证据、排查回归/兼容性或准备恢复旧方案时，才先读对应 `archive/README.md` 并选择最相关的一至两份文件。
 5. 不得仅凭聊天上下文推断长期约定；长期有效的结论必须写入仓库文档。
 
 ## 代码格式
@@ -63,17 +63,18 @@
 
 非简单改动在写代码前必须：
 
-1. 在 `docs/design/` 新建或更新设计文档。
-2. 在 `docs/plans/active/` 创建实施计划，文件名为 `YYYY-MM-DD-<topic>.md`。
-3. 在 `docs/ai-logs/YYYY/MM/` 创建或更新 AI 协作记录。
-4. 如果形成新的长期技术决策，在 `docs/decisions/` 新增 ADR。
+1. 在 `docs/<scope>/design/` 新建或更新设计文档。
+2. 在 `docs/<scope>/plans/active/` 创建实施计划，文件名为 `YYYY-MM-DD-<topic>.md`。
+3. 在 `docs/<scope>/ai-logs/YYYY/MM/` 创建或更新 AI 协作记录。
+4. 如果形成新的长期技术决策，在 `docs/<scope>/decisions/` 新增 ADR。
+5. 文档必须声明 `scope: foundation | forge | platform`；三个作用域共用根 `docs/templates/`，不得复制平行模板。
 
 任务完成后必须：
 
 1. 更新设计文档，使其描述最终实现，而不是最初设想。
 2. 补充实际验证结果、偏差、遗留问题和关联提交。
-3. 将完成的计划从 `plans/active/` 移到 `archive/plans/`，将对应 AI 协作记录移到 `archive/ai-logs/YYYY/MM/`，并标记为 `completed`。
-4. 若 ADR 被取代或设计被合并/废弃，分别移到 `archive/decisions/` 或 `archive/design/`，并在归档索引记录原因和现行替代来源。
+3. 将完成的计划从对应作用域的 `plans/active/` 移到同作用域的 `archive/plans/`，将 AI 协作记录移到 `archive/ai-logs/YYYY/MM/`，并标记为 `completed`。
+4. 若 ADR 被取代或设计被合并/废弃，分别移到同作用域的 `archive/decisions/` 或 `archive/design/`，并在归档索引记录原因和现行替代来源。
 5. 更新相关目录的 `README.md` 索引。
 6. 在所有约定验证通过后提交本轮改动，提交信息应准确概括交付内容，并包含“AI 自动提交的强制标记”规定的 trailer。
 
@@ -83,14 +84,14 @@
 
 ## 架构约束
 
-- 所有业务能力必须按模块组织在独立的 `<module>/` 文件夹中；前后端内置系统能力放入 `src/modules/system/<module>/`，后续产品业务能力放入 `src/modules/biz/<module>/`，禁止在 `src/modules/` 下新增与 `system`、`biz` 平级的模块，也禁止把两个无直接内聚关系的业务能力混放在同一目录或只以散落在 `views/`、`routes/`、`services/`、`stores/`、`db/` 等技术目录中的文件冒充模块。
-- 同一业务能力在前端、后端和 API 契约中应使用一致、稳定的模块名；前后端分别放入对应类别的 `src/modules/system/<module>/` 或 `src/modules/biz/<module>/`，API 契约继续放入 `packages/api-contract/src/modules/<module>/`。模块不存在于某一层时无需创建空目录。
+- 所有能力必须按模块组织在独立的 `<module>/` 文件夹中；Forge 维护的共享基础能力放入 `src/foundation/modules/<module>/`，具体业务平台能力放入 `src/platform/modules/<module>/`。禁止新增与 `foundation`、`platform` 平级的所有权目录，也禁止用散落在 `views/`、`routes/`、`services/`、`stores/`、`db/` 等技术目录中的文件冒充模块。
+- 同一能力在前端、后端和 API 契约中应使用一致、稳定的模块名，并分别放入各 workspace 的 `src/foundation/modules/<module>/` 或 `src/platform/modules/<module>/`。模块不存在于某一层时无需创建空目录。
 - 模块对外能力必须通过设计文档登记的表意文件暴露，后端优先使用 `<module>.module.ts`、`<module>.controller.ts`、`<module>.service.ts`，前端优先使用 `<module>.routes.ts`、`<module>.store.ts`、`<module>.api.ts`，避免使用 `index.ts` 和聚合式 barrel；其他模块只能依赖已登记的公共文件，禁止跨模块导入未登记的内部文件、数据库实现、页面组件或私有状态。
-- 模块依赖必须单向、显式且无循环。业务模块可依赖领域无关的 `shared`/平台能力；`shared` 不得反向依赖业务模块，也不得成为放置无法归类业务代码的兜底目录。
+- 模块依赖必须单向、显式且无循环。Platform 可以依赖已登记的 Foundation 公共接口；Foundation 禁止导入 Platform。领域无关共享能力归入 Foundation，不能成为放置无法归类业务代码的兜底目录。
 - 跨模块协作必须通过公共类型、应用服务、事件或端口接口完成；禁止直接读写其他模块的内部状态、仓储、数据表或私有 Schema。确需共享的业务规则必须明确归属一个模块，或经设计评审后提取为有清晰职责的新模块。
 - 应用入口、路由注册和依赖注入层只负责组装模块，不承载业务规则；删除一个模块时，除组装点、明确依赖方和迁移记录外，不应要求修改无关模块。
-- 新模块以及被实质修改的存量模块必须遵守 `docs/design/module-boundaries.md`，并在 `docs/design/modules/` 记录职责、边界、公共接口、依赖、数据流、失败模式和适用的测试或验证策略。若现有结构不合规，功能开发前应把本次触及的部分迁入模块目录，不得继续扩大遗留耦合。
-- `packages/api-contract` 中的 Zod 4 运行时 Schema 是当前前后端 HTTP 数据契约来源；类型通过 `z.infer` 推导，Nest Controller 使用 `ZodValidationPipe` 校验输入、`ContractRoute` 绑定响应与 OpenAPI。
+- 新模块以及被实质修改的存量模块必须遵守 `docs/foundation/design/module-boundaries.md`，并在对应作用域的 `design/modules/` 记录职责、边界、公共接口、依赖、数据流、失败模式和适用的测试或验证策略。若现有结构不合规，功能开发前应把本次触及的部分迁入模块目录，不得继续扩大遗留耦合。
+- `packages/api-contract` 中的 Zod 4 运行时 Schema 是当前前后端 HTTP 数据契约来源；Foundation 与 Platform 契约分别进入对应所有权目录，类型通过 `z.infer` 推导，Nest Controller 使用 `ZodValidationPipe` 校验输入、`ContractRoute` 绑定响应与 OpenAPI。
 - API 数据结构变化必须先更新共享 Schema；请求、查询和路径参数必须由后端在运行时校验，禁止只写会在编译后擦除的 TypeScript 类型。
 - Swagger/OpenAPI 由 Nest Controller 的契约元数据生成，用于本地调试和按需互操作；没有现实跨语言或外部 API 需求时，不维护第二份手写 OpenAPI。
 - TypeScript/NestJS 与 Fastify adapter 是默认后端实现。只有明确的生态、运行时、性能或组织约束才引入 Java 实现。
@@ -119,11 +120,11 @@
 
 - AI 开始仓库任务时先判断任务范围。只读问答、代码浏览、格式化、注释和单文件机械改动可以跳过归档审计；涉及业务行为、API、数据模型、模块边界、架构、迁移、ADR、计划或文档治理的任务，必须在首次修改文件前运行 `pnpm docs:archive:check`。
 - 如果任务开始时范围不明确，或实施过程中扩大到上述范围，必须在首次修改相关文件前补运行归档审计。
-- 若结果为 `DUE`，必须创建或继续 `docs/plans/active/` 下 `type: documentation-archive-review` 的计划。
+- 若结果为 `DUE`，必须创建或继续 `docs/foundation/plans/active/` 下 `type: documentation-archive-review` 的计划。
 - 若结果为 `IN_PROGRESS`，优先继续已有归档审查计划，不得创建重复计划。
 - 若结果为 `BLOCKED`，保留现有文档和证据，向维护者报告具体冲突，不得猜测后归档。
 - 合并前或 CI 必须运行 `pnpm docs:archive:check:ci`；没有 CI 的任务在最终验证阶段运行同一命令。
-- 归档触发、基线和阈值使用 `docs/archive/archive-policy.json` 与 `docs/archive/archive-ledger.json`；禁止使用 Codex、Claude 或其他单一 AI 平台的私有状态文件作为仓库协议。
+- 归档触发、基线和阈值使用 `docs/foundation/archive/archive-policy.json` 与 `docs/foundation/archive/archive-ledger.json`；禁止使用 Codex、Claude 或其他单一 AI 平台的私有状态文件作为仓库协议。
 - 归档审查必须先根据当前代码、测试、契约、迁移和 Git 历史补充当前 Design/ADR，再归档已经被取代的历史内容。
 
 @RTK.md
