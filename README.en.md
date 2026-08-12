@@ -24,7 +24,7 @@ It gives AI an understandable engineering structure, clear module boundaries, co
 
 > Build clearly. Evolve safely. Let complex systems grow clearly.
 
-## <img src="./apps/website/src/assets/readme-icons/context.svg" alt="" width="20" height="20" /> 01 / Why Cyber AI Forge
+## <img src="./forge/website/src/assets/readme-icons/context.svg" alt="" width="20" height="20" /> 01 / Why Cyber AI Forge
 
 AI can already generate large amounts of code, but “can generate code” does not mean “can continuously complete a project.” Without clear structure and rules, AI can easily run into these problems:
 
@@ -36,7 +36,7 @@ AI can already generate large amounts of code, but “can generate code” does 
 
 Cyber AI Forge was created to give people and AI an enterprise application engineering foundation they can understand, use, and evolve together.
 
-## <img src="./apps/website/src/assets/readme-icons/highlights.svg" alt="" width="20" height="20" /> 02 / Core Highlights
+## <img src="./forge/website/src/assets/readme-icons/highlights.svg" alt="" width="20" height="20" /> 02 / Core Highlights
 
 ### 02.1 / An engineering structure organized for AI
 
@@ -93,30 +93,30 @@ The project uses Zod to define API runtime Schemas and shares them between the f
 
 This allows AI and people to develop around the same interface facts and reduces frontend/backend drift.
 
-## <img src="./apps/website/src/assets/readme-icons/system.svg" alt="" width="20" height="20" /> 03 / System Screenshots
+## <img src="./forge/website/src/assets/readme-icons/system.svg" alt="" width="20" height="20" /> 03 / System Screenshots
 
 The screenshots in this README come from the runnable administration console included in the repository. They cover the login entry point, workbench, user and menu management, role permissions, API logs, and system settings. They illustrate the current capabilities and do not represent a remote demo environment.
 
 <div align="center">
-  <img src="./apps/website/src/assets/screenshots/login.png" alt="Cyber AI Forge login page" width="49%" />
-  <img src="./apps/website/src/assets/screenshots/home.png" alt="Cyber AI Forge workbench" width="49%" />
+  <img src="./forge/website/src/assets/screenshots/login.png" alt="Cyber AI Forge login page" width="49%" />
+  <img src="./forge/website/src/assets/screenshots/home.png" alt="Cyber AI Forge workbench" width="49%" />
 </div>
 
 <div align="center">
-  <img src="./apps/website/src/assets/screenshots/users.png" alt="Cyber AI Forge user management" width="49%" />
-  <img src="./apps/website/src/assets/screenshots/menus.png" alt="Cyber AI Forge menu management" width="49%" />
+  <img src="./forge/website/src/assets/screenshots/users.png" alt="Cyber AI Forge user management" width="49%" />
+  <img src="./forge/website/src/assets/screenshots/menus.png" alt="Cyber AI Forge menu management" width="49%" />
 </div>
 
 <div align="center">
-  <img src="./apps/website/src/assets/screenshots/roles.png" alt="Cyber AI Forge role and data permissions" width="49%" />
-  <img src="./apps/website/src/assets/screenshots/api-logs.png" alt="Cyber AI Forge API logs" width="49%" />
+  <img src="./forge/website/src/assets/screenshots/roles.png" alt="Cyber AI Forge role and data permissions" width="49%" />
+  <img src="./forge/website/src/assets/screenshots/api-logs.png" alt="Cyber AI Forge API logs" width="49%" />
 </div>
 
 <div align="center">
-  <img src="./apps/website/src/assets/screenshots/settings.png" alt="Cyber AI Forge system settings" width="49%" />
+  <img src="./forge/website/src/assets/screenshots/settings.png" alt="Cyber AI Forge system settings" width="49%" />
 </div>
 
-## <img src="./apps/website/src/assets/readme-icons/people.svg" alt="" width="20" height="20" /> 04 / Who is it for?
+## <img src="./forge/website/src/assets/readme-icons/people.svg" alt="" width="20" height="20" /> 04 / Who is it for?
 
 ### 04.1 / People who want to build applications with AI
 
@@ -142,7 +142,7 @@ If you are a developer, you can use Cyber AI Forge as a full-stack starting poin
 - Let AI assist development within explicit engineering rules
 - Use existing tests, builds, and design documents to reduce maintenance costs
 
-## <img src="./apps/website/src/assets/readme-icons/grid.svg" alt="" width="20" height="20" /> 05 / Typical Use Cases
+## <img src="./forge/website/src/assets/readme-icons/grid.svg" alt="" width="20" height="20" /> 05 / Typical Use Cases
 
 - Internal enterprise administration consoles
 - Customer relationship management systems
@@ -155,7 +155,7 @@ If you are a developer, you can use Cyber AI Forge as a full-stack starting poin
 
 If your application needs login, permissions, administration, and a database, Cyber AI Forge can be a reliable starting point.
 
-## <img src="./apps/website/src/assets/readme-icons/compare.svg" alt="" width="20" height="20" /> 06 / Why not let AI build everything from scratch?
+## <img src="./forge/website/src/assets/readme-icons/compare.svg" alt="" width="20" height="20" /> 06 / Why not let AI build everything from scratch?
 
 Of course, you can ask AI to build an application from an empty directory. The issue is not whether AI can generate the first version of the code, but whether the project can continue to be developed, maintained, and handed over reliably after that first version.
 
@@ -193,7 +193,7 @@ You can think of Cyber AI Forge as an engineering blueprint that everyone and ev
 
 > AI can handle its own construction work; Cyber ensures that all construction follows the same blueprint and is ultimately combined into a system that can be used continuously.
 
-## <img src="./apps/website/src/assets/readme-icons/guide.svg" alt="" width="20" height="20" /> 07 / If you are not technical, give this README to AI first
+## <img src="./forge/website/src/assets/readme-icons/guide.svg" alt="" width="20" height="20" /> 07 / If you are not technical, give this README to AI first
 
 If you can barely write code, you do not need to understand technical terms such as `pnpm`, `PostgreSQL`, or `Zod` first. You can give this README and the project to an AI that can access project files, let AI become your technical guide, and then complete development step by step with you.
 
@@ -232,7 +232,7 @@ AI will usually guide you through these stages:
 
 You do not need to describe your requirements professionally all at once. You can start by saying “I want to build a customer management tool,” then work with AI to add users, pages, permissions, and business rules step by step.
 
-## <img src="./apps/website/src/assets/readme-icons/start.svg" alt="" width="20" height="20" /> 08 / Quick Start
+## <img src="./forge/website/src/assets/readme-icons/start.svg" alt="" width="20" height="20" /> 08 / Quick Start
 
 ### 08.1 / Requirements
 
@@ -275,9 +275,9 @@ This credential is for local initialization only. Before entering a shared or pr
 
 The current migration chain targets the system-table baseline of a brand-new empty PostgreSQL database and does not support in-place upgrades of an existing database. An old database cannot be used directly as the new `DATABASE_URL`; if the old data must be kept, first stop using the old database and then design a separate data migration plan.
 
-See the [database baseline rebuild guide](docs/guides/database-baseline-rebuild.md) for details.
+See the [database baseline rebuild guide](docs/foundation/guides/database-baseline-rebuild.md) for details.
 
-## <img src="./apps/website/src/assets/readme-icons/module.svg" alt="" width="20" height="20" /> 09 / How to have AI develop your application
+## <img src="./forge/website/src/assets/readme-icons/module.svg" alt="" width="20" height="20" /> 09 / How to have AI develop your application
 
 At the beginning of each substantial task, ask AI to read the project documentation and relevant module designs before proposing an implementation plan. For example:
 
@@ -289,14 +289,14 @@ Based on the current project module conventions, add a “customer management”
 
 For ordinary users, requirements can be described entirely in natural language. Developers can add data models, permission rules, interaction details, and acceptance criteria.
 
-## <img src="./apps/website/src/assets/readme-icons/module.svg" alt="" width="20" height="20" /> 10 / How to add a business module
+## <img src="./forge/website/src/assets/readme-icons/module.svg" alt="" width="20" height="20" /> 10 / How to add a business module
 
 When adding business capabilities, the recommended path is:
 
 1. Define the responsibilities and boundaries of the business module
 2. Define runtime Schemas and inferred types in `packages/api-contract`
-3. Implement the backend module and routes in `apps/backend/src/modules/<module>/`
-4. Implement the frontend module and pages in `apps/frontend/src/modules/<module>/`
+3. Implement the backend module and routes in `apps/backend/src/platform/modules/<module>/`
+4. Implement the frontend module and pages in `apps/frontend/src/platform/modules/<module>/`
 5. Register pages, menus, and permissions
 6. Add backend and contract tests, and list manual frontend acceptance scenarios
 7. Run format checks, tests, and the production build
@@ -305,7 +305,7 @@ The page loader for database-driven menus is registered in the owning module’s
 
 The scaffold’s built-in system tables consistently use the `sys_` physical prefix, soft deletion, and five lifecycle fields: `is_deleted`, `created_at`, `created_by`, `updated_at`, and `updated_by`.
 
-## <img src="./apps/website/src/assets/readme-icons/architecture.svg" alt="" width="20" height="20" /> 11 / Technical Architecture
+## <img src="./forge/website/src/assets/readme-icons/architecture.svg" alt="" width="20" height="20" /> 11 / Technical Architecture
 
 ```text
 Human describes requirements
@@ -332,25 +332,27 @@ PostgreSQL
 | Database              | PostgreSQL                                                                  |
 | Repository management | pnpm monorepo                                                               |
 
-## <img src="./apps/website/src/assets/readme-icons/structure.svg" alt="" width="20" height="20" /> 12 / Project Structure
+## <img src="./forge/website/src/assets/readme-icons/structure.svg" alt="" width="20" height="20" /> 12 / Project Structure
 
 ```text
 apps/
 ├── frontend/                 # Vue frontend and administration console
-├── backend/                  # NestJS/Fastify service, database, and migrations
-└── website/                  # Chinese/English static promotional site and GitHub Pages build entry point
+└── backend/                  # NestJS/Fastify service, database, and migrations
+forge/
+└── website/                  # Forge-only promotional site and GitHub Pages build entry point
 packages/
 └── api-contract/             # API contracts shared by the frontend and backend
 docs/
-├── design/                   # Current system and module designs
-├── guides/                   # Operations guides for human maintainers
-├── reference/                # Reference materials such as error codes
+├── foundation/               # Infrastructure knowledge maintained by Forge and inherited downstream
+├── forge/                    # Forge-only knowledge excluded from downstream sync
+├── platform/                 # Knowledge independently maintained by the current platform
+├── templates/                # Documentation templates shared by all three scopes
 └── README.md                 # Documentation entry point shared by people and AI
 ```
 
-System capabilities and product business capabilities are organized separately under `src/modules/system/<module>/` and `src/modules/biz/<module>/`. Cross-module dependencies must go through registered public interfaces.
+System capabilities and product business capabilities are organized separately under `src/foundation/modules/<module>/` and `src/platform/modules/<module>/`. Cross-module dependencies must go through registered public interfaces.
 
-## <img src="./apps/website/src/assets/readme-icons/start.svg" alt="" width="20" height="20" /> 13 / Common Commands
+## <img src="./forge/website/src/assets/readme-icons/start.svg" alt="" width="20" height="20" /> 13 / Common Commands
 
 ```bash
 pnpm dev           # Start the frontend, backend, and API contract development workflow
@@ -361,27 +363,30 @@ pnpm format:check  # Check formatting
 pnpm lint          # Run ESLint checks
 pnpm db:generate   # Generate migrations from the Drizzle Schema
 pnpm db:migrate    # Apply migrations to a brand-new empty database
+pnpm db:platform:generate # Generate the independent Platform migration chain
 pnpm test:db       # Check PostgreSQL, system tables, and migration records
 ```
 
 The frontend currently does not maintain automated unit, component, or browser tests; frontend features and browser behavior are accepted manually by maintainers. The backend and shared contracts continue to use automated tests for verification.
 
-## <img src="./apps/website/src/assets/readme-icons/docs.svg" alt="" width="20" height="20" /> 14 / Project Documentation
+## <img src="./forge/website/src/assets/readme-icons/docs.svg" alt="" width="20" height="20" /> 14 / Project Documentation
 
 The [project documentation entry point](docs/README.md) contains current project knowledge for both human maintainers and AI collaboration:
 
-- [Human maintainer development guide](docs/guides/human-maintainer-development-guide.md): directory responsibilities, runtime Schemas, Drizzle, backend tests, manual frontend acceptance, and database maintenance workflows
-- [System and module design](docs/design/README.md): current architecture, module boundaries, public interfaces, data flows, and verification strategies
+- [Human maintainer development guide](docs/foundation/guides/human-maintainer-development-guide.md): directory responsibilities, runtime Schemas, Drizzle, backend tests, manual frontend acceptance, and database maintenance workflows
+- [System and module design](docs/foundation/design/README.md): current architecture, module boundaries, public interfaces, data flows, and verification strategies
 - [Database baseline rebuild guide](docs/guides/database-baseline-rebuild.md): creating a database, applying the baseline, verification, and rollback boundaries
-- [Error code reference](docs/reference/error-codes.md): unified responses, error-code ranges, and the registration workflow
+- [Error code reference](docs/foundation/reference/error-codes.md): unified responses, error-code ranges, and the registration workflow
+
+The root `README.md` and `README.en.md` belong to the current repository. Forge maintains its own copies, while each downstream business platform maintains its copied versions independently; Foundation sync never overwrites them.
 
 The root `AGENTS.md` records the collaboration rules that AI must follow when modifying the project. Important design, implementation, and verification results will continue to be synchronized into project documentation rather than remaining only in chat history.
 
-## <img src="./apps/website/src/assets/readme-icons/brand.svg" alt="" width="20" height="20" /> 15 / Branding and white-label configuration
+## <img src="./forge/website/src/assets/readme-icons/brand.svg" alt="" width="20" height="20" /> 15 / Branding and white-label configuration
 
 CYBER is maintained by JTLab. CYBER / Cyber AI Forge is the project name, and JTLab is the creator brand. The English subtitle is `AI-Native Enterprise Application Scaffold`; the Chinese subtitle is `AI 驱动的企业应用智能构建平台`. The frontend uses a brand system built from graphite black, warm white, mint green `#70CFA2`, and electric-purple nodes by default.
 
-Application text configuration is located in `apps/frontend/src/config/app.config.ts`. You can also copy `apps/frontend/.env.example` and override it per deployment environment with these variables:
+Application text configuration is located in `apps/frontend/src/platform/config/app.config.ts`. You can also copy `apps/frontend/.env.example` and override it per deployment environment with these variables:
 
 - `VITE_APP_NAME`
 - `VITE_APP_FULL_NAME`
@@ -391,7 +396,7 @@ Application text configuration is located in `apps/frontend/src/config/app.confi
 
 For a white-label deployment, also replace `CyberLogo.vue` and `public/cyber-mark.svg` so the product name stays consistent with the default C-shaped product mark.
 
-## <img src="./apps/website/src/assets/readme-icons/boundary.svg" alt="" width="20" height="20" /> 16 / Current Implementation Boundaries
+## <img src="./forge/website/src/assets/readme-icons/boundary.svg" alt="" width="20" height="20" /> 16 / Current Implementation Boundaries
 
 The current version has completed the administration foundation described above and is suitable for adding real business modules. To evaluate the project correctly, also keep these boundaries in mind:
 
@@ -403,12 +408,12 @@ The current version has completed the administration foundation described above 
 
 These boundaries do not prevent the project from serving as a starting point for AI full-stack development, but the corresponding engineering work must be completed separately before entering a shared or production environment.
 
-## <img src="./apps/website/src/assets/readme-icons/vision.svg" alt="" width="20" height="20" /> 17 / Project Vision
+## <img src="./forge/website/src/assets/readme-icons/vision.svg" alt="" width="20" height="20" /> 17 / Project Vision
 
 Cyber AI Forge aims to turn “building an enterprise application” from an ability reserved for professional developers into a creative process that ordinary people can complete with AI.
 
 People bring the ideas, and AI leads the implementation. The project structure and documentation keep AI on track, while clear engineering boundaries let an application grow from an idea into a genuinely usable, maintainable, and extensible system.
 
-## <img src="./apps/website/src/assets/readme-icons/contribute.svg" alt="" width="20" height="20" /> 18 / Contributing
+## <img src="./forge/website/src/assets/readme-icons/contribute.svg" alt="" width="20" height="20" /> 18 / Contributing
 
 Issues and feature suggestions are welcome, as are stories about applications built with Cyber AI Forge. Before submitting code or making a substantial design change, please read the [project documentation](docs/README.md) and the root [AGENTS.md](AGENTS.md).

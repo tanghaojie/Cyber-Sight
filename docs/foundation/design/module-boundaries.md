@@ -12,16 +12,16 @@ updated: 2026-07-30
 业务能力是主要组织单元。前端、后端和契约使用一致的稳定模块名；没有某一层实现时不创建空目录。
 
 ```text
-apps/frontend/src/modules/system/<module>/
-apps/frontend/src/modules/biz/<module>/
-apps/backend/src/modules/system/<module>/
-apps/backend/src/modules/biz/<module>/
-packages/api-contract/src/modules/<module>/
+apps/frontend/src/foundation/modules/<module>/
+apps/frontend/src/platform/modules/<module>/
+apps/backend/src/foundation/modules/<module>/
+apps/backend/src/platform/modules/<module>/
+packages/api-contract/src/foundation/modules/<module>/
 ```
 
 页面、状态、用例、领域规则、仓储适配器和业务 Schema 由所属模块拥有。组合根只注册路由、插件和依赖；`shared` 只放领域无关的平台能力，不能成为业务代码兜底目录。
 
-`system` 保存脚手架内置的认证、授权、系统管理、导航、工作台、健康检查和错误处理能力；`biz` 预留给基于脚手架建设的产品业务。前后端 `src/modules/` 下只允许这两个分类目录，模块不得绕过分类直接放在根级。分类不改变稳定模块名或 HTTP 契约命名；`packages/api-contract` 继续保持 `src/modules/<module>/`，避免把应用源码的组织标签泄漏到公共契约入口。
+`foundation` 保存 Forge 维护并同步给下游的认证、授权、系统管理、导航、健康检查和错误处理能力；`platform` 保存当前业务平台独立维护的首页、品牌内容和业务模块。前端、后端与 API 契约使用相同的所有权分类，模块不得绕过分类直接放在 `src/` 根级。分类不改变稳定模块名或 HTTP 契约命名。
 
 ## 公共文件
 

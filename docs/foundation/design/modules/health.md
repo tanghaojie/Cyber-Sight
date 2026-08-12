@@ -11,7 +11,7 @@ updated: 2026-08-07
 
 前端 Health 模块负责在应用壳中轮询 `GET /health`，把后端进程是否仍可响应转换为侧边栏运行状态指示。它只表达进程存活，不检查数据库或其他下游依赖，也不负责全局 HTTP 错误导航。
 
-模块入口是 `apps/frontend/src/modules/system/health/composables/useHealth.ts`，由 `AppSidebar.vue` 消费。模块依赖共享 HTTP 客户端、`health` API 契约和 localization；不直接依赖后端实现。
+模块入口是 `apps/frontend/src/foundation/modules/health/composables/useHealth.ts`，由 `AppSidebar.vue` 消费。模块依赖共享 HTTP 客户端、`health` API 契约和 localization；不直接依赖后端实现。
 
 ## 状态与数据流
 

@@ -11,7 +11,7 @@ updated: 2026-08-07
 
 `about` 是脚手架内置的产品介绍页面，负责解释 Cyber AI Forge 的定位、工程蓝图、核心能力和技术基础，并提供项目 GitHub 入口。它只消费品牌配置、图标、固定本地化文案和静态视觉结构，不读取业务数据，也不承载 README 的完整说明、认证状态或后端 API。
 
-页面放在 `apps/frontend/src/modules/system/about/`，因为它属于脚手架系统能力；后续具体产品的“关于我们”或企业资料应放在 `src/modules/biz/<module>/`，不能复用本模块承载业务内容。
+默认页面放在 `apps/frontend/src/platform/modules/about/`，作为当前平台可独立替换的品牌内容；Foundation 只提供布局、品牌组件插槽和菜单注册能力，后续业务平台不得把自身介绍反向写入 Foundation。
 
 ## 公共接口与路由
 

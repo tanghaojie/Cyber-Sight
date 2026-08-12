@@ -11,41 +11,41 @@ updated: 2026-08-11
 
 `apps/frontend` 是 Vue 3 单页应用，通过 `@cyber-ai-forge/api-contract` 推导的 TypeScript 类型访问后端。它拥有应用启动、认证状态、静态与动态路由、响应式管理端外壳和各前端业务模块；不依赖 NestJS 或 Fastify adapter 内部实现，也不把数据库字符串当作任意动态导入路径。
 
-业务页面、API 和状态按类别归属：脚手架内置能力位于 `src/modules/system/<module>/`，后续产品业务位于 `src/modules/biz/<module>/`。`src/router/`、`src/layouts/`、`src/bootstrap/`、`src/api/` 和领域无关的 `src/shared/` 只承担应用组合或平台能力，不承载具体业务规则。
+业务页面、API 和状态按类别归属：脚手架内置能力位于 `src/foundation/modules/<module>/`，后续产品业务位于 `src/platform/modules/<module>/`。`src/foundation/router/`、`src/foundation/layouts/`、`src/foundation/bootstrap/`、`src/foundation/api/` 和领域无关的 `src/foundation/shared/` 只承担应用组合或平台能力，不承载具体业务规则。
 
 ## 当前结构与公共边界
 
-- `src/modules/system/<module>/pages/`、`src/modules/biz/<module>/pages/`：模块路由页面；`pages/components/`：仅供所属页面使用的列表和 Dialog。
-- `src/modules/{system,biz}/<module>/*.api.ts`：模块 HTTP 调用；`*.store.ts`：确需跨页面共享的 Pinia 状态。
-- `src/modules/{system,biz}/<module>/*.locales.ts`：所属模块的中英文运行时固定领域文案；由
+- `src/foundation/modules/<module>/pages/`、`src/platform/modules/<module>/pages/`：模块路由页面；`pages/components/`：仅供所属页面使用的列表和 Dialog。
+- `src/{foundation,platform}/modules/<module>/*.api.ts`：模块 HTTP 调用；`*.store.ts`：确需跨页面共享的 Pinia 状态。
+- `src/{foundation,platform}/modules/<module>/*.locales.ts`：所属模块的中英文运行时固定领域文案；由
   localization 在构建期自动发现。跨模块通用文案必须改用 `shared.*`，不得在模块资源中重复定义。
-- `src/modules/{system,biz}/**/registerViews.ts`：需要被数据库菜单选择的模块登记页面加载器。
-- `src/modules/system/api-logs/`：只读接口日志分页查询、筛选表格和元数据详情抽屉；它只消费
+- `src/{foundation,platform}/modules/**/registerViews.ts`：需要被数据库菜单选择的模块登记页面加载器。
+- `src/foundation/modules/api-logs/`：只读接口日志分页查询、筛选表格和元数据详情抽屉；它只消费
   `ApiLogQuery` 和 `ApiLogItem` 的脱敏契约字段。
-- `src/shared/routing/view-registry.ts`：构建期发现全部 `registerViews.ts`，校验稳定 key 并冻结页面注册表。
-- `src/shared/routing/layout-registry.ts`：发现 `src/layouts/*.vue`，以文件名建立只读布局注册表；`AdminLayout` 必须存在。
-- `src/shared/browserStorage.ts`：向前端模块公开 `browserStorage()`；在 SSR、隐私模式或浏览器策略禁用存储时返回 `null`，调用方保留各自的内存降级和错误处理语义。
-- `src/shared/localization/localization.resource.ts`：定义受支持语言、资源结构和中英文键集合校验；
-  `src/shared/localization/shared.locales.ts`：提供 `shared.*` 命名空间的领域无关界面文案。
-- `src/router/constRoutes.ts`：登录、显式错误页面和不依赖后端菜单的个人资料路由；默认静态配置不占用 `/`。
-- `src/router/routerGuard.ts`：认证恢复、导航加载和首次动态路由安装。
-- `src/router/dynamicRoutes.ts`：根据菜单树生成、注册和清理动态路由。
-- `src/router/index.ts`：创建 Router，组装静态路由、最终 404 和认证守卫。
-- `src/bootstrap/registerHttpErrorHandler.ts`：组装 Router、认证、导航和全局 HTTP 错误动作。
-- `src/components/layout/` 与 `src/layouts/AdminLayout.vue`：桌面级联顶部导航、移动侧栏抽屉、顶栏和内容出口；头像下拉菜单可打开个人资料页。
-- `src/modules/system/tag-view/`：账号隔离的页面标签历史、浏览器持久化和标签控制界面。
-- `src/modules/system/settings/`：设备级系统界面偏好、版本化浏览器持久化、设置 Dialog，以及主题颜色与深色模式的应用根控制器；登录页通过 auth 模块私有入口消费其 Store 与主题元数据。
-- `src/modules/system/localization/`：默认中文的运行时语言状态、模块和 shared 资源发现、Element Plus
+- `src/foundation/shared/routing/view-registry.ts`：构建期发现全部 `registerViews.ts`，校验稳定 key 并冻结页面注册表。
+- `src/foundation/shared/routing/layout-registry.ts`：发现 `src/foundation/layouts/*.vue`，以文件名建立只读布局注册表；`AdminLayout` 必须存在。
+- `src/foundation/shared/browserStorage.ts`：向前端模块公开 `browserStorage()`；在 SSR、隐私模式或浏览器策略禁用存储时返回 `null`，调用方保留各自的内存降级和错误处理语义。
+- `src/foundation/shared/localization/localization.resource.ts`：定义受支持语言、资源结构和中英文键集合校验；
+  `src/foundation/shared/localization/shared.locales.ts`：提供 `shared.*` 命名空间的领域无关界面文案。
+- `src/foundation/router/constRoutes.ts`：登录、显式错误页面和不依赖后端菜单的个人资料路由；默认静态配置不占用 `/`。
+- `src/foundation/router/routerGuard.ts`：认证恢复、导航加载和首次动态路由安装。
+- `src/foundation/router/dynamicRoutes.ts`：根据菜单树生成、注册和清理动态路由。
+- `src/foundation/router/index.ts`：创建 Router，组装静态路由、最终 404 和认证守卫。
+- `src/foundation/bootstrap/registerHttpErrorHandler.ts`：组装 Router、认证、导航和全局 HTTP 错误动作。
+- `src/foundation/components/layout/` 与 `src/foundation/layouts/AdminLayout.vue`：桌面级联顶部导航、移动侧栏抽屉、顶栏和内容出口；头像下拉菜单可打开个人资料页。
+- `src/foundation/modules/tag-view/`：账号隔离的页面标签历史、浏览器持久化和标签控制界面。
+- `src/foundation/modules/settings/`：设备级系统界面偏好、版本化浏览器持久化、设置 Dialog，以及主题颜色与深色模式的应用根控制器；登录页通过 auth 模块私有入口消费其 Store 与主题元数据。
+- `src/foundation/modules/localization/`：默认中文的运行时语言状态、模块和 shared 资源发现、Element Plus
   语言包、日期格式化和语言切换器。
-- `src/layouts/EmptyLayout.vue`：只提供一个 `<router-view>` 的可选布局。
-- `src/assets/icons/*.svg`、`src/shared/icons/icon-registry.ts` 与 `src/components/AppIcon.vue`：构建期 SVG sprite 和稳定图标名称；每个文件使用 kebab-case 名称、`0 0 24 24` viewBox 和无硬编码颜色的单色描边图形，文件名会自动成为菜单可选的图标名。
+- `src/foundation/layouts/EmptyLayout.vue`：只提供一个 `<router-view>` 的可选布局。
+- `src/foundation/assets/icons/*.svg`、`src/foundation/shared/icons/icon-registry.ts` 与 `src/foundation/components/AppIcon.vue`：构建期 SVG sprite 和稳定图标名称；每个文件使用 kebab-case 名称、`0 0 24 24` viewBox 和无硬编码颜色的单色描边图形，文件名会自动成为菜单可选的图标名。
 
 模块外部只能依赖模块设计登记的表意公共文件。禁止新增无差别 `index.ts` barrel，禁止跨模块导入页面、私有 composable、内部状态或未登记 service。用户模块通过角色和部门 API 读取归属选项；用户、角色和部门弹窗复用 authorization 的 `DataPolicyEditor.vue` 与 API；菜单弹窗通过 authorization API 读取权限目录。
 
 ## 认证数据流
 
 1. `auth.api.ts` 封装登录、当前用户和退出请求，`auth.store.ts` 只编排状态、错误文案和 token 生命周期。
-2. 登录成功数据为 `{ user, issued: { token, expiresAt } }`。store 通过 `shared/accessToken.ts` 把 token 写入 `cyber_ai_forge_access_token` cookie，并使用服务端返回时间作为到期时间；清状态时同时删除旧 `cyber_access_token` 和 `jtlib_access_token`，但不继续使用旧令牌。
+2. 登录成功数据为 `{ user, issued: { token, expiresAt } }`。store 通过 Foundation 的 token 适配器把 token 写入由 Platform `storagePrefix` 派生的 cookie，并使用服务端返回时间作为到期时间；清状态时同时删除旧 `cyber_access_token` 和 `jtlib_access_token`，但不继续使用旧令牌。
 3. 共享 API Client 从 token 适配器读取值并附加 `Authorization: Bearer <token>`。
 4. 退出或 HTTP 401 清除认证、导航和动态路由状态；token 适配器同时移除 cookie 与旧 `localStorage` 键。
 5. `api/result.ts` 在后端既没有合法成功响应也没有错误响应时显示统一消息并抛出异常；HTTP `200` 中的非零业务 `status` 仍由调用模块处理。
@@ -66,20 +66,20 @@ cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie�
 
 ## 页面注册、布局与样式
 
-`view-registry.ts` 通过两个 `import.meta.glob` 模式扫描 `@/modules/system/**/registerViews.ts` 与 `@/modules/biz/**/registerViews.ts`，自动发现两个分类下的登记模块。登记 key 必须符合小写字母开头的 kebab-case 约束且全局唯一；页面标签使用 `{ key?, fallback }` 描述，供菜单编辑器按当前语言解析，未提供或找不到翻译 key 时保留回退文案。缺少 `registerViews()`、非法 key 或重复 key 会在注册表构建时失败。
+`view-registry.ts` 扫描 `@/foundation/modules/**/registerViews.ts`；`platform.register.ts` 独立扫描 `@/platform/modules/**/registerViews.ts` 并通过 Foundation 公共注册函数装配。登记 key 必须符合小写字母开头的 kebab-case 约束且全局唯一；页面标签使用 `{ key?, fallback }` 描述，供菜单编辑器按当前语言解析，未提供或找不到翻译 key 时保留回退文案。缺少 `registerViews()`、非法 key 或跨作用域重复 key 会在启动阶段失败。
 
-默认产品品牌为 `CYBER / Cyber AI Forge`，英文副标题为 `AI-Native Enterprise Application Scaffold`，中文副标题为 `AI 驱动的企业应用智能构建平台`。`components/brand/CyberLogo.vue` 以可缩放 SVG 实现连续双层 C 和数据节点，供登录页、侧栏和 404 复用；`public/cyber-mark.svg` 提供 favicon。`CreatorCredit.vue` 只在登录页以当前语言的创作者标签展示 JTLab / 桀士实验室，不进入产品 Logo 或应用壳。完整边界见[CYBER 品牌与视觉系统](../../../forge/design/branding.md)。
+当前 Platform 默认品牌为 `CYBER / Cyber AI Forge`。`src/platform/brand/` 和 `src/platform/config/` 拥有品牌组件与文字配置；Foundation 只通过 `PlatformDefinition` 注入接口渲染 Logo 和创作者信息，不直接导入 Platform。完整边界见[CYBER 品牌与视觉系统](../../../forge/design/branding.md)。
 
-`main.ts` 安装 localization 后再安装 Router；`App.vue` 通过 `LocalizationProvider.vue` 为
+`main.ts` 先调用 `installPlatform()` 登记品牌、Platform 文案和页面，再安装 Pinia、localization 与 Router；`App.vue` 通过 `LocalizationProvider.vue` 为
 Element Plus 提供当前语言包。登录页与 Header 共用 `LanguageSwitcher.vue`，语言切换立即
-更新固定文案、`<html lang>`、页面标题和本地日期格式，并写入 `cyber_ai_forge_locale:v1`。
+更新固定文案、`<html lang>`、页面标题和本地日期格式，并写入由 Platform `storagePrefix` 派生的版本化键。
 数据库与 API 契约不保存语言偏好。动态标题没有路由专属标题时使用 `appConfig.fullName` 与 `appConfig.name` 组合，Logo 下方的产品描述使用 `appConfig.tagline` 的大写形式，登录页签名使用原始 `appConfig.tagline`。
 
 `tag-view` 位于 Header 与主内容之间，历史标签可横向滚动，操作入口提供关闭当前、关闭其他和关闭全部。其版本化 `localStorage` 数据按 UUID 用户 ID 隔离；存储不可用或内容损坏时降级为内存状态，不影响 Router 导航。Header 用户下拉同时提供系统设置入口：该 Dialog 对设备级的导航菜单风格、主题颜色、深色模式、Tags View、侧栏 Logo 和动态标题设置逐项立即保存。导航菜单风格控制桌面导航布局；Tags View 控制标签栏可见性但不清空历史，并把应用主区的标签栏高度归零；侧栏 Logo 控制侧栏品牌区，移动抽屉在隐藏品牌时仍保留可访问的关闭按钮；动态标题打开时按当前路由与语言更新浏览器标题，关闭时始终显示 `appConfig.name`。主题颜色和深色模式会立即控制应用根。具体边界见[系统设置模块](settings.md)。
 
 全局变量 `--app-shell-header-height` 定义应用壳顶部高度，当前值为 `72px`。顶部模式的桌面应用壳为单列布局，粘性 Header 保留一级菜单、标题路径和用户菜单；下拉菜单在 Header 层级内显示，避免被内容区裁切。侧边模式的桌面应用壳固定为双列布局，Header 仍保留侧栏开关。窄屏由 `matchMedia('(max-width: 1023px)')` 强制使用抽屉式侧边导航，窗口恢复后重用保存的桌面偏好。菜单打开按钮不按断点隐藏；抽屉打开时侧栏中的关闭按钮与遮罩可关闭它。
 
-布局注册表通过懒加载发现 `src/layouts/*.vue`。`AdminLayout` 是静态根壳和必备布局；`EmptyLayout` 可供菜单显式选择。Tailwind CSS 负责布局、间距、响应式和多数视觉样式，Element Plus 提供表单、表格、弹窗和反馈；全局 SCSS 按基础、管理布局、过渡和 Element Plus 组件覆盖拆分。其中 `styles/element-plus/el-dialog-override.scss` 将 `--el-dialog-margin-top` 统一设为 `5vh`，适用于所有未自行覆盖该变量的 `el-dialog`。六套主题通过语义 CSS 令牌同时驱动应用表面、Element Plus、首页 Hero、登录页、侧栏品牌区和健康状态；组件只保留与语义状态相关的成功、警告和错误颜色。用户、角色、部门、菜单和字典管理页面共用的内容容器最大宽度为 `1920px`，窄于该宽度时仍保持响应式占满可用空间。
+布局注册表通过懒加载发现 `src/foundation/layouts/*.vue`。`AdminLayout` 是静态根壳和必备布局；`EmptyLayout` 可供菜单显式选择。Tailwind CSS 负责布局、间距、响应式和多数视觉样式，Element Plus 提供表单、表格、弹窗和反馈；全局 SCSS 按基础、管理布局、过渡和 Element Plus 组件覆盖拆分。其中 `styles/element-plus/el-dialog-override.scss` 将 `--el-dialog-margin-top` 统一设为 `5vh`，适用于所有未自行覆盖该变量的 `el-dialog`。六套主题通过语义 CSS 令牌同时驱动应用表面、Element Plus、首页 Hero、登录页、侧栏品牌区和健康状态；组件只保留与语义状态相关的成功、警告和错误颜色。用户、角色、部门、菜单和字典管理页面共用的内容容器最大宽度为 `1920px`，窄于该宽度时仍保持响应式占满可用空间。
 
 ## 全局 HTTP 错误
 

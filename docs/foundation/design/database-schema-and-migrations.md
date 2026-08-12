@@ -2,7 +2,7 @@
 title: 数据库 Schema 与迁移基线
 status: active
 owner: project maintainers
-updated: 2026-08-10
+updated: 2026-08-12
 ---
 
 # 数据库 Schema 与迁移基线
@@ -11,11 +11,13 @@ updated: 2026-08-10
 
 数据库层使用 PostgreSQL 18、Drizzle ORM 和受版本控制的 SQL 迁移。当前仓库中的表都是脚手架自带的系统能力表，物理表名统一使用 `sys_` 前缀；TypeScript 表对象继续使用既有语义名称，业务模块不直接拼接物理表名。全部应用表以数据库原生 `uuidv7()` 生成单一 `uuid` 主键，实体引用也统一为 `uuid`。
 
-`sys_` 只标识应用拥有的框架系统表。PostgreSQL 枚举类型 `menu_type`、`authorization_subject_type`、`data_scope_type` 以及 Drizzle 自有的 `drizzle.__drizzle_migrations` 不属于应用表，不增加该前缀。
+`sys_` 只标识应用拥有的框架系统表。PostgreSQL 枚举类型 `menu_type`、`authorization_subject_type`、`data_scope_type` 以及 Drizzle 自有的 `drizzle.__foundation_migrations`、`drizzle.__platform_migrations` 不属于应用表，不增加该前缀。
 
 ## Schema 源码组织
 
-`apps/backend/src/db/schema.ts` 是数据库 Schema 的稳定聚合入口：数据库客户端、Drizzle Kit 和既有调用方均从该文件取得完整 Schema。具体表定义按数据所有权拆分到同级 `schema/` 目录；聚合入口只显式重新导出各分片，不承载表定义，也不使用无差别 barrel。
+`apps/backend/src/foundation/database/schema.ts` 聚合 Forge 维护的基础表，`apps/backend/src/platform/database/schema.ts` 聚合当前业务平台拥有的表。根 `apps/backend/src/database.schema.ts` 只负责按 Foundation、Platform 顺序组合运行时完整 Schema；数据库客户端在根 `database.ts` 创建后通过 Nest Provider 注入 Foundation，避免 Foundation 反向导入 Platform。
+
+两个作用域的具体表定义分别放入自身 `schema/` 目录，聚合入口只显式重新导出分片，不承载表定义，也不使用无差别 barrel。Platform 可以显式引用 Foundation 公共表建立外键，Foundation Schema 禁止引用 Platform。
 
 分片之间可以为外键显式导入被引用的表，但不得改变导出的表对象、枚举、列、约束或索引。纯源码组织重构不生成 SQL migration，不改写既有 migration、snapshot 或 journal；只有数据库对象发生语义变化时才追加迁移。
 
@@ -56,7 +58,7 @@ updated: 2026-08-10
 
 ## 单一初始基线
 
-`apps/backend/drizzle/0000_initial_uuidv7_system_schema.sql` 是当前唯一迁移，并与 `0000_snapshot.json`、journal 的唯一条目对应。它只面向 PostgreSQL 18 空库，必须一次性创建 17 张系统表及脚手架运行所需的初始数据：
+`apps/backend/drizzle/foundation/0000_initial_uuidv7_foundation_schema.sql` 是当前唯一迁移，并与 `0000_snapshot.json`、journal 的唯一条目对应。它只面向 PostgreSQL 18 空库，必须一次性创建 17 张系统表及脚手架运行所需的初始数据：
 
 - 本地管理员、超级管理员角色及角色归属；
 - 权限目录、超级管理员功能权限及用户资源全量数据策略；
@@ -65,6 +67,15 @@ updated: 2026-08-10
 - 通用状态字典。
 
 全部 17 个主键由 `uuidv7()` 生成；关系列使用 `uuid`；部门和菜单根节点使用 `parent_id = NULL`；没有登录主体的系统审计使用 `created_by = NULL`、`updated_by = NULL`。后续 Schema 变化按正常规则追加新迁移，禁止改写已经在共享环境执行过的新基线；只有维护者再次明确宣布基线重置时，才能压缩历史。
+
+## 独立迁移链
+
+- `drizzle.foundation.config.ts` 使用 Foundation Schema、`drizzle/foundation/` 和 `drizzle.__foundation_migrations`。
+- `drizzle.platform.config.ts` 使用 Platform Schema、`drizzle/platform/` 和 `drizzle.__platform_migrations`。
+- `pnpm db:migrate` 固定先执行 Foundation，再执行 Platform；也可分别运行 `db:foundation:*` 与 `db:platform:*`。
+- Sight 当前没有业务表和业务 migration，因此 `drizzle/platform/` 只保留空基线说明，不伪造 SQL、snapshot 或 journal。
+
+临时外键 PoC 使用一张未提交的 Platform 表引用 `sys_users.id`。Drizzle Kit 0.31.10 只生成该 Platform 表和外键，没有重复生成 Foundation 表，因此当前允许自动生成 Platform migration；每次引入新的跨作用域关系仍必须审查生成 SQL。
 
 ## 发布与数据库切换
 

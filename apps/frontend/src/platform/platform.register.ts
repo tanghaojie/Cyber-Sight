@@ -1,0 +1,26 @@
+import type { App } from 'vue'
+import PlatformCreatorCredit from '@/platform/brand/CreatorCredit.vue'
+import PlatformLogo from '@/platform/brand/CyberLogo.vue'
+import { appConfig } from '@/platform/config/app.config'
+import { registerLocalizationResources } from '@/foundation/modules/localization/localization'
+import { installPlatformDefinition } from '@/foundation/platform/platform'
+import { registerViewModules } from '@/foundation/shared/routing/view-registry'
+
+const platformLocalizationResources = import.meta.glob('@/platform/modules/**/*.locales.ts', {
+  eager: true,
+})
+const platformViewModules = import.meta.glob('@/platform/modules/**/registerViews.ts', {
+  eager: true,
+})
+
+export function installPlatform(app: App): void {
+  installPlatformDefinition(app, {
+    config: appConfig,
+    brand: {
+      logo: PlatformLogo,
+      creatorCredit: PlatformCreatorCredit,
+    },
+  })
+  registerLocalizationResources(platformLocalizationResources)
+  registerViewModules(platformViewModules)
+}

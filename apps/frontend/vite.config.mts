@@ -21,7 +21,7 @@ export default defineConfig(function createViteConfig({ mode }) {
     plugins: [
       vue(),
       createSvgIconsPlugin({
-        iconDirs: [resolve(process.cwd(), 'src/assets/icons')],
+        iconDirs: [resolve(process.cwd(), 'src/foundation/assets/icons')],
         symbolId: 'icon-[name]',
       }),
       tailwindcss(),

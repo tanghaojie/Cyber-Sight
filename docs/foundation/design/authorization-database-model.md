@@ -86,7 +86,7 @@ WHERE ur.user_id = :current_user_id
 
 ### 初始数据
 
-唯一初始迁移 `apps/backend/drizzle/0000_initial_uuidv7_system_schema.sql` 会创建完整权限目录、超级管理员角色及归属，并授予该角色当前全部初始功能权限。超级管理员不依赖固定用户 UUID、运行时用户 ID 或角色编码绕过；其能力同样来自上述关系表。
+唯一初始迁移 `apps/backend/drizzle/foundation/0000_initial_uuidv7_foundation_schema.sql` 会创建完整权限目录、超级管理员角色及归属，并授予该角色当前全部初始功能权限。超级管理员不依赖固定用户 UUID、运行时用户 ID 或角色编码绕过；其能力同样来自上述关系表。
 
 ## 数据权限
 

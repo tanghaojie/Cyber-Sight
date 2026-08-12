@@ -8,6 +8,6 @@
 </template>
 
 <script setup lang="ts">
-import LocalizationProvider from '@/modules/system/localization/LocalizationProvider.vue'
-import ThemeController from '@/modules/system/settings/ThemeController.vue'
+import LocalizationProvider from '@/foundation/modules/localization/LocalizationProvider.vue'
+import ThemeController from '@/foundation/modules/settings/ThemeController.vue'
 </script>

@@ -39,7 +39,7 @@ updated: 2026-08-10
 
 每个标签只保存 `{ path, title }`。`path` 使用不含 query 和 hash 的规范路由路径，既作为页面唯一键，也作为重新导航目标；这样不会因筛选条件产生重复标签，也不会把可能敏感的查询参数长期写入浏览器存储。
 
-持久化键为带版本号和 UUID 用户 ID 的 `cyber_ai_forge_tag_view_history:v2:<userId>`。Store 激活账号时先通过 `EntityIdSchema` 校验 UUID，再解析并校验 JSON，拒绝非绝对路径、空标题和重复路径；后续每次变更同步写回。浏览器不提供 `localStorage`、JSON 损坏或写入失败时，模块降级为当前会话内存状态。
+持久化键为带 Platform `storagePrefix`、版本号和 UUID 用户 ID 的 `${platform.storagePrefix}_tag_view_history:v2:<userId>`。Store 激活账号时先通过 `EntityIdSchema` 校验 UUID，再解析并校验 JSON，拒绝非绝对路径、空标题和重复路径；后续每次变更同步写回。浏览器不提供 `localStorage`、JSON 损坏或写入失败时，模块降级为当前会话内存状态。
 
 `AdminLayout` 在账号或当前路由变化时先激活对应账号，再登记当前页面。关闭当前标签后优先导航到其右侧标签，其次左侧标签；没有相邻标签时回到 `/`。关闭全部后回到 `/`，根入口解析器会选择当前用户仍可访问的动态根页面、首个动态页面或无权限页，并把实际落点重新加入历史。
 

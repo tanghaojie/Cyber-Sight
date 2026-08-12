@@ -28,7 +28,7 @@ Vue 应用提供统一的语言状态、文案解析、日期格式、Element Pl
 
 ## 职责与边界
 
-`apps/frontend/src/modules/system/localization/` 是前端运行时语言能力的数据和规则所有者：
+`apps/frontend/src/foundation/modules/localization/` 是前端运行时语言能力的数据和规则所有者：
 
 - 只接受 `zh-CN` 和 `en-US` 两种受支持语言，默认与回退语言都是 `zh-CN`；
 - 从版本化浏览器键恢复语言并在切换后持久化；
@@ -37,7 +37,7 @@ Vue 应用提供统一的语言状态、文案解析、日期格式、Element Pl
 - 提供登录页和应用 Header 可复用的语言切换组件；
 - 校验每个模块及 shared 资源的中英文资源具有相同键集合。
 
-各业务模块拥有自己的 `*.locales.ts` 资源和领域文案。`src/shared/localization/shared.locales.ts`
+各业务模块拥有自己的 `*.locales.ts` 资源和领域文案。`src/foundation/shared/localization/shared.locales.ts`
 拥有新增、查看、删除等跨模块的领域无关界面文案，并以 `shared.*` 作为稳定命名空间；模块
 不得重复定义这些文案。`localization` 不集中拥有认证、用户、角色、菜单等业务模块的翻译，也
 不允许业务模块直接读写其内部语言状态。资源加载器发现并注册模块与 shared 的语言资源，其他
@@ -45,9 +45,9 @@ Vue 应用提供统一的语言状态、文案解析、日期格式、Element Pl
 
 ## 公共接口
 
-- `src/shared/localization/localization.resource.ts`：公开 `SupportedLocale`、资源结构和中英文键
+- `src/foundation/shared/localization/localization.resource.ts`：公开 `SupportedLocale`、资源结构和中英文键
   集合校验辅助函数。
-- `src/shared/localization/shared.locales.ts`：公开通过资源校验的 `shared` 通用界面文案。
+- `src/foundation/shared/localization/shared.locales.ts`：公开通过资源校验的 `shared` 通用界面文案。
 - `localization.ts`：公开受支持语言元数据、Vue 插件实例、`useLocalization()`、
   `setLocale()`、`translate()`、本地化标签解析和日期格式化能力。
 - `LocalizationProvider.vue`：在应用根部连接当前语言与 Element Plus Config Provider。
@@ -65,7 +65,7 @@ Vue 应用提供统一的语言状态、文案解析、日期格式、Element Pl
 SupportedLocale = 'zh-CN' | 'en-US'
 ```
 
-浏览器存储键为 `cyber_ai_forge_locale:v1`。读取不到、存储不可用、值损坏或值不受支持时使用
+浏览器存储键为 `${platform.storagePrefix}_locale:v1`，当前 Forge 默认值仍为 `cyber_ai_forge_locale:v1`。读取不到、存储不可用、值损坏或值不受支持时使用
 `zh-CN`；写入失败只影响刷新后的恢复，不阻断当前会话切换。
 
 每个模块资源以中文键集合为结构基准，英文资源必须提供相同键。界面文案使用稳定 key，
@@ -73,9 +73,9 @@ SupportedLocale = 'zh-CN' | 'en-US'
 
 ```text
 应用启动
-    -> 发现 system/biz 模块及 shared/localization 的 *.locales.ts
+    -> Foundation 发现自身模块与 shared/localization，Platform 通过公共注册函数登记自己的 *.locales.ts
     -> 创建并安装 localization
-    -> 恢复 cyber_ai_forge_locale:v1 或使用 zh-CN
+    -> 恢复 Platform 命名空间下的 locale:v1 或使用 zh-CN
     -> LocalizationProvider 选择 Element Plus locale
     -> 页面、路由标题和日期格式响应当前语言
 ```

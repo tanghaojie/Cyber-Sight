@@ -46,18 +46,18 @@ updated: 2026-08-12
 
 - [x] 暂存区门禁、工作区检查与文档归档审计。
 - [x] 建立总体设计、所有权 ADR、数据库迁移 ADR、计划和 AI 日志。
-- [ ] 将文档重组为 Foundation、Forge、Platform 完整生命周期，保留公共 `docs/templates`。
-- [ ] 更新模板 frontmatter，加入 scope、repository 和 owner。
-- [ ] 迁移 API 契约到 `foundation/platform`，清理遗留模块 `index.ts`。
-- [ ] 增加目录和 Foundation 单向依赖检查。
-- [ ] 迁移前端 Foundation、Platform 和稳定组合入口。
-- [ ] 迁移后端 Foundation、Platform 和 `PlatformModule`。
-- [ ] 建立 Platform 品牌、链接、存储、JWT、首页和 About 配置入口。
-- [ ] 拆分数据库 Schema、Drizzle 配置和迁移历史，生成空库 Foundation 基线。
-- [ ] 将推广站与 Forge README 资产迁入 `forge/`，更新 Pages 工作流。
-- [ ] 实现 `.forge-sync.yml`、同步命令、差异报告和临时 Git 仓库测试。
-- [ ] 更新所有相关现行设计、索引、指南和仓库规则。
-- [ ] 执行格式、Lint、测试、构建、文档与适用数据库验证。
+- [x] 将文档重组为 Foundation、Forge、Platform 完整生命周期，保留公共 `docs/templates`。
+- [x] 更新模板 frontmatter，加入 scope、repository 和 owner。
+- [x] 迁移 API 契约到 `foundation/platform`，清理遗留模块 `index.ts`。
+- [x] 增加目录和 Foundation 单向依赖检查。
+- [x] 迁移前端 Foundation、Platform 和稳定组合入口。
+- [x] 迁移后端 Foundation、Platform 和 `PlatformModule`。
+- [x] 建立 Platform 品牌、链接、存储、JWT、首页和 About 配置入口。
+- [x] 拆分数据库 Schema、Drizzle 配置和迁移历史，生成空库 Foundation 基线。
+- [x] 将推广站与 Forge README 资产迁入 `forge/`，更新 Pages 工作流。
+- [x] 实现 `.forge-sync.yml`、同步命令、差异报告和临时 Git 仓库测试。
+- [x] 更新所有相关现行设计、索引、指南和仓库规则。
+- [x] 执行格式、Lint、测试、构建、文档与适用数据库验证。
 - [ ] 复核最终 diff，归档计划和 AI 日志并创建带 AI trailer 的提交。
 
 ## 测试与验证
@@ -75,4 +75,6 @@ updated: 2026-08-12
 
 ## 完成记录
 
-实施中持续更新实际偏差、验证结果、未决问题和关联提交。
+实际实现采用根组合入口注入 Platform 配置：前端在动态加载 Foundation 前登记平台配置，后端根模块组合完整数据库 Schema 并向 Foundation 注入数据库与 JWT 身份。Drizzle 0.31.10 跨作用域外键 PoC 只生成 Platform 表和外键，未重复生成 Foundation 表，因此保留自动生成命令。
+
+结构守卫、同步临时仓库场景、Lint、140 个后端测试、API 契约验证以及包含 Forge website 的全量生产构建已通过。当前环境未提供可清空的 PostgreSQL 18 实例，因此没有执行真实 `db:migrate`/`test:db`；迁移 SQL、journal、Schema 和命令由静态测试覆盖，真实空库验证仍是部署门禁。

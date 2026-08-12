@@ -65,7 +65,7 @@ date: 2026-08-07
 
 ## 实现状态
 
-实现已落在 `apps/backend/src/modules/system/positions/`、`apps/frontend/src/modules/system/positions/` 和 `packages/api-contract/src/modules/positions/`；两张岗位表、权限和菜单种子现已合并到 `apps/backend/drizzle/0000_initial_uuidv7_system_schema.sql`，其主键和引用统一为 UUID。用户模块通过岗位公共服务在同一事务中替换或失效岗位关系，岗位编码未加入模型。
+实现已落在 `apps/backend/src/foundation/modules/positions/`、`apps/frontend/src/foundation/modules/positions/` 和 `packages/api-contract/src/foundation/modules/positions/`；两张岗位表、权限和菜单种子现已合并到 `apps/backend/drizzle/foundation/0000_initial_uuidv7_foundation_schema.sql`，其主键和引用统一为 UUID。用户模块通过岗位公共服务在同一事务中替换或失效岗位关系，岗位编码未加入模型。
 
 ## 相关设计
 

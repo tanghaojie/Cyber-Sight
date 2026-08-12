@@ -6,17 +6,21 @@ import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fa
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import type { FastifyServerOptions } from 'fastify'
 import { AppModule } from './app.module.js'
+import { databaseClient, db } from './database.js'
+import { platformConfig } from './platform/config/platform.config.js'
 import {
   createApiLogWriter,
   registerApiLogHooks,
-} from './modules/system/api-logs/api-logs.hooks.js'
-import type { AuthorizationProvider } from './modules/system/authorization/authorization.provider.js'
-import { ApiLogsRepository } from './modules/system/api-logs/api-logs.repository.js'
-import type { ApiLogWriter } from './modules/system/api-logs/api-logs.service.js'
-import type { RuntimeDependencies } from './shared/runtime/runtime.module.js'
+} from './foundation/modules/api-logs/api-logs.hooks.js'
+import type { AuthorizationProvider } from './foundation/modules/authorization/authorization.provider.js'
+import { ApiLogsRepository } from './foundation/modules/api-logs/api-logs.repository.js'
+import type { ApiLogWriter } from './foundation/modules/api-logs/api-logs.service.js'
+import type { Database } from './foundation/database/index.js'
 
-export interface AppDependencies extends Partial<Omit<RuntimeDependencies, 'jwtSecret'>> {
+export interface AppDependencies {
   jwtSecret?: string
+  database?: Database
+  closeDatabase?: boolean
   authorizationProvider?: AuthorizationProvider
   apiLogWriter?: ApiLogWriter
   controllers?: Type<unknown>[]
@@ -24,9 +28,9 @@ export interface AppDependencies extends Partial<Omit<RuntimeDependencies, 'jwtS
 
 function registerSwagger(app: NestFastifyApplication): void {
   const config = new DocumentBuilder()
-    .setTitle('Cyber AI Forge API')
-    .setVersion('0.1.0')
-    .setDescription('CYBER management scaffold — runtime-safe, modular, and AI-native')
+    .setTitle(platformConfig.api.title)
+    .setVersion(platformConfig.api.version)
+    .setDescription(platformConfig.api.description)
     .addBearerAuth(undefined, 'bearerAuth')
     .addSecurityRequirements('bearerAuth')
     .build()
@@ -46,9 +50,15 @@ export async function buildApp(
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule.register({
       jwtSecret,
+      jwtIdentity: platformConfig.jwt,
       authorizationProvider: dependencies.authorizationProvider,
-      database: dependencies.database,
-      closeDatabase: dependencies.closeDatabase,
+      // 完整运行时 Schema 是 Foundation 数据库端口的超集；组合根在此收窄注入类型。
+      database: (dependencies.database ?? db) as Database,
+      closeDatabase: dependencies.closeDatabase
+        ? async function closeDatabase(): Promise<void> {
+            await databaseClient.end()
+          }
+        : undefined,
       controllers: dependencies.controllers,
     }),
     adapter,

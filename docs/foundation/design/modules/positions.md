@@ -81,7 +81,7 @@ updated: 2026-08-10
 
 ### 契约公共文件
 
-- `packages/api-contract/src/modules/positions/positions.schema.ts`：岗位摘要、岗位请求、岗位选项、列表响应及错误结果 Schema。
+- `packages/api-contract/src/foundation/modules/positions/positions.schema.ts`：岗位摘要、岗位请求、岗位选项、列表响应及错误结果 Schema。
 
 契约包发布入口显式导出该文件中的稳定 Schema 和推导类型；不新增契约模块 barrel。实现已先更新共享 Zod 4 Schema，再由 Nest Controller 绑定运行时校验。
 
@@ -168,7 +168,7 @@ user_departments(user, position.department_id).is_deleted = false
 
 ### 迁移与种子
 
-当前 `0000_initial_uuidv7_system_schema.sql` 单一空库基线直接创建两张 `sys_` 表、UUID 外键、索引、`positions.manage` 权限和岗位管理菜单，并为初始超级管理员角色授予权限；未写入示例岗位数据。
+当前 `0000_initial_uuidv7_foundation_schema.sql` 单一空库基线直接创建两张 `sys_` 表、UUID 外键、索引、`positions.manage` 权限和岗位管理菜单，并为初始超级管理员角色授予权限；未写入示例岗位数据。
 
 ## 部门与用户关联方案
 
@@ -248,7 +248,7 @@ HTTP request
 
 ## 兼容性与后续边界
 
-已交付文件包括：后端 `positions.module.ts`、`positions.controller.ts`、`positions.service.ts`、`positions.access.ts`、`positions.repository.ts`；前端 `positions.api.ts`、`registerViews.ts`、`positions.locales.ts` 及岗位列表/编辑页面；契约 `packages/api-contract/src/modules/positions/positions.schema.ts`。
+已交付文件包括：后端 `positions.module.ts`、`positions.controller.ts`、`positions.service.ts`、`positions.access.ts`、`positions.repository.ts`；前端 `positions.api.ts`、`registerViews.ts`、`positions.locales.ts` 及岗位列表/编辑页面；契约 `packages/api-contract/src/foundation/modules/positions/positions.schema.ts`。
 
 前端遵守仓库约定的人工验收边界，需由维护者确认动态菜单、岗位筛选、用户多岗位编辑、禁用/删除冲突提示和窄屏布局。若后续出现跨部门共享岗位、主岗位、岗位层级、任职历史或按部门授权，应另开设计/ADR，不能在当前模型上隐式扩展。
 

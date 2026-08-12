@@ -24,7 +24,7 @@
 |   9000 | `INTERNAL_ERROR`            |       500 | 未分类的服务端内部错误                 |
 |   9001 | `EXTERNAL_DEPENDENCY_ERROR` |       200 | 数据库或外部服务不可用、超时或响应异常 |
 
-代码定义位于 `apps/backend/src/shared/errors/error-codes.ts`。本文档与代码必须在同一个提交中更新。
+代码定义位于 `apps/backend/src/foundation/shared/errors/error-codes.ts`。本文档与代码必须在同一个提交中更新。
 
 ## 区间分配
 

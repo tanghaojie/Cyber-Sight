@@ -53,4 +53,4 @@ updated: 2026-08-10
 
 本次默认菜单基线修正的实施证据见[完成计划](../../archive/plans/2026-07-30-default-menu-baseline.md)和 [AI 协作记录](../../archive/ai-logs/2026/07/2026-07-30-default-menu-baseline.md)。
 
-关于项目和工作台菜单都直接存在于 `0000_initial_uuidv7_system_schema.sql`。关于项目使用 `/about`、`about`、`AdminLayout` 且不绑定权限键；工作台使用 `/`、`home`、`AdminLayout`、`home.read` 和最小默认排序。初始超级管理员获得 `home.read`，其他账号必须由角色授权后才显示工作台。
+关于项目和工作台菜单都直接存在于 `0000_initial_uuidv7_foundation_schema.sql`。关于项目使用 `/about`、`about`、`AdminLayout` 且不绑定权限键；工作台使用 `/`、`home`、`AdminLayout`、`home.read` 和最小默认排序。初始超级管理员获得 `home.read`，其他账号必须由角色授权后才显示工作台。

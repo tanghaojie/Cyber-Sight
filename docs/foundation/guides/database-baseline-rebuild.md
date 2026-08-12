@@ -7,7 +7,7 @@
 ## 上线前检查
 
 - 保留旧应用版本和旧 `DATABASE_URL`，将旧数据库作为只读备份；不要删除旧库来“腾出”原名称。
-- 为新版应用创建另一个全新空数据库，确认其中没有旧应用表和旧 `drizzle.__drizzle_migrations` 记录。
+- 为新版应用创建另一个全新空数据库，确认其中没有旧应用表和任何旧 Drizzle migration 记录。
 - 若必须保留旧业务数据，停止本流程并单独设计备份、字段映射、ETL、行数与关键约束核对以及回滚方案。
 
 ## 重建步骤
@@ -21,12 +21,12 @@
    pnpm test:db
    ```
 
-4. 确认 `pnpm test:db` 输出包含 PostgreSQL 18 版本、`systemUsersTable=sys_users`、`migrationsTable=drizzle.__drizzle_migrations` 和 `identifiers=uuidv7`。
+4. 确认 `pnpm test:db` 输出包含 PostgreSQL 18 版本、`systemUsersTable=sys_users`、`foundationMigrationsTable=drizzle.__foundation_migrations`、`platformMigrationsTable=drizzle.__platform_migrations` 和 `identifiers=uuidv7`。
 5. 启动新版应用，使用本地初始管理员完成登录检查，并在共享或生产环境立即修改默认凭据。
 
 ## 数据库侧核对
 
-新基线应创建 17 张 `public.sys_*` 表，Drizzle journal 只登记 `0000_initial_uuidv7_system_schema` 对应的一次迁移。可由数据库管理员在新库执行只读核对：
+新基线应创建 17 张 `public.sys_*` 表，Drizzle journal 只登记 `0000_initial_uuidv7_foundation_schema` 对应的一次迁移。可由数据库管理员在新库执行只读核对：
 
 ```sql
 select tablename
@@ -35,14 +35,17 @@ where schemaname = 'public' and tablename like 'sys\_%' escape '\'
 order by tablename;
 
 select count(*)
-from drizzle.__drizzle_migrations;
+from drizzle.__foundation_migrations;
+
+select count(*)
+from drizzle.__platform_migrations;
 
 select uuid_extract_version(id), count(*)
 from public.sys_users
 group by uuid_extract_version(id);
 ```
 
-第一条查询应返回 17 行，第二条查询应返回 `1`，第三条查询应只返回 UUID 版本 `7`。
+第一条查询应返回 17 行，Foundation migration 查询应返回 `1`，Platform migration 查询应返回 `0`，UUID 查询应只返回版本 `7`。
 
 ## 禁止操作
 

@@ -35,18 +35,27 @@ status: active
 
 ## 方案和执行摘要
 
-按文档、契约、前后端、数据库、Forge 内容、同步工具顺序分阶段实施，每个阶段先建立结构检查并执行适用验证。
+已完成文档、契约、前后端、数据库、Forge 内容和同步工具迁移。前端 Foundation 通过 Platform 注册接口取得品牌、文案、页面和存储命名空间；后端通过根组合入口注入完整数据库、JWT 身份和 PlatformModule。同步工具在共同 Git 历史上执行无提交合并并强制所有权分类。
 
 ## 验证结果
 
 - `git diff --cached --quiet`：通过。
 - 初始工作区：无已跟踪或未跟踪改动。
 - `pnpm docs:archive:check`：`NOT_DUE`。
+- API 契约 build 与 dist 导入验证：通过。
+- `pnpm architecture:check`：通过，旧目录和 Foundation 反向依赖均未发现。
+- Drizzle Platform→Foundation 外键 PoC：只生成 Platform 表和外键，未重复生成 Foundation 表；临时文件已删除。
+- `pnpm forge:sync:test`：Platform/README 保留、Forge 排除、未知路径拒绝、验证失败保留未提交 merge 均通过。
+- 后端：16 个测试文件、140 个测试通过。
+- `pnpm lint`：通过。
+- `pnpm build`：API 契约、后端、前端和 `forge/website` 全部通过。
+- 前端自动化/浏览器测试未创建或运行，按仓库规则保留人工验收边界。
+- 当前环境没有可清空的 PostgreSQL 18 实例，未运行真实空库 migration 与 `test:db`。
 
 ## 未决问题与下一步
 
-- 完成数据库跨作用域外键生成 PoC。
 - Forge 结构稳定后，在 Cyber-Sight 单独执行 Platform 迁移和两次真实同步演练。
+- 部署到数据库前使用独立 PostgreSQL 18 空库执行两条 migration 和 `pnpm test:db`。
 
 ## 相关设计、ADR、计划和提交
 

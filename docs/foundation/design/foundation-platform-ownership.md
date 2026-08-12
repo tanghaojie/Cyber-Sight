@@ -1,6 +1,6 @@
 ---
 title: Forge、Foundation 与 Platform 所有权边界
-status: proposed
+status: accepted
 owner: project maintainers
 updated: 2026-08-12
 ---
@@ -72,4 +72,4 @@ Sight 当前没有业务表、业务迁移或需要保留的数据，因此本�
 - 前端执行 TypeScript 与生产构建，浏览器行为由维护者人工验收。
 - 同步工具在临时 Git 仓库覆盖 README、Platform、Forge、未知路径、迁移和验证失败场景。
 
-本设计在迁移完成前为目标状态；每个阶段完成后同步更新相关模块设计，最终改为 `accepted` 并只描述实际实现。
+当前实现通过 `.forge-sync.yml` 显式分类路径，`pnpm architecture:check` 检查旧目录和反向依赖，`pnpm forge:sync -- --upstream-ref <ref>` 执行无提交合并、保留 Platform/README、排除 Forge、拒绝未知路径并运行验证。集成控制文件仍进入差异报告，需要下游维护者在验证后人工完成合并提交。

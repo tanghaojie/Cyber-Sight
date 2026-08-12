@@ -25,7 +25,7 @@ date: 2026-08-10
 
 ## 决策
 
-采用方案三，在 `apps/website` 创建独立 Vite + Vue 3 应用，通过 GitHub Actions 发布其 `dist` 到 GitHub Pages。站点不跨应用导入管理端内部文件；品牌 SVG 可以在站点公共资产中保留一份发布副本，并由品牌设计文档约束一致性。
+采用方案三，在 `forge/website` 创建独立 Vite + Vue 3 应用，通过 GitHub Actions 发布其 `dist` 到 GitHub Pages。站点不跨应用导入管理端内部文件；品牌 SVG 可以在站点公共资产中保留一份发布副本，并由品牌设计文档约束一致性。
 
 运行时中英文切换由站点本地内容资源和浏览器存储实现，语言入口固定放在 Header。三维轮播只使用 CSS transform 和原生滚动进度，不增加 WebGL 或动画运行时依赖。
 

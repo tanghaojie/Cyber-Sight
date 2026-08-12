@@ -34,7 +34,7 @@ updated: 2026-08-07
 AppHeader 用户下拉
     -> SettingsDialog 单项变更或恢复默认
         -> settings.store.save() / reset()
-    -> localStorage: cyber_system_settings:v1
+    -> localStorage: ${platform.storagePrefix}_system_settings:v1
         -> ThemeController.vue
             -> html[data-theme] + html.dark + color-scheme
                 -> CSS variables + Element Plus tokens
@@ -65,7 +65,7 @@ AI 执行格式化、格式检查、TypeScript 检查、生产构建和最终 di
 
 ## 兼容性与迁移
 
-存储键为 `cyber_system_settings:v1`，不读取历史键。未来出现不兼容结构时递增版本；仅在明确需要保留用户设置时提供一次性迁移。
+存储键为 `${platform.storagePrefix}_system_settings:v1`，不读取历史键。未来出现不兼容结构时递增版本；仅在明确需要保留用户设置时提供一次性迁移。
 
 ## 相关记录
 

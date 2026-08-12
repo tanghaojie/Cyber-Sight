@@ -82,41 +82,41 @@ pnpm dev
 
 ### 4.3 `apps/backend`
 
-| 路径                           | 作用                                                    |
-| ------------------------------ | ------------------------------------------------------- |
-| `src/server.ts`                | 读取环境配置并监听端口，只负责进程启动                  |
-| `src/app.ts`                   | 组装 Nest 应用与 Fastify adapter，测试调用 `buildApp()` |
-| `src/app.module.ts`            | 注册 Nest 模块及全局 Guard、Filter、Interceptor         |
-| `src/config/env.ts`            | 加载和校验环境变量                                      |
-| `src/shared/runtime/`          | 数据库、令牌缓存与授权 Provider 运行时依赖              |
-| `src/modules/system/<module>/` | 脚手架内置系统能力的 Nest Module 与 Controller          |
-| `src/modules/biz/<module>/`    | 产品业务能力的 Nest Module 与 Controller                |
-| `src/shared/http/`             | Zod Pipe、契约装饰器、Filter、Interceptor 与响应规则    |
-| `src/shared/errors/`           | 可执行错误码常量                                        |
-| `src/db/schema.ts`             | Drizzle 数据模型的稳定聚合入口                          |
-| `src/db/schema/`               | 按数据所有权拆分的表、枚举与共享字段定义                |
-| `src/db/index.ts`              | PostgreSQL 客户端和 Drizzle 实例                        |
-| `drizzle/`                     | 已生成并需要提交的 SQL 迁移和快照                       |
-| `test/`                        | Nest/Fastify adapter 路由、契约和公共辅助函数测试       |
+| 路径                                | 作用                                                    |
+| ----------------------------------- | ------------------------------------------------------- |
+| `src/server.ts`                     | 读取环境配置并监听端口，只负责进程启动                  |
+| `src/app.ts`                        | 组装 Nest 应用与 Fastify adapter，测试调用 `buildApp()` |
+| `src/app.module.ts`                 | 注册 Nest 模块及全局 Guard、Filter、Interceptor         |
+| `src/foundation/config/env.ts`      | 加载和校验环境变量                                      |
+| `src/foundation/shared/runtime/`    | 数据库、令牌缓存与授权 Provider 运行时依赖              |
+| `src/foundation/modules/<module>/`  | 脚手架内置系统能力的 Nest Module 与 Controller          |
+| `src/platform/modules/<module>/`    | 产品业务能力的 Nest Module 与 Controller                |
+| `src/foundation/shared/http/`       | Zod Pipe、契约装饰器、Filter、Interceptor 与响应规则    |
+| `src/foundation/shared/errors/`     | 可执行错误码常量                                        |
+| `src/foundation/database/schema.ts` | Drizzle 数据模型的稳定聚合入口                          |
+| `src/foundation/database/schema/`   | 按数据所有权拆分的表、枚举与共享字段定义                |
+| `src/foundation/database/index.ts`  | PostgreSQL 客户端和 Drizzle 实例                        |
+| `drizzle/`                          | 已生成并需要提交的 SQL 迁移和快照                       |
+| `test/`                             | Nest/Fastify adapter 路由、契约和公共辅助函数测试       |
 
 `app.ts` 与 `server.ts` 必须保持分离。否则测试导入应用时会直接占用端口，无法使用底层 Fastify `inject` 对完整 Nest 应用进行快速测试。
 
-业务模块必须在所属类别下拥有独立的 `src/modules/system/<module>/` 或 `src/modules/biz/<module>/` 目录，并以 `<module>.module.ts`、`<module>.controller.ts`、`<module>.service.ts` 等表意文件公开稳定能力，避免创建 `index.ts` barrel。Controller、应用服务、领域规则、仓储和业务数据模型放在该模块目录内；`app.module.ts` 只从设计中登记的公共文件注册模块。不得导入其他模块未登记的内部文件，也不得直接访问其他模块的仓储或数据表。
+业务模块必须在所属类别下拥有独立的 `src/foundation/modules/<module>/` 或 `src/platform/modules/<module>/` 目录，并以 `<module>.module.ts`、`<module>.controller.ts`、`<module>.service.ts` 等表意文件公开稳定能力，避免创建 `index.ts` barrel。Controller、应用服务、领域规则、仓储和业务数据模型放在该模块目录内；`app.module.ts` 只从设计中登记的公共文件注册模块。不得导入其他模块未登记的内部文件，也不得直接访问其他模块的仓储或数据表。
 
 ### 4.4 `apps/frontend`
 
-| 路径                                             | 作用                                             |
-| ------------------------------------------------ | ------------------------------------------------ |
-| `src/api/client.ts`                              | 唯一共享的 fetch Client                          |
-| `src/modules/{system,biz}/<module>/composables/` | 封装模块 API 调用和页面状态                      |
-| `src/modules/{system,biz}/<module>/pages/`       | 模块拥有的路由页面，不直接堆积复杂业务和网络逻辑 |
-| `src/router/`                                    | Vue Router 配置和页面懒加载                      |
-| `src/stores/`                                    | 未来的跨页面 Pinia 状态；局部状态不要放入 store  |
-| `vite.config.mts`                                | Vite 构建、源码别名和 SVG 图标插件配置           |
+| 路径                                                      | 作用                                             |
+| --------------------------------------------------------- | ------------------------------------------------ |
+| `src/foundation/api/client.ts`                            | 唯一共享的 fetch Client                          |
+| `src/{foundation,platform}/modules/<module>/composables/` | 封装模块 API 调用和页面状态                      |
+| `src/{foundation,platform}/modules/<module>/pages/`       | 模块拥有的路由页面，不直接堆积复杂业务和网络逻辑 |
+| `src/foundation/router/`                                  | Vue Router 配置和页面懒加载                      |
+| `src/stores/`                                             | 未来的跨页面 Pinia 状态；局部状态不要放入 store  |
+| `vite.config.mts`                                         | Vite 构建、源码别名和 SVG 图标插件配置           |
 
 前端不能手写一份与后端相似的接口类型，应从 `@cyber-ai-forge/api-contract` 获取。
 
-新业务页面、组件、composable、service 和局部 store 都归入对应 `src/modules/system/<module>/` 或 `src/modules/biz/<module>/`，由 `registerViews.ts`、`*.routes.ts`、`*.store.ts` 等表意文件暴露路由或应用壳需要的能力。根级 `views`、`stores` 只保留存量或真正应用级能力；实质修改存量业务时应迁入模块目录。
+新业务页面、组件、composable、service 和局部 store 都归入对应 `src/foundation/modules/<module>/` 或 `src/platform/modules/<module>/`，由 `registerViews.ts`、`*.routes.ts`、`*.store.ts` 等表意文件暴露路由或应用壳需要的能力。根级 `views`、`stores` 只保留存量或真正应用级能力；实质修改存量业务时应迁入模块目录。
 
 前端不维护单元、组件或端到端自动化测试。功能、交互、错误状态和浏览器适配由维护者人工
 验收；AI 默认只执行格式、TypeScript 检查和生产构建，不运行前端或浏览器测试。
@@ -243,7 +243,7 @@ interface PaginationRequest {
 
 ### 6.4 前端全局响应拦截器
 
-`src/api/client.ts` 为唯一共享 Client，并在收到响应后调用已注册的全局 HTTP 错误处理器。它只处理 HTTP 401、404、500；应用入口注入清会话、跳转登录或 404 页面以及 ElMessage 服务异常提示。HTTP 200 中的非零业务状态仍由发起请求的模块处理。
+`src/foundation/api/client.ts` 为唯一共享 Client，并在收到响应后调用已注册的全局 HTTP 错误处理器。它只处理 HTTP 401、404、500；应用入口注入清会话、跳转登录或 404 页面以及 ElMessage 服务异常提示。HTTP 200 中的非零业务状态仍由发起请求的模块处理。
 
 业务 composable 不重复实现这些全局动作。它们只处理 HTTP 200 返回体中的非零 `status`，例如在表单旁显示参数错误、提示权限不足或让用户解决资源冲突。
 
@@ -253,7 +253,7 @@ interface PaginationRequest {
 
 1. 在 `docs/design/modules/` 更新用户模块设计。
 2. 在 `docs/plans/active/` 创建实施计划并建立 AI 日志。
-3. 确认前端、后端分别使用 `src/modules/system/users/`，契约使用 `src/modules/users/`，并只依赖已登记的表意公共文件。
+3. 确认前端、后端和契约分别使用 `src/foundation/modules/users/`，并只依赖已登记的表意公共文件。
 4. 在 `@cyber-ai-forge/api-contract` 的用户模块中定义请求、路径和响应 Schema，并从模块入口导出推导类型。
 5. 在后端用户模块中编写命名处理函数，使用 `success()` 或 `failure()`。
 6. 在 Nest Controller 中使用 `ZodValidationPipe` 和 `ContractRoute` 挂载共享运行时 Schema。
@@ -299,11 +299,11 @@ export const findUser = async (id: EntityId) => {
 
 ### 9.1 Drizzle 是什么
 
-Drizzle 用 TypeScript 定义数据库结构，并根据 Schema 差异生成 SQL 迁移。`src/db/schema.ts` 聚合 `src/db/schema/` 中按数据所有权拆分的目标模型，`drizzle/` 记录数据库如何一步步演进。脚手架自带表的物理名称统一以 `sys_` 开头，TypeScript 表对象保留简洁的模块语义名。
+Drizzle 用 TypeScript 定义数据库结构，并根据 Schema 差异生成 SQL 迁移。`src/foundation/database/schema.ts` 聚合 `src/foundation/database/schema/` 中按数据所有权拆分的目标模型，`drizzle/` 记录数据库如何一步步演进。脚手架自带表的物理名称统一以 `sys_` 开头，TypeScript 表对象保留简洁的模块语义名。
 
 ### 9.2 修改表结构
 
-1. 修改 `apps/backend/src/db/schema/` 中拥有该表的分片；新增分片时同步在 `apps/backend/src/db/schema.ts` 显式导出。
+1. 修改 `apps/backend/src/foundation/database/schema/` 中拥有该表的分片；新增分片时同步在 `apps/backend/src/foundation/database/schema.ts` 显式导出。
 2. 运行 `pnpm db:generate`。
 3. 人工审查新生成的 SQL，特别关注删除列、修改类型、唯一约束和默认值。
 4. 在开发数据库运行 `pnpm db:migrate`。
@@ -317,7 +317,7 @@ Drizzle 用 TypeScript 定义数据库结构，并根据 Schema 差异生成 SQL
 - 任何 `DROP`、数据回填或不可逆类型转换都必须单独设计备份和回滚方案。
 - 不得用 `db:push` 代替团队迁移历史。
 - 默认测试不依赖真实数据库；数据库集成验证通过 `pnpm test:db` 或专用测试环境运行。
-- 当前 `0000_initial_uuidv7_system_schema` 是维护者明确批准的一次性 UUIDv7 空库重置，只能在 PostgreSQL 18 全新空数据库执行；从该基线开始恢复“已执行迁移不可改写”的常规规则。
+- 当前 `0000_initial_uuidv7_foundation_schema` 是维护者明确批准的一次性 UUIDv7 空库重置，只能在 PostgreSQL 18 全新空数据库执行；从该基线开始恢复“已执行迁移不可改写”的常规规则。
 
 ### 9.4 常用数据库命令
 
@@ -388,7 +388,7 @@ pnpm --filter @cyber-ai-forge/frontend build # 前端类型检查和生产构建
 
 ### 数据库迁移没有生成
 
-确认修改的是 `src/db/schema/` 中对应分片，且该分片已由 `src/db/schema.ts` 导出；再从仓库根运行 `pnpm db:generate`。首次运行 Drizzle Kit 可能需要系统允许其创建本地工作目录。
+确认修改的是 `src/foundation/database/schema/` 中对应分片，且该分片已由 `src/foundation/database/schema.ts` 导出；再从仓库根运行 `pnpm db:generate`。首次运行 Drizzle Kit 可能需要系统允许其创建本地工作目录。
 
 ### 测试不应连接数据库，为什么仍需要 DATABASE_URL
 

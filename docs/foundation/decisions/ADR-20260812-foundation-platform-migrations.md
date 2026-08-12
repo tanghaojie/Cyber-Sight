@@ -18,6 +18,8 @@ Foundation 与 Platform 分别使用 Schema 生成入口、Drizzle 配置、输�
 
 Platform Schema 可以引用 Foundation 的公共表；Foundation Schema 禁止引用 Platform。正式启用自动生成 Platform 迁移前，必须通过外键 PoC 验证不会重复生成 Foundation 表；若当前 Drizzle Kit 无法可靠隔离，则 Platform 使用 custom migration，并由所有权检查验证 SQL。
 
+2026-08-12 的临时 PoC 使用 Platform 表引用 `sys_users.id`。Drizzle Kit 0.31.10 生成结果只包含 Platform 表和外键，没有创建或修改 `sys_users`，因此本版本启用 `db:platform:generate`；PoC 文件和生成物验证后已删除。
+
 ## 正面结果
 
 - Forge 与业务平台不再争用迁移编号、snapshot 和 journal。

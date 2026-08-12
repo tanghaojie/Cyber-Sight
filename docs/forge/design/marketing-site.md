@@ -19,9 +19,9 @@ Cyber AI Forge 需要一个部署到 GitHub Pages 的静态推广站，把仓库
 
 ## 职责与边界
 
-- `apps/website` 是独立 Vite + Vue 3 静态应用，只负责公开推广内容。
+- `forge/website` 是独立 Vite + Vue 3 静态应用，只负责公开推广内容。
 - 推广站仅通过公开 GitHub URL、仓库内品牌资产和构建时源文件了解主项目，不导入 `apps/frontend` 的内部组件、状态或 API。
-- `.github/workflows/deploy-pages.yml` 只构建和发布 `apps/website/dist`，不部署管理端或后端。
+- `.github/workflows/deploy-pages.yml` 只构建和发布 `forge/website/dist`，不部署管理端或后端。
 - 根工作区命令通过 pnpm workspace 自动发现推广站，并把它纳入统一格式、Lint 和构建验证。
 
 ## 公共接口
@@ -87,7 +87,7 @@ passive scroll event
 ## 测试与验证策略
 
 - 执行 `pnpm format`、`pnpm format:check`、`pnpm lint`、`pnpm build` 和 `pnpm docs:archive:check:ci`。
-- 检查生成的 `apps/website/dist` 包含 `/index.html`、`/zh/index.html`、`robots.txt`、`sitemap.xml`、品牌图标、分享图、可见预渲染正文和相对静态资源。
+- 检查生成的 `forge/website/dist` 包含 `/index.html`、`/zh/index.html`、`robots.txt`、`sitemap.xml`、品牌图标、分享图、可见预渲染正文和相对静态资源。
 - 检查两种 HTML 的语言、title、description、canonical、hreflang、结构化数据和语言切换链接；使用 Search Console 人工检查收录状态与实际搜索词。
 - 维护者人工验收 375、768、1024 和 1440 像素宽度下的 Header、语言切换、锚点、三维轮播、键盘操作、减少动效模式和 GitHub 跳转；自动检查不能替代该人工验收。
 
