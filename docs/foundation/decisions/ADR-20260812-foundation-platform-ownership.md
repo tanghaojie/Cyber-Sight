@@ -52,4 +52,4 @@ date: 2026-08-12
 ## 相关设计和计划
 
 - [所有权边界设计](../design/foundation-platform-ownership.md)
-- [实施计划](../plans/active/2026-08-12-foundation-platform-restructure.md)
+- [实施计划](../archive/plans/2026-08-12-foundation-platform-restructure.md)

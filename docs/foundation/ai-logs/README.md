@@ -4,7 +4,7 @@
 
 ## 进行中
 
-- [Forge Foundation/Platform 结构迁移](2026/08/2026-08-12-foundation-platform-restructure.md)
+当前没有活动 AI 协作记录。
 
 ## 生命周期
 

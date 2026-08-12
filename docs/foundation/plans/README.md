@@ -8,7 +8,7 @@
 
 ## 进行中
 
-- [Forge Foundation/Platform 结构迁移](active/2026-08-12-foundation-platform-restructure.md)
+当前没有活动计划。
 
 ## 生命周期
 

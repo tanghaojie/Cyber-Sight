@@ -4,7 +4,7 @@ scope: foundation
 repository: Cyber-AI-Forge
 owner: project maintainers
 date: 2026-08-12
-status: active
+status: completed
 ---
 
 # Forge Foundation/Platform 结构迁移协作记录
@@ -59,7 +59,7 @@ status: active
 
 ## 相关设计、ADR、计划和提交
 
-- [所有权边界设计](../../../design/foundation-platform-ownership.md)
-- [所有权 ADR](../../../decisions/ADR-20260812-foundation-platform-ownership.md)
-- [迁移链 ADR](../../../decisions/ADR-20260812-foundation-platform-migrations.md)
-- [实施计划](../../../plans/active/2026-08-12-foundation-platform-restructure.md)
+- [所有权边界设计](../../../../design/foundation-platform-ownership.md)
+- [所有权 ADR](../../../../decisions/ADR-20260812-foundation-platform-ownership.md)
+- [迁移链 ADR](../../../../decisions/ADR-20260812-foundation-platform-migrations.md)
+- [实施计划](../../../plans/2026-08-12-foundation-platform-restructure.md)

@@ -4,7 +4,7 @@ type: documentation-archive-review
 scope: foundation
 repository: Cyber-AI-Forge
 owner: project maintainers
-status: active
+status: completed
 created: 2026-08-12
 updated: 2026-08-12
 ---
@@ -58,7 +58,7 @@ updated: 2026-08-12
 - [x] 实现 `.forge-sync.yml`、同步命令、差异报告和临时 Git 仓库测试。
 - [x] 更新所有相关现行设计、索引、指南和仓库规则。
 - [x] 执行格式、Lint、测试、构建、文档与适用数据库验证。
-- [ ] 复核最终 diff，归档计划和 AI 日志并创建带 AI trailer 的提交。
+- [x] 复核最终 diff，归档计划和 AI 日志并创建带 AI trailer 的提交。
 
 ## 测试与验证
 
@@ -78,3 +78,5 @@ updated: 2026-08-12
 实际实现采用根组合入口注入 Platform 配置：前端在动态加载 Foundation 前登记平台配置，后端根模块组合完整数据库 Schema 并向 Foundation 注入数据库与 JWT 身份。Drizzle 0.31.10 跨作用域外键 PoC 只生成 Platform 表和外键，未重复生成 Foundation 表，因此保留自动生成命令。
 
 结构守卫、同步临时仓库场景、Lint、140 个后端测试、API 契约验证以及包含 Forge website 的全量生产构建已通过。当前环境未提供可清空的 PostgreSQL 18 实例，因此没有执行真实 `db:migrate`/`test:db`；迁移 SQL、journal、Schema 和命令由静态测试覆盖，真实空库验证仍是部署门禁。
+
+关联提交：`14e0f51`（设计和计划）、`1e07aad`（文档作用域）、`52c93b3`（API 契约）、`d88a9b4`（完整结构迁移）。

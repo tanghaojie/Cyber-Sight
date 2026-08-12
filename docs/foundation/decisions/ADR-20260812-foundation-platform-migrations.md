@@ -43,4 +43,4 @@ Platform Schema 可以引用 Foundation 的公共表；Foundation Schema 禁止�
 
 - [数据库设计](../design/database-schema-and-migrations.md)
 - [所有权边界设计](../design/foundation-platform-ownership.md)
-- [实施计划](../plans/active/2026-08-12-foundation-platform-restructure.md)
+- [实施计划](../archive/plans/2026-08-12-foundation-platform-restructure.md)
