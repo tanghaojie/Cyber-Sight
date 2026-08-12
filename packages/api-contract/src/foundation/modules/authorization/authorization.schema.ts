@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { apiResponseSchema, EntityIdSchema, ErrorResponseSchema } from '@/shared/http.js'
+import { apiResponseSchema, EntityIdSchema, ErrorResponseSchema } from '@/foundation/http/http.js'
 
 /**
  * 授权模块契约同时描述功能权限和数据范围策略。

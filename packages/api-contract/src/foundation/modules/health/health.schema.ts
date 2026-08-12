@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { apiResponseSchema } from '@/shared/http.js'
+import { apiResponseSchema } from '@/foundation/http/http.js'
 
 /** 健康检查只表达进程存活，不承诺数据库等下游依赖已经就绪。 */
 export const HealthDataSchema = z.strictObject({

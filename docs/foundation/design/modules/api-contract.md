@@ -39,7 +39,7 @@ TypeScript 只能检查参与编译的源码，类型在运行时会被擦除。
 
 ## 约束
 
-- 每个业务能力的请求、响应和事件 Schema 必须放在 `src/modules/<module>/` 独立目录，并通过 `<module>.schema.ts`、`<module>.types.ts` 等表意文件暴露公共契约，避免新增模块级 `index.ts`。前后端的 `system`/`biz` 是应用源码分类，不进入契约路径；同一能力在各层仍使用相同模块名。
+- Foundation 请求、响应和事件 Schema 放在 `src/foundation/modules/<module>/`，Platform Schema 放在 `src/platform/modules/<module>/`；两者都通过 `<module>.schema.ts`、`<module>.types.ts` 等表意文件暴露公共契约，避免模块级 `index.ts`。同一能力在前端、后端和契约层保持相同模块名。Platform 可以依赖已登记的 Foundation Schema，Foundation 禁止导入 Platform。
 - 契约包的包级发布入口只显式聚合各模块已登记的公共 Schema 和真正通用的包装类型，不得直接导出模块内部辅助 Schema。一个模块不得从另一个模块未登记的文件拼装契约；确需组合时只能使用对方公开的稳定 Schema。存量入口在模块实质修改时逐步迁移。
 - HTTP 数据结构必须先用共享 Zod Schema 定义，禁止在前端和后端维护平行 interface。
 - 所有外部请求体、查询参数和路径参数必须由后端运行时 Schema 校验。

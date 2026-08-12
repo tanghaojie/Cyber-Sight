@@ -5,8 +5,8 @@ import {
   EntityIdSchema,
   ErrorResponseSchema,
   paginatedResponseSchema,
-} from '@/shared/http.js'
-import { PermissionKeySchema } from '@/modules/authorization/authorization.schema.js'
+} from '@/foundation/http/http.js'
+import { PermissionKeySchema } from '@/foundation/modules/authorization/authorization.schema.js'
 
 /** 菜单三种节点共用的展示、排序和权限字段。 */
 const menuCommonShape = {

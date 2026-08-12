@@ -6,7 +6,7 @@ import {
   ErrorResponseSchema,
   PaginationRequestSchema,
   paginatedResponseSchema,
-} from '@/shared/http.js'
+} from '@/foundation/http/http.js'
 
 export const PositionSummarySchema = AuditFieldsSchema.extend({
   id: EntityIdSchema,

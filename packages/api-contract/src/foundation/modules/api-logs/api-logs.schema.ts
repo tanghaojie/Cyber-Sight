@@ -4,7 +4,7 @@ import {
   EntityIdSchema,
   PaginationRequestSchema,
   paginatedResponseSchema,
-} from '@/shared/http.js'
+} from '@/foundation/http/http.js'
 
 /** 接口日志查询只接受可索引的最小筛选条件，不暴露请求内容或敏感 HTTP 元数据。 */
 export const ApiLogQuerySchema = PaginationRequestSchema.extend({

@@ -5,7 +5,7 @@ import {
   EntityIdSchema,
   ErrorResponseSchema,
   paginatedResponseSchema,
-} from '@/shared/http.js'
+} from '@/foundation/http/http.js'
 
 /** 用户可关联多个角色和部门，但必须且只能从已关联部门中指定一个主部门。 */
 const entityIdArray = z.array(EntityIdSchema)

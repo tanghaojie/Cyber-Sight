@@ -4,7 +4,7 @@ import {
   AuditFieldsSchema,
   EntityIdSchema,
   ErrorResponseSchema,
-} from '@/shared/http.js'
+} from '@/foundation/http/http.js'
 
 /** 部门契约以 parentId 表达树关系；null 是唯一的根节点标识。 */
 export const DepartmentSummarySchema = AuditFieldsSchema.extend({

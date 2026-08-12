@@ -4,7 +4,7 @@ import {
   EntityIdSchema,
   ErrorResponseSchema,
   paginatedResponseSchema,
-} from '@/shared/http.js'
+} from '@/foundation/http/http.js'
 
 /** 字典项由 type 分组，value 供业务保存，label 供界面展示。 */
 export const DictionarySummarySchema = AuditFieldsSchema.extend({
