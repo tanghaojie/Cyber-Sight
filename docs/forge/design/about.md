@@ -17,7 +17,7 @@ updated: 2026-08-07
 
 - `registerViews.ts` 登记稳定组件键 `about`，供数据库菜单动态路由加载。
 - 菜单迁移提供 `/about`、`component = about`、`layout = AdminLayout` 的根级菜单。
-- 页面内部使用 `<a>` 打开 `appConfig.githubUrl`，不新增 API 或权限键。
+- 页面内部使用 Platform 配置中的 `githubUrl` 打开链接，不新增 API 或权限键。
 
 ## 数据流
 

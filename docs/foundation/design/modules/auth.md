@@ -13,7 +13,7 @@ updated: 2026-08-12
 
 ## 数据流与会话生命周期
 
-1. 登录在数据库中校验用户凭据并读取角色，使用 `src/foundation/config/env.ts` 校验并由应用组装层注入的 `JWT_ISSUER` 与 `JWT_AUDIENCE` 签发 subject 为用户 UUID、7 天有效的 HS256 JWT，把 token 的 SHA-256 哈希、用户和过期时间写入 `sys_auth_sessions`，再把 token 标识与当前用户快照写入容量为 100 的进程内 LRU 缓存。数据库不保存可直接复用的明文 token。
+1. 登录在数据库中校验用户凭据并读取角色，使用 Platform 配置解析器校验并由 Integration 应用组装层注入的 `JWT_ISSUER` 与 `JWT_AUDIENCE` 签发 subject 为用户 UUID、7 天有效的 HS256 JWT，把 token 的 SHA-256 哈希、用户和过期时间写入 `sys_auth_sessions`，再把 token 标识与当前用户快照写入容量为 100 的进程内 LRU 缓存。数据库不保存可直接复用的明文 token。
 2. 登录响应返回 `{ status: 0, data: { user, issued: { token, expiresAt } } }`。`auth.api.ts` 封装登录、当前用户和退出请求，`auth.store.ts` 负责会话状态，并通过 Foundation 的 `accessToken.ts` 把 token 写入由 Platform `storagePrefix` 派生、到期时间来自 `expiresAt` 的浏览器 cookie。共享 API Client 为请求附加 `Authorization: Bearer <token>`；清会话时同时清理当前 cookie、旧 `cyber_access_token` 和 `jtlib_access_token` cookie 及对应 `localStorage` 键。
 3. 鉴权先严格解析 Bearer 头并校验 JWT 签名、issuer、audience、算法和过期时间，再按 token 标识读取 LRU；缓存命中会刷新最近使用顺序，不查询数据库。
 4. 缓存未命中时，以 token 哈希查询未撤销且未过期的 `sys_auth_sessions`，联查启用用户和角色后回填 LRU。第 101 个 token 只淘汰最久未使用的缓存项，不撤销数据库会话；该 token 下次请求会回源后继续有效。进程重启同样只产生冷缓存。
@@ -35,7 +35,7 @@ updated: 2026-08-12
 - `pages/components/LoginInteraction.vue` 负责右侧语言切换、工作台访问环境提示、凭据输入、错误提示、提交状态、本地开发账号提示和登录后的 redirect 恢复。它通过 `useAuthStore().login()` 执行既有认证流程，成功后仍替换到路由 query 中的 `redirect` 或首页。
 - `pages/components/LoginAppearanceControls.vue` 是 `LoginInteraction` 使用的私有视觉偏好入口，消费 settings 模块登记的 Store、主题元数据和本地化键；它只更新设备级深色模式与主题颜色，不读取认证状态，也不改变登录流程。
 
-登录页桌面展示区和窄屏交互区都将 CYBER Logo 作为 GitHub 项目入口，复用 `appConfig.githubUrl` 并以新窗口安全属性打开；该外链不参与登录、redirect 或会话流程。
+登录页桌面展示区和窄屏交互区都将 CYBER Logo 作为 GitHub 项目入口，复用 Platform 配置中的 `githubUrl` 并以新窗口安全属性打开；该外链不参与登录、redirect 或会话流程。
 
 登录页的固定展示文案从 `auth.locales.ts` 提供，首屏明确说明模块边界、共享契约和持续演进三个价值支柱；窄屏隐藏左侧展示区，在交互区保留产品标识、访问环境和创作者署名。展示动画仅使用组件内 CSS，不新增运行时依赖或网络资源；`prefers-reduced-motion: reduce` 时停止连续动画，保留静态空间层次和可读内容。
 

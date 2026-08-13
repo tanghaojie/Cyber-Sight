@@ -247,10 +247,11 @@ AI 负责实现，人类仍然负责表达需求、判断产品方向和验收�
 pnpm install
 
 # Windows PowerShell
-Copy-Item apps/backend/.env.example apps/backend/.env
+Copy-Item apps/backend/.env.foundation.example apps/backend/.env.foundation.local
+Copy-Item apps/backend/.env.platform.example apps/backend/.env.platform.local
 ```
 
-编辑 `apps/backend/.env`，填写全新空 PostgreSQL 数据库的连接信息，并设置至少 32 个字符的 `JWT_SECRET`：
+编辑 `apps/backend/.env.foundation.local`，填写全新空 PostgreSQL 数据库的连接信息，并设置至少 32 个字符的 `JWT_SECRET`：
 
 ```bash
 pnpm db:migrate
@@ -387,7 +388,7 @@ pnpm test:db       # 检查 PostgreSQL、系统表和迁移记录
 
 CYBER 由 JTLab 维护；CYBER / Cyber AI Forge 是项目名称，JTLab 是创作者品牌。英文副标题为 `AI-Native Enterprise Application Scaffold`，中文副标题为 `AI 驱动的企业应用智能构建平台`。前端默认使用石墨黑、暖白、薄荷绿 `#70CFA2` 和电紫节点构成的品牌系统。
 
-应用文字配置位于 `apps/frontend/src/platform/config/app.config.ts`。也可以复制 `apps/frontend/.env.example`，通过以下变量按部署环境覆盖：
+应用文字配置位于 `apps/frontend/src/platform/config/platform.config.ts`。也可以复制 `apps/frontend/.env.platform.example`，通过以下变量按部署环境覆盖：
 
 - `VITE_APP_NAME`
 - `VITE_APP_FULL_NAME`

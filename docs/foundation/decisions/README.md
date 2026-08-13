@@ -9,6 +9,7 @@
 - [ADR-0026](ADR-0026-system-table-prefix-and-fresh-baseline.md)：框架表统一使用 `sys_` 物理前缀，并以只面向全新数据库的单一迁移重置早期历史。
 - [ADR-20260812-foundation-platform-ownership](ADR-20260812-foundation-platform-ownership.md)：使用 Forge、Foundation 与 Platform 统一表达源码、文档和同步所有权；取代 ADR-0027 的分类方案。
 - [ADR-20260812-foundation-platform-migrations](ADR-20260812-foundation-platform-migrations.md)：Foundation 与 Platform 使用独立 Schema 入口、迁移历史和执行顺序。
+- [ADR-20260813-layered-runtime-configuration](ADR-20260813-layered-runtime-configuration.md)：Foundation 与 Platform 分层维护环境变量，由 Integration 入口聚合并让进程环境拥有最高优先级。
 - [ADR-0029](ADR-0029-frontend-runtime-localization.md)：使用独立前端模块提供运行时中英文切换，以模块资源和严格默认菜单指纹保护用户录入数据。
 - [ADR-0033](ADR-0033-task-scoped-documentation-archive-audit.md)：按任务范围触发归档审计，并以合并前检查作为跨 AI 的共享兜底协议；取代已归档的 ADR-0030。
 - [ADR-20260811-frontend-brand-text-config](ADR-20260811-frontend-brand-text-config.md)：收敛前端品牌文字配置，使用 `VITE_APP_TAGLINE` 同时驱动登录签名和 Logo 产品描述，并按展示位置处理大小写。

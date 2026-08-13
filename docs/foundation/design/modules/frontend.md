@@ -68,14 +68,14 @@ cookie 当前由浏览器 JavaScript 管理，不是服务端 `HttpOnly` cookie�
 
 `view-registry.ts` 扫描 `@/foundation/modules/**/registerViews.ts`；`platform.register.ts` 独立扫描 `@/platform/modules/**/registerViews.ts` 并通过 Foundation 公共注册函数装配。登记 key 必须符合小写字母开头的 kebab-case 约束且全局唯一；页面标签使用 `{ key?, fallback }` 描述，供菜单编辑器按当前语言解析，未提供或找不到翻译 key 时保留回退文案。缺少 `registerViews()`、非法 key 或跨作用域重复 key 会在启动阶段失败。
 
-当前 Platform 默认品牌为 `CYBER / Cyber AI Forge`。`src/platform/brand/` 和 `src/platform/config/` 拥有品牌组件与文字配置；名称、副标题、项目链接和创作者署名可由 `VITE_APP_*` 环境变量覆盖，缺失或空白时回退默认值。Foundation 只通过 `PlatformDefinition` 注入接口渲染 Logo 和创作者信息，不直接导入 Platform。主题颜色由 settings 模块和语义令牌管理，不属于 `PlatformConfig`。完整边界见[CYBER 品牌与视觉系统](../../../forge/design/branding.md)。
+当前 Platform 默认品牌为 `CYBER / Cyber AI Forge`。`src/platform/brand/` 和 `src/platform/config/platform.config.ts` 拥有品牌组件与文字配置；名称、副标题、项目链接和创作者署名可由 `VITE_APP_*` 环境变量覆盖，缺失或空白时回退默认值。Foundation 本地开发端口由 `src/foundation/config/foundation.config.ts` 拥有，Integration 的 `src/config/runtime.config.ts` 聚合两层配置。Foundation 只通过 `PlatformDefinition` 注入接口渲染 Logo 和创作者信息，不直接导入 Platform。主题颜色由 settings 模块和语义令牌管理，不属于 `PlatformConfig`。完整边界见[CYBER 品牌与视觉系统](../../../forge/design/branding.md)。
 
 `main.ts` 先调用 `installPlatform()` 登记品牌、Platform 文案和页面，再安装 Pinia、localization 与 Router；`App.vue` 通过 `LocalizationProvider.vue` 为
 Element Plus 提供当前语言包。登录页与 Header 共用 `LanguageSwitcher.vue`，语言切换立即
 更新固定文案、`<html lang>`、页面标题和本地日期格式，并写入由 Platform `storagePrefix` 派生的版本化键。
-数据库与 API 契约不保存语言偏好。动态标题没有路由专属标题时使用 `appConfig.fullName` 与 `appConfig.name` 组合，Logo 下方的产品描述使用 `appConfig.tagline` 的大写形式，登录页签名使用原始 `appConfig.tagline`。
+数据库与 API 契约不保存语言偏好。动态标题没有路由专属标题时使用 `PlatformConfig.fullName` 与 `PlatformConfig.name` 组合，Logo 下方的产品描述使用 `PlatformConfig.tagline` 的大写形式，登录页签名使用原始 `PlatformConfig.tagline`。
 
-`tag-view` 位于 Header 与主内容之间，历史标签可横向滚动，操作入口提供关闭当前、关闭其他和关闭全部。其版本化 `localStorage` 数据按 UUID 用户 ID 隔离；存储不可用或内容损坏时降级为内存状态，不影响 Router 导航。Header 用户下拉同时提供系统设置入口：该 Dialog 对设备级的导航菜单风格、主题颜色、深色模式、Tags View、侧栏 Logo 和动态标题设置逐项立即保存。导航菜单风格控制桌面导航布局；Tags View 控制标签栏可见性但不清空历史，并把应用主区的标签栏高度归零；侧栏 Logo 控制侧栏品牌区，移动抽屉在隐藏品牌时仍保留可访问的关闭按钮；动态标题打开时按当前路由与语言更新浏览器标题，关闭时始终显示 `appConfig.name`。主题颜色和深色模式会立即控制应用根。具体边界见[系统设置模块](settings.md)。
+`tag-view` 位于 Header 与主内容之间，历史标签可横向滚动，操作入口提供关闭当前、关闭其他和关闭全部。其版本化 `localStorage` 数据按 UUID 用户 ID 隔离；存储不可用或内容损坏时降级为内存状态，不影响 Router 导航。Header 用户下拉同时提供系统设置入口：该 Dialog 对设备级的导航菜单风格、主题颜色、深色模式、Tags View、侧栏 Logo 和动态标题设置逐项立即保存。导航菜单风格控制桌面导航布局；Tags View 控制标签栏可见性但不清空历史，并把应用主区的标签栏高度归零；侧栏 Logo 控制侧栏品牌区，移动抽屉在隐藏品牌时仍保留可访问的关闭按钮；动态标题打开时按当前路由与语言更新浏览器标题，关闭时始终显示 `PlatformConfig.name`。主题颜色和深色模式会立即控制应用根。具体边界见[系统设置模块](settings.md)。
 
 全局变量 `--app-shell-header-height` 定义应用壳顶部高度，当前值为 `72px`。顶部模式的桌面应用壳为单列布局，粘性 Header 保留一级菜单、标题路径和用户菜单；下拉菜单在 Header 层级内显示，避免被内容区裁切。侧边模式的桌面应用壳固定为双列布局，Header 仍保留侧栏开关。窄屏由 `matchMedia('(max-width: 1023px)')` 强制使用抽屉式侧边导航，窗口恢复后重用保存的桌面偏好。菜单打开按钮不按断点隐藏；抽屉打开时侧栏中的关闭按钮与遮罩可关闭它。
 

@@ -6,8 +6,8 @@ import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fa
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import type { FastifyServerOptions } from 'fastify'
 import { AppModule } from './app.module.js'
+import { runtimeConfig } from './config/runtime.config.js'
 import { databaseClient, db } from './database.js'
-import { env } from './foundation/config/env.js'
 import {
   createApiLogWriter,
   registerApiLogHooks,
@@ -28,9 +28,9 @@ export interface AppDependencies {
 
 function registerSwagger(app: NestFastifyApplication): void {
   const config = new DocumentBuilder()
-    .setTitle(env.API_TITLE)
-    .setVersion(env.API_VERSION)
-    .setDescription(env.API_DESCRIPTION)
+    .setTitle(runtimeConfig.platform.API_TITLE)
+    .setVersion(runtimeConfig.platform.API_VERSION)
+    .setDescription(runtimeConfig.platform.API_DESCRIPTION)
     .addBearerAuth(undefined, 'bearerAuth')
     .addSecurityRequirements('bearerAuth')
     .build()
@@ -51,8 +51,8 @@ export async function buildApp(
     AppModule.register({
       jwtSecret,
       jwtIdentity: {
-        audience: env.JWT_AUDIENCE,
-        issuer: env.JWT_ISSUER,
+        audience: runtimeConfig.platform.JWT_AUDIENCE,
+        issuer: runtimeConfig.platform.JWT_ISSUER,
       },
       authorizationProvider: dependencies.authorizationProvider,
       // 完整运行时 Schema 是 Foundation 数据库端口的超集；组合根在此收窄注入类型。

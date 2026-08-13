@@ -1,8 +1,8 @@
 import { createApp, watchEffect } from 'vue'
 import App from './App.vue'
+import { runtimeConfig } from './config/runtime.config'
 import router from './foundation/router/index'
 import { pinia } from './foundation/stores/pinia'
-import { appConfig } from './platform/config/app.config'
 import { installPlatform } from './platform/platform.register'
 import 'virtual:svg-icons-register'
 import 'element-plus/theme-chalk/dark/css-vars.css'
@@ -30,7 +30,7 @@ export function startApplication(): void {
 
   watchEffect(() => {
     if (!settings.settings.dynamicTitle) {
-      document.title = appConfig.name
+      document.title = runtimeConfig.platform.name
       return
     }
 
@@ -38,8 +38,10 @@ export function startApplication(): void {
     currentLocale.value
     const localizedTitle = router.currentRoute.value.meta.localizedTitle as
       LocalizedLabel | undefined
-    const pageTitle = localizedTitle ? resolveLocalizedLabel(localizedTitle) : appConfig.fullName
-    document.title = `${pageTitle} · ${appConfig.name}`
+    const pageTitle = localizedTitle
+      ? resolveLocalizedLabel(localizedTitle)
+      : runtimeConfig.platform.fullName
+    document.title = `${pageTitle} · ${runtimeConfig.platform.name}`
   })
 
   app.mount('#app')

@@ -2,7 +2,7 @@
   <span
     class="cyber-logo"
     :class="[`cyber-logo--${tone}`, { 'cyber-logo--icon-only': iconOnly }]"
-    :aria-label="iconOnly ? appConfig.fullName : undefined"
+    :aria-label="iconOnly ? platformConfig.fullName : undefined"
   >
     <svg
       class="cyber-logo__mark"
@@ -10,7 +10,7 @@
       role="img"
       :aria-hidden="iconOnly ? undefined : true"
     >
-      <title v-if="iconOnly">{{ appConfig.fullName }}</title>
+      <title v-if="iconOnly">{{ platformConfig.fullName }}</title>
       <path class="cyber-logo__outer" d="M88 30 74 16H36L16 36v24l20 20h38l14-14" />
       <path class="cyber-logo__inner" d="M75 37 68 30H43L30 43v10l13 13h25l7-7" />
       <path class="cyber-logo__accent cyber-logo__accent--top" d="m79 21 9 9" />
@@ -18,14 +18,14 @@
       <rect class="cyber-logo__node" x="92" y="43" width="10" height="10" rx="1.5" />
     </svg>
     <span v-if="!iconOnly" class="cyber-logo__wordmark">
-      <strong>{{ appConfig.name }}</strong>
-      <small v-if="showDescriptor">{{ appConfig.tagline.toUpperCase() }}</small>
+      <strong>{{ platformConfig.name }}</strong>
+      <small v-if="showDescriptor">{{ platformConfig.tagline.toUpperCase() }}</small>
     </span>
   </span>
 </template>
 
 <script setup lang="ts">
-import { appConfig } from '@/platform/config/app.config'
+import { platformConfig } from '@/platform/config/platform.config'
 
 withDefaults(
   defineProps<{

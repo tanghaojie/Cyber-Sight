@@ -1,7 +1,7 @@
 import type { App } from 'vue'
+import { runtimeConfig } from '@/config/runtime.config'
 import PlatformCreatorCredit from '@/platform/brand/CreatorCredit.vue'
 import PlatformLogo from '@/platform/brand/CyberLogo.vue'
-import { appConfig } from '@/platform/config/app.config'
 import { registerLocalizationResources } from '@/foundation/modules/localization/localization'
 import { installPlatformDefinition } from '@/foundation/platform/platform'
 import { registerViewModules } from '@/foundation/shared/routing/view-registry'
@@ -15,7 +15,7 @@ const platformViewModules = import.meta.glob('@/platform/modules/**/registerView
 
 export function installPlatform(app: App): void {
   installPlatformDefinition(app, {
-    config: appConfig,
+    config: runtimeConfig.platform,
     brand: {
       logo: PlatformLogo,
       creatorCredit: PlatformCreatorCredit,

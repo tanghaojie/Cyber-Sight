@@ -50,7 +50,7 @@ LoginInteraction
 
 main.ts
     -> settings.store.settings.dynamicTitle
-    -> 路由标题或固定 appConfig.name
+    -> 路由标题或固定 PlatformConfig.name
 ```
 
 设置值必须是包含全部六项已知字段的有效对象。导航风格为 `sidebar` 或 `top`，主题色为 `jade`、`civic`、`monochrome`、`azure`、`violet` 或 `amber`，其余四项为布尔值。恢复旧版存储时，`aurora`、`ocean`、`violet`、`sunset` 分别映射为 `jade`、`azure`、`violet`、`amber`；其余有效偏好保持不变，并在用户下次保存时写回当前结构。

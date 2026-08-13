@@ -41,8 +41,9 @@ Vue 3 + fetch Client   Nest Pipe + Fastify adapter + Swagger
 
 ```powershell
 pnpm install
-Copy-Item apps/backend/.env.example apps/backend/.env
-# 编辑 apps/backend/.env，填写全新空数据库的 DATABASE_URL 和至少 32 个字符的 JWT_SECRET
+Copy-Item apps/backend/.env.foundation.example apps/backend/.env.foundation.local
+Copy-Item apps/backend/.env.platform.example apps/backend/.env.platform.local
+# 编辑 .env.foundation.local，填写全新空数据库的 DATABASE_URL 和至少 32 个字符的 JWT_SECRET
 pnpm db:migrate
 pnpm dev
 ```
@@ -56,7 +57,7 @@ pnpm dev
 - Swagger UI：`http://localhost:3000/docs`
 - Swagger JSON：`http://localhost:3000/docs/json`
 
-本地 `.env` 被 Git 忽略，禁止把真实密码复制到 README、设计文档、测试或提交记录中。
+本地 `.env`、`.env.foundation.local` 和 `.env.platform.local` 被 Git 忽略，禁止把真实密码复制到 README、设计文档、测试或提交记录中。
 
 ## 4. 目录和模块职责
 
@@ -82,22 +83,24 @@ pnpm dev
 
 ### 4.3 `apps/backend`
 
-| 路径                                | 作用                                                    |
-| ----------------------------------- | ------------------------------------------------------- |
-| `src/server.ts`                     | 读取环境配置并监听端口，只负责进程启动                  |
-| `src/app.ts`                        | 组装 Nest 应用与 Fastify adapter，测试调用 `buildApp()` |
-| `src/app.module.ts`                 | 注册 Nest 模块及全局 Guard、Filter、Interceptor         |
-| `src/foundation/config/env.ts`      | 加载和校验环境变量                                      |
-| `src/foundation/shared/runtime/`    | 数据库、令牌缓存与授权 Provider 运行时依赖              |
-| `src/foundation/modules/<module>/`  | 脚手架内置系统能力的 Nest Module 与 Controller          |
-| `src/platform/modules/<module>/`    | 产品业务能力的 Nest Module 与 Controller                |
-| `src/foundation/shared/http/`       | Zod Pipe、契约装饰器、Filter、Interceptor 与响应规则    |
-| `src/foundation/shared/errors/`     | 可执行错误码常量                                        |
-| `src/foundation/database/schema.ts` | Drizzle 数据模型的稳定聚合入口                          |
-| `src/foundation/database/schema/`   | 按数据所有权拆分的表、枚举与共享字段定义                |
-| `src/foundation/database/index.ts`  | PostgreSQL 客户端和 Drizzle 实例                        |
-| `drizzle/`                          | 已生成并需要提交的 SQL 迁移和快照                       |
-| `test/`                             | Nest/Fastify adapter 路由、契约和公共辅助函数测试       |
+| 路径                                         | 作用                                                    |
+| -------------------------------------------- | ------------------------------------------------------- |
+| `src/server.ts`                              | 读取环境配置并监听端口，只负责进程启动                  |
+| `src/app.ts`                                 | 组装 Nest 应用与 Fastify adapter，测试调用 `buildApp()` |
+| `src/app.module.ts`                          | 注册 Nest 模块及全局 Guard、Filter、Interceptor         |
+| `src/foundation/config/foundation.config.ts` | 校验 Foundation 环境变量                                |
+| `src/platform/config/platform.config.ts`     | 校验 Platform 环境变量                                  |
+| `src/config/runtime.config.ts`               | 聚合分层环境变量                                        |
+| `src/foundation/shared/runtime/`             | 数据库、令牌缓存与授权 Provider 运行时依赖              |
+| `src/foundation/modules/<module>/`           | 脚手架内置系统能力的 Nest Module 与 Controller          |
+| `src/platform/modules/<module>/`             | 产品业务能力的 Nest Module 与 Controller                |
+| `src/foundation/shared/http/`                | Zod Pipe、契约装饰器、Filter、Interceptor 与响应规则    |
+| `src/foundation/shared/errors/`              | 可执行错误码常量                                        |
+| `src/foundation/database/schema.ts`          | Drizzle 数据模型的稳定聚合入口                          |
+| `src/foundation/database/schema/`            | 按数据所有权拆分的表、枚举与共享字段定义                |
+| `src/foundation/database/index.ts`           | PostgreSQL 客户端和 Drizzle 实例                        |
+| `drizzle/`                                   | 已生成并需要提交的 SQL 迁移和快照                       |
+| `test/`                                      | Nest/Fastify adapter 路由、契约和公共辅助函数测试       |
 
 `app.ts` 与 `server.ts` 必须保持分离。否则测试导入应用时会直接占用端口，无法使用底层 Fastify `inject` 对完整 Nest 应用进行快速测试。
 

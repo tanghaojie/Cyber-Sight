@@ -15,15 +15,15 @@ Platform 的部署相关品牌文字、项目链接、创作者署名、Swagger 
 
 ## 范围与非目标
 
-本设计覆盖前端 `appConfig`、前端和后端 `.env.example`、后端经过 Zod 校验的 `env`，以及应用组装对这些配置的消费。主要作用域为 `platform`，同时影响 `foundation` 的前端注入接口和后端配置入口，并同步 Forge 品牌说明。
+本设计覆盖前端 Platform 配置、前后端分层环境示例、后端经过 Zod 校验的 Platform 配置，以及应用组装对这些配置的消费。主要作用域为 `platform`，同时影响 Foundation 的配置接口和 Integration 聚合入口，并同步 Forge 品牌说明。
 
 本次不改变 HTTP 契约、JWT 算法、令牌兼容策略、主题持久化格式或视觉资产。生产密钥仍必须由部署环境提供，不设置安全降级默认值。
 
 ## 职责与边界
 
-- `apps/frontend/src/platform/config/app.config.ts` 读取 `VITE_APP_*` 品牌变量和 `VITE_STORAGE_PREFIX`；缺失、空字符串或纯空白时回退到仓库默认品牌。
-- `apps/backend/src/foundation/config/env.ts` 在进程启动时统一加载、规范化和校验环境变量。`DATABASE_URL` 与 `JWT_SECRET` 必填；API 展示元数据和 JWT issuer/audience 可覆盖，并在缺失或空白时使用默认值。
-- `apps/backend/src/app.ts` 只消费已经校验的 `env` 完成 Swagger 和认证依赖组装，不维护第二份 Platform 常量对象。
+- `apps/frontend/src/platform/config/platform.config.ts` 读取 `VITE_APP_*` 品牌变量和 `VITE_STORAGE_PREFIX`；缺失、空字符串或纯空白时回退到仓库默认品牌。
+- `apps/backend/src/platform/config/platform.config.ts` 只解析 API 展示元数据和 JWT issuer/audience；缺失或空白时使用 Platform 默认值。
+- `apps/backend/src/config/runtime.config.ts` 聚合 Foundation 与 Platform 配置，应用入口只消费聚合结果，不维护第二份 Platform 常量对象。
 - 主题颜色不属于静态 Platform 配置。Foundation settings 模块和语义 CSS 令牌拥有运行时主题状态，因此 `PlatformConfig` 不暴露未消费的 `primaryColor`。
 
 ## 公共接口
@@ -44,7 +44,7 @@ Platform 的部署相关品牌文字、项目链接、创作者署名、Swagger 
 
 ## 数据流与依赖
 
-构建期的 Vite 环境变量进入 `appConfig`，再通过 Platform 注册边界注入 Foundation 页面。后端进程环境由 `env.ts` 一次性解析，`app.ts` 使用 API 元数据创建 Swagger 文档，并把 JWT identity 注入认证模块。
+Vite 按 `.env`、`.env.local`、模式文件、`.env.foundation.local`、`.env.platform.local` 和进程环境的顺序聚合变量，构建期只把 `VITE_*` 注入 `platformConfig`。后端由 Integration 入口加载同样的分层本地文件并让进程环境拥有最高优先级，再分别交给 Foundation 与 Platform 解析器。Platform 配置通过注册边界注入 Foundation 页面。
 
 Foundation 不反向导入 Platform 内部配置文件。Platform 只通过既有注册和应用组装边界向 Foundation 提供配置。
 

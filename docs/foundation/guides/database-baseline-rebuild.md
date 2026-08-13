@@ -13,7 +13,7 @@
 ## 重建步骤
 
 1. 在 PostgreSQL 18 中创建新的空数据库，并为应用账号授予建表、建类型和读写权限。
-2. 将 `apps/backend/.env` 或部署环境的 `DATABASE_URL` 指向新数据库。
+2. 将 `apps/backend/.env.foundation.local` 或部署环境的 `DATABASE_URL` 指向新数据库。
 3. 从仓库根执行：
 
    ```powershell

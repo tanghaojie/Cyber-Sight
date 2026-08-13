@@ -2,19 +2,19 @@
   <div
     class="creator-credit"
     :class="`creator-credit--${tone}`"
-    :aria-label="`${t('localization.creator.createdBy')} ${appConfig.creatorName} ${appConfig.creatorFullName}`"
+    :aria-label="`${t('localization.creator.createdBy')} ${platformConfig.creatorName} ${platformConfig.creatorFullName}`"
   >
     <span>{{ t('localization.creator.createdBy') }}</span>
     <i aria-hidden="true" />
     <div>
-      <strong>{{ appConfig.creatorName }}</strong>
-      <small>{{ appConfig.creatorFullName }}</small>
+      <strong>{{ platformConfig.creatorName }}</strong>
+      <small>{{ platformConfig.creatorFullName }}</small>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { appConfig } from '@/platform/config/app.config'
+import { platformConfig } from '@/platform/config/platform.config'
 import { useLocalization } from '@/foundation/modules/localization/localization'
 
 withDefaults(defineProps<{ tone?: 'dark' | 'light' }>(), { tone: 'light' })

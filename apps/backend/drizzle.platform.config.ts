@@ -1,18 +1,12 @@
-import 'dotenv/config'
 import type { Config } from 'drizzle-kit'
-
-const databaseUrl = process.env.DATABASE_URL
-
-if (!databaseUrl) {
-  throw new Error('DATABASE_URL is required. Copy .env.example to .env first.')
-}
+import { runtimeConfig } from './src/config/runtime.config.js'
 
 export default {
   schema: './src/platform/database/schema.ts',
   out: './drizzle/platform',
   dialect: 'postgresql',
   dbCredentials: {
-    url: databaseUrl,
+    url: runtimeConfig.foundation.DATABASE_URL,
   },
   migrations: {
     schema: 'drizzle',

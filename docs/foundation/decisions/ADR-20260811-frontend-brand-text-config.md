@@ -25,7 +25,7 @@ date: 2026-08-11
 
 ## 决策
 
-采用方案 3：删除 `VITE_APP_PRODUCT_LABEL` 及对应的 `appConfig.productLabel`。所有原产品标签使用位置改为读取 `appConfig.tagline`；`CyberLogo` 只在 Logo 下方的产品描述位置调用 `.toUpperCase()`，登录页签名保持原始大小写。动态标题在没有路由专属标题时使用 `appConfig.fullName`，再与短名称组合。
+采用方案 3：删除 `VITE_APP_PRODUCT_LABEL` 及对应的 `PlatformConfig.productLabel`。所有原产品标签使用位置改为读取 `PlatformConfig.tagline`；`CyberLogo` 只在 Logo 下方的产品描述位置调用 `.toUpperCase()`，登录页签名保持原始大小写。动态标题在没有路由专属标题时使用 `PlatformConfig.fullName`，再与短名称组合。配置实现由 Platform 配置模块提供，运行时通过 Integration 聚合入口注入 Foundation。
 
 ## 正面结果
 

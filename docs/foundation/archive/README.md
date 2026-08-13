@@ -46,6 +46,8 @@
 
 - 2026-08-12：[Forge Foundation/Platform 结构迁移](plans/2026-08-12-foundation-platform-restructure.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-12-foundation-platform-restructure.md)。
+- 2026-08-13：[Foundation 与 Platform 分层运行时配置](plans/2026-08-13-layered-runtime-configuration.md)及其
+  [AI 协作记录](ai-logs/2026/08/2026-08-13-layered-runtime-configuration.md)。
 
 - 2026-08-11：[动态根路由解析修复](plans/2026-08-11-dynamic-root-route.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-11-dynamic-root-route.md)。

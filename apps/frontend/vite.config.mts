@@ -7,12 +7,53 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
-export default defineConfig(function createViteConfig({ mode }) {
-  const env = loadEnv(mode, process.cwd())
-  const port = Number(env.VITE_PORT || 3333)
-  const backendPort = Number(env.VITE_BACKEND_PORT || 3000)
+function loadLayeredEnvironment(mode: string): Record<string, string> {
+  const standardEnvironment = loadEnv(mode, process.cwd(), '')
+  const foundationEnvironment = loadEnv('foundation', process.cwd(), '')
+  const platformEnvironment = loadEnv('platform', process.cwd(), '')
+  const foundationKeys = ['VITE_PORT', 'VITE_BACKEND_PORT']
+  const platformKeys = [
+    'VITE_APP_NAME',
+    'VITE_APP_FULL_NAME',
+    'VITE_APP_TAGLINE',
+    'VITE_APP_GITHUB_URL',
+    'VITE_APP_CREATOR_NAME',
+    'VITE_APP_CREATOR_FULL_NAME',
+    'VITE_STORAGE_PREFIX',
+  ]
+
+  const scopedValues = function scopedValues(
+    environment: Record<string, string>,
+    keys: string[],
+  ): Record<string, string> {
+    return Object.fromEntries(
+      keys.flatMap((key) => (environment[key] ? [[key, environment[key]]] : [])),
+    )
+  }
 
   return {
+    ...standardEnvironment,
+    ...scopedValues(foundationEnvironment, foundationKeys),
+    ...scopedValues(platformEnvironment, platformKeys),
+    ...process.env,
+  } as Record<string, string>
+}
+
+function publicEnvironment(environment: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(environment)
+      .filter(([key]) => key.startsWith('VITE_'))
+      .map(([key, value]) => [`import.meta.env.${key}`, JSON.stringify(value)]),
+  )
+}
+
+export default defineConfig(function createViteConfig({ mode }) {
+  const environment = loadLayeredEnvironment(mode)
+  const port = Number(environment.VITE_PORT || 3333)
+  const backendPort = Number(environment.VITE_BACKEND_PORT || 3000)
+
+  return {
+    define: publicEnvironment(environment),
     resolve: {
       alias: {
         '@': resolve(process.cwd(), 'src'),

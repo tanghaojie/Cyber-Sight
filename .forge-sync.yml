@@ -1,6 +1,8 @@
 foundation:
   - apps/frontend/src/foundation/
+  - apps/frontend/.env.foundation.example
   - apps/backend/src/foundation/
+  - apps/backend/.env.foundation.example
   - apps/backend/test/foundation/
   - apps/backend/drizzle/foundation/
   - packages/api-contract/src/foundation/
@@ -10,8 +12,10 @@ foundation:
 
 platform:
   - apps/frontend/src/platform/
+  - apps/frontend/.env.platform.example
   - apps/backend/src/platform/
   - apps/backend/test/platform/
+  - apps/backend/.env.platform.example
   - apps/backend/drizzle/platform/
   - packages/api-contract/src/platform/
   - docs/platform/
@@ -35,15 +39,17 @@ integration:
   - apps/backend/src/database.check.ts
   - apps/backend/src/database.schema.ts
   - apps/backend/src/database.ts
+  - apps/backend/src/config/
   - apps/backend/src/server.ts
   - apps/backend/tsconfig.json
   - apps/frontend/package.json
+  - apps/frontend/src/config/
   - apps/frontend/src/App.vue
   - apps/frontend/src/env.d.ts
+  - apps/frontend/vite.config.mts
   - apps/frontend/src/main.ts
   - apps/frontend/src/start.ts
   - apps/frontend/tsconfig.json
-  - apps/frontend/vite.config.mts
   - docs/README.md
   - eslint.config.mjs
   - package.json
