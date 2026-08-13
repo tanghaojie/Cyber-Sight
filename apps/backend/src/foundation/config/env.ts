@@ -15,9 +15,7 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(32),
   API_TITLE: defaultedString('Cyber AI Forge API'),
   API_VERSION: defaultedString('0.1.0'),
-  API_DESCRIPTION: defaultedString(
-    'CYBER management scaffold — runtime-safe, modular, and AI-native',
-  ),
+  API_DESCRIPTION: defaultedString('AI-Native Enterprise Application Scaffold'),
   JWT_AUDIENCE: defaultedString('cyber-ai-forge-api'),
   JWT_ISSUER: defaultedString('cyber-ai-forge'),
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
