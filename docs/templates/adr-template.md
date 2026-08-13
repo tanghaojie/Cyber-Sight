@@ -1,10 +1,15 @@
 ---
 title: <决策标题>
+scope: foundation | forge | platform
+repository: <repository>
+owner: <owner>
 status: proposed
 date: YYYY-MM-DD
 ---
 
 # ADR-YYYYMMDD-<topic>：<决策标题>
+
+将文件保存到 `docs/<scope>/decisions/`。公共模板由 Forge 维护，具体决策只属于 frontmatter 声明的作用域。
 
 ## 背景
 

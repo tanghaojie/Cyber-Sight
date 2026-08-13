@@ -1,0 +1,74 @@
+foundation:
+  - apps/frontend/src/foundation/
+  - apps/frontend/env/.env.foundation.example
+  - apps/backend/src/foundation/
+  - apps/backend/env/.env.foundation.example
+  - apps/backend/test/foundation/
+  - apps/backend/drizzle/foundation/
+  - packages/api-contract/src/foundation/
+  - docs/foundation/
+  - docs/templates/
+  - scripts/architecture/
+
+platform:
+  - apps/website/
+  - apps/frontend/src/platform/
+  - apps/frontend/env/.env.platform.example
+  - apps/backend/src/platform/
+  - apps/backend/test/platform/
+  - apps/backend/env/.env.platform.example
+  - apps/backend/drizzle/platform/
+  - packages/api-contract/src/platform/
+  - docs/platform/
+  - .github/workflows/deploy-pages.yml
+  - README.md
+  - README.en.md
+
+forge:
+  - forge/
+  - docs/forge/
+
+integration:
+  - .forge-sync.yml
+  - .prettierrc.json
+  - AGENTS.md
+  - apps/backend/drizzle.foundation.config.ts
+  - apps/backend/drizzle.platform.config.ts
+  - apps/backend/package.json
+  - apps/backend/src/app.module.ts
+  - apps/backend/src/app.ts
+  - apps/backend/src/database.check.ts
+  - apps/backend/src/database.schema.ts
+  - apps/backend/src/database.ts
+  - apps/backend/src/config/
+  - apps/backend/src/server.ts
+  - apps/backend/tsconfig.json
+  - apps/frontend/package.json
+  - apps/frontend/src/config/
+  - apps/frontend/src/App.vue
+  - apps/frontend/src/env.d.ts
+  - apps/frontend/vite.config.mts
+  - apps/frontend/src/main.ts
+  - apps/frontend/src/start.ts
+  - apps/frontend/tsconfig.json
+  - docs/README.md
+  - eslint.config.mjs
+  - package.json
+  - packages/api-contract/package.json
+  - packages/api-contract/scripts/
+  - packages/api-contract/src/index.ts
+  - packages/api-contract/tsconfig.json
+  - pnpm-lock.yaml
+  - pnpm-workspace.yaml
+  - scripts/docs/
+  - scripts/forge-sync.mjs
+  - scripts/forge-sync.test.mjs
+  - tsconfig.base.json
+
+validate:
+  - pnpm architecture:check
+  - pnpm format:check
+  - pnpm lint
+  - pnpm test
+  - pnpm build
+  - pnpm docs:archive:check:ci

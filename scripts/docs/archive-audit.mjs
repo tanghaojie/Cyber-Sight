@@ -5,8 +5,9 @@ import { fileURLToPath } from 'node:url'
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url))
 const repositoryRoot = resolve(scriptDirectory, '../..')
-const policyPath = join(repositoryRoot, 'docs/archive/archive-policy.json')
-const ledgerPath = join(repositoryRoot, 'docs/archive/archive-ledger.json')
+const foundationDocsRoot = join(repositoryRoot, 'docs/foundation')
+const policyPath = join(foundationDocsRoot, 'archive/archive-policy.json')
+const ledgerPath = join(foundationDocsRoot, 'archive/archive-ledger.json')
 const adrFilenamePattern = /^ADR-(?:\d{4}|\d{8})-.+\.md$/i
 
 function readJson(filePath) {
@@ -162,7 +163,7 @@ function getScopes(paths) {
 
   for (const filePath of paths) {
     const moduleMatch = filePath.match(
-      /^(?:apps\/[^/]+|packages\/api-contract)\/src\/modules\/(?:system\/|biz\/)?([^/]+)/,
+      /^(?:apps\/[^/]+|packages\/api-contract)\/src\/(?:foundation|platform)\/modules\/([^/]+)/,
     )
 
     if (moduleMatch) {
@@ -185,7 +186,7 @@ function getScopes(paths) {
 }
 
 function getNewAcceptedAdrs(baselineCommit) {
-  const decisionsDirectory = join(repositoryRoot, 'docs/decisions')
+  const decisionsDirectory = join(foundationDocsRoot, 'decisions')
   return listFiles(decisionsDirectory)
     .filter((filePath) => adrFilenamePattern.test(relative(decisionsDirectory, filePath)))
     .filter((filePath) => parseFrontMatter(filePath).status === 'accepted')
@@ -200,8 +201,8 @@ function getChangedPlanPaths(baselineCommit) {
       '--name-only',
       `${baselineCommit}..HEAD`,
       '--',
-      'docs/plans/active',
-      'docs/archive/plans',
+      'docs/foundation/plans/active',
+      'docs/foundation/archive/plans',
     ],
     true,
   )
@@ -211,8 +212,8 @@ function getChangedPlanPaths(baselineCommit) {
 function getCompletedPlans(baselineCommit) {
   const changedPlanPaths = new Set(getChangedPlanPaths(baselineCommit))
   const planFiles = [
-    ...listFiles(join(repositoryRoot, 'docs/plans/active')),
-    ...listFiles(join(repositoryRoot, 'docs/archive/plans')),
+    ...listFiles(join(foundationDocsRoot, 'plans/active')),
+    ...listFiles(join(foundationDocsRoot, 'archive/plans')),
   ]
 
   return planFiles
@@ -223,7 +224,7 @@ function getCompletedPlans(baselineCommit) {
 }
 
 function findActiveArchivePlans() {
-  return listFiles(join(repositoryRoot, 'docs/plans/active'))
+  return listFiles(join(foundationDocsRoot, 'plans/active'))
     .filter((filePath) => extname(filePath).toLowerCase() === '.md')
     .map((filePath) => ({
       path: toRepositoryPath(filePath),
@@ -233,9 +234,9 @@ function findActiveArchivePlans() {
 }
 
 function findSupersededAdrs() {
-  return listFiles(join(repositoryRoot, 'docs/decisions'))
+  return listFiles(join(foundationDocsRoot, 'decisions'))
     .filter((filePath) =>
-      adrFilenamePattern.test(relative(join(repositoryRoot, 'docs/decisions'), filePath)),
+      adrFilenamePattern.test(relative(join(foundationDocsRoot, 'decisions'), filePath)),
     )
     .filter((filePath) =>
       ['superseded', 'replaced', 'retired'].includes(parseFrontMatter(filePath).status),
@@ -252,7 +253,7 @@ function findBrokenDocumentationLinks() {
   const brokenLinks = []
 
   for (const filePath of listFiles(docsRoot)) {
-    if (filePath.includes(`${join('docs', 'archive')}`)) {
+    if (toRepositoryPath(filePath).includes('/archive/')) {
       continue
     }
 
@@ -294,8 +295,8 @@ function findBrokenDocumentationLinks() {
 
 function detectArchitectureChanges(commits) {
   const architecturePaths = new Set([
-    'docs/design/system-overview.md',
-    'docs/design/module-boundaries.md',
+    'docs/foundation/design/system-overview.md',
+    'docs/foundation/design/module-boundaries.md',
   ])
 
   return commits.some(
