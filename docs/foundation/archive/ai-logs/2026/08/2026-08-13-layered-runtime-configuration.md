@@ -31,7 +31,7 @@ status: completed
 
 ## 验证结果
 
-`pnpm format`、`pnpm format:check`、`pnpm lint`、`pnpm test`、`pnpm build`、`pnpm architecture:check` 和 `pnpm docs:archive:check:ci` 均通过。前端未创建自动化浏览器测试，仍需维护者人工确认品牌变量和端口覆盖效果。
+`pnpm format`、`pnpm format:check`、`pnpm lint`、`pnpm test`、`pnpm build` 和 `pnpm architecture:check` 均通过；实现提交前的归档 CI 因旧基线识别为 `DUE`，更新账本到实现提交后重新执行并通过。前端未创建自动化浏览器测试，仍需维护者人工确认品牌变量和端口覆盖效果。
 
 ## 未决问题与下一步
 
@@ -40,3 +40,4 @@ status: completed
 ## 相关设计、ADR、计划和提交
 
 - [实施计划](../../../plans/2026-08-13-layered-runtime-configuration.md)
+- 实现提交：`8364215933197d5966e70ed8cd27f256c0cede55`

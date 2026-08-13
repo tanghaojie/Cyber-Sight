@@ -2,9 +2,9 @@
   "version": 1,
   "scopes": {
     "repository": {
-      "lastReviewedCommit": "d88a9b4e03eb9641ab2fe94206dbfd152c2a2286",
+      "lastReviewedCommit": "8364215933197d5966e70ed8cd27f256c0cede55",
       "lastReviewedAt": "2026-08-13T16:00:00+08:00",
-      "reviewId": "foundation-platform-restructure"
+      "reviewId": "layered-runtime-configuration"
     }
   }
 }
