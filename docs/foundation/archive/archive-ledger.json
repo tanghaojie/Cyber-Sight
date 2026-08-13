@@ -2,9 +2,9 @@
   "version": 1,
   "scopes": {
     "repository": {
-      "lastReviewedCommit": "8364215933197d5966e70ed8cd27f256c0cede55",
+      "lastReviewedCommit": "e8bc4b76a17cddefb83c76eb705100f71ac6bdb4",
       "lastReviewedAt": "2026-08-13T16:00:00+08:00",
-      "reviewId": "layered-runtime-configuration"
+      "reviewId": "env-directory"
     }
   }
 }
