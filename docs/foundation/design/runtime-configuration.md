@@ -23,8 +23,9 @@ Foundation 拥有基础运行时配置的定义和校验：后端数据库连接
 
 ```text
 apps/backend/
-├── .env.foundation.example
-├── .env.platform.example
+├── env/
+│   ├── .env.foundation.example
+│   └── .env.platform.example
 └── src/
     ├── foundation/config/foundation.config.ts
     ├── platform/config/platform.config.ts
@@ -33,15 +34,16 @@ apps/backend/
         └── runtime.config.ts
 
 apps/frontend/
-├── .env.foundation.example
-├── .env.platform.example
+├── env/
+│   ├── .env.foundation.example
+│   └── .env.platform.example
 └── src/
     ├── foundation/config/foundation.config.ts
     ├── platform/config/platform.config.ts
     └── config/runtime.config.ts
 ```
 
-Foundation 文件由 Forge 维护并同步；Platform 文件由业务平台维护；Integration 文件属于集成控制面，变更需要同步报告和验证。`.env.foundation.local`、`.env.platform.local` 和 `.env.local` 被 Git 忽略，不进入提交或合并。
+Foundation 文件由 Forge 维护并同步；Platform 文件由业务平台维护；Integration 文件属于集成控制面，变更需要同步报告和验证。所有环境文件集中放在对应 workspace 的 `env/` 目录中；`.env`、`.env.local`、`.env.foundation.local` 和 `.env.platform.local` 被 Git 忽略，不进入提交或合并。
 
 ## 配置字段边界
 
@@ -54,7 +56,7 @@ Foundation 负责其字段的格式校验；Platform 负责其字段的默认值
 
 ## 加载顺序与数据流
 
-后端 Integration 入口按以下顺序读取文件，并让后者覆盖前者：
+后端 Integration 入口从 `apps/backend/env/` 按以下顺序读取文件，并让后者覆盖前者：
 
 ```text
 .env -> .env.local -> .env.foundation.local -> .env.platform.local -> process.env
@@ -62,7 +64,7 @@ Foundation 负责其字段的格式校验；Platform 负责其字段的默认值
 
 `process.env` 拥有最高优先级，便于容器和生产部署覆盖本地文件。聚合结果分别交给 `parseFoundationEnvironment` 和 `parsePlatformEnvironment`，得到 `runtimeConfig.foundation` 与 `runtimeConfig.platform`。应用入口、数据库连接和 Drizzle 配置只消费已校验结果。
 
-前端 Vite 在保留模式文件加载顺序的基础上追加 Foundation/Platform local 文件，并将进程环境放在最高优先级。只有以 `VITE_` 开头的变量通过构建注入浏览器；前端 `runtimeConfig` 同时聚合 Foundation 开发端口和 Platform 品牌配置。Platform 通过 `PlatformDefinition` 向 Foundation 页面提供品牌配置，Foundation 不导入 Platform 内部文件。
+前端 Vite 将 `env/` 作为 `envDir`，在保留模式文件加载顺序的基础上追加 Foundation/Platform local 文件，并将进程环境放在最高优先级。只有以 `VITE_` 开头的变量通过构建注入浏览器；前端 `runtimeConfig` 同时聚合 Foundation 开发端口和 Platform 品牌配置。Platform 通过 `PlatformDefinition` 向 Foundation 页面提供品牌配置，Foundation 不导入 Platform 内部文件。
 
 ## 失败模式与安全考虑
 
@@ -80,7 +82,7 @@ Foundation 负责其字段的格式校验；Platform 负责其字段的默认值
 
 ## 兼容性与迁移
 
-本次保留现有环境变量名称，仅把示例文件拆为 `.env.foundation.example` 与 `.env.platform.example`。本地开发者应分别复制为 `.env.foundation.local` 和 `.env.platform.local`；部署环境无需文件迁移，可继续直接提供进程环境变量。旧的单一 `.env.example` 不再作为版本控制入口。
+本次保留现有环境变量名称，仅把示例文件拆为 `env/.env.foundation.example` 与 `env/.env.platform.example`。本地开发者应在对应 workspace 的 `env/` 中分别复制为 `.env.foundation.local` 和 `.env.platform.local`；部署环境无需文件迁移，可继续直接提供进程环境变量。旧的单一 `.env.example` 不再作为版本控制入口。
 
 ## 相关 ADR、计划和 AI 日志
 

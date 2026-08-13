@@ -28,7 +28,7 @@ date: 2026-08-13
 
 ## 决策
 
-采用方案 3。后端使用 Foundation 与 Platform 独立 Zod 解析器，由 `src/config/runtime.config.ts` 聚合；前端使用 Foundation 与 Platform 独立配置对象，由 `src/config/runtime.config.ts` 聚合。文件加载顺序为 `.env`、`.env.local`、`.env.foundation.local`、`.env.platform.local`、进程环境，后者覆盖前者。Vite 只注入 `VITE_*`。
+采用方案 3。后端使用 Foundation 与 Platform 独立 Zod 解析器，由 `src/config/runtime.config.ts` 聚合；前端使用 Foundation 与 Platform 独立配置对象，由 `src/config/runtime.config.ts` 聚合。前后端分别以各自 workspace 的 `env/` 为环境目录，文件加载顺序为 `.env`、`.env.local`、`.env.foundation.local`、`.env.platform.local`、进程环境，后者覆盖前者。Vite 只注入 `VITE_*`。
 
 ## 正面结果
 

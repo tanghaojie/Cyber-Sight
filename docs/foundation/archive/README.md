@@ -44,6 +44,9 @@
 
 ## 完成计划与 AI 协作记录
 
+- 2026-08-13：[集中前后端环境文件目录](plans/2026-08-13-env-directory.md)及其
+  [AI 协作记录](ai-logs/2026/08/2026-08-13-env-directory.md)。
+
 - 2026-08-12：[Forge Foundation/Platform 结构迁移](plans/2026-08-12-foundation-platform-restructure.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-12-foundation-platform-restructure.md)。
 - 2026-08-13：[Foundation 与 Platform 分层运行时配置](plans/2026-08-13-layered-runtime-configuration.md)及其

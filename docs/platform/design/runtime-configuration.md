@@ -44,7 +44,7 @@ Platform 的部署相关品牌文字、项目链接、创作者署名、Swagger 
 
 ## 数据流与依赖
 
-Vite 按 `.env`、`.env.local`、模式文件、`.env.foundation.local`、`.env.platform.local` 和进程环境的顺序聚合变量，构建期只把 `VITE_*` 注入 `platformConfig`。后端由 Integration 入口加载同样的分层本地文件并让进程环境拥有最高优先级，再分别交给 Foundation 与 Platform 解析器。Platform 配置通过注册边界注入 Foundation 页面。
+Vite 以 `apps/frontend/env/` 作为 `envDir`，按 `.env`、`.env.local`、模式文件、`.env.foundation.local`、`.env.platform.local` 和进程环境的顺序聚合变量，构建期只把 `VITE_*` 注入 `platformConfig`。后端由 Integration 入口从 `apps/backend/env/` 加载同样的分层本地文件并让进程环境拥有最高优先级，再分别交给 Foundation 与 Platform 解析器。Platform 配置通过注册边界注入 Foundation 页面。
 
 Foundation 不反向导入 Platform 内部配置文件。Platform 只通过既有注册和应用组装边界向 Foundation 提供配置。
 

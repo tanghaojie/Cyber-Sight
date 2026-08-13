@@ -41,9 +41,9 @@ Vue 3 + fetch Client   Nest Pipe + Fastify adapter + Swagger
 
 ```powershell
 pnpm install
-Copy-Item apps/backend/.env.foundation.example apps/backend/.env.foundation.local
-Copy-Item apps/backend/.env.platform.example apps/backend/.env.platform.local
-# 编辑 .env.foundation.local，填写全新空数据库的 DATABASE_URL 和至少 32 个字符的 JWT_SECRET
+Copy-Item apps/backend/env/.env.foundation.example apps/backend/env/.env.foundation.local
+Copy-Item apps/backend/env/.env.platform.example apps/backend/env/.env.platform.local
+# 编辑 env/.env.foundation.local，填写全新空数据库的 DATABASE_URL 和至少 32 个字符的 JWT_SECRET
 pnpm db:migrate
 pnpm dev
 ```
@@ -57,7 +57,7 @@ pnpm dev
 - Swagger UI：`http://localhost:3000/docs`
 - Swagger JSON：`http://localhost:3000/docs/json`
 
-本地 `.env`、`.env.foundation.local` 和 `.env.platform.local` 被 Git 忽略，禁止把真实密码复制到 README、设计文档、测试或提交记录中。
+本地 `env/.env`、`env/.env.foundation.local` 和 `env/.env.platform.local` 被 Git 忽略，禁止把真实密码复制到 README、设计文档、测试或提交记录中。
 
 ## 4. 目录和模块职责
 

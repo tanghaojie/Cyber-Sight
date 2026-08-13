@@ -7,10 +7,12 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
+const frontendEnvironmentDirectory = resolve(process.cwd(), 'env')
+
 function loadLayeredEnvironment(mode: string): Record<string, string> {
-  const standardEnvironment = loadEnv(mode, process.cwd(), '')
-  const foundationEnvironment = loadEnv('foundation', process.cwd(), '')
-  const platformEnvironment = loadEnv('platform', process.cwd(), '')
+  const standardEnvironment = loadEnv(mode, frontendEnvironmentDirectory, '')
+  const foundationEnvironment = loadEnv('foundation', frontendEnvironmentDirectory, '')
+  const platformEnvironment = loadEnv('platform', frontendEnvironmentDirectory, '')
   const foundationKeys = ['VITE_PORT', 'VITE_BACKEND_PORT']
   const platformKeys = [
     'VITE_APP_NAME',
@@ -53,6 +55,7 @@ export default defineConfig(function createViteConfig({ mode }) {
   const backendPort = Number(environment.VITE_BACKEND_PORT || 3000)
 
   return {
+    envDir: frontendEnvironmentDirectory,
     define: publicEnvironment(environment),
     resolve: {
       alias: {

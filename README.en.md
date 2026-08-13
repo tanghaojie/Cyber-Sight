@@ -246,11 +246,11 @@ You do not need to describe your requirements professionally all at once. You ca
 pnpm install
 
 # Windows PowerShell
-Copy-Item apps/backend/.env.foundation.example apps/backend/.env.foundation.local
-Copy-Item apps/backend/.env.platform.example apps/backend/.env.platform.local
+Copy-Item apps/backend/env/.env.foundation.example apps/backend/env/.env.foundation.local
+Copy-Item apps/backend/env/.env.platform.example apps/backend/env/.env.platform.local
 ```
 
-Edit `apps/backend/.env.foundation.local`, enter the connection information for a brand-new empty PostgreSQL database, and set a `JWT_SECRET` with at least 32 characters:
+Edit `apps/backend/env/.env.foundation.local`, enter the connection information for a brand-new empty PostgreSQL database, and set a `JWT_SECRET` with at least 32 characters:
 
 ```bash
 pnpm db:migrate
@@ -387,7 +387,7 @@ The root `AGENTS.md` records the collaboration rules that AI must follow when mo
 
 CYBER is maintained by JTLab. CYBER / Cyber AI Forge is the project name, and JTLab is the creator brand. The English subtitle is `AI-Native Enterprise Application Scaffold`; the Chinese subtitle is `AI 驱动的企业应用智能构建平台`. The frontend uses a brand system built from graphite black, warm white, mint green `#70CFA2`, and electric-purple nodes by default.
 
-Application text configuration is located in `apps/frontend/src/platform/config/platform.config.ts`. You can also copy `apps/frontend/.env.platform.example` and override it per deployment environment with these variables:
+Application text configuration is located in `apps/frontend/src/platform/config/platform.config.ts`. You can also copy `apps/frontend/env/.env.platform.example` and override it per deployment environment with these variables:
 
 - `VITE_APP_NAME`
 - `VITE_APP_FULL_NAME`

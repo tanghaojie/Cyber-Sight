@@ -16,10 +16,11 @@ export interface RuntimeConfig {
 }
 
 const backendDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
+const backendEnvironmentDirectory = resolve(backendDirectory, 'env')
 
 export function createRuntimeConfig(
   processEnvironment: NodeJS.ProcessEnv = process.env,
-  directory = backendDirectory,
+  directory = backendEnvironmentDirectory,
 ): RuntimeConfig {
   const environment = loadLayeredEnvironment(processEnvironment, directory)
 

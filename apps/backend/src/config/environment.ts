@@ -13,7 +13,7 @@ export function mergeEnvironmentLayers(
 
 export function loadLayeredEnvironment(
   processEnvironment: NodeJS.ProcessEnv = process.env,
-  directory = process.cwd(),
+  directory = resolve(process.cwd(), 'env'),
 ): NodeJS.ProcessEnv {
   const fileEnvironments = environmentFileNames.flatMap((fileName) => {
     const filePath = resolve(directory, fileName)

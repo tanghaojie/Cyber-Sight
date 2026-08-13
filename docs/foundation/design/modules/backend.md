@@ -63,8 +63,8 @@ Java 引入不是简单代码生成，需要独立的设计、ADR、迁移计划
 
 ## 数据库开发基线
 
-- Foundation 本地连接信息写入被 Git 忽略的 `apps/backend/.env.foundation.local`；Platform 本地覆盖写入 `apps/backend/.env.platform.local`。
-- `.env.foundation.example` 与 `.env.platform.example` 只提供无敏感信息的分层示例；Integration 入口 `src/config/runtime.config.ts` 负责聚合两层配置。
+- Foundation 本地连接信息写入被 Git 忽略的 `apps/backend/env/.env.foundation.local`；Platform 本地覆盖写入 `apps/backend/env/.env.platform.local`。
+- `env/.env.foundation.example` 与 `env/.env.platform.example` 只提供无敏感信息的分层示例；Integration 入口 `src/config/runtime.config.ts` 负责聚合两层配置。
 - Drizzle 迁移文件进入版本控制，数据库结构变化通过迁移执行。
 - 默认单元和路由测试不得依赖本机数据库；数据库集成验证使用独立命令显式运行。
 - 所有业务表包含 `is_deleted`、`created_at`、`created_by`、`updated_at`、`updated_by`；仓储查询显式过滤软删除数据。

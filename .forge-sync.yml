@@ -1,8 +1,8 @@
 foundation:
   - apps/frontend/src/foundation/
-  - apps/frontend/.env.foundation.example
+  - apps/frontend/env/.env.foundation.example
   - apps/backend/src/foundation/
-  - apps/backend/.env.foundation.example
+  - apps/backend/env/.env.foundation.example
   - apps/backend/test/foundation/
   - apps/backend/drizzle/foundation/
   - packages/api-contract/src/foundation/
@@ -12,10 +12,10 @@ foundation:
 
 platform:
   - apps/frontend/src/platform/
-  - apps/frontend/.env.platform.example
+  - apps/frontend/env/.env.platform.example
   - apps/backend/src/platform/
   - apps/backend/test/platform/
-  - apps/backend/.env.platform.example
+  - apps/backend/env/.env.platform.example
   - apps/backend/drizzle/platform/
   - packages/api-contract/src/platform/
   - docs/platform/
