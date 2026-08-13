@@ -30,4 +30,4 @@ Cyber-Sight 以 Cyber AI Forge 的 Foundation 为共享工程基线，在 Platfo
 - Forge 上游基线：`c97d184c439b8dc0378828bf386a3cc6e6a3c673`。
 - 自动化：同步规则、ownership、格式、Lint、契约构建、后端 143 项测试、全工作区生产构建和归档 CI 通过。
 - 文档：Sight 产品文档统一迁入 `docs/platform/`，旧 `docs/design/`、`docs/decisions/`、`docs/guides/`、`docs/archive/` 产品路径已移除；Forge 官网和 `docs/forge/` 未进入下游。
-- 关联提交：本次同步合并提交创建后补录。
+- 关联提交：`a23c38240d7d71f1aa5eb36438ffeda59c5f5355`。

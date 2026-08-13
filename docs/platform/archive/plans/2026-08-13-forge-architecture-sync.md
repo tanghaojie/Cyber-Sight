@@ -35,3 +35,5 @@ updated: 2026-08-13
 ## 实际结果与遗留边界
 
 Foundation 代码、契约和迁移目录已接入；Cyber-Sight 官网、品牌、产品模块和历史文档已保留在 Platform。Forge 官网及 `docs/forge/` 未进入本仓库。数据库自动检查只完成了迁移测试与配置/构建验证，真实 PostgreSQL 连接、登录/导航/品牌视觉、Swagger 和官网发布仍需维护者人工验收。
+
+关联合并提交：`a23c38240d7d71f1aa5eb36438ffeda59c5f5355`。

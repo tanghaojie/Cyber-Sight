@@ -30,6 +30,7 @@ date: 2026-08-13
 - `pnpm forge:sync:test`、`pnpm architecture:check`、`pnpm format:check`、`pnpm lint`、`pnpm test` 和 `pnpm build` 通过。
 - `pnpm docs:archive:check:ci` 在归档审查计划接续后通过；当前链接检查无失效项。
 - `pnpm test:db` 因本机没有 `DATABASE_URL` 和 `JWT_SECRET` 未能建立 PostgreSQL 连接。
+- 同步合并提交：`a23c38240d7d71f1aa5eb36438ffeda59c5f5355`，父提交保留 Sight `301e5fa` 与 Forge `c97d184`。
 
 ## 人工验收边界
 

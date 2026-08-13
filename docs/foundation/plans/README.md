@@ -8,7 +8,9 @@
 
 ## 进行中
 
-- [Forge 架构同步文档归档审查](active/2026-08-13-documentation-archive-review.md)：审查本次 Foundation/Platform 文档作用域迁移、链接和归档基线。
+当前没有活动计划。
+
+最近完成的归档审查：[Forge 架构同步文档归档审查](../archive/plans/2026-08-13-documentation-archive-review.md)。
 
 ## 生命周期
 
