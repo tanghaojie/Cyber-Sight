@@ -1,5 +1,5 @@
 ---
-title: Geo 空间可视化模块
+title: Geo 前端空间可视化工作台
 scope: platform
 repository: Cyber-Sight
 status: proposed
@@ -7,322 +7,230 @@ owner: project maintainers
 updated: 2026-08-14
 ---
 
-# Geo 空间可视化模块
+# Geo 前端空间可视化工作台
 
 ## 背景与目标
 
-Geo 是 Cyber-Sight 首个复杂 Platform 业务模块。它继承维护者在
-`vue3-cesium-typescript-start-up-template` 中积累的 Cesium 功能经验，但不复制旧项目以全局
-Cesium 实例和页面目录为中心的应用架构。旧项目只作为功能需求、交互经验和可复用算法的证据源；
-Cyber-Sight 的实现服从当前模块边界、运行时契约、授权和 Platform 所有权规则。
+Geo 延续维护者开源项目 `vue3-cesium-typescript-start-up-template` 的定位：面向使用者提供一个可直接操作的 Cesium 三维地球页面。旧项目保留为功能需求、交互经验和算法实现的参考，但不整体迁移其目录、Vuex 状态树、全局 Cesium 对象或 Ribbon 式界面。
 
-首版目标是交付一个可保存、可恢复、可扩展的三维空间工作区，并通过真实能力验证
-Cyber-Sight 承载复杂业务模块的完整链路：
+本阶段只建设 Cyber-Sight 前端中的 Geo 页面，目标是：
 
-- 在统一工作区中浏览三维地球、管理场景和图层、绘制与测量；
-- 以编译期内置插件注册能力，隔离 Cesium 生命周期和不同工具状态；
-- 通过共享 Zod 契约、Nest 应用服务和 Platform 数据表持久化场景；
-- 复用 Foundation 的认证、授权、菜单、导航和审计边界；
-- 建立 UI 与 AI 共用的类型化命令目录，使模块“AI-ready”但不依赖 AI 才能工作；
-- 形成后续 Market 模块可以参考的 Platform 纵向实现样板。
+- 把旧项目已验证的通用 Cesium 能力迁入一个清晰、可拆分、可释放资源的前端模块；
+- 以地图为视觉主体，重新设计工具导航、上下文面板和状态反馈；
+- 所有已接入能力直接提供给进入页面的使用者，不建设管理后台、配置审批或 Geo 专属权限；
+- 通过编译期内置插件隔离不同能力，避免再次形成一个相互穿透的巨大页面和状态树；
+- 保留 Cyber-Sight 现有 Platform 外壳、主题、本地化和 AI 辅助开发基础设施，但不在 Geo 中新增用户侧 AI 功能。
 
 ## 范围与非目标
 
-### 首版范围
+### 当前范围
 
-- 桌面优先的 Geo 工作区，包括场景列表、图层树、三维视图、属性面板和状态栏；
-- 相机定位、基础环境设置、图层显隐、透明度、排序和移除；
-- 首批内置图层适配器：XYZ 影像、WMS、GeoJSON 和 Cesium 3D Tiles；
-- 首批内置工具：绘制、距离测量、面积测量和结果清除；
-- 场景、图层配置、绘制要素和相机状态的保存、读取、更新、删除；
-- 所有者数据隔离、角色功能权限和服务端运行时校验；
-- 一个受控 AI 纵向能力：把自然语言转换为允许列表中的 Geo 命令，并在执行持久化或外部资源加载前要求确认；
-- 缺少令牌、WebGL 不可用、跨域失败、插件加载失败和保存冲突的明确降级反馈。
+- 一个桌面优先、地图全屏的 `/geo` 前端页面；
+- Cesium Viewer 创建、销毁、相机、场景模式和交互生命周期管理；
+- 影像、地形、模型与 3D Tiles 的前端预置资源管理；
+- 环境效果、标绘、测量、模型/3D Tiles 工具和地形分析；
+- 编译期插件注册、互斥交互工具管理、局部失败隔离和统一清理协议；
+- 对旧项目通用 Geo 能力的分阶段迁移与现代化 UI 重组；
+- 前端构建、类型、格式和维护者人工浏览器验收。
 
-### 非目标
+### 明确不做
 
-- 不加载远程 JavaScript、第三方 npm 包或用户上传代码作为运行时插件；
-- 不提供地图服务代理、瓦片生产、对象存储、海量数据托管或服务器端空间分析；
-- 不在首版引入 PostGIS、实时协同编辑、离线地图、移动端专业作业或多租户；
-- 不整体迁移旧项目的目录、全局对象、页面组件和示例数据；
-- 不默认携带来源、授权或商业用途不明确的影像、地形、3D Tiles 和访问令牌；
-- 不在 Geo 单一用例尚未验证前建立跨业务通用 AI Foundation 或通用远程插件市场；
-- 不创建或运行前端自动化、端到端或浏览器测试；交互行为由维护者人工验收。
+- 不新增 Geo 后端模块、HTTP API、共享 API 契约或数据库表；
+- 不接入 PostgreSQL、PostGIS、对象存储或服务端空间分析；
+- 不建设场景、图层、用户、权限、审计或数据源管理后台；
+- 不让用户上传插件代码，不加载远程 JavaScript，也不设计插件市场；
+- 不保存或共享业务场景；刷新页面后交互结果和运行状态可以重置；
+- 不新增聊天、自然语言命令、模型提供商、提示词或任何用户侧 AI 界面；
+- 不迁移旧项目中的行业大屏等特定业务应用；这类应用以后应作为独立业务模块消费 Geo 公共能力；
+- 不整体复制旧项目目录、示例数据、全局对象或过时 UI；
+- 不创建或运行前端自动化、端到端或浏览器测试，交互与视觉由维护者人工验收。
 
-## 职责与边界
+## 旧项目现状与重设计依据
 
-稳定模块名统一为 `geo`：
+2026-08-14 对旧站和源码进行了只读核对。旧界面主要由约 122px 高的顶部 Ribbon、约 300px 宽的常驻左栏和地图画布组成。功能按照“视图、效果、工具、地形、其他、应用”平铺，图标、文字和开关密度高；左栏长期占用地图面积，工具被激活后缺少统一的上下文和互斥反馈。
+
+旧源码采用宽泛的 `components/`、`views/`、`store/` 和 `libs/` 目录，并在深层 Vuex 模块中按工具继续嵌套状态。Cesium 生命周期、工具状态和界面组织因而容易相互耦合。新实现只复用仍有价值的功能算法，进入模块前必须去除全局依赖，并适配新的 Viewer 与交互生命周期。
+
+## 模块边界
+
+稳定模块名为 `geo`，当前只存在前端所有权目录：
 
 ```text
 apps/frontend/src/platform/modules/geo/
-apps/backend/src/platform/modules/geo/
-packages/api-contract/src/platform/modules/geo/
 ```
 
-`geo` 拥有场景、图层配置、绘制要素、Cesium 运行时适配、插件注册、命令执行和 Geo 专属
-AI 编排。应用组合根只注册模块，不承载 Geo 规则。
-
-模块内部按职责分层，但不拆成互相穿透的伪模块：
-
-```text
-geo/
-├─ application/     场景用例、命令调度和保存协调
-├─ domain/          场景快照、修订号和插件状态规则
-├─ infrastructure/  Cesium、HTTP、仓储和模型提供器适配
-├─ plugins/         编译期内置插件
-└─ pages/           工作区页面与展示组件
-```
-
-具体目录可以在实施时按前后端职责裁剪；不得创建无内容的平行层，也不得将 Geo 业务规则放入
-`shared/`、Vue 页面、Nest Controller 或 Platform 组合入口。
+Geo 拥有 Viewer 适配、工作台页面、内置插件、Geo 运行状态和地图专属组件。Foundation 不得依赖 Geo；其他 Platform 模块不得导入 Geo 页面、Cesium 实例、插件内部状态或内部组件。
 
 ### 公共文件
 
-前端允许外部依赖的公共文件：
+初始只登记两个公共文件：
 
-- `registerViews.ts`：登记动态菜单可加载的稳定视图键 `geo-workspace`；
-- `geo.api.ts`：Geo HTTP 调用边界；
-- `geo.store.ts`：工作区应用状态和场景生命周期；
-- `geo.commands.ts`：类型化命令目录、命令安全级别和执行入口；
-- `geo.plugins.ts`：内置插件贡献类型和注册函数，不导出 Cesium 私有实例。
+- `geo.routes.ts`：声明 `/geo` 的稳定静态路由并延迟加载工作台页面；
+- `geo.plugins.ts`：登记随应用构建的 Geo 插件定义，供 Geo 页面组合使用。
 
-后端允许外部依赖的公共文件：
+若后续其他 Platform 模块出现真实的地图嵌入需求，再评审并登记最小公共端口；本阶段不预先导出 Cesium Viewer、store 或组件集合，也不创建 `index.ts` barrel。
 
-- `geo.module.ts`：Nest 模块装配入口；
-- `geo.controller.ts`：HTTP 传输入口；
-- `geo.service.ts`：场景用例和事务边界；
-- `geo.schema.ts`：Drizzle 表定义，仅供 Platform Schema 聚合入口显式导出；
-- `geo.authorization.ts`：Geo 权限键、数据资源贡献和仓储过滤适配。
+### 建议内部结构
 
-契约公共文件：
+目录按真实职责逐步创建，不预建空层级：
 
-- `geo.schema.ts`：请求、响应、图层配置、场景快照和 AI 命令的 Zod 4 运行时 Schema；
-- `platform.contracts.ts`：只显式重新导出 Geo 的稳定契约。
+```text
+geo/
+├─ geo.routes.ts
+├─ geo.plugins.ts
+├─ pages/
+│  └─ GeoWorkspacePage.vue
+├─ core/
+│  ├─ geo-context.ts
+│  ├─ viewer-adapter.ts
+│  ├─ plugin-registry.ts
+│  ├─ interaction-manager.ts
+│  └─ disposable.ts
+├─ state/
+│  ├─ geo.store.ts
+│  └─ geo.types.ts
+├─ plugins/
+│  ├─ view/
+│  ├─ layers/
+│  ├─ environment/
+│  ├─ drawing/
+│  ├─ measurement/
+│  ├─ tileset/
+│  └─ terrain/
+└─ components/
+   ├─ shell/
+   ├─ panels/
+   └─ controls/
+```
 
-未在本设计登记的页面、插件实现、Cesium 适配器、仓储和内部 Schema 均为私有实现，其他模块不得
-穿透导入。
+## 前端接入方式
 
-## 总体架构与数据流
+Geo 不依赖数据库菜单或后端权限目录。Platform 组合入口把 `geo.routes.ts` 注册为静态前端路由，Platform 首页提供进入 Geo 的产品入口。该路由仍处于 Cyber-Sight 现有应用会话内，但不增加 Geo 专属角色、功能权限或数据权限。
+
+工作台使用独立的地图全屏布局，不套用面向列表和表单的 `AdminLayout`。页面保留返回 Platform 首页、品牌和必要的全局能力入口，但不显示常规后台侧边栏，从而把主要画布留给地图。
 
 ```mermaid
 flowchart LR
-    U["用户"] --> W["Geo Workspace"]
-    W --> C["Geo Command Registry"]
-    C --> P["Built-in Plugins"]
-    P --> V["Cesium Viewer Adapter"]
-    W --> A["Geo API"]
-    A --> S["Geo Application Service"]
-    S --> Z["Zod Contracts"]
-    S --> R["Geo Repository"]
-    R --> D["Platform PostgreSQL Tables"]
-    S --> F["Foundation Authorization Provider"]
-    I["Geo AI Orchestrator"] --> C
-    W --> I
+    H["Platform 首页"] --> R["静态 /geo 路由"]
+    R --> W["Geo 工作台页面"]
+    W --> G["插件注册表"]
+    G --> I["交互管理器"]
+    G --> V["Viewer 适配器"]
+    V --> C["Cesium Viewer"]
+    G --> D["前端预置数据源"]
 ```
 
-正常交互不经过 AI。页面和 AI 都只能调用命令目录；插件通过受限上下文访问 Viewer、工作区状态和
-命令执行器，不直接读写其他插件的私有状态。服务端持久化前重新校验所有输入，不能信任浏览器中的
-插件校验结果。
+## 前端插件架构
 
-## 插件与命令模型
+插件是源码内、编译期注册的功能单元，不是可下载的软件包。插件定义至少包含：
 
-Geo 采用编译期内置插件，而不是运行时远程插件。插件代码随 Cyber-Sight 构建、审阅和发布，通过
-`geo.plugins.ts` 注册。首版定义三类最小扩展点：
+- 稳定 `id`、排序和本地化标题键；
+- 所属任务组、工具栏贡献和可选上下文面板；
+- `activate(context)` 与配对的停用或 `dispose()` 清理逻辑；
+- 是否占用鼠标主交互，以及不可用原因和错误状态；
+- 需要的 Viewer 能力或其他已登记端口。
 
-- `GeoLayerAdapter`：识别一种图层配置，负责校验、创建、更新、销毁和序列化 Cesium 资源；
-- `GeoTool`：管理绘制、测量等有激活态的交互工具，并在停用时释放事件、实体和临时资源；
-- `GeoCommand`：声明稳定命令 ID、输入 Schema、安全级别和执行函数，供按钮、快捷入口和 AI 共同使用。
+`GeoContext` 只暴露受控的 Viewer 适配器、交互管理器、轻量事件和 UI 状态端口。插件不能读取其他插件私有状态。需要组合的能力通过已登记端口或事件完成。
 
-插件声明稳定 `id`、本地化名称、版本、贡献项和清理函数。插件 ID 一旦进入已保存场景不得无迁移
-重用。未知或版本不兼容的插件配置保留原始记录并标记不可用，不阻止场景其他部分恢复。
+只有一个占用鼠标主交互的工具能够处于活动状态。`InteractionManager` 在切换标绘、测量、拾取、分类或地形分析前先停用当前工具，并统一恢复鼠标样式、提示、事件处理器和临时实体。
 
-命令按副作用分为：
+Cesium Viewer、DataSource、Primitive、ScreenSpaceEventHandler 等对象保持非深度响应式，使用 `markRaw`、浅引用或普通类封装。Vue 状态只保存界面需要的可描述状态；路由离开、Viewer 重建、插件停用和热更新都必须执行幂等清理。
 
-- `view`：相机移动、面板开关等可逆的本地视图变化；
-- `workspace`：图层显隐、透明度、绘制等未持久化工作区变化；
-- `persist`：保存、覆盖或删除服务端数据；
-- `external`：加载新的外部 URL 或调用外部服务。
+## 功能范围与界面分组
 
-AI 可以自动执行 `view` 命令；`workspace`、`persist` 和 `external` 默认先展示结构化预览并由用户
-确认。任何调用者都必须通过同一命令 Schema，不提供 AI 直接执行任意 JavaScript、SQL、URL 请求或
-Cesium API 的通道。
+旧项目能力不再按源码技术分类展示，而按用户任务重组：
 
-Cesium Viewer 保持非响应式，由单一 `GeoViewerAdapter` 创建和销毁；Vue 状态只保存可序列化的场景
-状态、选择状态和插件状态。切换路由、热更新或工作区销毁时必须释放 ScreenSpaceEventHandler、
-DataSource、Primitive、定时器和订阅。
+| 任务组   | 首批迁移能力                                                                     |
+| -------- | -------------------------------------------------------------------------------- |
+| 数据     | 影像底图和标注、地形、模型与 3D Tiles 的预置列表，显示、隐藏、定位和局部属性调整 |
+| 视图     | 全球/中国定位、相机坐标、鼠标坐标、视距、2D/3D/哥伦布模式、相机设置和范围限制    |
+| 场景     | 太阳、月亮、大气、光照、天空盒、阴影、地球底色、深度检测                         |
+| 标绘     | 点、线、面标绘和清除当前或全部结果                                               |
+| 测量     | 点位、距离、面积测量和结果清除                                                   |
+| 三维模型 | 3D Tiles 高亮、滑动/点击分类、模型切割或分屏、偏移校正                           |
+| 地形分析 | 地形采样、淹没分析、等高线和地形着色                                             |
+| 对比     | 影像或场景分屏对比                                                               |
 
-## 用户体验与视觉结构
+具体算法先核对旧实现的依赖和正确性，再迁移到对应插件；功能名称相同不代表直接复制实现。第三方数据不可用时，对应能力展示局部错误或不可用原因，不阻塞其他插件和 Viewer。
 
-Geo 在现有 `AdminLayout` 内提供专用工作区，不替换 Foundation 应用壳：
+## UI 与交互设计
 
-- 左侧：场景选择、搜索和图层树，可折叠；
-- 中央：Cesium 画布和低干扰浮动工具条；
-- 右侧：当前图层、对象或工具的属性检查器，可切换 AI 助手；
-- 底部：坐标、高程、相机高度、加载和错误状态；
-- 窄屏：左右面板改为互斥抽屉，保留浏览和基础图层操作，不承诺专业移动作业体验。
+### 设计原则
 
-视觉沿用 Cyber-Sight 的石墨黑、暖白和主题强调色，地图画布周围减少装饰性网格和持续动画。按钮、
-图层节点和属性控件使用现有 Element Plus 与平台图标能力；新增图标进入受控图标注册表，不引入另一套
-组件系统。键盘焦点、文本对比度、错误信息和 `prefers-reduced-motion` 必须可用。
+- 地图优先：除必要导航外，默认不让永久面板占用地图；
+- 渐进披露：首层只显示任务组和常用操作，高级参数进入上下文面板；
+- 状态明确：活动工具、下一步操作、完成方式、错误和退出方式始终可见；
+- 上下文一致：选择图层、对象或工具后，只显示与当前对象相关的控制；
+- 与 Sight 一致：复用现有主题令牌、Element Plus 和图标能力，不引入第二套组件系统。
 
-## 数据模型与持久化
+### 页面结构
 
-首版使用 PostgreSQL JSONB 保存经过契约约束的 Cesium 配置和 GeoJSON，不引入 PostGIS。只有出现
-服务器端空间筛选、相交、距离、索引或大规模要素查询的真实需求时再提出迁移设计。
+- 顶部 48–56px 紧凑栏：返回入口、Geo 标识、当前页面标题和少量全局动作；
+- 左侧 48–56px 工具轨：数据、视图、场景、标绘、测量、分析等任务入口；
+- 按需上下文面板：默认关闭，打开后约 320px，可折叠；同一时刻只展示一个主要任务面板；
+- 右侧属性检查器：仅在选中图层、模型或对象时出现；
+- 右上地图控制：相机复位、视角、全屏等高频地图动作；
+- 底部轻量状态条：鼠标经纬度、高程、相机高度、FPS/加载状态和活动工具提示。
 
-### `geo_scenes`
+视觉采用高对比深色半透明表面、克制的强调色、8px 间距体系和至少 40px 的可点击控件。避免旧站的大面积灰色 Ribbon、永久 300px 侧栏、连续装饰动画和无层级图标平铺。
 
-- `id`：数据库原生 UUIDv7；
-- `name`、`description`：场景元数据；
-- `owner_user_id`：引用 Foundation `sys_users.id`，由服务端从当前会话写入；
-- `camera_state`、`environment_settings`：经共享 Schema 校验的 JSONB；
-- `revision`：从 `1` 开始的乐观并发修订号；
-- 通用创建、更新、软删除和审计字段。
+桌面是专业操作目标。宽度低于 1024px 时面板覆盖地图而非压缩画布；手机只保证浏览、图层切换和基础相机操作，不承诺复杂标绘与分析体验。
 
-### `geo_scene_layers`
+### 无障碍与反馈
 
-- `scene_id`：所属场景；
-- `plugin_id`、`layer_type`、`plugin_version`：确定负责恢复该图层的内置适配器；
-- `name`、`visible`、`opacity`、`display_order`：通用展示状态；
-- `config`：按 `layer_type` 判别并校验的 JSONB；
-- 通用 UUIDv7、审计和软删除字段。
+- 图标按钮有可见提示、可访问名称和键盘焦点；
+- 活动工具不能只靠颜色区分；
+- 加载、空状态、WebGL 不可用、数据跨域和插件异常提供文字说明；
+- 尊重 `prefers-reduced-motion`，地图以外的动效不妨碍操作；
+- 面板开合不重建 Viewer，切换工具不丢失无关图层状态。
 
-### `geo_scene_features`
+## 状态与数据
 
-- `scene_id`：所属场景；
-- `feature_type`：首版为绘制或测量结果；
-- `geometry`：符合约束的 GeoJSON Geometry JSONB；
-- `properties`、`style`：限制深度和大小的 JSONB；
-- 通用 UUIDv7、审计和软删除字段。
+Geo 的数据来源仅包括：
 
-场景详情一次返回场景、图层和要素。保存使用单个事务和 `expectedRevision`：修订号不匹配时返回稳定
-业务错误，不覆盖其他会话已经保存的状态。外部影像、地形、GeoJSON 和 3D Tiles 原始数据不复制进
-数据库，只保存非敏感配置和 URL；访问令牌、私钥、Cookie 和临时签名 URL 不进入场景记录。
+- 随前端构建发布的 TypeScript/JSON 配置；
+- 维护者明确选择、许可和配置的浏览器可访问影像、地形、GeoJSON、模型或 3D Tiles 服务；
+- 用户在当前页面会话中产生的标绘、测量和分析结果。
 
-## HTTP 契约
+本阶段不提供数据源新增表单、场景保存或多人共享。除非后续单独设计，业务状态只保存在内存中；可以复用已有浏览器偏好能力保存纯 UI 偏好，但不得把它描述为场景持久化。
 
-首版公开以下业务 API：
+访问令牌和授权不明的数据不得提交仓库。必须使用浏览器令牌时，只能通过前端运行时配置提供公开客户端令牌，并明确它可被终端用户看到；需要保密的凭据意味着该数据源不适合当前纯前端阶段。
 
-- `GET /geo/scenes`：按 `pageNum`、`pageSize` 返回当前用户可见场景；
-- `POST /geo/scenes`：创建空场景，所有者固定为当前用户；
-- `GET /geo/scenes/{id}`：读取完整场景；
-- `PUT /geo/scenes/{id}`：更新名称和描述；
-- `PUT /geo/scenes/{id}/snapshot`：以事务保存相机、环境、图层和要素快照；
-- `DELETE /geo/scenes/{id}`：软删除场景及其活动子记录；
-- `POST /geo/ai/commands:propose`：返回经过 Schema 校验的命令提案，不直接执行命令。
+## 失败模式
 
-所有请求、查询和路径参数由 `ZodValidationPipe` 在运行时校验，Controller 使用 `ContractRoute` 绑定
-响应。成功、失败、分页和 HTTP 状态遵循仓库统一协议；若新增错误码，同步更新
-`docs/reference/error-codes.md`。
+- WebGL 不可用或 Viewer 初始化失败：展示阻塞说明和重试，不渲染失效工具面板；
+- Cesium Worker、Widget 或 Asset 路径错误：开发与生产构建分别验证，初始化失败时保留可诊断信息；
+- 外部服务 CORS、限频、令牌或网络失败：只标记对应数据源/插件失败，不销毁 Viewer；
+- 插件激活失败：回滚该插件创建的事件、临时实体和 UI 状态，并恢复可选择工具状态；
+- 连续切换工具或路由：幂等清理，防止事件重复、Primitive 泄漏和幽灵提示；
+- 分析数据量过大：在插件入口限制输入，保持主线程可响应，并为耗时任务提供取消能力；
+- 预置资源许可或可用性不明确：不随产品发布，使用本地或明确授权的替代演示资源。
 
-## 授权与数据隔离
+## 验证策略
 
-稳定功能权限键为：
+自动验证只覆盖仓库允许的前端静态检查：格式、TypeScript、lint、生产构建、架构边界和文档归档门禁。不得新增或运行前端自动化、端到端或浏览器测试。
 
-- `geo.workspace.read`：查看 Geo 菜单、场景列表和工作区；
-- `geo.scenes.manage`：创建、修改、保存和删除场景；
-- `geo.ai.use`：请求 Geo AI 命令提案。
+维护者人工验收至少覆盖：
 
-菜单 `/geo` 使用组件键 `geo-workspace` 并要求 `geo.workspace.read`。所有 Geo Controller 处理器显式
-声明权限，不把菜单可见性当作后端授权。
+1. `/geo` 可从 Platform 首页进入并返回，Viewer 只创建一次且离开后释放；
+2. 1280×720 与常用桌面宽度下地图是视觉主体，顶部和侧栏不再复制旧 Ribbon 布局；
+3. 工具轨、上下文面板、属性检查器和状态条的层级、开合与焦点可理解；
+4. 所有已实现任务组均可进入，互斥鼠标工具切换后没有残留事件或临时实体；
+5. 影像、地形、模型和 3D Tiles 单项加载失败不影响其他能力；
+6. 相机、图层、场景、标绘、测量、三维模型、地形分析和分屏能力按阶段验收；
+7. 开发与生产构建的 Cesium Worker、Widget、字体和静态资源路径一致；
+8. 连续进入/退出页面和长时间操作后没有明显资源累积或重复响应。
 
-数据资源键为 `geo_scenes`。读取、更新和删除首版支持 `self` 与 `all`；创建由
-`geo.scenes.manage` 控制，服务端无条件把 `owner_user_id` 设为当前用户，因此不接受客户端指定所有者。
-仓储必须把同一数据访问谓词用于列表、count、详情、更新、快照保存和删除；范围外详情按不存在处理。
+前端静态检查不能代替上述视觉、交互和资源生命周期人工验收。
 
-当前 Foundation 的权限键和数据资源目录为硬编码实现，Platform 尚无贡献入口。Geo 实施前必须先在
-Cyber AI Forge 设计并实现通用的 Platform 授权贡献机制，再按上游同步协议进入 Cyber-Sight。Geo
-不得直接修改 Foundation 文件、由 Platform migration 写入 Foundation 表、退化为仅登录即可访问，
-或在仓储中复制一套不可配置的授权系统。
+## 后续演进边界
 
-## AI 接入边界
+只有用户明确提出场景保存、共享、管理或服务端空间计算后，才为 Geo 单独设计后端、契约和数据模型。只有出现第二个真实消费者后，才评审把 Viewer 或插件端口提升为跨 Platform 模块公共能力。
 
-当前仓库没有模型提供器、提示词治理或 Agent 运行时。Geo 首先实现与模型无关的命令目录，核心功能
-不依赖 AI。核心场景和插件通过验收后，再在 `geo` 模块内增加最小 `GeoModelProvider` 端口和一个
-服务端适配器：
+AI 辅助开发继续由 Sight 现有仓库能力承担；Geo 文档和源码无需复制一套 AI 基础设施。若以后要向产品用户提供 AI 地图操作，应作为新的业务需求重新设计，不能从本设计推导实现授权。
 
-1. 浏览器只提交用户问题、场景 ID 和必要的结构化上下文摘要；
-2. 服务端按当前权限读取可见场景，并向模型提供允许的命令 Schema；
-3. 模型输出只被解析为 `GeoCommandProposal[]`，解析或权限校验失败即拒绝；
-4. 浏览器展示命令、参数、影响范围和确认要求；
-5. 用户确认后由前端命令执行器执行，服务端数据变化仍走正常 Geo API；
-6. 首版不保存对话历史，不把外部图层属性文本默认拼入提示词。
+## 关联记录
 
-模型密钥只允许存在于后端环境变量或未来的安全密钥提供器中。AI 提案不是权限主体，不能扩大当前
-用户的数据和功能权限。Market 出现第二个真实 AI 用例后，再评估是否把提供器端口、审计和工具协议
-提取到 Foundation；Geo 不提前定义跨业务通用抽象。
-
-## 依赖关系
-
-```text
-geo -> Foundation auth / authorization / navigation / HTTP / database provider
-geo -> Platform runtime configuration
-geo -> shared Platform API contracts
-geo -> Vue / Pinia / Element Plus / Cesium
-Foundation -X-> geo
-```
-
-`cesium` 是前端直接依赖。具体版本在实施时选择与当前 Node、Vite 和浏览器基线兼容的稳定版本并精确
-记录锁文件结果，不从旧项目沿用版本约束。Geo AI 的具体模型 SDK不是核心阶段前置依赖；优先使用窄的
-HTTP 适配器或已确认的官方 SDK，避免把供应商类型泄漏到领域和命令层。
-
-## 失败模式与安全考虑
-
-- WebGL 或浏览器能力不足：显示阻塞说明，场景列表和配置管理仍可访问；
-- Cesium 初始化失败：销毁部分资源并提供重试，不重复创建 Viewer；
-- 外部 URL 跨域、超时或格式错误：只把对应图层标记失败，不阻断其他图层；
-- 未知插件或版本：保留配置、禁用该图层并显示迁移提示；
-- 保存冲突：返回修订冲突，保留本地未保存状态，由用户选择重新加载或另存；
-- 超大 GeoJSON 或深层 JSON：契约限制请求大小、要素数量、属性深度和字符串长度；
-- XSS：外部属性默认作为纯文本显示，不使用未经清洗的 HTML；
-- SSRF：首版不提供通用服务端 URL 代理或抓取接口；
-- 凭据泄漏：场景配置禁止秘密字段，日志、AI 上下文和错误信息不输出令牌；
-- 资源泄漏：插件和 Viewer 销毁路径必须幂等，切换场景前释放事件和 Cesium 对象；
-- AI 越权或提示注入：模型只产生结构化提案，命令重新校验权限和参数，外部内容不作为可信指令。
-
-## 测试与验证策略
-
-### 自动化验证
-
-- API 契约构建和测试覆盖场景、图层判别联合、GeoJSON 限制、命令提案和错误响应；
-- 后端单元测试覆盖所有者强制写入、数据范围、修订冲突、事务保存、软删除和未知插件；
-- Schema 与 migration 测试覆盖 UUIDv7、外键、索引、软删除唯一性和 Platform 独立迁移链；
-- 路由测试覆盖未认证、缺少三类功能权限、范围外资源和无授权声明；
-- 运行 `pnpm format`、`pnpm format:check`、`pnpm lint`、`pnpm test`、`pnpm build`、
-  `pnpm architecture:check` 和 `pnpm docs:archive:check:ci`；
-- 有空 PostgreSQL 18 数据库时执行 Platform migration 和 `pnpm test:db`。
-
-### 维护者人工验收
-
-- 桌面与窄屏工作区布局、面板折叠、主题和减少动效；
-- Viewer 重复进入/离开、场景切换和长时间使用后无明显重复事件或图层；
-- XYZ、WMS、GeoJSON、3D Tiles 的加载、失败、显隐、排序和透明度恢复；
-- 绘制、距离、面积、清除和保存后恢复；
-- 修订冲突、CORS 失败、无 WebGL、缺少令牌和未知插件提示；
-- AI 提案预览、确认、取消、非法参数拒绝和权限不足；
-- 前端人工验收不被格式、类型和生产构建结果替代。
-
-## 兼容性与迁移
-
-Geo 是 Cyber-Sight 新模块，不承诺旧项目状态、URL、LocalStorage 或目录结构兼容。可复用算法必须以
-当前许可证、类型和模块边界重新审阅后移植。旧项目示例数据默认不进入生产种子。
-
-首版场景快照包含 `schemaVersion`，插件配置包含 `pluginVersion`。破坏性 Schema 变化必须提供显式迁移
-函数或拒绝加载并保留原始记录，不能静默丢弃。删除 Geo 模块时，除 Platform 组合入口、菜单、权限
-贡献、契约导出、Platform Schema 聚合和 migration 外，不应修改无关模块。
-
-## 已确定事项
-
-- Geo 先于 Market 实施，并作为首个复杂 Platform 样板模块；
-- 采用单一 `geo` 业务模块和内部编译期插件，不采用运行时远程插件；
-- UI 与 AI 共用类型化命令目录，AI 只提出受控命令；
-- 首版使用 PostgreSQL JSONB，不引入 PostGIS；
-- 首版不托管外部空间数据、不做通用服务端代理；
-- 首版数据以场景所有者隔离，不实现协作分享和多租户；
-- Platform 授权贡献入口是编码前必须解决的 Forge 前置依赖。
-
-## 相关 ADR、计划和 AI 日志
-
-- [Geo 编译期插件与统一命令架构](../../decisions/ADR-20260814-geo-compile-time-plugins-and-commands.md)
-- [Geo 空间可视化模块 MVP 实施计划](../../plans/active/2026-08-14-geo-platform-mvp.md)
+- [Geo 前端编译期插件架构](../../decisions/ADR-20260814-geo-frontend-plugin-architecture.md)
+- [Geo 前端工作台实施计划](../../plans/active/2026-08-14-geo-frontend-workspace.md)
 - [Geo 模块设计协作记录](../../ai-logs/2026/08/2026-08-14-geo-platform-design.md)

@@ -1,6 +1,6 @@
 # Platform 设计索引
 
-- [Geo 空间可视化模块](modules/geo.md)：定义 Geo 工作区、编译期插件、场景数据、授权、AI 命令和首版验证边界。
+- [Geo 前端空间可视化工作台](modules/geo.md)：定义纯前端 Geo 页面、编译期插件、旧功能迁移、地图优先 UI 和人工验收边界。
 - [Platform 运行时配置](runtime-configuration.md)：定义前端品牌、后端 API 元数据与 JWT identity 的环境变量边界和失败兜底。
 - [Forge 集成与下游所有权](forge-integration.md)：记录 Foundation、Platform、Forge 的接入边界和本次同步策略。
 - [上游同步](upstream-synchronization.md)：定义 Cyber-Sight 获取 Forge 更新、保留产品所有权和执行验证的流程。

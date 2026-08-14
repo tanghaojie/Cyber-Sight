@@ -9,62 +9,94 @@ status: active
 
 # Geo 模块设计协作记录
 
-## 用户目标和约束
+## 用户目标与明确约束
 
-- Cyber-Sight 后续业务顺序为 Geo、Market、Intelligence，当前正式开始 Geo；
-- Geo 来源于维护者的开源 Cesium 项目经验，但需要重构为更插件化的架构、现代化 UI，并具备 AI
-  基础设施接入能力；
-- 本轮只明确设计和实施计划，不编写 Geo 业务代码；
-- 必须遵守 Platform 所有权、模块边界、共享 Zod 契约、独立 migration、前端人工验收和文档门禁；
-- 任务开始时暂存区和工作区均为空，文档归档审计结果为 `NOT_DUE`。
+- Cyber-Sight 后续业务顺序为 Geo、Market、Intelligence，当前先实施 Geo；
+- Geo 延续维护者开源项目 `vue3-cesium-typescript-start-up-template` 的产品定位，是一个面向用户的 Cesium 前端页面；
+- 当前不接入后端、PostgreSQL、管理能力、场景保存、Geo 专属权限或数据权限；
+- 页面中接入的功能直接提供给用户，不建设管理员与普通用户两套入口；
+- “架构重新设计”只指前端架构，重点解决 Viewer 生命周期、功能解耦和插件化；
+- UI 现代化是本阶段重点，旧站视觉与交互不能原样迁移；
+- “AI 基础设施”指 Sight 已有的 AI 辅助开发能力，不是 Geo 用户功能；Geo 不新增 AI 设计；
+- 本轮只修订设计、ADR 和实施计划，不实施 Geo 业务代码。
 
-## 关键问答与确认
+## 维护者纠正
 
-- 用户接受先 Geo、后 Market 的实施顺序；
-- Geo 被定位为 Cyber-Sight 首个复杂 Platform 纵向样板，而不是简单把旧仓库嵌入管理后台；
-- Intelligence 暂不实施；Geo 中只设计最小受控 AI 命令能力；
-- 旧项目的功能和算法可以作为需求证据，但旧架构、全局状态和示例数据不自动成为当前实现事实。
+上一版方案错误地把 Geo 定义为需要后端场景服务、PostgreSQL 持久化、授权贡献和用户侧 AI 命令的纵向业务模块。维护者明确否定这些范围。
 
-## AI 的重要假设
+本轮已撤销相关现行设计，不再把 Foundation 授权扩展、后端 API、共享契约、数据库 migration 或模型提供商作为 Geo 前置条件。历史提交保留事实记录，当前设计和 ADR 作为后续实施的唯一现行依据。
 
-- 首版以个人或小团队的场景所有权为中心，不实现实时协作、多租户和分享审批；
-- 首版空间数据量允许把经过限制的 GeoJSON 保存为 PostgreSQL JSONB，不需要服务器端空间查询；
-- 外部影像、地形和 3D Tiles 由客户端直连数据服务，首版不增加服务端通用代理；
-- AI 能力必须在核心 Geo 可独立工作后加入，模型不可直接执行任意代码或 Cesium API；
-- 具体 Cesium、数据提供器和模型提供器版本在实施阶段按兼容性和许可确认，不在设计阶段虚构。
+## 只读核对结果
 
-## 方案和执行摘要
+### 旧站界面
 
-- 阅读 Platform 文档入口、现行设计和 ADR，确认本任务主要作用域为 `platform`；
-- 阅读模块边界、Foundation/Platform 所有权、数据库迁移和授权设计；
-- 检查现有前端、后端、契约和 Platform Schema 组合入口；
-- 检查授权实现后确认权限键与数据资源目录仍硬编码在 Foundation，Platform 没有贡献入口；
-- 选择单一 `geo` 模块、编译期内置插件、非响应式 Viewer 适配器和统一类型化命令目录；
-- 选择场景、图层、绘制要素三张 Platform 业务表，首版不引入 PostGIS；
-- 定义角色功能权限、所有者数据隔离、AI 命令确认和外部数据安全边界；
-- 创建 Geo 设计、长期架构 ADR 和分阶段活动计划，并更新现行索引。
+通过应用内浏览器核对部署站点：
 
-## 验证结果
+- 顶部约 122px 的灰色 Ribbon 横跨全屏，按“视图、效果、工具、地形、其他、应用”组织大量图标和开关；
+- 左侧约 300px 的深色常驻栏同时承载影像、模型和地形列表；
+- 顶栏与侧栏持续挤压地图画布，功能层级和当前操作上下文不够清晰；
+- 视图、效果、标绘、测量、3D Tiles、模型和地形分析已形成可迁移的通用功能清单。
 
-- `git diff --cached --quiet`：通过，开始修改前无暂存内容；
-- `git status --short`：开始修改前为空；
-- `pnpm docs:archive:check`：`NOT_DUE`，无归档审查计划需要创建或继续；
-- `pnpm format`：通过，新建设计、ADR、计划和 AI 日志已按根 Prettier 配置格式化；
+### 旧仓库源码
+
+通过 GitHub 连接器只读核对旧仓库目录：
+
+- 前端使用宽泛的 `components/`、`libs/`、`store/` 和 `views/` 目录；
+- 工具状态在深层 Vuex 模块中继续嵌套，页面、工具和 Cesium 资源边界不够明确；
+- 存在可作为算法证据的通用 Cesium 能力，也存在不属于 Geo 核心的行业大屏示例；
+- 新实现应逐项解开全局依赖和生命周期耦合，不整体复制旧目录或示例应用。
+
+### Cyber-Sight 接入点
+
+- 当前常规业务菜单由后端数据动态生成，不适合本阶段无后端的 Geo；
+- Platform 组合入口可以注册 Platform 所有的静态前端路由；
+- Geo 采用 `/geo` 静态路由，并从 Platform 首页进入，可避免新增数据库菜单和 Foundation 业务耦合；
+- 独立地图全屏布局比复用常规后台列表/表单布局更符合地图优先目标。
+
+## 方案选择
+
+- 单一前端所有权目录：`apps/frontend/src/platform/modules/geo/`；
+- 公共入口仅先登记 `geo.routes.ts` 和 `geo.plugins.ts`；
+- Viewer 由非深度响应式适配器统一创建和销毁；
+- 编译期插件按数据、视图、场景、标绘、测量、模型与地形分析拆分；
+- `InteractionManager` 保证鼠标主交互互斥，各插件拥有并清理自己的事件和 Cesium 资源；
+- 页面采用紧凑顶栏、左侧工具轨、按需上下文面板、选中时属性检查器和底部状态条；
+- 状态只保存在当前前端会话，不设计业务持久化；
+- Sight 现有 AI 辅助开发能力不在 Geo 文档中重复建设。
+
+## 实际文档改动
+
+- 重写 Geo 模块设计，删除后端、API、数据库、权限和用户侧 AI 范围；
+- 用“Geo 前端编译期插件架构”ADR 替换错误的“插件与统一 AI 命令”决策；
+- 用纯前端工作台实施计划替换包含 Foundation、后端、migration 和 AI 阶段的旧计划；
+- 更新 Platform 设计、ADR、活动计划和 AI 日志索引；
+- 保留人工浏览器验收边界，不新增或运行前端自动化测试。
+
+## 验证记录
+
+- `git diff --cached --quiet`：通过，修订前暂存区为空；
+- `git status --short`：修订前工作区为空；
+- `pnpm docs:archive:check`：`NOT_DUE`，无需创建文档归档审查计划；
+- 旧站视觉和旧仓库源码只读核对：完成；
+- `pnpm format`：通过，修订文档已按仓库 Prettier 配置格式化；
 - `pnpm format:check`：通过；
-- `pnpm architecture:check`：通过，所有权结构未被文档变更破坏；
-- `pnpm docs:archive:check:ci`：通过，结果仍为 `NOT_DUE`；
-- 新增设计、ADR、计划和 AI 日志的索引目标存在；`git diff --cached --check` 通过，提交 trailer 验证待执行。
+- `pnpm architecture:check`：通过；
+- `pnpm docs:archive:check:ci`：通过，结果为 `NOT_DUE`；
+- `git diff --check`：通过；
+- 提交 trailer 验证待本轮提交后执行。
 
-## 未决问题与下一步
+## 未决问题与实施时确认项
 
-- 先在 Cyber AI Forge 为 Platform 权限和数据资源贡献设计通用 Foundation 扩展点；
-- 确认首版 Cesium 版本、公开数据服务许可和开发环境令牌；
-- Foundation 扩展同步完成后，按活动计划阶段 1 开始 Geo 契约、Schema 和模块骨架；
-- Geo 核心人工验收通过后再选择模型提供器，不提前抽取跨业务 AI Foundation。
+- Cesium 的具体稳定版本和 Vite 静态资源方案，在阶段 1 按当前依赖兼容性确认；
+- 首批预置影像、地形、模型和 3D Tiles 需核对许可、CORS 和客户端令牌要求；
+- 每项旧算法在迁移前判断复用或重写，并记录未迁移原因；
+- Platform 首页 Geo 入口的最终卡片文案和视觉在 UI 阶段与现有首页一起确定。
 
-## 相关设计、ADR、计划和提交
+以上事项不会改变已确认的纯前端、单页、无管理、无数据库和无用户侧 AI 边界。
 
-- [Geo 空间可视化模块](../../../design/modules/geo.md)
-- [Geo 编译期插件与统一命令架构](../../../decisions/ADR-20260814-geo-compile-time-plugins-and-commands.md)
-- [Geo 空间可视化模块 MVP 实施计划](../../../plans/active/2026-08-14-geo-platform-mvp.md)
-- 关联提交：待本轮验证和提交后补充。
+## 关联设计、ADR、计划和提交
+
+- [Geo 前端空间可视化工作台](../../../design/modules/geo.md)
+- [Geo 前端编译期插件架构](../../../decisions/ADR-20260814-geo-frontend-plugin-architecture.md)
+- [Geo 前端工作台实施计划](../../../plans/active/2026-08-14-geo-frontend-workspace.md)
+- 被纠正的初版设计提交：`45d29def200e01d989437dcf009c331b0207030a`；修正版设计见本记录所在提交。

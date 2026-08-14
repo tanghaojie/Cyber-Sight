@@ -1,3 +1,3 @@
 # Platform 活动实施计划
 
-- [Geo 空间可视化模块 MVP](2026-08-14-geo-platform-mvp.md)：建立可授权、可保存、插件化并具备受控 AI 命令入口的 Cesium 工作区。
+- [Geo 前端工作台](2026-08-14-geo-frontend-workspace.md)：分阶段交付纯前端 Cesium 页面、现代化 UI、插件内核和旧功能迁移。
