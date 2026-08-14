@@ -9,4 +9,4 @@
 - `ai-logs/`：当前 Platform 协作记录。
 - `archive/`：历史设计、决策、计划和日志。
 
-Cyber-Sight 以 Forge 的 Foundation 为共享基线；平台品牌、官网、业务模块、产品契约、配置和接入记录均由本目录独立维护。创建文档时使用公共[模板](../templates/)并设置 `scope: platform`。
+Cyber-Sight 以 Forge 的 Foundation 为共享基线；平台品牌、业务模块、产品契约、配置和接入记录均由本目录独立维护。创建文档时使用公共[模板](../templates/)并设置 `scope: platform`。

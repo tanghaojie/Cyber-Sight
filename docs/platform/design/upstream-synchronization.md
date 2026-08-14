@@ -2,7 +2,7 @@
 title: Cyber AI Forge 上游同步
 status: accepted
 owner: project maintainers
-updated: 2026-08-13
+updated: 2026-08-14
 ---
 
 # Cyber AI Forge 上游同步
@@ -21,8 +21,8 @@ Cyber-Sight 是以 Cyber AI Forge 为工程基线、长期独立演进的下游�
 
 ### Cyber-Sight 下游拥有
 
-- `README.md`、`README.en.md` 与 Cyber-Sight 产品入口。
-- 产品可见品牌配置、浏览器元信息、Swagger 展示和推广站内容。
+- `README.md` 与 Cyber-Sight 产品入口。
+- 产品可见品牌配置、浏览器元信息、Swagger 展示和产品文档内容。
 - `apps/frontend/src/platform/**`、`apps/backend/src/platform/**`、`packages/api-contract/src/platform/**` 和 `apps/backend/drizzle/platform/**` 中的产品业务能力及其设计、契约和迁移。
 - 本设计、上游同步指南及 Cyber-Sight 专属 ADR。
 

@@ -1,8 +1,9 @@
 ---
 title: Cyber-Sight 推广站
-status: accepted
+status: archived
 owner: project maintainers
 updated: 2026-08-11
+archived: 2026-08-14
 ---
 
 # Cyber-Sight 推广站
@@ -112,9 +113,9 @@ passive scroll event
 ## 相关 ADR、计划和 AI 日志
 
 - [ADR-0037：独立静态应用发布开源推广站](../decisions/ADR-0037-static-marketing-site.md)
-- [原始实施计划](../archive/plans/2026-08-10-marketing-site.md)
-- [视觉优化计划](../archive/plans/2026-08-10-marketing-site-visual-refinement.md)
-- [核心卡片语言切换显现修复](../archive/plans/2026-08-10-feature-locale-reveal.md)
-- [AI 协作记录](../archive/ai-logs/2026/08/2026-08-10-marketing-site-visual-refinement.md)
-- [中英文静态入口与 SEO 增强计划](../archive/plans/2026-08-10-website-seo.md)
-- [中英文静态入口与 SEO 增强 AI 协作记录](../archive/ai-logs/2026/08/2026-08-10-website-seo.md)
+- [原始实施计划](../plans/2026-08-10-marketing-site.md)
+- [视觉优化计划](../plans/2026-08-10-marketing-site-visual-refinement.md)
+- [核心卡片语言切换显现修复](../plans/2026-08-10-feature-locale-reveal.md)
+- [AI 协作记录](../ai-logs/2026/08/2026-08-10-marketing-site-visual-refinement.md)
+- [中英文静态入口与 SEO 增强计划](../plans/2026-08-10-website-seo.md)
+- [中英文静态入口与 SEO 增强 AI 协作记录](../ai-logs/2026/08/2026-08-10-website-seo.md)

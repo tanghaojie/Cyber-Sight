@@ -1,7 +1,8 @@
 ---
 title: 独立静态应用发布开源推广站
-status: accepted
+status: archived
 date: 2026-08-10
+archived: 2026-08-14
 ---
 
 # ADR-0037：独立静态应用发布开源推广站
@@ -49,4 +50,4 @@ date: 2026-08-10
 ## 相关设计和计划
 
 - [开源推广站设计](../design/marketing-site.md)
-- [实施计划](../archive/plans/2026-08-10-marketing-site.md)
+- [实施计划](../plans/2026-08-10-marketing-site.md)

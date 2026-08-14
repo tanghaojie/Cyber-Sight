@@ -85,8 +85,8 @@ git merge --no-ff upstream/master -m "chore: sync Cyber AI Forge @ <upstream-sha
 
 ### 保留 Cyber-Sight，再人工吸收上游内容
 
-- `README.md`、`README.en.md`。
-- Cyber-Sight 产品品牌、公开 URL、推广站内容和 SEO。
+- `README.md`。
+- Cyber-Sight 产品品牌、公开 URL 和产品文档内容。
 - `apps/frontend/src/platform/**`、`apps/backend/src/platform/**`、`packages/api-contract/src/platform/**` 及产品业务设计。
 - `docs/platform/**` 和本指南。
 

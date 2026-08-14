@@ -2,6 +2,7 @@
 title: Cyber-Sight 下游身份与上游兼容边界
 status: accepted
 date: 2026-08-11
+updated: 2026-08-14
 ---
 
 # ADR-20260811：Cyber-Sight 下游身份与上游兼容边界
@@ -12,7 +13,7 @@ Cyber-Sight 基于维护者的开源项目 Cyber AI Forge 建立。GitHub 不允
 
 ## 决策驱动因素
 
-- 让用户可见的仓库、界面、Swagger 和推广站统一识别为 Cyber-Sight。
+- 让用户可见的仓库、界面和 Swagger 统一识别为 Cyber-Sight。
 - 明确 Cyber AI Forge 是工程基线和上游来源，不把其作者关系或许可证贡献隐藏。
 - 保留共同提交历史，以标准 Git merge 获取上游更新。
 - 避免仅为展示改名而变更 workspace 导入、JWT 校验、浏览器存储或数据库。
@@ -32,7 +33,7 @@ Cyber-Sight 基于维护者的开源项目 Cyber AI Forge 建立。GitHub 不允
 - 英文产品标签为 `AI-NATIVE BUSINESS APPLICATION`，中文说明为 `AI 原生业务应用`；在业务定位正式确定前不虚构行业能力。
 - 保留现有 C 形 Logo、石墨黑、暖白、薄荷绿与电紫节点视觉；资产文件名可以继续使用 `cyber-*`，文件名不作为产品正式名称。
 - `JTLab / 桀士实验室` 继续作为与产品 Logo 分离的创作者署名。
-- README、前端默认展示、浏览器元信息、Swagger、关于页、推广站和公开 URL 改为 Cyber-Sight，并明确 `Built on Cyber AI Forge` / `基于 Cyber AI Forge 构建`。
+- README、前端默认展示、浏览器元信息、Swagger、关于页和公开 URL 改为 Cyber-Sight，并明确 `Built on Cyber AI Forge` / `基于 Cyber AI Forge 构建`。
 - 根包名 `cyber-ai-forge`、workspace 作用域 `@cyber-ai-forge/*`、JWT issuer/audience、浏览器存储键和脚手架系统表不改名。这些是上游兼容或运行时标识，不是当前 UI 品牌。
 - `origin` 是唯一日常推送目标；`upstream` 只获取 Cyber AI Forge 更新，本地 push URL 必须禁用。
 - 上游同步使用显式 fetch、专用同步分支和保留父提交的 merge；下游品牌和业务文件由 Cyber-Sight 拥有。
@@ -49,7 +50,7 @@ Cyber-Sight 基于维护者的开源项目 Cyber AI Forge 建立。GitHub 不允
 ## 负面结果与风险
 
 - 代码中仍会合理出现 `cyber-ai-forge` 技术标识，需要文档解释它们不是品牌遗漏。
-- README、品牌配置和推广站成为下游拥有文件，上游修改这些文件时必须人工移植，无法零冲突自动同步。
+- README、品牌配置和产品文档成为下游拥有文件，上游修改这些文件时必须人工移植，无法零冲突自动同步。
 - Cyber-Sight 业务定位尚未确定，现阶段品牌说明只能保持中性，后续需要随正式业务设计更新。
 
 ## 验证和复审条件

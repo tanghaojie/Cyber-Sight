@@ -11,7 +11,6 @@ foundation:
   - scripts/architecture/
 
 platform:
-  - apps/website/
   - apps/frontend/src/platform/
   - apps/frontend/env/.env.platform.example
   - apps/backend/src/platform/
@@ -20,9 +19,7 @@ platform:
   - apps/backend/drizzle/platform/
   - packages/api-contract/src/platform/
   - docs/platform/
-  - .github/workflows/deploy-pages.yml
   - README.md
-  - README.en.md
 
 forge:
   - forge/

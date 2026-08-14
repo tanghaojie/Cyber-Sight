@@ -2,7 +2,7 @@
 title: Cyber-Sight 品牌与视觉系统
 status: active
 owner: project maintainers
-updated: 2026-08-11
+updated: 2026-08-14
 ---
 
 # Cyber-Sight 品牌与视觉系统
@@ -15,7 +15,7 @@ Cyber-Sight 是以 Cyber AI Forge 为工程基线持续演进的独立产品仓�
 
 ## 范围与非目标
 
-本设计覆盖默认产品命名、Logo、色彩、登录页、应用壳、浏览器元信息、Swagger、README、推广站和公开 URL。它不改变模块边界、HTTP 契约、数据库表、业务行为或前端人工验收边界，也不重命名 Cyber AI Forge 兼容技术标识。
+本设计覆盖默认产品命名、Logo、色彩、登录页、应用壳、浏览器元信息、Swagger、README 和公开 URL。它不改变模块边界、HTTP 契约、数据库表、业务行为或前端人工验收边界，也不重命名 Cyber AI Forge 兼容技术标识。
 
 ## 品牌层级
 
@@ -59,7 +59,7 @@ Logo 以仓库内 SVG/Vue 组件实现，保证侧栏、移动端、404 和 favi
 
 ## 失败模式与安全考虑
 
-- 产品文案重新声称 Cyber-Sight 就是脚手架：README、关于页和推广站必须区分下游产品与 Cyber AI Forge 工程基线。
+- 产品文案重新声称 Cyber-Sight 就是脚手架：README 和关于页必须区分下游产品与 Cyber AI Forge 工程基线。
 - 上游同步覆盖产品品牌：品牌与 README 是 Cyber-Sight 下游拥有文件，冲突时保留下游身份并人工移植上游通用内容。
 - 技术标识被误判为遗漏并全量改名：不得在缺少兼容设计时修改 workspace、JWT、浏览器存储或数据库标识。
 - Logo 在小尺寸失真：组件保留强轮廓、有限色彩和独立 favicon，并通过生产构建与维护者人工检查验证。
@@ -71,7 +71,7 @@ Logo 以仓库内 SVG/Vue 组件实现，保证侧栏、移动端、404 和 favi
 - 搜索当前代码与现行文档，确认 `Cyber AI Forge` 只保留在工程基线、继承能力、上游同步或技术兼容说明中。
 - 维护者人工验收桌面与窄屏登录页、侧栏、404、工作台、favicon、浏览器标题和 Swagger 品牌展示；前端不创建或运行自动化测试。
 
-2026-08-11 实施结果：`pnpm format:check`、`pnpm lint`、`pnpm test` 和 `pnpm build` 均通过，后端共通过 140 项测试；构建产物中的前端标题、推广站中英文 SEO、结构化数据、仓库链接和 Cyber AI Forge 工程归属已完成静态检查。桌面与窄屏视觉、交互和 Swagger 展示仍由维护者人工验收。
+2026-08-11 实施结果：`pnpm format:check`、`pnpm lint`、`pnpm test` 和 `pnpm build` 均通过，后端共通过 143 项测试；构建产物中的前端标题、结构化数据、仓库链接和 Cyber AI Forge 工程归属已完成静态检查。桌面与窄屏视觉、交互和 Swagger 展示仍由维护者人工验收。
 
 ## 相关 ADR、计划和 AI 日志
 

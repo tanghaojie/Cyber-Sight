@@ -5,11 +5,7 @@
 <h1 align="center">Cyber-Sight</h1>
 
 <p align="center">
-  <a href="https://tanghaojie.github.io/Cyber-Sight/">Project Website</a>
-  ·
   <a href="https://github.com/tanghaojie/Cyber-AI-Forge">Cyber AI Forge Upstream</a>
-  ·
-  <a href="./README.en.md">English</a>
   ·
   <a href="./docs/README.md">Documentation</a>
 </p>
@@ -28,7 +24,7 @@
 > Build clearly. Evolve safely. 让复杂系统清晰生长。  
 > Built on Cyber AI Forge. 基于 Cyber AI Forge 构建。
 
-## <img src="./apps/website/src/assets/readme-icons/context.svg" alt="" width="20" height="20" /> 01 / Cyber-Sight 的工程基线
+## 01 / Cyber-Sight 的工程基线
 
 AI 已经可以生成大量代码，但“能生成代码”不等于“能持续完成一个项目”。当项目缺少清晰的结构和规则时，AI 很容易遇到这些问题：
 
@@ -40,7 +36,7 @@ AI 已经可以生成大量代码，但“能生成代码”不等于“能持�
 
 Cyber AI Forge 为 Cyber-Sight 提供人类和 AI 可以共同理解、共同使用、共同演进的企业应用工程基础。后续产品业务进入 `src/modules/biz/**`，通用脚手架增强优先回到 Cyber AI Forge，再通过上游同步进入本仓库。
 
-## <img src="./apps/website/src/assets/readme-icons/highlights.svg" alt="" width="20" height="20" /> 02 / 核心亮点
+## 02 / 核心亮点
 
 以下工程能力继承自 Cyber AI Forge，并作为 Cyber-Sight 后续业务开发的系统基线。
 
@@ -99,30 +95,11 @@ AI 可以继续完成数据库设计、Schema 定义、后端路由、前端页�
 
 这让 AI 和人类都能围绕同一份接口事实进行开发，减少前后端失同步。
 
-## <img src="./apps/website/src/assets/readme-icons/system.svg" alt="" width="20" height="20" /> 03 / 系统界面
+## 03 / 系统界面
 
-README 中展示的截图来自仓库内可运行的管理端界面，覆盖登录入口、工作台、用户与菜单管理、角色权限、接口日志和系统设置。截图仅用于说明当前能力，不代表接入了远程演示环境。
+README 不内嵌截图，界面请在本地启动后人工验收。当前管理端覆盖登录入口、工作台、用户与菜单管理、角色权限、接口日志和系统设置。
 
-<div align="center">
-  <img src="./apps/website/src/assets/screenshots/login.png" alt="Cyber-Sight 登录页" width="49%" />
-  <img src="./apps/website/src/assets/screenshots/home.png" alt="Cyber-Sight 工作台" width="49%" />
-</div>
-
-<div align="center">
-  <img src="./apps/website/src/assets/screenshots/users.png" alt="Cyber-Sight 用户管理" width="49%" />
-  <img src="./apps/website/src/assets/screenshots/menus.png" alt="Cyber-Sight 菜单管理" width="49%" />
-</div>
-
-<div align="center">
-  <img src="./apps/website/src/assets/screenshots/roles.png" alt="Cyber-Sight 角色管理与数据权限" width="49%" />
-  <img src="./apps/website/src/assets/screenshots/api-logs.png" alt="Cyber-Sight 接口日志" width="49%" />
-</div>
-
-<div align="center">
-  <img src="./apps/website/src/assets/screenshots/settings.png" alt="Cyber-Sight 系统设置" width="49%" />
-</div>
-
-## <img src="./apps/website/src/assets/readme-icons/people.svg" alt="" width="20" height="20" /> 04 / 适合谁使用
+## 04 / 适合谁使用
 
 ### 04.1 / 想通过 AI 做应用的普通人
 
@@ -148,7 +125,7 @@ AI 负责实现，人类仍然负责表达需求、判断产品方向和验收�
 - 让 AI 在明确的工程规则内协助开发
 - 使用已有的测试、构建和设计文档降低维护成本
 
-## <img src="./apps/website/src/assets/readme-icons/grid.svg" alt="" width="20" height="20" /> 05 / 典型使用场景
+## 05 / 典型使用场景
 
 - 企业内部管理后台
 - 客户关系管理系统
@@ -161,7 +138,7 @@ AI 负责实现，人类仍然负责表达需求、判断产品方向和验收�
 
 如果你的应用需要登录、权限、后台管理和数据库，Cyber-Sight 已经提供一个可靠的起点。
 
-## <img src="./apps/website/src/assets/readme-icons/compare.svg" alt="" width="20" height="20" /> 06 / 为什么不直接让 AI 从零搭建
+## 06 / 为什么不直接让 AI 从零搭建
 
 当然可以直接让 AI 从一个空目录开始搭建应用。问题不在于 AI 能不能生成第一版代码，而在于这个项目能不能在第一版之后继续稳定地开发、维护和交接。
 
@@ -199,7 +176,7 @@ AI 负责实现，人类仍然负责表达需求、判断产品方向和验收�
 
 > AI 可以负责各自的施工，Cyber-Sight 负责让所有施工遵循同一套图纸，最后组合成一个可以持续使用的系统。
 
-## <img src="./apps/website/src/assets/readme-icons/guide.svg" alt="" width="20" height="20" /> 07 / 如果你不懂技术，先把这份 README 交给 AI
+## 07 / 如果你不懂技术，先把这份 README 交给 AI
 
 如果你几乎不会写代码，不需要先弄懂 `pnpm`、`PostgreSQL`、`Zod` 这些技术词汇。你可以把这份 README 和项目一起交给支持项目文件访问的 AI，让 AI 先成为你的技术向导，再带着你一步一步完成开发。
 
@@ -238,7 +215,7 @@ AI 负责实现，人类仍然负责表达需求、判断产品方向和验收�
 
 你不需要一次把需求说得很专业。可以先说“我想做一个客户管理工具”，再和 AI 一起逐步补充用户、页面、权限和业务规则。
 
-## <img src="./apps/website/src/assets/readme-icons/start.svg" alt="" width="20" height="20" /> 08 / 快速开始
+## 08 / 快速开始
 
 ### 08.1 / 环境要求
 
@@ -283,7 +260,7 @@ pnpm dev
 
 详见[数据库基线重建指南](docs/guides/database-baseline-rebuild.md)。
 
-## <img src="./apps/website/src/assets/readme-icons/module.svg" alt="" width="20" height="20" /> 09 / 如何让 AI 开发自己的应用
+## 09 / 如何让 AI 开发自己的应用
 
 建议在每次较大的任务开始时，让 AI 先阅读项目文档和相关模块设计，再提出实施方案。例如：
 
@@ -295,7 +272,7 @@ pnpm dev
 
 对于普通人来说，需求可以只用自然语言描述；对于开发者来说，可以继续补充数据模型、权限规则、交互细节和验收标准。
 
-## <img src="./apps/website/src/assets/readme-icons/module.svg" alt="" width="20" height="20" /> 10 / 如何添加业务模块
+## 10 / 如何添加业务模块
 
 新增业务能力时，推荐遵循这条路径：
 
@@ -311,7 +288,7 @@ pnpm dev
 
 脚手架自带系统表统一使用 `sys_` 物理前缀、软删除，以及 `is_deleted`、`created_at`、`created_by`、`updated_at`、`updated_by` 五个生命周期字段。
 
-## <img src="./apps/website/src/assets/readme-icons/architecture.svg" alt="" width="20" height="20" /> 11 / 技术架构
+## 11 / 技术架构
 
 ```text
 人类描述需求
@@ -338,25 +315,24 @@ PostgreSQL
 | 数据库   | PostgreSQL                                                 |
 | 仓库管理 | pnpm monorepo                                              |
 
-## <img src="./apps/website/src/assets/readme-icons/structure.svg" alt="" width="20" height="20" /> 12 / 项目结构
+## 12 / 项目结构
 
 ```text
 apps/
 ├── frontend/                 # Vue 前端和管理后台
 ├── backend/                  # NestJS/Fastify 服务、数据库和迁移
-└── website/                  # 中英文静态推广站和 GitHub Pages 构建入口
 packages/
 └── api-contract/             # 前后端共享的 API 契约
 docs/
-├── design/                   # 当前系统与模块设计
-├── guides/                   # 人类维护者操作指南
-├── reference/                # 错误码等参考资料
+├── foundation/               # Forge Foundation 基线设计、指南和参考资料
+├── platform/                 # Cyber-Sight 产品设计、指南和决策
+├── templates/                # 文档模板
 └── README.md                 # 人类与 AI 共用的文档入口
 ```
 
 系统能力和产品业务能力分别按 `src/modules/system/<module>/` 与 `src/modules/biz/<module>/` 组织。跨模块依赖必须通过登记过的公共接口完成。
 
-## <img src="./apps/website/src/assets/readme-icons/start.svg" alt="" width="20" height="20" /> 13 / 常用命令
+## 13 / 常用命令
 
 ```bash
 pnpm dev           # 启动前端、后端和 API 契约开发流程
@@ -372,19 +348,19 @@ pnpm test:db       # 检查 PostgreSQL、系统表和迁移记录
 
 前端目前不维护自动化单元、组件或浏览器测试；前端功能和浏览器行为由维护者人工验收。后端和共享契约继续使用自动化测试验证。
 
-## <img src="./apps/website/src/assets/readme-icons/docs.svg" alt="" width="20" height="20" /> 14 / 项目文档
+## 14 / 项目文档
 
 [项目文档入口](docs/README.md)同时包含面向人类维护者和 AI 协作的当前项目知识：
 
-- [人类维护者开发指南](docs/guides/human-maintainer-development-guide.md)：目录职责、运行时 Schema、Drizzle、后端测试、前端人工验收和数据库维护流程
-- [系统与模块设计](docs/design/README.md)：当前架构、模块边界、公共接口、数据流和验证策略
-- [数据库基线重建指南](docs/guides/database-baseline-rebuild.md)：新建数据库、执行基线、验证与回滚边界
-- [Cyber AI Forge 上游同步指南](docs/guides/upstream-sync.md)：安全配置、同步分支、冲突所有权和验证流程
-- [错误码参考](docs/reference/error-codes.md)：统一响应、错误码区间和登记流程
+- [人类维护者开发指南](docs/foundation/guides/human-maintainer-development-guide.md)：目录职责、运行时 Schema、Drizzle、后端测试、前端人工验收和数据库维护流程
+- [系统与模块设计](docs/foundation/design/README.md)：当前架构、模块边界、公共接口、数据流和验证策略
+- [数据库基线重建指南](docs/foundation/guides/database-baseline-rebuild.md)：新建数据库、执行基线、验证与回滚边界
+- [Cyber AI Forge 上游同步指南](docs/platform/guides/upstream-sync.md)：安全配置、同步分支、冲突所有权和验证流程
+- [错误码参考](docs/foundation/reference/error-codes.md)：统一响应、错误码区间和登记流程
 
 项目根目录的 `AGENTS.md` 记录 AI 修改项目时必须遵守的协作规则。重要的设计、实施和验证结果会继续同步到项目文档，而不是只留在聊天记录中。
 
-## <img src="./apps/website/src/assets/readme-icons/brand.svg" alt="" width="20" height="20" /> 15 / 品牌与白标配置
+## 15 / 品牌与白标配置
 
 Cyber-Sight 由 JTLab 维护，并基于 Cyber AI Forge 构建。正式名称为 `Cyber-Sight`，界面短名称为 `CYBER-SIGHT`；英文副标题为 `AI-Native Business Application`，中文副标题为 `AI 原生业务应用`。前端继续使用石墨黑、暖白、薄荷绿 `#70CFA2` 和电紫节点构成的品牌系统。
 
@@ -401,24 +377,24 @@ Cyber-Sight 由 JTLab 维护，并基于 Cyber AI Forge 构建。正式名称为
 
 白标部署时，还应同步替换 `CyberLogo.vue` 和 `public/cyber-mark.svg`，避免产品名称与默认 C 形产品标不一致。
 
-## <img src="./apps/website/src/assets/readme-icons/boundary.svg" alt="" width="20" height="20" /> 16 / 当前实现边界
+## 16 / 当前实现边界
 
 当前版本已经完成上述管理系统基础能力，适合继续添加真实业务模块。为了让使用者正确评估项目，也需要了解这些边界：
 
 - 当前数据库实现绑定 PostgreSQL
 - 初始迁移只面向全新空数据库
-- 管理端与后端尚无 CI 和生产部署基线；推广站仅提供 GitHub Pages 自动部署
+- 管理端与后端尚无 CI 和生产部署基线
 - 生产环境仍需由维护者完成密钥、初始密码、部署和安全配置
 - 前端功能和浏览器行为需要人工验收
 
 这些边界不影响项目作为 AI 全栈开发起点，但在进入共享环境或生产环境前必须单独完成相应的工程工作。
 
-## <img src="./apps/website/src/assets/readme-icons/vision.svg" alt="" width="20" height="20" /> 17 / 项目愿景
+## 17 / 项目愿景
 
 Cyber-Sight 希望在可靠的工程基线上，把一个业务想法持续建设为真正可用、可维护、可扩展的应用。
 
 人类提出想法，AI 主力实现；项目结构和文档让 AI 不迷路；清晰的工程边界让应用可以从一个想法，逐步成长为真正可用、可维护、可扩展的系统。
 
-## <img src="./apps/website/src/assets/readme-icons/contribute.svg" alt="" width="20" height="20" /> 18 / 参与项目
+## 18 / 参与项目
 
 欢迎通过 [Cyber-Sight Issues](https://github.com/tanghaojie/Cyber-Sight/issues) 反馈产品问题和业务建议。可复用于其他项目的脚手架增强应优先提交到 [Cyber AI Forge](https://github.com/tanghaojie/Cyber-AI-Forge)，再按[上游同步指南](docs/guides/upstream-sync.md)进入本仓库。提交代码或较大的设计变更前，请先阅读[项目文档](docs/README.md)和根目录的 [AGENTS.md](AGENTS.md)。
