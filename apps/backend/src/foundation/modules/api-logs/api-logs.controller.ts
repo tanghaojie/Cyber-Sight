@@ -1,0 +1,45 @@
+import { Controller, Get, Inject, Query } from '@nestjs/common'
+import {
+  ApiLogPageResultSchema,
+  ApiLogQuerySchema,
+  type ApiLogQuery,
+} from '@cyber-ai-forge/api-contract'
+import { RequirePermissions } from '@/foundation/modules/authorization/authorization.guard.js'
+import { authorizationPermissionKeys } from '@/foundation/modules/authorization/authorization.resources.js'
+import { ContractRoute } from '@/foundation/shared/http/contract.js'
+import { paginatedSuccess } from '@/foundation/shared/http/response.js'
+import { ZodValidationPipe } from '@/foundation/shared/http/zod-validation.pipe.js'
+import { ApiLogsRepository, type NormalizedApiLogQuery } from './api-logs.repository.js'
+
+function normalizedApiLogQuery(query: ApiLogQuery): NormalizedApiLogQuery {
+  return {
+    pageNum: query.pageNum ?? 1,
+    pageSize: query.pageSize ?? 10,
+    actorUserId: query.actorUserId,
+    actorUsername: query.actorUsername,
+    method: query.method,
+    routePattern: query.routePattern,
+    httpStatus: query.httpStatus,
+    retention: query.retention,
+    occurredFrom: query.occurredFrom === undefined ? undefined : new Date(query.occurredFrom),
+    occurredTo: query.occurredTo === undefined ? undefined : new Date(query.occurredTo),
+  }
+}
+
+@Controller()
+export class ApiLogsController {
+  constructor(@Inject(ApiLogsRepository) private readonly repository: ApiLogsRepository) {}
+
+  @Get('/admin/api-logs')
+  @RequirePermissions(authorizationPermissionKeys.apiLogsRead)
+  @ContractRoute({
+    operationId: 'listApiLogs',
+    tags: ['API logs'],
+    query: ApiLogQuerySchema,
+    response: ApiLogPageResultSchema,
+  })
+  async list(@Query(new ZodValidationPipe(ApiLogQuerySchema)) query: ApiLogQuery) {
+    const result = await this.repository.listApiLogs(normalizedApiLogQuery(query))
+    return paginatedSuccess(result.list, result.total)
+  }
+}

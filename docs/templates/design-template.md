@@ -1,11 +1,15 @@
 ---
 title: <设计名称>
+scope: foundation | forge | platform
+repository: <repository>
 status: draft
 owner: <负责人>
 updated: YYYY-MM-DD
 ---
 
 # <设计名称>
+
+将文件保存到 `docs/<scope>/design/`。设计只描述所属作用域当前怎样工作。
 
 ## 背景与目标
 
