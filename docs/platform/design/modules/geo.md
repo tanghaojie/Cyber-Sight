@@ -2,7 +2,7 @@
 title: Geo 前端空间可视化工作台
 scope: platform
 repository: Cyber-Sight
-status: proposed
+status: active
 owner: project maintainers
 updated: 2026-08-14
 ---
@@ -461,6 +461,30 @@ Cesium Viewer、DataSource、Primitive、ScreenSpaceEventHandler 等对象保持
 
 视觉采用高对比深色半透明表面、克制的强调色、8px 间距体系和至少 40px 的可点击控件。避免旧站的大面积灰色 Ribbon、永久 300px 侧栏、连续装饰动画和无层级图标平铺。
 
+### 首版审定视觉基线
+
+维护者已确认首版高保真方向稿，实施时采用以下具体基线：
+
+- 地图画布铺满视口并保持绝对视觉主体，所有工作台表面浮于地图之上，不压缩 Viewer；
+- 顶部使用居中的紧凑悬浮栏，展示 Geo 工作台、当前场景和少量全局操作，不铺满为管理后台 Header；
+- 左侧任务轨按“数据、视图、场景、标绘、测量、分析”分组，活动项同时使用形状、边框和文字反馈；
+- 上下文面板紧邻任务轨覆盖地图，首个垂直切片以距离测量状态展示参数、开始操作、当前结果和退出提示；
+- 右上地图控制保持紧凑，底部状态条统一承载坐标、相机、渲染状态和活动工具指引；
+- 表面使用炭黑与海军蓝半透明层、轻微模糊、细边框和冷蓝强调色，避免紫色渐变、赛博朋克霓虹和游戏 HUD；
+- 实际文本由 Vue 组件和本地化资源渲染，视觉稿中的生成式文字误差不进入实现。
+
+### 当前实现状态
+
+首个可运行垂直切片已经落地：
+
+- `registerViews.ts` 已登记组件键 `geo`，页面继续依赖 Forge 菜单的 `/geo`、空布局配置，不增加静态路由；
+- `GeoWorkspacePage.vue` 创建页面级 `GeoRuntime`，Viewer ready 后创建测量 controller，离开页面时按 controller、交互、运行时和 Viewer 顺序清理；
+- 顶部栏、任务轨、上下文面板、右上地图控制、状态条、初始化、失败和重试状态已按审定方向实现；
+- 相机复位、2D/3D、全屏、鼠标经纬度、相机高度和 FPS 已连接真实 Viewer 状态；
+- 距离测量已经形成“纯 `DistanceMeasurementTool` → `MeasurementController` → `MeasurementPanel.vue`”垂直切片，支持单击加点、双击完成、Esc 取消和清除结果；
+- 数据、视图、场景、标绘和分析任务组当前只提供结构化占位说明，具体能力按活动计划后续阶段迁移；右侧属性检查器等待第一个可选择对象插件后再实现；
+- 完整插件注册表、UI contribution 发布、capability registry 和 event bus 尚未实现，当前 Shell 和测量垂直切片不得被描述为完整插件内核。
+
 桌面是专业操作目标。宽度低于 1024px 时面板覆盖地图而非压缩画布；手机只保证浏览、图层切换和基础相机操作，不承诺复杂标绘与分析体验。
 
 ### 无障碍与反馈
@@ -472,6 +496,14 @@ Cesium Viewer、DataSource、Primitive、ScreenSpaceEventHandler 等对象保持
 - 面板开合不重建 Viewer，切换工具不丢失无关图层状态。
 
 ## 状态与数据
+
+### 首版运行依赖基线
+
+- 仓库当前 Node 基线为 `20.19.4`；Cesium 锁定为仍支持 Node 20.19 的 `1.140.0`，不采用要求 Node 22 的后续版本；
+- Vite 使用 `vite-plugin-static-copy@3.1.4` 复制 Cesium 的 `Workers`、`ThirdParty`、`Assets` 和 `Widgets` 到 `/cesiumStatic/`，开发和生产共用同一 `CESIUM_BASE_URL`；
+- 首版不提交 Cesium ion token，不依赖需要保密的凭据；基础地球影像使用 Cesium 包内的 Natural Earth II 静态资源，后续预置数据源再单独核对许可和 CORS；
+- Viewer 自带的后台式控件默认关闭，工作台 Shell 负责相机复位、2D/3D、全屏和状态反馈。
+- Geo 页面被编译为独立懒加载 chunk；当前完整 Viewer chunk 约 `4.13 MB`，gzip 约 `1.11 MB`。该体积不进入主应用首屏，功能稳定后再评估 `@cesium/engine`/widgets 拆分，不以牺牲 Viewer 契约和可维护性换取过早优化。
 
 Geo 的数据来源仅包括：
 

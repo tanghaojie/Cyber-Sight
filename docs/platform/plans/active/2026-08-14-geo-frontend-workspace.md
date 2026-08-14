@@ -40,38 +40,49 @@ status: active
 - 新增目录和公共端口以当前真实消费者为准，不预建空架构；
 - UI 以任务流和上下文组织，功能迁移不等于复刻旧 Ribbon。
 
+## 当前实施切片
+
+本轮在不预建完整插件市场式内核的前提下交付第一个可运行垂直切片：
+
+- [x] 锁定 Cesium 和 Vite 静态资源依赖并完成开发/生产构建装配；
+- [x] 通过 `registerViews.ts` 登记 Geo 页面并实现页面级 Viewer 生命周期；
+- [x] 实现审定视觉稿中的顶部栏、任务轨、测量上下文面板、地图控制和状态条；
+- [x] 提供真实相机复位、2D/3D、全屏以及初始化/失败/重试状态；
+- [x] 以距离测量垂直切片验证纯工具、controller、Shell 与 Vue UI 边界；
+- [x] 完成允许的静态验证并记录维护者人工浏览器验收边界。
+
 ## 阶段 1：路由、Viewer 与页面骨架
 
-- [ ] 确认当前 Vite、Vue、TypeScript、Node 和浏览器基线兼容的稳定 Cesium 版本并锁定依赖；
-- [ ] 配置开发与生产环境所需的 Cesium Worker、Widget、字体和 Asset 路径；
-- [ ] 新建 `platform/modules/geo/`，通过 `registerViews.ts` 登记稳定组件键 `geo`；
+- [x] 确认当前 Vite、Vue、TypeScript、Node 和浏览器基线兼容的稳定 Cesium 版本并锁定依赖；
+- [x] 配置开发与生产环境所需的 Cesium Worker、Widget、字体和 Asset 路径；
+- [x] 新建 `platform/modules/geo/`，通过 `registerViews.ts` 登记稳定组件键 `geo`；
 - [ ] 在 Forge 菜单管理中配置 `/geo`、组件 `geo`、空布局和空功能权限，不新增静态路由或菜单 migration；
-- [ ] 确认动态路由直接渲染 Geo 页面，页面不提供返回 Platform、首页或后台的入口；
-- [ ] 实现单页面实例所有的 `GeoRuntime`、`viewerAccess: GeoViewerAccess` 和页面进入/离开清理；
-- [ ] 实现 `provideGeoRuntime()` 和返回真实 `Cesium.Viewer` 的 `useCesiumViewer()`；
+- [x] 确认动态路由直接渲染 Geo 页面，页面不提供返回 Platform、首页或后台的入口；
+- [x] 实现单页面实例所有的 `GeoRuntime`、`viewerAccess: GeoViewerAccess` 和页面进入/离开清理；
+- [x] 实现 `provideGeoRuntime()` 和返回真实 `Cesium.Viewer` 的 `useCesiumViewer()`；
 - [ ] 让 `GeoPluginContext.viewer` 和纯工具的 `viewer` 参数统一为 `Cesium.Viewer`；
-- [ ] 禁止把 Viewer 放入 `window`、Vue 全局属性或 Pinia；
-- [ ] 实现 Geo 工作台基础布局、WebGL 不可用、初始化中、失败与重试状态；
-- [ ] 确认不新增后端、契约、migration 或权限定义。
+- [x] 禁止把 Viewer 放入 `window`、Vue 全局属性或 Pinia；
+- [x] 实现 Geo 工作台基础布局、WebGL 不可用、初始化中、失败与重试状态；
+- [x] 确认不新增后端、契约、migration 或权限定义。
 
 完成条件：Forge 菜单动态加载 `/geo`；页面不包含返回 Platform 的入口；开发与生产构建均可创建 Viewer；重复进入页面不会创建残留实例。
 
 ## 阶段 2：UI 系统与插件内核
 
-- [ ] 实现 48–56px 顶栏、左侧工具轨、按需上下文面板、右侧属性检查器和底部状态条；
-- [ ] 使用现有 Sight 设计令牌、Element Plus、图标和本地化能力；
-- [ ] 建立 `tools/` 纯 Cesium 工具边界，禁止依赖 Vue、Pinia、UI、本地化和插件注册表；
+- [ ] 实现 48–56px 顶栏、左侧工具轨、按需上下文面板、右侧属性检查器和底部状态条；当前除等待真实选择对象的右侧检查器外均已实现；
+- [x] 使用现有 Sight 设计令牌、图标和本地化能力；
+- [x] 建立 `tools/` 纯 Cesium 工具边界，禁止依赖 Vue、Pinia、UI、本地化和插件注册表；
 - [ ] 使用现有 lint/架构检查和人工 diff 复核 `tools/` 的依赖方向，并阻止 Shell 穿透导入具体工具；需要通用工具扩展时先走 Forge 上游流程；
-- [ ] 建立“纯工具 → 插件 controller/UI contributions → 插件自有 `.vue`”调用链；
-- [ ] 为有状态工具定义 session、`stop()`/`dispose()` 和工具/交互 scope 所有权；
+- [ ] 建立“纯工具 → 插件 controller/UI contributions → 插件自有 `.vue`”调用链；当前已完成纯工具 → controller → `.vue`，待插件注册表发布 contributions；
+- [x] 为有状态工具定义 session、`stop()`/`dispose()` 和工具/交互 scope 所有权；
 - [ ] 定义插件 ID、依赖、排序、`GeoPluginContext`、带 UI 贡献的安装实例和错误隔离；
 - [ ] 实现重复 ID、缺失依赖和依赖循环校验，并按拓扑顺序安装、逆序销毁；
 - [ ] 实现插件独立 `DisposableScope`、`AbortController` 和统一 Cesium 资源登记辅助方法；
-- [ ] 实现 `InteractionManager`，保证鼠标主交互工具互斥；
+- [x] 实现 `InteractionManager`，保证鼠标主交互工具互斥；
 - [ ] 区分 action、toggle、panel 和 interaction 工具，统一交互的激活、完成、取消和幂等销毁协议；
 - [ ] 实现最小类型化 capability registry 和 event bus，禁止插件穿透导入其他插件；
-- [ ] 完成桌面、窄桌面和手机基础降级布局；
-- [ ] 为图标按钮、焦点、活动状态、工具提示和 reduced motion 补齐无障碍行为；
+- [x] 完成桌面、窄桌面和手机基础降级布局；
+- [x] 为图标按钮、焦点、活动状态、工具提示和 reduced motion 补齐首版无障碍行为；
 - [ ] 对 1280×720 进行重点人工视觉验收，确保地图面积和信息层级明显优于旧站。
 
 完成条件：插件可贡献工具与面板；纯工具可脱离 Vue 使用；代码中的 `viewer` 均为 `Cesium.Viewer`，生命周期访问器明确命名为 `viewerAccess`；切换任务组不重建 Viewer；页面不出现旧式 Ribbon 和永久宽侧栏。
@@ -149,7 +160,7 @@ pnpm docs:archive:check:ci
 
 ## 实际偏差与遗留问题
 
-当前尚未实施代码。Cesium 具体版本、首批预置数据和每项旧算法的复用程度在对应阶段通过兼容性、许可和源码核对确定，不改变纯前端、单页和无用户侧 AI 的范围。
+首个工作台垂直切片已实现。当前 Node 为 `20.19.4`，使用 `cesium@1.140.0` 和 `vite-plugin-static-copy@3.1.4`；首版使用 Cesium 包内 Natural Earth II 静态影像，不引入 ion token。距离测量提前作为架构验证切片进入代码，面积、高度及其余旧算法仍在对应功能阶段核对。Forge 菜单记录需要维护者在菜单管理中配置；按仓库规则，视觉、交互和连续进出页面的资源行为仍由维护者人工验收。
 
 ## 关联记录
 

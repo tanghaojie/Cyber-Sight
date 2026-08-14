@@ -18,7 +18,7 @@ status: active
 - “架构重新设计”只指前端架构，重点解决 Viewer 生命周期、功能解耦和插件化；
 - UI 现代化是本阶段重点，旧站视觉与交互不能原样迁移；
 - “AI 基础设施”指 Sight 已有的 AI 辅助开发能力，不是 Geo 用户功能；Geo 不新增 AI 设计；
-- 本轮只修订设计、ADR 和实施计划，不实施 Geo 业务代码。
+- 初始轮次只修订设计、ADR 和实施计划；维护者审核 UI 方向后已授权开始首版代码实施。
 
 ## 维护者纠正
 
@@ -38,6 +38,15 @@ status: active
 - 代码中的普通名称 `viewer` 应表示真实 `Cesium.Viewer`，不能实际放入 `GeoViewerPort` 一类访问器；
 - 旧项目 `src/libs/cesium/libs/` 的价值之一是提供不依赖 Vue 的 Cesium 业务工具，再由 `.vue` 负责具体调用和展示；
 - 新架构需要明确纯工具模块如何通过插件适配层连接 Vue UI，而不是把算法、插件协议和界面写成同一层。
+
+维护者随后审核并确认高保真 UI 方向稿，可以直接开始实施；实现中如有疑问可随时询问。首版视觉以地图优先、紧凑悬浮顶栏、左侧任务轨、按需上下文面板、右上地图控制和底部状态条为准。
+
+## 首版实施启动
+
+- 仓库运行环境为 Node `20.19.4`；官方包信息显示 Cesium `1.141.0` 及后续版本要求 Node 22，因此锁定支持 Node 20.19 的 `cesium@1.140.0`；
+- Cesium 官方 Vite 示例要求复制 `Workers`、`ThirdParty`、`Assets` 和 `Widgets` 并配置 `CESIUM_BASE_URL`，本轮使用支持 Node 20 的 `vite-plugin-static-copy@3.1.4`；
+- 首版不要求 ion token，先使用 Cesium 包内 Natural Earth II 静态影像，避免把外部凭据和未确认许可的数据作为 UI 骨架前置条件；
+- 本轮交付动态视图注册、Viewer 生命周期、审定工作台 Shell 和真实相机/场景控制；复杂测量算法仍按计划在工具与插件垂直切片中实现。
 
 ## 只读核对结果
 
@@ -101,6 +110,17 @@ status: active
 - 更新 Platform 设计、ADR、活动计划和 AI 日志索引；
 - 保留人工浏览器验收边界，不新增或运行前端自动化测试。
 
+## 首版实际实现
+
+- 增加 `cesium@1.140.0` 和 `vite-plugin-static-copy@3.1.4`，Vite 将 Cesium 四类静态目录发布到 `/cesiumStatic/`；
+- 新增 Geo `registerViews.ts` 和中英文本地化资源，以组件键 `geo` 接入既有动态路由注册；
+- 新增 `GeoRuntime`、`GeoViewerAccess`、`DisposableScope`、`InteractionManager` 和 Vue provide/inject 访问器；
+- Viewer 使用包内 Natural Earth II 影像，无 ion token；默认关闭 Cesium 自带工具栏，由 Geo Shell 提供相机复位、2D/3D 和全屏；
+- 实现审定视觉稿中的悬浮顶栏、任务轨、上下文面板、地图控制、状态条、加载失败和响应式降级布局；
+- 实现纯 `DistanceMeasurementTool`、`MeasurementController` 和 `MeasurementPanel.vue`，支持加点、动态距离、双击完成、Esc 取消和清除；
+- 其他任务组只显示明确的迁移占位，不伪装为已完成能力；右侧属性检查器等待真实选择对象后实现；
+- 未修改后端、API 契约、数据库、权限、菜单 migration 或 Foundation 源码。
+
 ## 验证记录
 
 - `git diff --cached --quiet`：通过，修订前暂存区为空；
@@ -113,6 +133,15 @@ status: active
 - `pnpm docs:archive:check:ci`：通过，结果为 `NOT_DUE`；
 - `git diff --check`：通过；
 - 提交 trailer 验证待本轮提交后执行。
+
+首版实现阶段新增验证：
+
+- `pnpm --filter @cyber-ai-forge/frontend build`：通过；`vue-tsc` 无错误，Vite 生产构建成功，Cesium 四类静态资源均已复制；
+- Geo 页面保持独立懒加载 chunk，约 `4.13 MB`，gzip 约 `1.11 MB`；
+- `pnpm lint`：通过；
+- `pnpm architecture:check`：通过；
+- `tools/measurement` 依赖检索：没有 Vue、Pinia、Element Plus、插件和组件导入；
+- 按仓库规则未创建或运行前端自动化、端到端和浏览器测试；视觉、测量交互与连续进出页面仍需维护者人工验收。
 
 ## 未决问题与实施时确认项
 
