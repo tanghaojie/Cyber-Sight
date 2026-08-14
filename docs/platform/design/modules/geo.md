@@ -59,7 +59,7 @@ Geo 延续维护者开源项目 `vue3-cesium-typescript-start-up-template` 的�
 apps/frontend/src/platform/modules/geo/
 ```
 
-Geo 拥有 Viewer 适配、工作台页面、内置插件、Geo 运行状态和地图专属组件。Foundation 不得依赖 Geo；其他 Platform 模块不得导入 Geo 页面、Cesium 实例、插件内部状态或内部组件。
+Geo 拥有 Viewer 生命周期、纯 Cesium 工具、工作台页面、内置插件、Geo 运行状态和地图专属组件。Foundation 不得依赖 Geo；其他 Platform 模块不得导入 Geo 页面、Cesium 实例、插件内部状态或内部组件。
 
 ### 公共文件
 
@@ -83,10 +83,16 @@ geo/
 │  ├─ geo-context.ts
 │  ├─ geo-runtime.ts
 │  ├─ use-geo-runtime.ts
-│  ├─ viewer-adapter.ts
+│  ├─ viewer-access.ts
 │  ├─ plugin-registry.ts
 │  ├─ interaction-manager.ts
 │  └─ disposable.ts
+├─ tools/
+│  ├─ drawing/
+│  ├─ measurement/
+│  ├─ layers/
+│  ├─ tileset/
+│  └─ terrain/
 ├─ plugins/
 │  ├─ view/
 │  ├─ layers/
@@ -96,10 +102,10 @@ geo/
 │  ├─ tileset/
 │  └─ terrain/
 └─ components/
-   ├─ shell/
-   ├─ panels/
-   └─ controls/
+   └─ shell/
 ```
+
+`tools/` 保存不依赖 Vue 的 Cesium 业务工具；插件专属的 controller、面板和控件与 `*.plugin.ts` 一起放在对应 `plugins/<plugin>/` 中。`components/shell/` 只保存工具轨、面板容器、属性检查器和状态条等通用工作台组件。
 
 ## 前端接入方式
 
@@ -133,7 +139,7 @@ flowchart LR
     DR --> W["/geo 工作台页面"]
     W --> G["插件注册表"]
     G --> I["交互管理器"]
-    G --> VA["Viewer 适配器"]
+    G --> VA["Viewer 生命周期访问器"]
     VA --> C["Cesium Viewer"]
     G --> DS["前端预置数据源"]
 ```
@@ -152,7 +158,7 @@ idle -> mounting -> ready -> disposing -> disposed
 
 Viewer 只存在于当前 `GeoRuntime` 实例中，不挂到 `window`、`globalThis`、Vue `app.config.globalProperties` 或 Pinia，也不跨路由复用。这样同一应用将来即使出现多个 Geo 容器，也不会因全局单例互相覆盖。
 
-页面创建运行时后通过 Vue `provide` 提供只读上下文；后代组件使用 `useGeoRuntime()` 获取同一实例。插件不依赖 Vue 注入，而是在安装时由注册表显式接收 `GeoPluginContext`。普通算法函数不查找运行时，所需 Viewer、Scene、Camera 或数据直接作为参数传入。
+页面创建运行时后通过 Vue `provide` 提供只读上下文；通用 Shell 使用 `useGeoRuntime()` 读取运行时状态，需要真实 Viewer 的后代组件使用 `useCesiumViewer()`。插件不依赖 Vue 注入，而是在安装时由注册表显式接收 `GeoPluginContext`。普通算法函数不查找运行时，所需 Viewer、Scene、Camera 或数据直接作为参数传入。
 
 ```ts
 const runtime = createGeoRuntime()
@@ -173,36 +179,35 @@ onBeforeUnmount(function disposeGeo() {
 
 ### Viewer 访问端口
 
-`ViewerAdapter` 保存 `markRaw(viewer)`，并提供初始化等待与两种 Viewer 访问方式：
+`GeoViewerAccess` 是 Viewer 初始化和销毁状态的访问器，内部保存 `markRaw(viewer)`。它不命名为 `viewer`，因为 Geo 代码中没有限定词的 `viewer` 一律表示真实的 `Cesium.Viewer` 对象。
 
 ```ts
-interface GeoViewerPort {
+interface GeoViewerAccess {
   readonly status: 'idle' | 'mounting' | 'ready' | 'failed' | 'disposed'
-  whenReady(): Promise<void>
-  requireViewer(): Viewer
-  use<T>(operation: (viewer: Viewer) => T): T
+  whenReady(): Promise<Viewer>
+  require(): Viewer
 }
 ```
 
-- `whenReady()`：组件或插件需要等待初始化时使用；初始化失败或运行时已销毁时拒绝；
-- `requireViewer()`：仅供已经处于 `ready` 生命周期的同步 Cesium 逻辑使用，否则立即抛出可诊断错误；
-- `use(operation)`：推荐入口，先校验生命周期，再把当前 Viewer 传给一个同步、短生命周期操作；回调不得返回 Promise，避免调用方跨 `await` 缓存 Viewer；
-- 异步加载必须使用插件上下文的 `AbortSignal`：先创建或加载独立资源，await 后检查取消状态，再调用一次 `use()` 把结果加入当前 Viewer；不能凭早先取得的 Viewer 继续写入已销毁场景。
+- `whenReady()`：等待初始化并返回真实 `Cesium.Viewer`；初始化失败或运行时已销毁时拒绝；
+- `require()`：同步取得真实 `Cesium.Viewer`；未进入 `ready` 或已经销毁时立即抛出可诊断错误；
+- `useCesiumViewer()`：Geo Vue 后代组件使用的便捷 composable，内部调用当前运行时的 `viewerAccess.require()`，返回类型就是 `Cesium.Viewer`；
+- 异步加载必须同时使用插件或运行时的 `AbortSignal`。跨 `await` 后先检查取消状态，再通过 `viewerAccess.require()` 取得当前 Viewer 并写入场景，不能继续使用 await 前缓存的实例。
 
 各类代码的使用规则如下：
 
-| 使用位置           | 获取方式                                           | 约束                                                       |
-| ------------------ | -------------------------------------------------- | ---------------------------------------------------------- |
-| Geo 页面和后代组件 | `useGeoRuntime()` 后调用 `runtime.viewer.use(...)` | 只操作界面当前需要的 Viewer 能力，不把 Viewer 放入组件状态 |
-| Geo 插件           | `install(context)` 获得 `context.viewer`           | 插件只在自己的 `DisposableScope` 内创建和登记资源          |
-| Cesium 工具类/算法 | Viewer、Scene 或 Camera 作为显式函数参数           | 禁止工具文件反向 import 页面运行时或全局 store             |
-| Geo 模块以外       | 不允许访问                                         | 未来出现真实消费者时另行登记公共端口                       |
+| 使用位置           | 获取方式                                                    | 约束                                                                    |
+| ------------------ | ----------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Geo 页面和后代组件 | `useCesiumViewer()` 返回 `Cesium.Viewer`                    | 只在 Viewer ready 后挂载需要它的子树，不把 Viewer 放入响应式状态        |
+| Geo 插件           | `install(context)` 获得 `context.viewer: Cesium.Viewer`     | 安装发生在 Viewer ready 后，插件只在自己的 `DisposableScope` 内登记资源 |
+| Cesium 工具类/算法 | `Cesium.Viewer`、Scene 或 Camera 作为构造参数或显式函数参数 | 禁止工具文件反向 import 页面运行时、插件或全局 store                    |
+| Geo 模块以外       | 不允许访问                                                  | 未来出现真实消费者时另行登记公共端口                                    |
 
-运行时包含但不公开原始对象的长期引用：
+运行时接口用明确命名的访问器表达 Viewer 生命周期：
 
 ```ts
 interface GeoRuntime {
-  readonly viewer: GeoViewerPort
+  readonly viewerAccess: GeoViewerAccess
   readonly interactions: GeoInteractionManager
   readonly plugins: GeoPluginRegistry
   readonly state: Readonly<GeoRuntimeState>
@@ -211,7 +216,7 @@ interface GeoRuntime {
 }
 ```
 
-`GeoRuntimeState` 只保存活动任务组、面板、选择对象、活动工具、加载和错误等可描述 UI 状态。当前没有跨页面共享需求，因此不创建全局 Geo Pinia store；若未来需要持久化纯 UI 偏好，应通过单独端口接入，Viewer 仍不得进入 store。
+`GeoRuntimeState` 只保存活动任务组、面板、选择对象、活动工具、加载和错误等可描述 UI 状态。当前没有跨页面共享需求，因此不创建全局 Geo Pinia store；若未来需要持久化纯 UI 偏好，应通过单独端口接入，`Cesium.Viewer` 仍不得进入 store。
 
 ## 前端插件架构
 
@@ -233,7 +238,7 @@ interface GeoPluginInstance {
 }
 
 interface GeoPluginContext {
-  readonly viewer: GeoViewerPort
+  readonly viewer: Viewer
   readonly interactions: GeoInteractionManager
   readonly capabilities: GeoCapabilityRegistry
   readonly events: GeoEventBus
@@ -243,6 +248,91 @@ interface GeoPluginContext {
 ```
 
 定义只包含稳定 ID、排序、显式依赖和安装函数。安装完成的实例再提供 UI 贡献，使贡献处理器能够安全闭包当前 `GeoRuntime` 的插件状态，而不会退化为模块级单例。插件实例同时承诺销毁；某个工具的激活/停用由工具贡献和交互管理器负责，不把整个插件反复安装卸载。
+
+### 纯工具、插件适配与 Vue UI
+
+旧项目 `src/libs/cesium/libs/` 中的 `Measure`、`Draw`、`FlyTo`、`Highlight` 等类直接接收 `Cesium.Viewer`，不依赖 Vue；`.vue` 组件和工具栏配置层再取得 Viewer 并调用这些业务工具。新实现保留这个正确边界，同时增加插件适配层统一处理 UI 贡献、互斥交互和资源回收：
+
+```mermaid
+flowchart LR
+    U["Vue UI：按钮、表单、面板"] --> A["插件适配：controller 与 UI contributions"]
+    A --> T["纯 Cesium 工具：tools/"]
+    A --> I["InteractionManager"]
+    T --> V["Cesium.Viewer"]
+    I --> T
+```
+
+| 层次                     | 允许依赖                                       | 主要职责                                                                                                 |
+| ------------------------ | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `tools/` 纯工具          | Cesium 和领域无关 TypeScript 工具              | 接收真实 `Cesium.Viewer`，实现绘制、测量、图层、地形和模型算法，返回领域结果并释放自己创建的 Cesium 资源 |
+| `plugins/<name>/` 适配层 | 纯工具、GeoRuntime 核心端口、插件自有 Vue 组件 | 创建工具实例，接入互斥交互、错误和 busy 状态，构造 controller，声明工具和面板贡献                        |
+| 插件自有 `.vue` UI       | controller、展示类型、Element Plus 和本地化    | 收集参数、展示状态和结果、调用 controller；不创建全局工具实例，不直接协调其他插件                        |
+| `components/shell/`      | 插件注册表的只读贡献                           | 通用渲染工具轨、面板容器、检查器和状态条，不了解具体 Cesium 业务                                         |
+
+纯工具必须满足：
+
+- 不 import Vue、Pinia、Element Plus、locales、插件注册表或工作台组件；
+- 构造函数或函数参数中的 `viewer` 类型就是 `Cesium.Viewer`，不使用自定义端口冒充 Viewer；
+- 不通过 `window`、inject 或 store 查找 Viewer；
+- 不直接弹消息、打开面板或写 UI busy 状态，只通过返回值、领域事件或回调报告开始、进度、结果和失败；
+- 有状态工具提供 `stop()`/`dispose()`，一次交互最好返回独立的 disposable session；
+- 不向 `Cesium.Viewer` 挂载 `jt` 等扩展属性。工具实例与 Viewer 分开保存，避免污染 Cesium 公共类型。
+
+例如测量工具保持纯逻辑：
+
+```ts
+class MeasurementTool {
+  constructor(private readonly viewer: Viewer) {}
+
+  startDistance(options: DistanceMeasurementOptions): MeasurementSession {
+    // 只操作 Cesium 并返回可停止的会话。
+  }
+
+  clear(): void {}
+  dispose(): void {}
+}
+```
+
+测量插件在每个 `GeoRuntime` 中创建一次工具和 controller，并把 controller 传给自己的 Vue 面板：
+
+```ts
+async function installMeasurement(context: GeoPluginContext): Promise<GeoPluginInstance> {
+  const tool = markRaw(new MeasurementTool(context.viewer))
+  context.scope.use(tool)
+
+  const controller = markRaw({
+    startDistance() {
+      return context.interactions.activate({
+        id: 'measurement.distance',
+        start(interactionContext) {
+          const session = tool.startDistance({ signal: interactionContext.signal })
+          interactionContext.scope.use(session)
+        },
+      })
+    },
+    clear() {
+      tool.clear()
+    },
+  })
+
+  return {
+    contributions: measurementContributions(controller),
+    dispose() {},
+  }
+}
+```
+
+Vue 面板只负责展示和调用：
+
+```ts
+const props = defineProps<{ controller: MeasurementController }>()
+
+function startDistance(): void {
+  props.controller.startDistance()
+}
+```
+
+因此纯工具仍可脱离 Geo 页面单独使用：调用方只需创建 `Cesium.Viewer` 并把它传给工具。进入 Cyber-Sight 后，插件适配层负责把同一个工具接入统一 UI 和生命周期。只有完全无状态、无互斥需求的简单 Viewer 操作允许 `.vue` 通过 `useCesiumViewer()` 直接调用纯函数；绘制、测量、拾取等有状态交互必须经过插件 controller 和 `InteractionManager`。
 
 ### UI 贡献
 
@@ -325,7 +415,7 @@ interface GeoInteractionDefinition {
 
 ### 资源所有权与跨插件协作
 
-`DisposableScope` 提供 `defer(cleanup)`、`child()` 和面向 Cesium 对象的登记辅助方法。插件创建的 ScreenSpaceEventHandler、Entity、DataSource、Primitive、PostProcessStage、Cesium event listener、DOM listener、定时器和 AbortController 必须在创建位置立即登记。临时交互资源进入交互子 scope，插件常驻资源进入插件 scope。
+`DisposableScope` 提供 `use(disposable)`、`defer(cleanup)`、`child()` 和面向 Cesium 对象的登记辅助方法。插件创建的纯工具、交互 session、ScreenSpaceEventHandler、Entity、DataSource、Primitive、PostProcessStage、Cesium event listener、DOM listener、定时器和 AbortController 必须在创建位置立即登记。临时交互资源进入交互子 scope，插件常驻资源进入插件 scope。
 
 scope 按后进先出顺序执行清理，`dispose()` 幂等；单个清理函数抛错时继续清理剩余资源，最终把聚合后的安全错误交给运行时记录。插件不得依赖 Viewer 的最终 `destroy()` 代替自己的资源释放。
 
@@ -406,6 +496,8 @@ Geo 的数据来源仅包括：
 ## 验证策略
 
 自动验证只覆盖仓库允许的前端静态检查：格式、TypeScript、lint、生产构建、架构边界和文档归档门禁。不得新增或运行前端自动化、端到端或浏览器测试。
+
+实施时优先用现有 lint 或架构检查验证 `tools/**` 不导入 Vue、Pinia、Element Plus、插件和 UI 目录，并阻止通用 Shell 穿透导入具体工具；当前工具不能表达的边界进入人工 diff 验收。若需要新增可复用的 Foundation 检查能力，应先在 Forge 上游单独设计和实现，不能在 Geo 任务中直接修改下游 Foundation。该约束只验证依赖方向，不替代 Cesium 行为的人工验收。
 
 维护者人工验收至少覆盖：
 

@@ -23,25 +23,29 @@ Geo 使用随 Cyber-Sight 源码构建和发布的编译期内置插件：
 
 1. `registerViews.ts` 以稳定组件键 `geo` 登记页面，由 Forge 菜单管理提供路径、名称、图标、排序和动态路由；Geo 不声明静态路由；
 2. 插件通过 `geo.plugins.ts` 显式注册，代码与应用一起审阅、构建和发布；
-3. 每次页面访问创建独立 `GeoRuntime`；Viewer 只由该运行时拥有，通过 Vue 注入或插件上下文访问，不进入全局对象或 Pinia；
-4. `GeoPluginContext` 向插件提供受控 Viewer 适配器、交互管理器、能力注册表、类型化事件和资源 scope，不暴露可跨插件任意修改的全局对象；
+3. 每次页面访问创建独立 `GeoRuntime`；生命周期访问器命名为 `viewerAccess: GeoViewerAccess`，没有限定词的 `viewer` 一律表示真实 `Cesium.Viewer`；
+4. Vue 后代通过 `useCesiumViewer()` 获得 `Cesium.Viewer`，`GeoPluginContext.viewer` 也直接提供 ready 后的 `Cesium.Viewer`；Viewer 不进入全局对象、响应式状态或 Pinia；
 5. `InteractionManager` 保证同一时刻只有一个鼠标主交互工具激活，并负责工具切换清理；
 6. 每个插件拥有自己的 Cesium 资源和事件，必须提供幂等销毁逻辑；
 7. Vue 只管理可描述的界面状态，Cesium 实例和重资源对象不进入深度响应式状态；
-8. 插件可以向工具轨、上下文面板、属性检查器或状态条贡献声明式 UI 元数据，但不能直接控制整个工作台布局；
-9. Geo 菜单使用组件 `geo`、路径 `/geo`、空布局和空功能权限；页面直接全屏渲染，不提供返回 Platform 的入口；
-10. 本架构不包含 AI 命令目录。Sight 的 AI 辅助开发能力属于仓库基础设施，不是 Geo 运行时插件职责。
+8. Cesium 业务工具放在 `tools/`，只依赖 Cesium 和普通 TypeScript；插件负责把纯工具适配为 controller 和 UI 贡献，`.vue` 只展示并调用 controller；
+9. 插件可以向工具轨、上下文面板、属性检查器或状态条贡献声明式 UI 元数据，但不能直接控制整个工作台布局；
+10. Geo 菜单使用组件 `geo`、路径 `/geo`、空布局和空功能权限；页面直接全屏渲染，不提供返回 Platform 的入口；
+11. 本架构不包含 AI 命令目录。Sight 的 AI 辅助开发能力属于仓库基础设施，不是 Geo 运行时插件职责。
 
 ## Viewer 运行时决策
 
 - `GeoWorkspacePage.vue` 在挂载时创建并提供 `GeoRuntime`，卸载时销毁；
-- Vue 后代组件通过 `useGeoRuntime()` 获取当前运行时，插件通过安装参数获取 `GeoPluginContext`，普通算法通过显式函数参数获取 Viewer/Scene/Camera；
-- `ViewerAdapter` 使用非深度响应式引用保存 Viewer，并以 `whenReady()`、`requireViewer()` 和 `use(operation)` 约束未初始化、已失败和已销毁状态；
+- Vue 后代组件通过 `useCesiumViewer()` 获得真实 `Cesium.Viewer`，插件通过安装参数获得 `context.viewer: Cesium.Viewer`，普通算法通过构造参数或函数参数获得 Viewer/Scene/Camera；
+- `GeoViewerAccess` 使用非深度响应式引用保存 Viewer，并以 `whenReady()` 和 `require()` 约束未初始化、已失败和已销毁状态；运行时中的属性名为 `viewerAccess`；
 - 异步任务必须同时使用运行时或插件的 `AbortSignal`，不能在路由离开后继续修改旧 Viewer；
 - Geo 模块以外不允许访问 Viewer；未来需要跨模块嵌入时重新设计公共端口。
 
 ## 插件运行时决策
 
+- `tools/` 中的类和函数禁止依赖 Vue、Pinia、UI、本地化或插件注册表，也不向 `Cesium.Viewer` 添加自定义属性；
+- 插件安装时用真实 Viewer 创建纯工具，为工具建立 controller，并把 controller 作为 props 交给插件自有 `.vue` 面板；
+- 纯工具负责 Cesium 算法和自身资源，插件负责互斥交互、busy/error 状态、UI 贡献和跨工具协调，Vue 负责输入与展示；
 - 插件定义包含稳定 ID、显式依赖、排序和 `install(context)`；安装实例提供声明式 UI 贡献和 `dispose()`，贡献处理器可闭包当前运行时状态而不是创建模块级单例；
 - 注册阶段拒绝重复 ID、缺失依赖和循环依赖；Viewer ready 后按拓扑顺序安装，页面离开时按逆序销毁；
 - 每个插件拥有独立 `DisposableScope` 和 `AbortController`；交互工具另有子 scope；
@@ -85,6 +89,7 @@ Geo 当前不存在用户侧 AI 用例。为假设能力建立命令抽象会增
 正向影响：
 
 - 能力边界、资源归属和清理责任明确；
+- 纯 Cesium 工具可以脱离 Vue 和 Geo 页面独立复用，UI 改版不会迫使算法层同步重写；
 - 可独立启用、停用和验收每组功能；
 - 地图工作台 UI 与底层算法解耦，可持续迭代视觉和交互；
 - 复用 Forge 现有菜单管理和动态路由，不需要新增 Geo 后端、数据库表或 Foundation 授权扩展即可开始实施。

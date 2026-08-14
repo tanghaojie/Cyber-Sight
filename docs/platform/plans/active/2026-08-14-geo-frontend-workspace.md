@@ -17,7 +17,7 @@ status: active
 
 ## 范围
 
-- `apps/frontend/src/platform/modules/geo/` 中的页面注册、运行时、Cesium 适配器、插件和组件；
+- `apps/frontend/src/platform/modules/geo/` 中的页面注册、Viewer 生命周期、纯 Cesium 工具、插件适配和 Vue 组件；
 - Forge 菜单管理、`registerViews.ts` 和动态 `/geo` 路由的既有装配链路；
 - 地图全屏布局和现代化工作台 UI；
 - 旧项目通用视图、数据、环境、标绘、测量、模型与地形分析能力的迁移；
@@ -47,8 +47,9 @@ status: active
 - [ ] 新建 `platform/modules/geo/`，通过 `registerViews.ts` 登记稳定组件键 `geo`；
 - [ ] 在 Forge 菜单管理中配置 `/geo`、组件 `geo`、空布局和空功能权限，不新增静态路由或菜单 migration；
 - [ ] 确认动态路由直接渲染 Geo 页面，页面不提供返回 Platform、首页或后台的入口；
-- [ ] 实现单页面实例所有的 `GeoRuntime`、幂等 `ViewerAdapter` 和页面进入/离开清理；
-- [ ] 实现 `provideGeoRuntime()`、`useGeoRuntime()`、插件上下文和显式算法参数四种受控访问路径；
+- [ ] 实现单页面实例所有的 `GeoRuntime`、`viewerAccess: GeoViewerAccess` 和页面进入/离开清理；
+- [ ] 实现 `provideGeoRuntime()` 和返回真实 `Cesium.Viewer` 的 `useCesiumViewer()`；
+- [ ] 让 `GeoPluginContext.viewer` 和纯工具的 `viewer` 参数统一为 `Cesium.Viewer`；
 - [ ] 禁止把 Viewer 放入 `window`、Vue 全局属性或 Pinia；
 - [ ] 实现 Geo 工作台基础布局、WebGL 不可用、初始化中、失败与重试状态；
 - [ ] 确认不新增后端、契约、migration 或权限定义。
@@ -59,6 +60,10 @@ status: active
 
 - [ ] 实现 48–56px 顶栏、左侧工具轨、按需上下文面板、右侧属性检查器和底部状态条；
 - [ ] 使用现有 Sight 设计令牌、Element Plus、图标和本地化能力；
+- [ ] 建立 `tools/` 纯 Cesium 工具边界，禁止依赖 Vue、Pinia、UI、本地化和插件注册表；
+- [ ] 使用现有 lint/架构检查和人工 diff 复核 `tools/` 的依赖方向，并阻止 Shell 穿透导入具体工具；需要通用工具扩展时先走 Forge 上游流程；
+- [ ] 建立“纯工具 → 插件 controller/UI contributions → 插件自有 `.vue`”调用链；
+- [ ] 为有状态工具定义 session、`stop()`/`dispose()` 和工具/交互 scope 所有权；
 - [ ] 定义插件 ID、依赖、排序、`GeoPluginContext`、带 UI 贡献的安装实例和错误隔离；
 - [ ] 实现重复 ID、缺失依赖和依赖循环校验，并按拓扑顺序安装、逆序销毁；
 - [ ] 实现插件独立 `DisposableScope`、`AbortController` 和统一 Cesium 资源登记辅助方法；
@@ -69,7 +74,7 @@ status: active
 - [ ] 为图标按钮、焦点、活动状态、工具提示和 reduced motion 补齐无障碍行为；
 - [ ] 对 1280×720 进行重点人工视觉验收，确保地图面积和信息层级明显优于旧站。
 
-完成条件：插件可贡献工具与面板；Viewer 只能通过运行时端口访问；切换任务组不重建 Viewer；活动工具和下一步操作清晰；页面不出现旧式 Ribbon 和永久宽侧栏。
+完成条件：插件可贡献工具与面板；纯工具可脱离 Vue 使用；代码中的 `viewer` 均为 `Cesium.Viewer`，生命周期访问器明确命名为 `viewerAccess`；切换任务组不重建 Viewer；页面不出现旧式 Ribbon 和永久宽侧栏。
 
 ## 阶段 3：视图、数据与场景能力
 
@@ -136,7 +141,7 @@ pnpm docs:archive:check:ci
 
 - Cesium 资源路径在开发和生产环境不一致：阶段 1 同时验证两种构建，不延后到功能迁移结束；
 - Viewer 被全局缓存或异步任务持有过久：只允许当前页面运行时拥有实例，异步流程同时绑定 `AbortSignal`；
-- 旧算法依赖全局状态：逐个能力解耦，通过 Viewer 适配器和插件上下文接入；
+- 旧算法依赖全局状态：逐个能力解耦，通过真实 Viewer 参数、纯工具和插件上下文接入；
 - 事件和临时资源泄漏：以插件拥有权、互斥工具和幂等销毁作为完成门槛；
 - 外部数据受 CORS、令牌、限频和许可影响：只发布明确允许且可被浏览器安全访问的数据；
 - 为插件化创建过度抽象：只实现当前任务组共同需要的最小端口；

@@ -33,6 +33,12 @@ status: active
 - 页面不保留返回 Platform、首页或后台的入口；
 - 设计必须明确 Viewer 在组件、插件和普通算法中的运行时使用方式，并展开插件系统的注册、安装、交互和清理逻辑。
 
+维护者进一步纠正 Viewer 命名和逻辑/UI 分层：
+
+- 代码中的普通名称 `viewer` 应表示真实 `Cesium.Viewer`，不能实际放入 `GeoViewerPort` 一类访问器；
+- 旧项目 `src/libs/cesium/libs/` 的价值之一是提供不依赖 Vue 的 Cesium 业务工具，再由 `.vue` 负责具体调用和展示；
+- 新架构需要明确纯工具模块如何通过插件适配层连接 Vue UI，而不是把算法、插件协议和界面写成同一层。
+
 ## 只读核对结果
 
 ### 旧站界面
@@ -53,6 +59,13 @@ status: active
 - 存在可作为算法证据的通用 Cesium 能力，也存在不属于 Geo 核心的行业大屏示例；
 - 新实现应逐项解开全局依赖和生命周期耦合，不整体复制旧目录或示例应用。
 
+针对维护者指定的 `src/libs/cesium/libs/` 再次通过 GitHub 连接器核对代表性文件：
+
+- `Measure.ts`、`Draw.ts`、`FlyTo.ts` 和 `Highlight.ts` 直接接收 `Cesium.Viewer`，不 import Vue；
+- `cesium-jt.ts` 以 Viewer 为参数延迟创建各工具，但旧实现通过 `viewer.jt` 扩展 Cesium 对象；
+- Vue 等高线设置组件通过 inject 取得 Viewer，再操作 Cesium 材质；工具栏 3D Tiles 配置同时协调 Viewer、Vuex 状态和交互销毁；
+- 新设计保留“纯工具接收真实 Viewer、Vue 调用工具”的方向，但不延续 `viewer.jt`、全局 store 协调和分散销毁。
+
 ### Cyber-Sight 接入点
 
 - `platform.register.ts` 已在启动阶段发现 Platform 模块的 `registerViews.ts` 并注册到 Foundation `viewRegistry`；
@@ -65,8 +78,9 @@ status: active
 
 - 单一前端所有权目录：`apps/frontend/src/platform/modules/geo/`；
 - 唯一初始公共入口为 `registerViews.ts`，`geo.plugins.ts` 是模块内部组合文件；
-- 每次页面访问创建独立 `GeoRuntime`，Viewer 由非深度响应式适配器统一创建和销毁；
-- Vue 后代通过 `useGeoRuntime()`、插件通过 `GeoPluginContext`、算法通过显式参数访问 Viewer；禁止全局对象和 Pinia 保存 Viewer；
+- 每次页面访问创建独立 `GeoRuntime`；生命周期访问器明确命名为 `viewerAccess: GeoViewerAccess`；
+- Vue 后代通过 `useCesiumViewer()`、插件通过 `GeoPluginContext.viewer`、纯工具通过构造参数或函数参数取得真实 `Cesium.Viewer`；禁止全局对象和 Pinia 保存 Viewer；
+- `tools/` 只实现纯 Cesium 业务逻辑，插件创建工具和 controller，插件自有 `.vue` 接收 controller 并负责展示；
 - 编译期插件按数据、视图、场景、标绘、测量、模型与地形分析拆分；
 - 插件定义包含依赖、UI 贡献和安装函数；注册表负责校验、拓扑安装、局部错误隔离和逆序销毁；
 - `InteractionManager` 保证鼠标主交互互斥，`DisposableScope` 与 `AbortSignal` 约束各插件的事件、异步任务和 Cesium 资源；
@@ -82,6 +96,8 @@ status: active
 - 将接入方式修正为 Forge 菜单管理、`registerViews.ts` 和动态 `/geo` 路由，删除 Platform 首页和返回入口；
 - 补充 `GeoRuntime`、Viewer 访问端口、Vue 注入、插件上下文、显式算法参数和异步取消规则；
 - 补充插件契约、UI 贡献、依赖校验、安装顺序、互斥交互、资源 scope、capability 和事件协作规则；
+- 将 `viewer: GeoViewerPort` 修正为 `viewerAccess: GeoViewerAccess`，并让组件、插件和纯工具中的 `viewer` 统一表示 `Cesium.Viewer`；
+- 增加纯工具、插件 controller/UI contributions、插件自有 Vue UI 和通用 Shell 四层职责及调用示例；
 - 更新 Platform 设计、ADR、活动计划和 AI 日志索引；
 - 保留人工浏览器验收边界，不新增或运行前端自动化测试。
 
@@ -90,7 +106,7 @@ status: active
 - `git diff --cached --quiet`：通过，修订前暂存区为空；
 - `git status --short`：修订前工作区为空；
 - `pnpm docs:archive:check`：`NOT_DUE`，无需创建文档归档审查计划；
-- 旧站视觉和旧仓库源码只读核对：完成；
+- 旧站视觉、旧仓库整体结构和维护者指定 `src/libs/cesium/libs/` 代表性工具/UI 调用只读核对：完成；
 - `pnpm format`：通过，修订文档已按仓库 Prettier 配置格式化；
 - `pnpm format:check`：通过；
 - `pnpm architecture:check`：通过；
@@ -112,4 +128,4 @@ status: active
 - [Geo 前端空间可视化工作台](../../../design/modules/geo.md)
 - [Geo 前端编译期插件架构](../../../decisions/ADR-20260814-geo-frontend-plugin-architecture.md)
 - [Geo 前端工作台实施计划](../../../plans/active/2026-08-14-geo-frontend-workspace.md)
-- 被纠正的初版设计提交：`45d29def200e01d989437dcf009c331b0207030a`；纯前端范围修正提交：`599a7d10210e23882dd629703f7b16190c390ac7`；动态菜单、Viewer 运行时和插件细化见本记录所在提交。
+- 被纠正的初版设计提交：`45d29def200e01d989437dcf009c331b0207030a`；纯前端范围修正提交：`599a7d10210e23882dd629703f7b16190c390ac7`；动态菜单、Viewer 运行时和插件细化提交：`94615b0a6056304cac085d7371e18d5044d285e2`；Viewer 命名和纯工具/UI 分层修订见本记录所在提交。
