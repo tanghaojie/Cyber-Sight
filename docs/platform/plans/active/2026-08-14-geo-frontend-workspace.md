@@ -17,8 +17,8 @@ status: active
 
 ## 范围
 
-- `apps/frontend/src/platform/modules/geo/` 中的页面、路由、状态、Cesium 适配器、插件和组件；
-- Platform 首页到 `/geo` 的静态前端入口；
+- `apps/frontend/src/platform/modules/geo/` 中的页面注册、运行时、Cesium 适配器、插件和组件；
+- Forge 菜单管理、`registerViews.ts` 和动态 `/geo` 路由的既有装配链路；
 - 地图全屏布局和现代化工作台 UI；
 - 旧项目通用视图、数据、环境、标绘、测量、模型与地形分析能力的迁移；
 - 前端静态验证与维护者人工浏览器验收。
@@ -26,7 +26,7 @@ status: active
 ## 非目标
 
 - 后端、API 契约、数据库、场景保存、用户或管理功能；
-- Geo 专属功能权限、数据权限和数据库菜单；
+- Geo 专属功能权限、数据权限和新的菜单管理机制；
 - 用户侧 AI、模型提供商、提示词和自然语言地图操作；
 - 远程插件、插件市场和用户上传代码；
 - 旧项目行业大屏等特定应用；
@@ -44,27 +44,32 @@ status: active
 
 - [ ] 确认当前 Vite、Vue、TypeScript、Node 和浏览器基线兼容的稳定 Cesium 版本并锁定依赖；
 - [ ] 配置开发与生产环境所需的 Cesium Worker、Widget、字体和 Asset 路径；
-- [ ] 新建 `platform/modules/geo/`，登记 `geo.routes.ts` 和 `geo.plugins.ts`；
-- [ ] 由 Platform 组合入口注册静态 `/geo` 路由，不依赖数据库菜单；
-- [ ] 在 Platform 首页增加 Geo 产品入口；
-- [ ] 实现幂等 `ViewerAdapter` 和页面进入/离开清理；
+- [ ] 新建 `platform/modules/geo/`，通过 `registerViews.ts` 登记稳定组件键 `geo`；
+- [ ] 在 Forge 菜单管理中配置 `/geo`、组件 `geo`、空布局和空功能权限，不新增静态路由或菜单 migration；
+- [ ] 确认动态路由直接渲染 Geo 页面，页面不提供返回 Platform、首页或后台的入口；
+- [ ] 实现单页面实例所有的 `GeoRuntime`、幂等 `ViewerAdapter` 和页面进入/离开清理；
+- [ ] 实现 `provideGeoRuntime()`、`useGeoRuntime()`、插件上下文和显式算法参数四种受控访问路径；
+- [ ] 禁止把 Viewer 放入 `window`、Vue 全局属性或 Pinia；
 - [ ] 实现 Geo 工作台基础布局、WebGL 不可用、初始化中、失败与重试状态；
 - [ ] 确认不新增后端、契约、migration 或权限定义。
 
-完成条件：从 Platform 首页可进入和离开 Geo；开发与生产构建均可创建 Viewer；重复进入页面不会创建残留实例。
+完成条件：Forge 菜单动态加载 `/geo`；页面不包含返回 Platform 的入口；开发与生产构建均可创建 Viewer；重复进入页面不会创建残留实例。
 
 ## 阶段 2：UI 系统与插件内核
 
 - [ ] 实现 48–56px 顶栏、左侧工具轨、按需上下文面板、右侧属性检查器和底部状态条；
 - [ ] 使用现有 Sight 设计令牌、Element Plus、图标和本地化能力；
-- [ ] 定义最小插件贡献类型、`GeoContext`、注册表和错误隔离；
+- [ ] 定义插件 ID、依赖、排序、`GeoPluginContext`、带 UI 贡献的安装实例和错误隔离；
+- [ ] 实现重复 ID、缺失依赖和依赖循环校验，并按拓扑顺序安装、逆序销毁；
+- [ ] 实现插件独立 `DisposableScope`、`AbortController` 和统一 Cesium 资源登记辅助方法；
 - [ ] 实现 `InteractionManager`，保证鼠标主交互工具互斥；
-- [ ] 统一插件的激活、停用、取消和幂等销毁协议；
+- [ ] 区分 action、toggle、panel 和 interaction 工具，统一交互的激活、完成、取消和幂等销毁协议；
+- [ ] 实现最小类型化 capability registry 和 event bus，禁止插件穿透导入其他插件；
 - [ ] 完成桌面、窄桌面和手机基础降级布局；
 - [ ] 为图标按钮、焦点、活动状态、工具提示和 reduced motion 补齐无障碍行为；
 - [ ] 对 1280×720 进行重点人工视觉验收，确保地图面积和信息层级明显优于旧站。
 
-完成条件：插件可贡献工具与面板；切换任务组不重建 Viewer；活动工具和下一步操作清晰；页面不出现旧式 Ribbon 和永久宽侧栏。
+完成条件：插件可贡献工具与面板；Viewer 只能通过运行时端口访问；切换任务组不重建 Viewer；活动工具和下一步操作清晰；页面不出现旧式 Ribbon 和永久宽侧栏。
 
 ## 阶段 3：视图、数据与场景能力
 
@@ -130,6 +135,7 @@ pnpm docs:archive:check:ci
 ## 风险与控制
 
 - Cesium 资源路径在开发和生产环境不一致：阶段 1 同时验证两种构建，不延后到功能迁移结束；
+- Viewer 被全局缓存或异步任务持有过久：只允许当前页面运行时拥有实例，异步流程同时绑定 `AbortSignal`；
 - 旧算法依赖全局状态：逐个能力解耦，通过 Viewer 适配器和插件上下文接入；
 - 事件和临时资源泄漏：以插件拥有权、互斥工具和幂等销毁作为完成门槛；
 - 外部数据受 CORS、令牌、限频和许可影响：只发布明确允许且可被浏览器安全访问的数据；

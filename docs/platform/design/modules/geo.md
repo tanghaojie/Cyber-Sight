@@ -63,10 +63,9 @@ Geo 拥有 Viewer 适配、工作台页面、内置插件、Geo 运行状态和�
 
 ### 公共文件
 
-初始只登记两个公共文件：
+初始只登记一个公共文件：
 
-- `geo.routes.ts`：声明 `/geo` 的稳定静态路由并延迟加载工作台页面；
-- `geo.plugins.ts`：登记随应用构建的 Geo 插件定义，供 Geo 页面组合使用。
+- `registerViews.ts`：以稳定组件键 `geo` 登记工作台懒加载器，供 Forge 菜单管理生成动态路由。
 
 若后续其他 Platform 模块出现真实的地图嵌入需求，再评审并登记最小公共端口；本阶段不预先导出 Cesium Viewer、store 或组件集合，也不创建 `index.ts` barrel。
 
@@ -76,19 +75,18 @@ Geo 拥有 Viewer 适配、工作台页面、内置插件、Geo 运行状态和�
 
 ```text
 geo/
-├─ geo.routes.ts
+├─ registerViews.ts
 ├─ geo.plugins.ts
 ├─ pages/
 │  └─ GeoWorkspacePage.vue
 ├─ core/
 │  ├─ geo-context.ts
+│  ├─ geo-runtime.ts
+│  ├─ use-geo-runtime.ts
 │  ├─ viewer-adapter.ts
 │  ├─ plugin-registry.ts
 │  ├─ interaction-manager.ts
 │  └─ disposable.ts
-├─ state/
-│  ├─ geo.store.ts
-│  └─ geo.types.ts
 ├─ plugins/
 │  ├─ view/
 │  ├─ layers/
@@ -105,36 +103,235 @@ geo/
 
 ## 前端接入方式
 
-Geo 不依赖数据库菜单或后端权限目录。Platform 组合入口把 `geo.routes.ts` 注册为静态前端路由，Platform 首页提供进入 Geo 的产品入口。该路由仍处于 Cyber-Sight 现有应用会话内，但不增加 Geo 专属角色、功能权限或数据权限。
+Geo 页面不声明静态路由。`platform.register.ts` 在启动时发现 `registerViews.ts`，以稳定键 `geo` 把 `GeoWorkspacePage.vue` 的懒加载器登记到 `viewRegistry`。维护者通过 Forge 菜单管理创建页面菜单，推荐配置为：
 
-工作台使用独立的地图全屏布局，不套用面向列表和表单的 `AdminLayout`。页面保留返回 Platform 首页、品牌和必要的全局能力入口，但不显示常规后台侧边栏，从而把主要画布留给地图。
+```ts
+const geoPage: RouteComponent = () => import('./pages/GeoWorkspacePage.vue')
+
+export function registerViews(appViews: ViewRegistrar): void {
+  appViews.register('geo', { key: 'geo.pageLabel', fallback: 'Geo 空间可视化' }, geoPage)
+}
+```
+
+- 类型：菜单；
+- 路径：`/geo`；
+- 组件：`geo`；
+- 布局：留空，直接渲染 Geo 页面；
+- 功能权限：留空，使已认证用户均可获得该菜单；
+- 图标、名称和排序：由 Forge 菜单管理维护。
+
+登录后，`GET /navigation/menus` 返回该菜单，`dynamicRoutes.ts` 使用组件键从 `viewRegistry` 取得页面并生成 `/geo` 动态路由。Geo 不新增菜单 migration、专属角色、功能权限或数据权限，但沿用 Forge 已有的认证、菜单管理和动态路由能力。
+
+工作台使用独立的地图全屏页面，不套用 `AdminLayout`。页面不提供返回 Platform、首页或管理后台的入口，也不渲染常规导航、Header 或 Tags View；离开页面依靠浏览器历史、直接地址或后续由产品外部导航决定。
 
 ```mermaid
 flowchart LR
-    H["Platform 首页"] --> R["静态 /geo 路由"]
-    R --> W["Geo 工作台页面"]
+    M["Forge 菜单管理：component=geo"] --> N["GET /navigation/menus"]
+    RV["registerViews：key=geo"] --> R["viewRegistry"]
+    N --> DR["dynamicRoutes"]
+    R --> DR
+    DR --> W["/geo 工作台页面"]
     W --> G["插件注册表"]
     G --> I["交互管理器"]
-    G --> V["Viewer 适配器"]
-    V --> C["Cesium Viewer"]
-    G --> D["前端预置数据源"]
+    G --> VA["Viewer 适配器"]
+    VA --> C["Cesium Viewer"]
+    G --> DS["前端预置数据源"]
 ```
+
+## Viewer 运行时与访问方式
+
+### 所有权和生命周期
+
+`GeoWorkspacePage.vue` 是每次页面访问的运行时所有者。页面挂载后创建一个 `GeoRuntime`，把地图容器交给运行时初始化 Viewer；页面卸载时只调用一次 `runtime.dispose()`。生命周期固定为：
+
+```text
+idle -> mounting -> ready -> disposing -> disposed
+                    \
+                     -> failed -> disposing -> disposed
+```
+
+Viewer 只存在于当前 `GeoRuntime` 实例中，不挂到 `window`、`globalThis`、Vue `app.config.globalProperties` 或 Pinia，也不跨路由复用。这样同一应用将来即使出现多个 Geo 容器，也不会因全局单例互相覆盖。
+
+页面创建运行时后通过 Vue `provide` 提供只读上下文；后代组件使用 `useGeoRuntime()` 获取同一实例。插件不依赖 Vue 注入，而是在安装时由注册表显式接收 `GeoPluginContext`。普通算法函数不查找运行时，所需 Viewer、Scene、Camera 或数据直接作为参数传入。
+
+```ts
+const runtime = createGeoRuntime()
+provideGeoRuntime(runtime)
+
+onMounted(async function mountGeo() {
+  const container = mapContainer.value
+  if (!container) {
+    throw new Error('Geo map container is unavailable')
+  }
+  await runtime.mount(container)
+})
+
+onBeforeUnmount(function disposeGeo() {
+  runtime.dispose()
+})
+```
+
+### Viewer 访问端口
+
+`ViewerAdapter` 保存 `markRaw(viewer)`，并提供初始化等待与两种 Viewer 访问方式：
+
+```ts
+interface GeoViewerPort {
+  readonly status: 'idle' | 'mounting' | 'ready' | 'failed' | 'disposed'
+  whenReady(): Promise<void>
+  requireViewer(): Viewer
+  use<T>(operation: (viewer: Viewer) => T): T
+}
+```
+
+- `whenReady()`：组件或插件需要等待初始化时使用；初始化失败或运行时已销毁时拒绝；
+- `requireViewer()`：仅供已经处于 `ready` 生命周期的同步 Cesium 逻辑使用，否则立即抛出可诊断错误；
+- `use(operation)`：推荐入口，先校验生命周期，再把当前 Viewer 传给一个同步、短生命周期操作；回调不得返回 Promise，避免调用方跨 `await` 缓存 Viewer；
+- 异步加载必须使用插件上下文的 `AbortSignal`：先创建或加载独立资源，await 后检查取消状态，再调用一次 `use()` 把结果加入当前 Viewer；不能凭早先取得的 Viewer 继续写入已销毁场景。
+
+各类代码的使用规则如下：
+
+| 使用位置           | 获取方式                                           | 约束                                                       |
+| ------------------ | -------------------------------------------------- | ---------------------------------------------------------- |
+| Geo 页面和后代组件 | `useGeoRuntime()` 后调用 `runtime.viewer.use(...)` | 只操作界面当前需要的 Viewer 能力，不把 Viewer 放入组件状态 |
+| Geo 插件           | `install(context)` 获得 `context.viewer`           | 插件只在自己的 `DisposableScope` 内创建和登记资源          |
+| Cesium 工具类/算法 | Viewer、Scene 或 Camera 作为显式函数参数           | 禁止工具文件反向 import 页面运行时或全局 store             |
+| Geo 模块以外       | 不允许访问                                         | 未来出现真实消费者时另行登记公共端口                       |
+
+运行时包含但不公开原始对象的长期引用：
+
+```ts
+interface GeoRuntime {
+  readonly viewer: GeoViewerPort
+  readonly interactions: GeoInteractionManager
+  readonly plugins: GeoPluginRegistry
+  readonly state: Readonly<GeoRuntimeState>
+  mount(container: HTMLElement): Promise<void>
+  dispose(): void
+}
+```
+
+`GeoRuntimeState` 只保存活动任务组、面板、选择对象、活动工具、加载和错误等可描述 UI 状态。当前没有跨页面共享需求，因此不创建全局 Geo Pinia store；若未来需要持久化纯 UI 偏好，应通过单独端口接入，Viewer 仍不得进入 store。
 
 ## 前端插件架构
 
-插件是源码内、编译期注册的功能单元，不是可下载的软件包。插件定义至少包含：
+插件是源码内、编译期注册的功能单元，不是可下载的软件包。`geo.plugins.ts` 显式导出有序定义列表，`GeoRuntime` 创建注册表后一次性登记；它是 Geo 内部组合文件，不是跨模块公共 API。
 
-- 稳定 `id`、排序和本地化标题键；
-- 所属任务组、工具栏贡献和可选上下文面板；
-- `activate(context)` 与配对的停用或 `dispose()` 清理逻辑；
-- 是否占用鼠标主交互，以及不可用原因和错误状态；
-- 需要的 Viewer 能力或其他已登记端口。
+### 插件契约
 
-`GeoContext` 只暴露受控的 Viewer 适配器、交互管理器、轻量事件和 UI 状态端口。插件不能读取其他插件私有状态。需要组合的能力通过已登记端口或事件完成。
+```ts
+interface GeoPluginDefinition {
+  readonly id: string
+  readonly order?: number
+  readonly requires?: readonly string[]
+  install(context: GeoPluginContext): GeoPluginInstance | Promise<GeoPluginInstance>
+}
 
-只有一个占用鼠标主交互的工具能够处于活动状态。`InteractionManager` 在切换标绘、测量、拾取、分类或地形分析前先停用当前工具，并统一恢复鼠标样式、提示、事件处理器和临时实体。
+interface GeoPluginInstance {
+  readonly contributions: GeoPluginContributions
+  dispose(): void
+}
 
-Cesium Viewer、DataSource、Primitive、ScreenSpaceEventHandler 等对象保持非深度响应式，使用 `markRaw`、浅引用或普通类封装。Vue 状态只保存界面需要的可描述状态；路由离开、Viewer 重建、插件停用和热更新都必须执行幂等清理。
+interface GeoPluginContext {
+  readonly viewer: GeoViewerPort
+  readonly interactions: GeoInteractionManager
+  readonly capabilities: GeoCapabilityRegistry
+  readonly events: GeoEventBus
+  readonly scope: DisposableScope
+  readonly signal: AbortSignal
+}
+```
+
+定义只包含稳定 ID、排序、显式依赖和安装函数。安装完成的实例再提供 UI 贡献，使贡献处理器能够安全闭包当前 `GeoRuntime` 的插件状态，而不会退化为模块级单例。插件实例同时承诺销毁；某个工具的激活/停用由工具贡献和交互管理器负责，不把整个插件反复安装卸载。
+
+### UI 贡献
+
+`GeoPluginContributions` 可以声明以下编译期贡献：
+
+- `groups`：工具轨任务组；
+- `tools`：`action`、`toggle`、`panel` 或 `interaction` 工具；
+- `panels`：按需加载的上下文面板组件；
+- `inspectors`：根据选中对象类型匹配的属性检查器；
+- `statusItems`：底部状态条片段。
+
+每个贡献使用全局唯一的 `${pluginId}.${localId}` 标识、locales 文案键、图标、排序和可用性函数。工作台 Shell 只渲染注册表提供的排序结果，不 import 具体插件组件，也不包含标绘、测量或地形业务判断。
+
+工具贡献使用判别联合，避免一个充满可选字段的万能接口：
+
+```ts
+type GeoToolContribution = GeoActionTool | GeoToggleTool | GeoPanelTool | GeoInteractionTool
+
+interface GeoActionTool extends GeoToolMetadata {
+  readonly kind: 'action'
+  run(context: GeoToolContext): void | Promise<void>
+}
+
+interface GeoToggleTool extends GeoToolMetadata {
+  readonly kind: 'toggle'
+  read(context: GeoToolContext): boolean
+  write(context: GeoToolContext, enabled: boolean): void | Promise<void>
+}
+
+interface GeoPanelTool extends GeoToolMetadata {
+  readonly kind: 'panel'
+  readonly panelId: string
+}
+
+interface GeoInteractionTool extends GeoToolMetadata {
+  readonly kind: 'interaction'
+  create(context: GeoToolContext): GeoInteractionDefinition
+}
+```
+
+`GeoToolMetadata` 只包含 ID、组、文案、图标、排序和 `isAvailable(context)`；Shell 不直接调用贡献函数，而是把贡献 ID 交给注册表的 `executeTool(id)`，由注册表统一检查插件状态、可用性、重复执行、busy 状态和错误隔离。
+
+### 注册与安装流程
+
+1. `GeoRuntime` 把 `geo.plugins.ts` 中的定义交给注册表；
+2. 注册表校验插件 ID、贡献 ID、依赖是否存在以及依赖图是否有环；
+3. 按依赖拓扑和稳定排序确定安装顺序；
+4. Viewer 进入 `ready` 后，为每个插件创建独立 `DisposableScope` 与 `AbortController`；
+5. 调用 `install(context)`，成功后发布其 UI 贡献；
+6. 单插件失败时立即销毁其 scope、记录局部错误并隐藏或禁用该插件贡献，不回滚已成功插件；
+7. 页面卸载时先取消活动交互，再按安装逆序中止插件 signal、调用实例 `dispose()` 并销毁插件 scope，最后销毁 Viewer。
+
+### 工具执行与互斥交互
+
+普通 `action` 直接在当前插件 scope 中执行；`toggle` 必须提供读写当前状态的方法；`panel` 只改变 Shell 的当前面板；`interaction` 交给 `InteractionManager.activate()`：
+
+```ts
+interface GeoInteractionDefinition {
+  readonly id: string
+  readonly cursor?: string
+  readonly hint?: string
+  start(context: GeoInteractionContext): void | Promise<void>
+}
+```
+
+`InteractionManager` 为每次激活创建子 `DisposableScope`。开始新交互前，它以 `switch` 原因取消旧交互，销毁旧 scope，清理鼠标样式、提示、事件处理器和临时对象，再启动新交互。完成、用户取消、插件失败、Viewer 失败和页面卸载分别使用明确原因结束；重复取消必须安全。
+
+完整调用路径为：
+
+```text
+用户点击工具
+  -> Shell 传递 contributionId
+  -> PluginRegistry.executeTool()
+  -> 校验插件 ready / 工具 available / 非重复 busy
+  -> action 或 toggle：在插件 scope 中执行
+  -> panel：更新 runtime.state.activePanelId
+  -> interaction：InteractionManager 取消旧工具并创建交互子 scope
+  -> 成功时更新状态，失败时清理本次资源并记录插件局部错误
+```
+
+### 资源所有权与跨插件协作
+
+`DisposableScope` 提供 `defer(cleanup)`、`child()` 和面向 Cesium 对象的登记辅助方法。插件创建的 ScreenSpaceEventHandler、Entity、DataSource、Primitive、PostProcessStage、Cesium event listener、DOM listener、定时器和 AbortController 必须在创建位置立即登记。临时交互资源进入交互子 scope，插件常驻资源进入插件 scope。
+
+scope 按后进先出顺序执行清理，`dispose()` 幂等；单个清理函数抛错时继续清理剩余资源，最终把聚合后的安全错误交给运行时记录。插件不得依赖 Viewer 的最终 `destroy()` 代替自己的资源释放。
+
+插件不得 import 其他插件内部文件或读取其状态。确需同步调用时，由提供方以类型化 token 向 `GeoCapabilityRegistry` 登记最小能力，消费方通过 `requires` 和 token 获取；只需广播变化时使用类型化 `GeoEventBus`。能力注册在提供方 scope 销毁时自动撤销，避免悬空引用。
+
+Cesium Viewer、DataSource、Primitive、ScreenSpaceEventHandler 等对象保持非深度响应式。所有 UI 状态由运行时只读暴露并通过专用方法修改；插件不持有 Shell 组件实例，也不能直接改变整个工作台布局。
 
 ## 功能范围与界面分组
 
@@ -165,7 +362,7 @@ Cesium Viewer、DataSource、Primitive、ScreenSpaceEventHandler 等对象保持
 
 ### 页面结构
 
-- 顶部 48–56px 紧凑栏：返回入口、Geo 标识、当前页面标题和少量全局动作；
+- 顶部 48–56px 紧凑栏：Geo 标识、当前页面标题和少量地图全局动作；不提供返回 Platform 的入口；
 - 左侧 48–56px 工具轨：数据、视图、场景、标绘、测量、分析等任务入口；
 - 按需上下文面板：默认关闭，打开后约 320px，可折叠；同一时刻只展示一个主要任务面板；
 - 右侧属性检查器：仅在选中图层、模型或对象时出现；
@@ -212,7 +409,7 @@ Geo 的数据来源仅包括：
 
 维护者人工验收至少覆盖：
 
-1. `/geo` 可从 Platform 首页进入并返回，Viewer 只创建一次且离开后释放；
+1. `registerViews.ts` 登记键 `geo`，Forge 菜单以 `/geo`、组件 `geo`、空布局动态加载页面；页面不显示返回 Platform 的入口，Viewer 只创建一次且离开后释放；
 2. 1280×720 与常用桌面宽度下地图是视觉主体，顶部和侧栏不再复制旧 Ribbon 布局；
 3. 工具轨、上下文面板、属性检查器和状态条的层级、开合与焦点可理解；
 4. 所有已实现任务组均可进入，互斥鼠标工具切换后没有残留事件或临时实体；

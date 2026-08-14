@@ -26,6 +26,13 @@ status: active
 
 本轮已撤销相关现行设计，不再把 Foundation 授权扩展、后端 API、共享契约、数据库 migration 或模型提供商作为 Geo 前置条件。历史提交保留事实记录，当前设计和 ADR 作为后续实施的唯一现行依据。
 
+维护者随后进一步确认：
+
+- `/geo` 不使用静态路由或 Platform 首页入口，而是由 Forge 菜单管理和动态路由加载；
+- Geo 页面通过 `registerViews.ts` 登记组件；
+- 页面不保留返回 Platform、首页或后台的入口；
+- 设计必须明确 Viewer 在组件、插件和普通算法中的运行时使用方式，并展开插件系统的注册、安装、交互和清理逻辑。
+
 ## 只读核对结果
 
 ### 旧站界面
@@ -48,18 +55,21 @@ status: active
 
 ### Cyber-Sight 接入点
 
-- 当前常规业务菜单由后端数据动态生成，不适合本阶段无后端的 Geo；
-- Platform 组合入口可以注册 Platform 所有的静态前端路由；
-- Geo 采用 `/geo` 静态路由，并从 Platform 首页进入，可避免新增数据库菜单和 Foundation 业务耦合；
-- 独立地图全屏布局比复用常规后台列表/表单布局更符合地图优先目标。
+- `platform.register.ts` 已在启动阶段发现 Platform 模块的 `registerViews.ts` 并注册到 Foundation `viewRegistry`；
+- `dynamicRoutes.ts` 根据 Forge 菜单返回的路径、组件和布局动态生成页面路由；
+- Geo 登记稳定组件键 `geo`，菜单使用 `/geo`、空布局和空功能权限即可直接渲染全屏页面；
+- 该方案复用 Forge 现有认证、菜单管理和动态路由，不需要新增 Geo 后端或静态路由；
+- 页面不提供返回 Platform 的入口，也不渲染 `AdminLayout`。
 
 ## 方案选择
 
 - 单一前端所有权目录：`apps/frontend/src/platform/modules/geo/`；
-- 公共入口仅先登记 `geo.routes.ts` 和 `geo.plugins.ts`；
-- Viewer 由非深度响应式适配器统一创建和销毁；
+- 唯一初始公共入口为 `registerViews.ts`，`geo.plugins.ts` 是模块内部组合文件；
+- 每次页面访问创建独立 `GeoRuntime`，Viewer 由非深度响应式适配器统一创建和销毁；
+- Vue 后代通过 `useGeoRuntime()`、插件通过 `GeoPluginContext`、算法通过显式参数访问 Viewer；禁止全局对象和 Pinia 保存 Viewer；
 - 编译期插件按数据、视图、场景、标绘、测量、模型与地形分析拆分；
-- `InteractionManager` 保证鼠标主交互互斥，各插件拥有并清理自己的事件和 Cesium 资源；
+- 插件定义包含依赖、UI 贡献和安装函数；注册表负责校验、拓扑安装、局部错误隔离和逆序销毁；
+- `InteractionManager` 保证鼠标主交互互斥，`DisposableScope` 与 `AbortSignal` 约束各插件的事件、异步任务和 Cesium 资源；
 - 页面采用紧凑顶栏、左侧工具轨、按需上下文面板、选中时属性检查器和底部状态条；
 - 状态只保存在当前前端会话，不设计业务持久化；
 - Sight 现有 AI 辅助开发能力不在 Geo 文档中重复建设。
@@ -69,6 +79,9 @@ status: active
 - 重写 Geo 模块设计，删除后端、API、数据库、权限和用户侧 AI 范围；
 - 用“Geo 前端编译期插件架构”ADR 替换错误的“插件与统一 AI 命令”决策；
 - 用纯前端工作台实施计划替换包含 Foundation、后端、migration 和 AI 阶段的旧计划；
+- 将接入方式修正为 Forge 菜单管理、`registerViews.ts` 和动态 `/geo` 路由，删除 Platform 首页和返回入口；
+- 补充 `GeoRuntime`、Viewer 访问端口、Vue 注入、插件上下文、显式算法参数和异步取消规则；
+- 补充插件契约、UI 贡献、依赖校验、安装顺序、互斥交互、资源 scope、capability 和事件协作规则；
 - 更新 Platform 设计、ADR、活动计划和 AI 日志索引；
 - 保留人工浏览器验收边界，不新增或运行前端自动化测试。
 
@@ -90,7 +103,7 @@ status: active
 - Cesium 的具体稳定版本和 Vite 静态资源方案，在阶段 1 按当前依赖兼容性确认；
 - 首批预置影像、地形、模型和 3D Tiles 需核对许可、CORS 和客户端令牌要求；
 - 每项旧算法在迁移前判断复用或重写，并记录未迁移原因；
-- Platform 首页 Geo 入口的最终卡片文案和视觉在 UI 阶段与现有首页一起确定。
+- Forge 菜单中的 Geo 名称、图标和排序由维护者在菜单管理中确定，不进入 Geo 页面代码。
 
 以上事项不会改变已确认的纯前端、单页、无管理、无数据库和无用户侧 AI 边界。
 
@@ -99,4 +112,4 @@ status: active
 - [Geo 前端空间可视化工作台](../../../design/modules/geo.md)
 - [Geo 前端编译期插件架构](../../../decisions/ADR-20260814-geo-frontend-plugin-architecture.md)
 - [Geo 前端工作台实施计划](../../../plans/active/2026-08-14-geo-frontend-workspace.md)
-- 被纠正的初版设计提交：`45d29def200e01d989437dcf009c331b0207030a`；修正版设计见本记录所在提交。
+- 被纠正的初版设计提交：`45d29def200e01d989437dcf009c331b0207030a`；纯前端范围修正提交：`599a7d10210e23882dd629703f7b16190c390ac7`；动态菜单、Viewer 运行时和插件细化见本记录所在提交。
