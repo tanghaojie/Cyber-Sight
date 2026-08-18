@@ -11,6 +11,7 @@ foundation:
   - scripts/architecture/
 
 platform:
+  - .archive-audit.json
   - apps/frontend/src/platform/
   - apps/frontend/env/.env.platform.example
   - apps/backend/src/platform/

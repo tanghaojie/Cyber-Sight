@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "repositoryRole": "forge-upstream",
+  "managedScopes": ["foundation", "forge", "platform"],
+  "inheritedScopes": [],
+  "excludedScopes": [],
+  "integrationOwner": "foundation"
+}

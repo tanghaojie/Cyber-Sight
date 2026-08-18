@@ -13,6 +13,7 @@ test('parses the repository YAML manifest', async () => {
   const manifestPath = fileURLToPath(new URL('../.forge-sync.yml', import.meta.url))
   const manifest = parseManifest(await readFile(manifestPath, 'utf8'))
   assert.ok(manifest.foundation.includes('docs/templates/'))
+  assert.ok(manifest.platform.includes('.archive-audit.json'))
   assert.ok(manifest.platform.includes('README.md'))
   assert.ok(manifest.forge.includes('forge/'))
 })
@@ -38,7 +39,7 @@ async function repository(validate = []) {
     join(directory, '.forge-sync.yml'),
     JSON.stringify({
       foundation: ['foundation/'],
-      platform: ['platform/', 'README.md'],
+      platform: ['platform/', '.archive-audit.json', 'README.md'],
       forge: ['forge/'],
       integration: ['.forge-sync.yml', 'scripts/forge-sync.mjs'],
       validate,
@@ -46,6 +47,7 @@ async function repository(validate = []) {
   )
   await write(join(directory, 'foundation/value.txt'), 'foundation-v1')
   await write(join(directory, 'platform/value.txt'), 'platform-default-v1')
+  await write(join(directory, '.archive-audit.json'), '{"repositoryRole":"forge-upstream"}')
   await write(join(directory, 'forge/value.txt'), 'forge-v1')
   await write(join(directory, 'README.md'), 'forge-readme-v1')
   run('git', ['init', '-b', 'master'], directory)
@@ -56,6 +58,7 @@ async function repository(validate = []) {
 
   run('git', ['switch', '-c', 'downstream'], directory)
   await write(join(directory, 'platform/value.txt'), 'platform-downstream')
+  await write(join(directory, '.archive-audit.json'), '{"repositoryRole":"platform-downstream"}')
   await write(join(directory, 'README.md'), 'downstream-readme')
   run('git', ['rm', '-r', 'forge'], directory)
   run('git', ['add', '.'], directory)
@@ -65,6 +68,7 @@ async function repository(validate = []) {
   run('git', ['switch', '-c', 'upstream'], directory)
   await write(join(directory, 'foundation/value.txt'), 'foundation-v2')
   await write(join(directory, 'platform/value.txt'), 'platform-default-v2')
+  await write(join(directory, '.archive-audit.json'), '{"repositoryRole":"forge-upstream-v2"}')
   await write(join(directory, 'forge/value.txt'), 'forge-v2')
   await write(join(directory, 'README.md'), 'forge-readme-v2')
   run('git', ['add', '.'], directory)
@@ -88,6 +92,10 @@ test('preserves Platform and README while accepting Foundation and excluding For
       'platform-downstream',
     )
     assert.equal(await readFile(join(directory, 'README.md'), 'utf8'), 'downstream-readme')
+    assert.equal(
+      await readFile(join(directory, '.archive-audit.json'), 'utf8'),
+      '{"repositoryRole":"platform-downstream"}',
+    )
     assert.notEqual(
       run('git', ['cat-file', '-e', 'HEAD:forge/value.txt'], directory, true).status,
       0,

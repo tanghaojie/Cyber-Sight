@@ -1,8 +1,9 @@
 ---
 title: ADR-0033 Task-scoped documentation archive audit
-status: accepted
+status: superseded
 date: 2026-08-07
 supersedes: ADR-0030
+superseded_by: ADR-20260818-scope-owned-documentation-archive-audit
 ---
 
 # ADR-0033：按任务范围触发文档归档审计

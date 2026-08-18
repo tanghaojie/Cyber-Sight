@@ -1,8 +1,10 @@
 ---
 title: 分层文档与历史归档
+scope: foundation
+repository: Cyber-AI-Forge
 status: accepted
 owner: project maintainers
-updated: 2026-08-11
+updated: 2026-08-18
 ---
 
 # 分层文档与历史归档
@@ -101,37 +103,51 @@ docs/
 项目允许多个不同的 AI 智能体协作。归档触发不能依赖 `.codex`、`.claude` 或其他平台私有目录；同时，
 人类提交通常只包含代码和配置，AI 需要从实现证据中补充当前 Design、文档和 ADR。
 
-### 仓库级协议
+### 共享协议、仓库角色与所有权状态
 
 - AI 任务按范围触发归档审计：只读问答、代码浏览、格式化、注释和单文件机械改动可以跳过；涉及业务行为、API、数据模型、模块边界、架构、迁移、ADR、计划或文档治理的任务，在首次修改文件前运行 `pnpm docs:archive:check`。
 - 如果任务范围中途扩大，必须在修改相关文件前补运行归档审计。
-- 审计脚本只读计算 Git 提交、当前文档、活动计划和归档基线，不启动 AI，也不写工作区。
-- `docs/archive/archive-policy.json` 定义阈值和立即触发条件。
-- `docs/archive/archive-ledger.json` 记录每个范围最近一次审查的 Git 基线。
-- 需要处理的任务使用 `docs/plans/active/` 下带有 `type: documentation-archive-review` 的普通计划表示。
-- 归档完成后，计划进入 `docs/archive/plans/`，并更新归档台账与索引。
-- 合并前或 CI 使用 `pnpm docs:archive:check:ci`；没有 CI 的任务在最终验证阶段运行同一入口。该入口通过 `--fail-on-due` 将 `DUE` 和 `BLOCKED` 转换为失败状态。
+- `scripts/docs/archive-audit.mjs` 与 `docs/foundation/archive/archive-policy.json` 是由 Foundation 维护并同步的共享协议。脚本只读计算 Git 提交、当前文档、活动计划和归档基线，不启动 AI，也不写工作区。
+- 根 `.archive-audit.json` 是当前仓库自己的审计角色配置，声明 `managedScopes`、`inheritedScopes`、`excludedScopes` 和 `integrationOwner`。同步将该文件作为 Platform 内容保留，不从仓库名称、Git remote 或 AI 私有状态推断角色。
+- `docs/<scope>/archive/archive-ledger.json` 由对应所有权作用域维护，只记录该作用域最近一次完成审查的 Git 基线。Foundation ledger 可同步但在下游只读；Platform 下游只推进 Platform ledger。
+- 需要处理的任务使用对应 `docs/<scope>/plans/active/` 下带有 `type: documentation-archive-review` 的普通计划表示。计划默认覆盖 frontmatter 的 `scope`，跨作用域计划通过逗号分隔的 `review_scopes` 显式声明。
+- 归档完成后，计划进入同作用域 `archive/plans/`，并更新同作用域 ledger 与索引。
+- 合并前或 CI 使用 `pnpm docs:archive:check:ci`；没有 CI 的任务在最终验证阶段运行同一入口。只要 managed scope 仍然 `due: true`，即使已有活动计划，CI 也继续失败，直到审查完成并推进 ledger。
+
+Forge 上游角色管理 `foundation`、`forge` 与默认 `platform`。业务平台下游角色只管理 `platform`，把 `foundation` 标记为 inherited 并排除 `forge`。Integration 路径由 Foundation 负责；下游不得把 Integration 变更吸收到 Platform 归档任务。
+
+### 审查单元与证据归属
+
+第一版以文档所有权作用域作为 review unit，不建立模块级 ledger：
+
+- `ownerScope`：`foundation | forge | platform | integration`，由 `.forge-sync.yml` 路径分类决定；Integration 再映射到仓库配置声明的责任方。
+- `component`：`frontend | backend | api-contract | tooling`，只作为报告证据。
+- `module`：模块目录中的稳定模块名，只作为报告证据。
+- ADR、计划、失效 ADR 和断链按其源文档所在的 `docs/<scope>/` 归属；根 `docs/README.md` 等 Integration 文档归 `integrationOwner`。
+
+Managed scope 计算提交、ADR、完成计划、时间阈值和立即触发条件。Inherited scope 不计算本地周期阈值，只检查断链和仍留在当前区的失效 ADR；发现问题返回 `UPSTREAM_REQUIRED`，要求先在 Forge 修复后同步。Excluded scope 不参加当前仓库审计。
 
 ### 默认触发条件
 
-任一范围达到以下条件时生成归档审查候选：
+任一 managed ownership scope 达到以下条件时生成归档审查候选：
 
 - 同一范围内达到 20 个有效代码提交；
 - 3 个新增且仍为 `accepted` 的 ADR；
 - 3 个完成的功能计划；
 - 距离上次审查超过 30 天。
 
-架构边界变更、当前文档链接失效或仍在当前区保存 `superseded`/`replaced`/`retired` ADR 时立即触发。
+共享架构边界或归档治理文件变更、当前文档链接失效或仍在当前区保存 `superseded`/`replaced`/`retired` ADR 时立即触发。跨所有权提交只触发实际涉及且由当前仓库管理的作用域，不生成全局单一任务。
 格式化、纯文档、合并、生成产物和锁文件提交不计入有效代码提交。
 
 ### AI 审查顺序
 
 1. 检查暂存区和工作区，避免覆盖人类未提交内容。
-2. 阅读基线之后的人类提交、代码差异、测试、API 契约和数据库迁移。
-3. 依据可验证事实更新当前 Design 和 ADR。
-4. 判断旧文档是否保留、更新、合并或归档，并建立替代关系。
-5. 更新当前索引后，归档被取代的 Design、文档、ADR、完成计划和 AI 协作记录。
-6. 执行格式、链接和项目约定的验证，记录实际偏差和未决问题。
+2. 只处理报告中由当前仓库管理的 ownership scope；下游的 inherited Foundation 问题转回 Forge。
+3. 阅读该 scope 基线之后的人类提交、代码差异、测试、API 契约和数据库迁移。
+4. 依据可验证事实更新该 scope 当前 Design 和 ADR。
+5. 判断旧文档是否保留、更新、合并或归档，并建立替代关系。
+6. 更新当前索引后，归档被取代的 Design、文档、ADR、完成计划和 AI 协作记录。
+7. 执行格式、链接和项目约定的验证，记录实际偏差和未决问题，再推进该 scope ledger。
 
 代码、测试、契约和 Git diff 可以证明当前行为；提交信息可能提供设计原因。无法从仓库证据确认的意图
 必须标记为待维护者确认，不能由 AI 编造后写入当前 ADR。
@@ -140,7 +156,18 @@ docs/
 
 审计结果使用以下状态：
 
-- `NOT_DUE`：尚未达到条件；
-- `DUE`：应创建归档审查计划；
-- `IN_PROGRESS`：已有归档审查计划，应继续原任务；
-- `BLOCKED`：存在需要人类确认的冲突。
+- `NOT_DUE`：managed scope 尚未达到条件；
+- `DUE`：managed scope 应在自己的活动计划目录创建归档审查计划；
+- `IN_PROGRESS`：同一 scope 已有匹配的归档审查计划，应继续原任务，但 `due` 仍为 `true`，CI 不放行；
+- `INHERITED`：只读同步作用域没有结构性问题，不参与本地周期阈值；
+- `UPSTREAM_REQUIRED`：只读同步作用域存在断链或失效 ADR，必须回上游修复；
+- `EXCLUDED`：当前仓库不包含或不管理该作用域；
+- `BLOCKED`：配置、基线或证据存在需要人类确认的冲突。
+
+顶层状态按 `BLOCKED`、`DUE`、`UPSTREAM_REQUIRED`、`IN_PROGRESS`、`NOT_DUE` 的顺序聚合，但报告必须始终保留每个作用域的独立状态、原因、证据和匹配计划。一个作用域的活动计划不能覆盖另一个作用域的 `DUE`。
+
+### 兼容性与迁移
+
+旧版 `version: 1` repository ledger 只作为一次性迁移输入。切换 v2 时，Forge 必须对 Foundation、Forge 和默认 Platform 分别确认旧基线至实现提交之间的证据，再写入各自 `version: 2` ledger。下游业务仓库单独建立自己的 Platform 基线，不复制 Forge 的 Foundation 完成状态。完成迁移后，脚本缺少角色配置或对应 managed ledger 时返回 `BLOCKED`，不静默回退到全仓库任务。
+
+本设计由 [ADR-20260818](../decisions/ADR-20260818-scope-owned-documentation-archive-audit.md)记录，取代 ADR-0033 中单一 Foundation ledger 和全局活动计划的状态模型；按任务范围决定何时启动检查的原则继续保留。

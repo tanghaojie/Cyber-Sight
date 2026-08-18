@@ -9,3 +9,5 @@
 - `archive/`：历史设计、决策、计划和日志。
 
 新平台由 Forge 提供最小示例；平台建立后，本目录立即转为下游独立所有。创建文档时使用公共[模板](../templates/)并设置 `scope: platform`。
+
+业务平台下游必须把根 `.archive-audit.json` 配置为 `platform-downstream`：只管理 `platform`，把 `foundation` 标记为 inherited，并排除 `forge`。可以从公共[下游归档审计配置模板](../templates/archive-audit-platform-downstream.json)复制；Foundation 问题返回上游处理，不得在下游修改 Foundation ledger。

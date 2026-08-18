@@ -11,6 +11,7 @@ updated: YYYY-MM-DD
 # <计划名称>
 
 将文件保存到 `docs/<scope>/plans/active/`。跨作用域任务声明一个主要 `scope`，并在范围中列出其他受影响作用域。
+归档审查计划增加 `type: documentation-archive-review`；一个计划需要覆盖多个所有权作用域时，再增加逗号分隔的 `review_scopes: foundation,forge,platform`。
 
 ## 目标
 

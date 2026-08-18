@@ -11,7 +11,7 @@
 - [ADR-20260812-foundation-platform-migrations](ADR-20260812-foundation-platform-migrations.md)：Foundation 与 Platform 使用独立 Schema 入口、迁移历史和执行顺序。
 - [ADR-20260813-layered-runtime-configuration](ADR-20260813-layered-runtime-configuration.md)：Foundation 与 Platform 分层维护环境变量，由 Integration 入口聚合并让进程环境拥有最高优先级。
 - [ADR-0029](ADR-0029-frontend-runtime-localization.md)：使用独立前端模块提供运行时中英文切换，以模块资源和严格默认菜单指纹保护用户录入数据。
-- [ADR-0033](ADR-0033-task-scoped-documentation-archive-audit.md)：按任务范围触发归档审计，并以合并前检查作为跨 AI 的共享兜底协议；取代已归档的 ADR-0030。
+- [ADR-20260818-scope-owned-documentation-archive-audit](ADR-20260818-scope-owned-documentation-archive-audit.md)：共享归档协议与策略，使用显式仓库角色、所有权分域台账和作用域任务，使下游只处理 Platform；取代 ADR-0033。
 - [ADR-20260811-frontend-brand-text-config](ADR-20260811-frontend-brand-text-config.md)：收敛前端品牌文字配置，使用 `VITE_APP_TAGLINE` 同时驱动登录签名和 Logo 产品描述，并按展示位置处理大小写。
 - [ADR-0032](ADR-0032-nestjs-fastify-adapter.md)：后端迁移到 NestJS 11，继续使用 Fastify 5 adapter，并保留共享 Zod 契约为唯一 HTTP 数据源。
 - [ADR-0034](ADR-0034-position-organization-ownership.md)：岗位作为按部门归属的组织主数据，由独立 `positions` 模块拥有用户岗位关系，不参与授权。
