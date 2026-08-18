@@ -5,7 +5,7 @@ review_scopes: foundation,forge,platform
 scope: foundation
 repository: Cyber-AI-Forge
 owner: project maintainers
-status: active
+status: completed
 created: 2026-08-18
 updated: 2026-08-18
 ---
@@ -49,7 +49,7 @@ updated: 2026-08-18
 - [x] 更新同步配置、仓库规则与各作用域文档入口。
 - [x] 增加 Forge 上游、Platform 下游、计划隔离和 CI 行为测试。
 - [x] 完成格式、测试、构建、归档检查和最终差异复核。
-- [ ] 建立新基线，归档完成计划与 AI 日志并创建带 AI trailer 的提交。
+- [x] 建立新基线，归档完成计划与 AI 日志并创建带 AI trailer 的提交。
 
 ## 测试与验证
 
@@ -75,6 +75,8 @@ updated: 2026-08-18
 脚本自查时额外收紧了两项边界：纯 ledger 跨作用域提交不再误判为架构变更；下游只接受位于 managed scope 计划目录中的活动计划，因此只读 Foundation 计划即使声明 `review_scopes: platform` 也不能改变本地 Platform 状态。
 
 生产构建保留现有 Sass legacy API、VueUse pure annotation 和 AdminLayout 动静态混合导入警告；本任务未修改对应前端实现。前端功能仍按仓库约定由维护者人工验收，本任务没有新增或运行前端浏览器测试。
+
+实现提交为 `8b22250c3c8b7e6f1f9852f5c79af65bcca724b5`。该提交后新版审计按预期将 Foundation 与 Platform 报告为 `IN_PROGRESS` 且 `due: true`，Forge 独立保持 `NOT_DUE`；三个作用域完成证据复核后均以该提交建立 v2 基线。
 
 ## 相关设计、ADR 和 AI 日志
 

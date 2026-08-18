@@ -7,7 +7,7 @@
 
 ## 进行中
 
-- [分域文档归档审计重构](active/2026-08-18-scope-owned-documentation-archive-audit.md)：拆分共享归档协议与各所有权作用域状态，使下游只处理 Platform。
+当前没有活动计划。
 
 ## 生命周期
 

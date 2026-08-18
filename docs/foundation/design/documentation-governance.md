@@ -171,3 +171,9 @@ Managed scope 计算提交、ADR、完成计划、时间阈值和立即触发条
 旧版 `version: 1` repository ledger 只作为一次性迁移输入。切换 v2 时，Forge 必须对 Foundation、Forge 和默认 Platform 分别确认旧基线至实现提交之间的证据，再写入各自 `version: 2` ledger。下游业务仓库单独建立自己的 Platform 基线，不复制 Forge 的 Foundation 完成状态。完成迁移后，脚本缺少角色配置或对应 managed ledger 时返回 `BLOCKED`，不静默回退到全仓库任务。
 
 本设计由 [ADR-20260818](../decisions/ADR-20260818-scope-owned-documentation-archive-audit.md)记录，取代 ADR-0033 中单一 Foundation ledger 和全局活动计划的状态模型；按任务范围决定何时启动检查的原则继续保留。
+
+### 实施验证
+
+2026-08-18 已完成 v2 分域审计落地。临时 Git 仓库测试覆盖 Platform 下游只处理 Platform、inherited Foundation 返回 `UPSTREAM_REQUIRED`、一个作用域的计划不能掩盖另一个作用域，以及 inherited 目录中的跨作用域计划不能改变下游 Platform 状态。`pnpm format`、`pnpm format:check`、`pnpm lint`、`pnpm test`、`pnpm build`、所有权检查和归档检查均通过；工具层 8 项测试、后端 143 项测试与 API 契约验证通过。实现提交为 `8b22250c3c8b7e6f1f9852f5c79af65bcca724b5`。
+
+生产构建仍输出既有 Sass legacy API、VueUse annotation 和 AdminLayout chunk 警告，与本次归档治理改动无关。业务平台下游升级时必须显式建立 `platform-downstream` 配置和自己的 Platform ledger；这是同步接入动作，不由 Forge 猜测或覆盖。

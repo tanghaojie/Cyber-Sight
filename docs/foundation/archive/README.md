@@ -44,6 +44,9 @@
 
 ## 完成计划与 AI 协作记录
 
+- 2026-08-18：[分域文档归档审计重构](plans/2026-08-18-scope-owned-documentation-archive-audit.md)及其
+  [AI 协作记录](ai-logs/2026/08/2026-08-18-scope-owned-documentation-archive-audit.md)。
+
 - 2026-08-13：[集中前后端环境文件目录](plans/2026-08-13-env-directory.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-13-env-directory.md)。
 

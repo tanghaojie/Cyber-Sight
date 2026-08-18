@@ -4,7 +4,7 @@ scope: foundation
 repository: Cyber-AI-Forge
 owner: project maintainers
 date: 2026-08-18
-status: active
+status: completed
 downstreamAction: configure-platform-profile
 ---
 
@@ -42,14 +42,16 @@ downstreamAction: configure-platform-profile
 - `pnpm build`：API 契约、后端、前端和 Forge website 生产构建通过；保留既有 Sass、VueUse annotation 和 AdminLayout chunk 警告。
 - `node scripts/architecture/check-ownership.mjs`：通过。
 - `pnpm docs:archive:check`：v2 Forge 上游三个 managed scope 均无断链或失效 ADR。
+- 实现提交 `8b22250c3c8b7e6f1f9852f5c79af65bcca724b5` 后，Foundation 与 Platform 返回 `IN_PROGRESS` 且 `due: true`，Forge 返回 `NOT_DUE`；证明分域状态和 CI 语义生效。
 - 本机依赖目录在首次 pnpm 自检后需要重建；最终按锁文件完整恢复，未产生版本控制改动。
 
 ## 未决问题与下一步
 
-- 以实现提交建立 v2 分域基线并归档本记录。
+没有遗留实现问题。业务平台下游接入本版本时需要从公共模板建立自己的 `platform-downstream` 配置和 Platform 基线，不得复制 Forge 的 Foundation ledger。
 
 ## 相关设计、ADR、计划和提交
 
 - `docs/foundation/design/documentation-governance.md`
 - `docs/foundation/decisions/ADR-20260818-scope-owned-documentation-archive-audit.md`
 - `docs/foundation/plans/active/2026-08-18-scope-owned-documentation-archive-audit.md`
+- 实现提交：`8b22250c3c8b7e6f1f9852f5c79af65bcca724b5`

@@ -1,7 +1,7 @@
 {
   "version": 2,
   "scope": "platform",
-  "lastReviewedCommit": "e8bc4b76a17cddefb83c76eb705100f71ac6bdb4",
-  "lastReviewedAt": "2026-08-13T16:00:00+08:00",
-  "reviewId": "scope-audit-v2-migration"
+  "lastReviewedCommit": "8b22250c3c8b7e6f1f9852f5c79af65bcca724b5",
+  "lastReviewedAt": "2026-08-18T16:03:00+08:00",
+  "reviewId": "scope-owned-archive-audit-v2"
 }

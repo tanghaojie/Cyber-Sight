@@ -4,7 +4,7 @@
 
 ## 进行中
 
-- [分域文档归档审计重构](2026/08/2026-08-18-scope-owned-documentation-archive-audit.md)
+当前没有活动 AI 协作记录。
 
 ## 生命周期
 
