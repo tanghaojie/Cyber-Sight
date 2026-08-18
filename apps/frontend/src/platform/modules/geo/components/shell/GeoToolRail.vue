@@ -56,6 +56,8 @@ defineEmits<{
   background: var(--geo-surface-strong);
   box-shadow: var(--geo-shadow);
   backdrop-filter: blur(18px) saturate(125%);
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .geo-tool-rail__item {
@@ -134,6 +136,8 @@ defineEmits<{
     flex-direction: row;
     justify-content: space-between;
     padding: 5px;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 
   .geo-tool-rail__item {

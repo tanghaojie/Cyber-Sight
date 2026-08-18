@@ -19,6 +19,7 @@ export interface DistanceMeasurementOptions {
   readonly signal: AbortSignal
   onUpdate(distanceMeters: number): void
   onComplete(distanceMeters: number): void
+  onCancel?(): void
 }
 
 export interface DistanceMeasurementSession extends Disposable {}
@@ -47,13 +48,19 @@ function formatDistance(distanceMeters: number): string {
 export class DistanceMeasurementTool implements Disposable {
   private readonly entities = new Set<Entity>()
   private readonly sessions = new Set<DistanceMeasurementSession>()
+  private activeSession?: DistanceMeasurementSession
+  private disposed = false
 
   constructor(private readonly viewer: Viewer) {}
 
   startDistance(options: DistanceMeasurementOptions): DistanceMeasurementSession {
+    if (this.disposed) {
+      throw new Error('Distance measurement tool has been disposed')
+    }
     if (options.signal.aborted) {
       throw new Error('Distance measurement was cancelled before it started')
     }
+    this.activeSession?.dispose()
 
     const positions: Cartesian3[] = []
     const sessionEntities: Entity[] = []
@@ -163,20 +170,36 @@ export class DistanceMeasurementTool implements Disposable {
         }
         disposed = true
         options.signal.removeEventListener('abort', session.dispose)
+        if (typeof window !== 'undefined') {
+          window.removeEventListener('keydown', onKeyDown)
+        }
         if (!handler.isDestroyed()) {
           handler.destroy()
         }
         if (!completed) {
+          options.onCancel?.()
           sessionEntities.forEach((entity) => {
             this.viewer.entities.remove(entity)
             this.entities.delete(entity)
           })
         }
         this.sessions.delete(session)
+        if (this.activeSession === session) {
+          this.activeSession = undefined
+        }
       },
     }
     this.sessions.add(session)
+    this.activeSession = session
     options.signal.addEventListener('abort', session.dispose, { once: true })
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === 'Escape') {
+        session.dispose()
+      }
+    }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('keydown', onKeyDown)
+    }
     return session
   }
 
@@ -190,6 +213,10 @@ export class DistanceMeasurementTool implements Disposable {
   }
 
   dispose(): void {
+    if (this.disposed) {
+      return
+    }
+    this.disposed = true
     this.clear()
   }
 }

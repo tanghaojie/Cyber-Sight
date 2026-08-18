@@ -1,3 +1,3 @@
 # Platform 活动实施计划
 
-- [Geo 前端工作台](2026-08-14-geo-frontend-workspace.md)：分阶段交付动态页面、Viewer 生命周期、纯 Cesium 工具、插件适配、现代化 UI 和旧功能迁移。
+- [Geo 功能交付后的文档归档审查](2026-08-17-geo-documentation-archive-review.md)：记录 Platform 已完成证据，并等待 Forge/Foundation 归档台账接续。

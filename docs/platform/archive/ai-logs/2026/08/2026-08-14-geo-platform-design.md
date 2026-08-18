@@ -4,7 +4,7 @@ scope: platform
 repository: Cyber-Sight
 owner: project maintainers
 date: 2026-08-14
-status: active
+status: completed
 ---
 
 # Geo 模块设计协作记录
@@ -47,6 +47,15 @@ status: active
 - Cesium 官方 Vite 示例要求复制 `Workers`、`ThirdParty`、`Assets` 和 `Widgets` 并配置 `CESIUM_BASE_URL`，本轮使用支持 Node 20 的 `vite-plugin-static-copy@3.1.4`；
 - 首版不要求 ion token，先使用 Cesium 包内 Natural Earth II 静态影像，避免把外部凭据和未确认许可的数据作为 UI 骨架前置条件；
 - 本轮交付动态视图注册、Viewer 生命周期、审定工作台 Shell 和真实相机/场景控制；复杂测量算法仍按计划在工具与插件垂直切片中实现。
+
+## 2026-08-17 完整功能实施续期
+
+- 维护者已将本地 Node 升级到 `24.19.0`，授权使用最新版 Cesium 并继续实施活动计划中的全部剩余功能；
+- npm 官方注册表核对结果为 `cesium@1.144.0`，Node 要求 `>=22.0.0`，本轮据此替换原 `1.140.0` 临时兼容基线；
+- 维护者指定旧项目 `imagery-manager/imagery-sources.ts` 作为底图需求参考。只读核对确认其包含天地图、高德、Google、本地示例和切片调试网格；
+- 旧文件硬编码了天地图客户端令牌，本轮不复制该值。新实现仅从公开前端环境配置读取令牌，无配置时局部禁用对应底图；
+- 高德源标记为 GCJ-02，必须通过适配处理坐标偏移或明确显示限制；第三方瓦片源按浏览器可达性、CORS 和许可作为可配置候选，不把可用性失败升级为 Viewer 整体失败；
+- 维护者明确允许使用子智能体并行开发；主任务负责设计更新、依赖升级、Shell 集成、最终静态验证、文档归档和提交。
 
 ## 只读核对结果
 
@@ -121,6 +130,20 @@ status: active
 - 其他任务组只显示明确的迁移占位，不伪装为已完成能力；右侧属性检查器等待真实选择对象后实现；
 - 未修改后端、API 契约、数据库、权限、菜单 migration 或 Foundation 源码。
 
+## 完整功能实际实现
+
+- 运行环境确认升级到 Node `24.19.0`，前端依赖升级到 `cesium@1.144.0`，继续使用既有 Vite 静态资源复制方案；
+- 新增 plugin registry、capability registry、event bus、插件独立 scope/abort、依赖拓扑安装、逆序销毁、局部 busy/error 和动态 UI contribution 渲染；
+- `GeoWorkspacePage.vue` 改为从 `geo.plugins.ts` 组合数据、视图、场景、标绘、测量、模型、地形和对比八组内置插件，任务轨、面板和检查器不再硬编码业务组件；
+- 数据能力参考旧项目源类型提供 Natural Earth II、天地图影像/矢量及注记、高德影像/矢量及注记、Google 影像/道路/地形候选和调试网格；未复制旧令牌，天地图只读取 `VITE_GEO_TIANDITU_TOKEN`，高德 GCJ-02 默认禁用并说明限制；
+- 数据面板支持影像显示、排序、定位，以及当前会话 GeoJSON、glTF/GLB 和 3D Tiles URL 加载；外部失败保持局部，异步加载绑定插件 `AbortSignal`；
+- 视图和场景面板实现定位、相机参数、2D/3D/哥伦布模式、视距限制、天体、大气、光照、阴影、地球底色和深度检测；
+- 标绘实现点、线、面及当前/全部清理；测量实现点位、距离、面积及结果清理；所有鼠标主交互统一由 `InteractionManager` 互斥和取消；
+- 模型能力通过 `activeTilesetCapability` 消费数据插件当前 3D Tiles，提供高亮、分类、偏移、裁剪、分屏和右侧属性检查器；
+- 地形能力提供批量采样、淹没动画、等高线以及高程、坡度和坡向着色；对比能力提供真实影像图层选择、split slider、播放、暂停和关闭；
+- 并行实现后进行了交叉复核，修正了默认底图兜底层被移除、外部加载跨销毁写入、插件资源重复销毁、地形异步竞态、模型裁剪资源所有权、对比泄漏校验和测量面板无效控制等问题；
+- 未修改后端、共享契约、数据库、权限、菜单 migration 或 Foundation 源码。
+
 ## 验证记录
 
 - `git diff --cached --quiet`：通过，修订前暂存区为空；
@@ -143,18 +166,30 @@ status: active
 - `tools/measurement` 依赖检索：没有 Vue、Pinia、Element Plus、插件和组件导入；
 - 按仓库规则未创建或运行前端自动化、端到端和浏览器测试；视觉、测量交互与连续进出页面仍需维护者人工验收。
 
-## 未决问题与实施时确认项
+完整功能阶段最终验证：
 
-- Cesium 的具体稳定版本和 Vite 静态资源方案，在阶段 1 按当前依赖兼容性确认；
-- 首批预置影像、地形、模型和 3D Tiles 需核对许可、CORS 和客户端令牌要求；
-- 每项旧算法在迁移前判断复用或重写，并记录未迁移原因；
-- Forge 菜单中的 Geo 名称、图标和排序由维护者在菜单管理中确定，不进入 Geo 页面代码。
+- `pnpm format`、`pnpm format:check`：通过；
+- `pnpm build` 内置的前端 `vue-tsc`、`pnpm lint`、`pnpm architecture:check`：通过；
+- `pnpm build`：通过，API contract、后端和前端均成功构建，Cesium 四类静态资源成功复制；
+- 完整 Geo JavaScript chunk 约 `4.28 MB`，gzip 约 `1.16 MB`；Geo CSS 约 `57.44 kB`，gzip 约 `11.06 kB`；仅保留既有 Sass、Rollup 注释和大 chunk 警告；
+- `pnpm docs:archive:check:ci` 返回 `DUE`，原因来自 Foundation 归档台账基线之后的既有 Geo 架构提交。Cyber-Sight 下游任务不得修改 Foundation 台账，而检查脚本不识别 Platform 活动计划，因此创建 Platform 归档审查接续记录并如实保留门禁阻塞，留待明确的 Forge/Foundation 任务推进；
+- 按仓库规则未创建或运行前端自动化、端到端和浏览器测试；1280×720 视觉、全部交互、连续路由进出、外部服务可达性和 WebGL 资源释放仍需维护者人工验收；
+- Forge 菜单中的 `/geo` 记录仍由维护者通过菜单管理创建，不增加 migration。
+- 2026-08-18，维护者确认归档审计把 Platform 触发与 Foundation 活动计划硬编码在一起属于后续 Forge 治理事项，明确授权本次忽略 `docs:archive:check:ci` 的 `DUE` 并按其他提交要求交付；本记录不把该门禁描述为通过。
+
+## 遗留与人工验收边界
+
+- 第三方影像、地形、模型和 3D Tiles 的许可、CORS、限频与区域可达性由实际部署环境和维护者选择决定；候选配置不构成服务稳定性承诺；
+- `VITE_GEO_TIANDITU_TOKEN` 是会暴露给浏览器用户的公开客户端配置，不能放入要求保密的凭据；
+- Forge 菜单中的 Geo 名称、图标和排序由维护者在菜单管理中确定，不进入 Geo 页面代码；
+- 视觉、交互、连续进入/退出和长时间 WebGL 资源行为需维护者人工验收，静态检查与生产构建不能替代这些结论。
 
 以上事项不会改变已确认的纯前端、单页、无管理、无数据库和无用户侧 AI 边界。
 
 ## 关联设计、ADR、计划和提交
 
-- [Geo 前端空间可视化工作台](../../../design/modules/geo.md)
-- [Geo 前端编译期插件架构](../../../decisions/ADR-20260814-geo-frontend-plugin-architecture.md)
-- [Geo 前端工作台实施计划](../../../plans/active/2026-08-14-geo-frontend-workspace.md)
+- [Geo 前端空间可视化工作台](../../../../design/modules/geo.md)
+- [Geo 前端编译期插件架构](../../../../decisions/ADR-20260814-geo-frontend-plugin-architecture.md)
+- [Geo 前端工作台实施计划](../../../plans/2026-08-14-geo-frontend-workspace.md)
+- [Geo 文档归档审查计划](../../../../plans/active/2026-08-17-geo-documentation-archive-review.md)
 - 被纠正的初版设计提交：`45d29def200e01d989437dcf009c331b0207030a`；纯前端范围修正提交：`599a7d10210e23882dd629703f7b16190c390ac7`；动态菜单、Viewer 运行时和插件细化提交：`94615b0a6056304cac085d7371e18d5044d285e2`；Viewer 命名和纯工具/UI 分层修订见本记录所在提交。

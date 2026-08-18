@@ -17,6 +17,7 @@
 - [2026-08-12 Platform 环境变量配置收敛](plans/2026-08-12-runtime-configuration.md)：把品牌元数据、Swagger 元数据和 JWT identity 收敛到环境变量入口。
 - [2026-08-13 Forge 架构更新接入 Cyber-Sight](plans/2026-08-13-forge-architecture-sync.md)：完成 Foundation 同步、Platform 文档迁移和下游边界固化。
 - [2026-08-14 清理已移除推广站引用](plans/2026-08-14-remove-retired-marketing-site-references.md)：清理 README、同步清单、部署配置和当前文档中的失效引用。
+- [2026-08-14 Geo 前端工作台](plans/2026-08-14-geo-frontend-workspace.md)：完成纯前端 Cesium 工作台、编译期插件和通用 Geo 能力迁移。
 
 ## AI 协作记录
 
@@ -28,5 +29,6 @@
 - [2026-08-12 Platform 环境变量配置收敛](ai-logs/2026/08/2026-08-12-runtime-configuration.md)
 - [2026-08-13 Forge 架构更新接入 Cyber-Sight](ai-logs/2026/08/2026-08-13-forge-architecture-sync.md)
 - [2026-08-14 清理已移除推广站引用](ai-logs/2026/08/2026-08-14-remove-retired-marketing-site-references.md)
+- [2026-08-14 Geo 模块设计与实施](ai-logs/2026/08/2026-08-14-geo-platform-design.md)
 
 Sight 等业务平台在自己的仓库维护本目录。

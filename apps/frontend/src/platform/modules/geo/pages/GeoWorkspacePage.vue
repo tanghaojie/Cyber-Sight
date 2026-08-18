@@ -7,7 +7,7 @@
     />
     <div class="geo-map-atmosphere" aria-hidden="true" />
 
-    <template v-if="runtime.state.status === 'ready' && measurementController">
+    <template v-if="runtime.state.status === 'ready'">
       <GeoTopBar
         :title="t('geo.workspace.title')"
         :scene-name="t('geo.workspace.scene')"
@@ -28,25 +28,7 @@
         :close-label="t('geo.tasks.closePanel')"
         @close="closePanel"
       >
-        <MeasurementPanel
-          v-if="activeTaskId === 'measurement'"
-          :controller="measurementController"
-          :title="t('geo.measurement.title')"
-          :distance-label="t('geo.measurement.distance')"
-          :area-label="t('geo.measurement.area')"
-          :height-label="t('geo.measurement.height')"
-          :unavailable-label="t('geo.measurement.unavailable')"
-          :unit-label="t('geo.measurement.unit')"
-          :unit-meters-label="t('geo.measurement.unitMeters')"
-          :unit-kilometers-label="t('geo.measurement.unitKilometers')"
-          :snap-label="t('geo.measurement.snap')"
-          :start-label="t('geo.measurement.start')"
-          :cancel-label="t('geo.measurement.cancel')"
-          :clear-label="t('geo.measurement.clear')"
-          :current-result-label="t('geo.measurement.currentResult')"
-          :empty-result-label="t('geo.measurement.emptyResult')"
-          :exit-hint-label="t('geo.measurement.exitHint')"
-        />
+        <component :is="activePanelComponent" v-if="activePanelComponent" />
         <GeoTaskOverview
           v-else
           :icon="activeTask.icon"
@@ -69,6 +51,16 @@
         @toggle-fullscreen="toggleFullscreen"
       />
 
+      <GeoInspectorFrame
+        v-if="activeInspectorComponent"
+        :title="t('geo.inspector.title')"
+        eyebrow="SELECTION"
+      >
+        <component :is="activeInspectorComponent" />
+      </GeoInspectorFrame>
+
+      <GeoPluginErrors :title="t('geo.plugins.errors')" :errors="runtime.plugins.state.errors" />
+
       <GeoStatusBar
         :longitude="runtime.state.longitude"
         :latitude="runtime.state.latitude"
@@ -76,7 +68,7 @@
         :camera-height="runtime.state.cameraHeight"
         :fps="runtime.state.framesPerSecond"
         :hint="activeHint"
-        :active="measurementController.state.status === 'measuring'"
+        :active="Boolean(runtime.interactions.state.activeId)"
         :longitude-label="t('geo.status.longitude')"
         :latitude-label="t('geo.status.latitude')"
         :height-label="t('geo.status.height')"
@@ -101,22 +93,26 @@
 </template>
 
 <script setup lang="ts">
-import { computed, markRaw, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, type Component } from 'vue'
 import { useLocalization } from '@/foundation/modules/localization/localization'
 import GeoLoadState from '../components/shell/GeoLoadState.vue'
+import GeoInspectorFrame from '../components/shell/GeoInspectorFrame.vue'
 import GeoMapControls from '../components/shell/GeoMapControls.vue'
 import GeoPanelFrame from '../components/shell/GeoPanelFrame.vue'
+import GeoPluginErrors from '../components/shell/GeoPluginErrors.vue'
 import GeoStatusBar from '../components/shell/GeoStatusBar.vue'
 import GeoTaskOverview from '../components/shell/GeoTaskOverview.vue'
 import GeoToolRail, { type GeoTaskRailItem } from '../components/shell/GeoToolRail.vue'
 import GeoTopBar from '../components/shell/GeoTopBar.vue'
 import { provideGeoRuntime } from '../core/geo-context'
+import type {
+  GeoInspectorContribution,
+  GeoPanelContribution,
+  GeoTaskGroupContribution,
+  GeoToolContribution,
+} from '../core/geo-plugin'
 import { createGeoRuntime } from '../core/geo-runtime'
-import MeasurementPanel from '../plugins/measurement/MeasurementPanel.vue'
-import {
-  createMeasurementController,
-  type MeasurementController,
-} from '../plugins/measurement/measurement.controller'
+import { geoPlugins } from '../geo.plugins'
 
 interface GeoTaskItem extends GeoTaskRailItem {
   description: string
@@ -125,13 +121,12 @@ interface GeoTaskItem extends GeoTaskRailItem {
 const { t } = useLocalization()
 const workspaceRoot = ref<HTMLElement>()
 const mapContainer = ref<HTMLElement>()
-const activeTaskId = ref('measurement')
+const activeTaskId = ref('data')
 const panelOpen = ref(true)
-const measurementController = shallowRef<MeasurementController>()
-const runtime = createGeoRuntime()
+const runtime = createGeoRuntime({ plugins: geoPlugins })
 provideGeoRuntime(runtime)
 
-const tasks = computed<readonly GeoTaskItem[]>(function geoTasks() {
+const taskDefinitions = computed<readonly GeoTaskItem[]>(function taskMetadata() {
   return [
     {
       id: 'data',
@@ -164,12 +159,33 @@ const tasks = computed<readonly GeoTaskItem[]>(function geoTasks() {
       description: t('geo.measurement.idleHint'),
     },
     {
-      id: 'analysis',
-      label: t('geo.tasks.analysis'),
+      id: 'model',
+      label: t('geo.tasks.model'),
+      icon: 'grid',
+      description: t('geo.tasks.modelDescription'),
+    },
+    {
+      id: 'terrain',
+      label: t('geo.tasks.terrain'),
       icon: 'chart',
-      description: t('geo.tasks.analysisDescription'),
+      description: t('geo.tasks.terrainDescription'),
+    },
+    {
+      id: 'compare',
+      label: t('geo.tasks.compare'),
+      icon: 'panel',
+      description: t('geo.tasks.compareDescription'),
     },
   ]
+})
+
+const tasks = computed<readonly GeoTaskItem[]>(function geoTasks() {
+  const installedGroupIds = new Set(
+    runtime.plugins
+      .getContributions('group')
+      .map((entry) => (entry.contribution as GeoTaskGroupContribution).id),
+  )
+  return taskDefinitions.value.filter((task) => installedGroupIds.has(task.id))
 })
 const taskRailItems = computed<readonly GeoTaskRailItem[]>(function railItems() {
   return tasks.value.map(function toRailItem(task) {
@@ -177,19 +193,36 @@ const taskRailItems = computed<readonly GeoTaskRailItem[]>(function railItems() 
   })
 })
 const activeTask = computed<GeoTaskItem>(function currentTask() {
-  return tasks.value.find((task) => task.id === activeTaskId.value) ?? tasks.value[0]
+  return (
+    tasks.value.find((task) => task.id === activeTaskId.value) ??
+    tasks.value[0] ??
+    taskDefinitions.value[0]
+  )
 })
+const activePanelComponent = computed<Component | undefined>(function currentPanelComponent() {
+  const activePanelId = runtime.plugins.state.activePanelId
+  if (!panelOpen.value || !activePanelId) {
+    return undefined
+  }
+  const entry = runtime.plugins.getContribution(activePanelId)
+  if (!entry || entry.kind !== 'panel') {
+    return undefined
+  }
+  return (entry.contribution as GeoPanelContribution).component as Component
+})
+const activeInspectorComponent = computed<Component | undefined>(
+  function currentInspectorComponent() {
+    const entry = runtime.plugins.getContributions('inspector').find(function findInspector(item) {
+      return (item.contribution as GeoInspectorContribution).matches(undefined)
+    })
+    return entry ? (entry.contribution as GeoInspectorContribution).component : undefined
+  },
+)
 const activeHint = computed(function currentHint() {
-  if (activeTaskId.value !== 'measurement' || !measurementController.value) {
-    return activeTask.value.description
+  if (runtime.interactions.state.activeId) {
+    return `${t('geo.status.activeTool')} · ${runtime.interactions.state.activeId}`
   }
-  if (measurementController.value.state.status === 'measuring') {
-    return t('geo.measurement.activeHint')
-  }
-  if (measurementController.value.state.status === 'complete') {
-    return t('geo.measurement.completeHint')
-  }
-  return t('geo.measurement.idleHint')
+  return activeTask.value.description
 })
 
 async function mountWorkspace(): Promise<void> {
@@ -197,13 +230,12 @@ async function mountWorkspace(): Promise<void> {
   if (!container) {
     return
   }
-  measurementController.value?.dispose()
-  measurementController.value = undefined
   try {
     await runtime.mount(container)
-    measurementController.value = markRaw(
-      createMeasurementController(runtime.viewerAccess.require(), runtime.interactions),
-    )
+    if (!tasks.value.some((task) => task.id === activeTaskId.value)) {
+      activeTaskId.value = tasks.value[0]?.id ?? 'data'
+    }
+    openTaskPanel(activeTaskId.value)
   } catch {
     // GeoRuntime owns the diagnosable failure state rendered above.
   }
@@ -212,15 +244,34 @@ async function mountWorkspace(): Promise<void> {
 function selectTask(id: string): void {
   if (activeTaskId.value === id) {
     panelOpen.value = !panelOpen.value
+    if (panelOpen.value) {
+      openTaskPanel(id)
+    } else {
+      runtime.plugins.setActivePanel(undefined)
+    }
     return
   }
-  measurementController.value?.cancel()
+  runtime.interactions.cancel('switch')
   activeTaskId.value = id
   panelOpen.value = true
+  openTaskPanel(id)
+}
+
+function openTaskPanel(groupId: string): void {
+  const panelTool = runtime.plugins.getContributions('tool').find(function findPanelTool(entry) {
+    const contribution = entry.contribution as GeoToolContribution
+    return contribution.kind === 'panel' && contribution.groupId === groupId
+  })
+  if (!panelTool) {
+    runtime.plugins.setActivePanel(undefined)
+    return
+  }
+  void runtime.plugins.executeTool(panelTool.id)
 }
 
 function closePanel(): void {
-  measurementController.value?.cancel()
+  runtime.interactions.cancel('cancel')
+  runtime.plugins.setActivePanel(undefined)
   panelOpen.value = false
 }
 
@@ -239,10 +290,11 @@ function handleEscape(event: KeyboardEvent): void {
   if (event.key !== 'Escape') {
     return
   }
-  if (measurementController.value?.state.status === 'measuring') {
-    measurementController.value.cancel()
+  if (runtime.interactions.state.activeId) {
+    runtime.interactions.cancel('cancel')
     return
   }
+  runtime.plugins.setActivePanel(undefined)
   panelOpen.value = false
 }
 
@@ -253,7 +305,6 @@ onMounted(function mountGeoPage() {
 
 onBeforeUnmount(function disposeGeoPage() {
   window.removeEventListener('keydown', handleEscape)
-  measurementController.value?.dispose()
   runtime.dispose()
 })
 </script>

@@ -1,9 +1,27 @@
 <template>
   <div class="measurement-panel">
     <div class="measurement-panel__modes" role="group" :aria-label="title">
-      <button class="is-active" type="button">{{ distanceLabel }}</button>
-      <button type="button" disabled :title="unavailableLabel">{{ areaLabel }}</button>
-      <button type="button" disabled :title="unavailableLabel">{{ heightLabel }}</button>
+      <button
+        :class="{ 'is-active': controller.state.mode === 'distance' }"
+        type="button"
+        @click="startMode('distance')"
+      >
+        {{ distanceLabel }}
+      </button>
+      <button
+        :class="{ 'is-active': controller.state.mode === 'area' }"
+        type="button"
+        @click="startMode('area')"
+      >
+        {{ areaLabel }}
+      </button>
+      <button
+        :class="{ 'is-active': controller.state.mode === 'point' }"
+        type="button"
+        @click="controller.startPoint"
+      >
+        {{ pointLabel ?? '点位' }}
+      </button>
     </div>
 
     <label class="measurement-field">
@@ -16,7 +34,7 @@
 
     <label class="measurement-toggle">
       <span>{{ snapLabel }}<small>Cesium Globe</small></span>
-      <input v-model="snap" type="checkbox" />
+      <input :checked="true" type="checkbox" disabled />
       <i aria-hidden="true" />
     </label>
 
@@ -35,17 +53,17 @@
         <span>{{ currentResultLabel }}</span>
         <button
           type="button"
-          :disabled="controller.state.resultMeters === undefined"
+          :disabled="!hasResult"
           :title="clearLabel"
           :aria-label="clearLabel"
-          @click="controller.clear()"
+          @click="controller.clearCurrent()"
         >
           <AppIcon name="trash" />
         </button>
       </div>
       <div class="measurement-result__value">
         <span aria-hidden="true"><i /><i /><i /></span>
-        <strong v-if="controller.state.resultMeters !== undefined">{{ formattedResult }}</strong>
+        <strong v-if="formattedResult">{{ formattedResult }}</strong>
         <small v-else>{{ emptyResultLabel }}</small>
       </div>
       <p v-if="controller.state.error" class="measurement-result__error">
@@ -67,8 +85,7 @@ const props = defineProps<{
   title: string
   distanceLabel: string
   areaLabel: string
-  heightLabel: string
-  unavailableLabel: string
+  pointLabel?: string
   unitLabel: string
   unitMetersLabel: string
   unitKilometersLabel: string
@@ -82,8 +99,21 @@ const props = defineProps<{
 }>()
 
 const unit = ref<'meters' | 'kilometers'>('kilometers')
-const snap = ref(true)
+const hasResult = computed(function hasMeasurementResult() {
+  return Boolean(
+    props.controller.state.resultMeters !== undefined ||
+    props.controller.state.resultSquareMeters !== undefined ||
+    props.controller.state.point,
+  )
+})
 const formattedResult = computed(function measurementResult() {
+  if (props.controller.state.resultSquareMeters !== undefined) {
+    return `${props.controller.state.resultSquareMeters.toFixed(1)} m²`
+  }
+  if (props.controller.state.point) {
+    const point = props.controller.state.point
+    return `${point.longitude.toFixed(5)}, ${point.latitude.toFixed(5)}`
+  }
   const resultMeters = props.controller.state.resultMeters
   if (resultMeters === undefined) {
     return ''
@@ -99,7 +129,21 @@ function toggleMeasurement(): void {
     props.controller.cancel()
     return
   }
-  props.controller.startDistance()
+  if (props.controller.state.mode === 'area') {
+    props.controller.startArea()
+  } else if (props.controller.state.mode === 'point') {
+    props.controller.startPoint()
+  } else {
+    props.controller.startDistance()
+  }
+}
+
+function startMode(mode: 'distance' | 'area'): void {
+  if (mode === 'distance') {
+    props.controller.startDistance()
+  } else {
+    props.controller.startArea()
+  }
 }
 </script>
 

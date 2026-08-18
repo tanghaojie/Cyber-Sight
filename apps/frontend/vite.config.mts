@@ -27,6 +27,7 @@ function loadLayeredEnvironment(mode: string): Record<string, string> {
     'VITE_APP_CREATOR_NAME',
     'VITE_APP_CREATOR_FULL_NAME',
     'VITE_STORAGE_PREFIX',
+    'VITE_GEO_TIANDITU_TOKEN',
   ]
 
   const scopedValues = function scopedValues(

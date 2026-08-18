@@ -4,7 +4,7 @@ scope: platform
 repository: Cyber-Sight
 status: active
 owner: project maintainers
-updated: 2026-08-14
+updated: 2026-08-17
 ---
 
 # Geo 前端空间可视化工作台
@@ -475,15 +475,30 @@ Cesium Viewer、DataSource、Primitive、ScreenSpaceEventHandler 等对象保持
 
 ### 当前实现状态
 
-首个可运行垂直切片已经落地：
+Geo 前端工作台的计划内代码能力已经落地：
 
-- `registerViews.ts` 已登记组件键 `geo`，页面继续依赖 Forge 菜单的 `/geo`、空布局配置，不增加静态路由；
-- `GeoWorkspacePage.vue` 创建页面级 `GeoRuntime`，Viewer ready 后创建测量 controller，离开页面时按 controller、交互、运行时和 Viewer 顺序清理；
-- 顶部栏、任务轨、上下文面板、右上地图控制、状态条、初始化、失败和重试状态已按审定方向实现；
-- 相机复位、2D/3D、全屏、鼠标经纬度、相机高度和 FPS 已连接真实 Viewer 状态；
-- 距离测量已经形成“纯 `DistanceMeasurementTool` → `MeasurementController` → `MeasurementPanel.vue`”垂直切片，支持单击加点、双击完成、Esc 取消和清除结果；
-- 数据、视图、场景、标绘和分析任务组当前只提供结构化占位说明，具体能力按活动计划后续阶段迁移；右侧属性检查器等待第一个可选择对象插件后再实现；
-- 完整插件注册表、UI contribution 发布、capability registry 和 event bus 尚未实现，当前 Shell 和测量垂直切片不得被描述为完整插件内核。
+- `registerViews.ts` 登记组件键 `geo`，页面继续依赖 Forge 菜单的 `/geo`、空布局配置，不增加静态路由；
+- `GeoWorkspacePage.vue` 创建带内置插件定义的页面级 `GeoRuntime`，由运行时统一安装插件、取消活动交互、逆序释放插件资源并销毁 Viewer；
+- 插件注册表、capability registry、event bus、独立 `DisposableScope`、`AbortSignal`、拓扑安装、重复/缺失/循环依赖校验、局部错误隔离和动态 UI contributions 已实现；
+- 顶部栏、动态任务轨、上下文面板、右侧属性检查器、插件错误提示、右上地图控制、状态条以及初始化、失败和重试状态均按审定方向实现；
+- 数据插件提供多源影像目录、图层显示/排序/定位、GeoJSON、glTF/GLB 和 3D Tiles 会话加载；`activeTilesetCapability` 向模型插件发布当前 3D Tiles，而不是穿透导入插件内部实现；
+- 视图和场景插件提供全球/中国定位、相机参数、2D/3D/哥伦布模式、视距限制以及太阳、月亮、大气、光照、阴影、地球底色、深度检测等设置；
+- 标绘插件提供点、线、面交互和当前/全部结果清理；测量插件提供点位、距离、面积交互和结果清理；两者统一经 `InteractionManager` 互斥；
+- 模型插件提供 3D Tiles 高亮、分类、偏移、裁剪和平面分屏，并通过动态属性检查器展示选中对象；
+- 地形插件提供坐标批量采样、淹没动画、等高线以及高程、坡度、坡向着色；对比插件提供左右影像图层选择、分屏滑块、播放、暂停和关闭；
+- 所有 Cesium 算法保留在不依赖 Vue 的 `tools/**`，插件 controller 负责接入生命周期和 UI，`.vue` 面板只收集输入、展示状态并调用 controller。
+
+旧站通用能力的处理结论如下：
+
+| 旧能力                                         | 当前结论             | 实现方式                                                              |
+| ---------------------------------------------- | -------------------- | --------------------------------------------------------------------- |
+| 相机、坐标、场景模式与环境效果                 | 已迁移并重组         | `view`、`scene` 插件和统一状态条                                      |
+| 多源影像、GeoJSON、模型与 3D Tiles             | 已迁移并收敛         | `data` 插件；令牌、CORS 和坐标限制显式展示                            |
+| 点线面标绘、点位/距离/面积测量                 | 已迁移并重写生命周期 | 纯工具、controller、互斥交互和插件面板                                |
+| 3D Tiles 高亮、分类、偏移、裁剪与分屏          | 已迁移并重组         | `model` 插件消费当前 3D Tiles capability                              |
+| 地形采样、淹没、等高线与地形着色               | 已迁移并增加输入限制 | `terrain` 插件和可取消异步工具                                        |
+| 影像对比                                       | 已迁移               | `compare` 插件使用真实图层选择与 split position                       |
+| `viewer.jt`、全局 Vuex、常驻 Ribbon 和行业大屏 | 废弃或不迁移         | 由页面运行时、编译期插件和现代工作台替代；行业应用不属于 Geo 核心范围 |
 
 桌面是专业操作目标。宽度低于 1024px 时面板覆盖地图而非压缩画布；手机只保证浏览、图层切换和基础相机操作，不承诺复杂标绘与分析体验。
 
@@ -499,11 +514,13 @@ Cesium Viewer、DataSource、Primitive、ScreenSpaceEventHandler 等对象保持
 
 ### 首版运行依赖基线
 
-- 仓库当前 Node 基线为 `20.19.4`；Cesium 锁定为仍支持 Node 20.19 的 `1.140.0`，不采用要求 Node 22 的后续版本；
+- 维护者已把本地运行环境升级为 Node `24.19.0`；Geo 从兼容 Node 20 的临时基线升级到当前 npm 稳定版 `cesium@1.144.0`，其官方 Node 要求为 `>=22.0.0`；
 - Vite 使用 `vite-plugin-static-copy@3.1.4` 复制 Cesium 的 `Workers`、`ThirdParty`、`Assets` 和 `Widgets` 到 `/cesiumStatic/`，开发和生产共用同一 `CESIUM_BASE_URL`；
-- 首版不提交 Cesium ion token，不依赖需要保密的凭据；基础地球影像使用 Cesium 包内的 Natural Earth II 静态资源，后续预置数据源再单独核对许可和 CORS；
+- 默认底图改为旧项目底图配置所采用的多源思路：提供天地图影像/矢量及独立注记、高德影像/矢量及注记、Google 影像/道路/地形候选源，以及 Cesium 本地 Natural Earth II 和切片调试网格；具体可用项由浏览器网络、CORS、许可和运行时配置共同决定；
+- 不复制旧项目中硬编码的天地图令牌。天地图令牌只能通过 `VITE_GEO_TIANDITU_TOKEN` 这类公开客户端运行时配置传入，并在界面中明确客户端令牌会暴露给最终用户；没有令牌时对应源显示为不可用，不影响其他底图；
+- 高德源的 GCJ-02 偏移必须由影像适配层显式处理或标明坐标限制，不能把偏移瓦片当作 WGS84 静默叠加；第三方公开瓦片仅作为可配置候选源，不承诺服务稳定性或商业使用许可；
 - Viewer 自带的后台式控件默认关闭，工作台 Shell 负责相机复位、2D/3D、全屏和状态反馈。
-- Geo 页面被编译为独立懒加载 chunk；当前完整 Viewer chunk 约 `4.13 MB`，gzip 约 `1.11 MB`。该体积不进入主应用首屏，功能稳定后再评估 `@cesium/engine`/widgets 拆分，不以牺牲 Viewer 契约和可维护性换取过早优化。
+- Geo 页面被编译为独立懒加载 chunk；当前完整功能构建的 Geo JavaScript chunk 约 `4.28 MB`，gzip 约 `1.16 MB`，Geo CSS 约 `57.44 kB`，gzip 约 `11.06 kB`。该体积不进入主应用首屏，功能稳定后再评估 `@cesium/engine`/widgets 拆分，不以牺牲 Viewer 契约和可维护性换取过早优化。
 
 Geo 的数据来源仅包括：
 
@@ -553,5 +570,5 @@ AI 辅助开发继续由 Sight 现有仓库能力承担；Geo 文档和源码无
 ## 关联记录
 
 - [Geo 前端编译期插件架构](../../decisions/ADR-20260814-geo-frontend-plugin-architecture.md)
-- [Geo 前端工作台实施计划](../../plans/active/2026-08-14-geo-frontend-workspace.md)
-- [Geo 模块设计协作记录](../../ai-logs/2026/08/2026-08-14-geo-platform-design.md)
+- [Geo 前端工作台实施计划](../../archive/plans/2026-08-14-geo-frontend-workspace.md)
+- [Geo 模块设计协作记录](../../archive/ai-logs/2026/08/2026-08-14-geo-platform-design.md)

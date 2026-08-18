@@ -2,7 +2,7 @@
 title: Geo 前端编译期插件架构
 scope: platform
 repository: Cyber-Sight
-status: proposed
+status: accepted
 owner: project maintainers
 date: 2026-08-14
 supersedes: none
@@ -115,4 +115,4 @@ Geo 当前不存在用户侧 AI 用例。为假设能力建立命令抽象会增
 ## 关联设计
 
 - [Geo 前端空间可视化工作台](../design/modules/geo.md)
-- [Geo 前端工作台实施计划](../plans/active/2026-08-14-geo-frontend-workspace.md)
+- [Geo 前端工作台实施计划](../archive/plans/2026-08-14-geo-frontend-workspace.md)

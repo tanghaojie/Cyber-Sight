@@ -7,6 +7,7 @@ import {
   Math as CesiumMath,
   ScreenSpaceEventHandler,
   ScreenSpaceEventType,
+  SceneMode,
   TileMapServiceImageryProvider,
   Viewer,
 } from 'cesium'
@@ -14,9 +15,11 @@ import 'cesium/Build/Cesium/Widgets/widgets.css'
 import { createDisposableScope, type DisposableScope } from './disposable'
 import { createGeoInteractionManager, type GeoInteractionManager } from './interaction-manager'
 import { createGeoViewerAccess, type GeoViewerAccess } from './viewer-access'
+import { createGeoPluginRegistry, type GeoPluginRegistry } from './plugin-registry'
+import type { GeoPluginDefinition } from './geo-plugin'
 
 export type GeoRuntimeStatus = 'idle' | 'mounting' | 'ready' | 'failed' | 'disposed'
-export type GeoSceneMode = '2d' | '3d'
+export type GeoSceneMode = '2d' | '3d' | 'columbus'
 
 export interface GeoRuntimeState {
   status: GeoRuntimeStatus
@@ -33,6 +36,7 @@ export interface GeoRuntimeState {
 export interface GeoRuntime {
   readonly viewerAccess: GeoViewerAccess
   readonly interactions: GeoInteractionManager
+  readonly plugins: GeoPluginRegistry
   readonly state: Readonly<GeoRuntimeState>
   mount(container: HTMLElement): Promise<void>
   resetCamera(): void
@@ -102,6 +106,19 @@ function registerRuntimeStatus(
   const removeCameraListener = viewer.camera.changed.addEventListener(updateCameraHeight)
   scope.defer(removeCameraListener)
 
+  function updateSceneMode(): void {
+    state.sceneMode =
+      viewer.scene.mode === SceneMode.SCENE2D
+        ? '2d'
+        : viewer.scene.mode === SceneMode.COLUMBUS_VIEW
+          ? 'columbus'
+          : '3d'
+  }
+
+  updateSceneMode()
+  const removeMorphListener = viewer.scene.morphComplete.addEventListener(updateSceneMode)
+  scope.defer(removeMorphListener)
+
   const pointerHandler = new ScreenSpaceEventHandler(viewer.scene.canvas)
   pointerHandler.setInputAction(function updatePointerPosition(
     movement: ScreenSpaceEventHandler.MotionEvent,
@@ -137,9 +154,17 @@ function registerRuntimeStatus(
   scope.defer(removePostRenderListener)
 }
 
-export function createGeoRuntime(): GeoRuntime {
+export interface GeoRuntimeOptions {
+  readonly plugins?: readonly GeoPluginDefinition[]
+}
+
+export function createGeoRuntime(options: GeoRuntimeOptions = {}): GeoRuntime {
   const viewerAccessControl = createGeoViewerAccess()
   const interactions = createGeoInteractionManager()
+  const plugins = createGeoPluginRegistry({
+    definitions: options.plugins ?? [],
+    interactions,
+  })
   const state = reactive<GeoRuntimeState>({
     status: 'idle',
     sceneMode: '3d',
@@ -172,6 +197,10 @@ export function createGeoRuntime(): GeoRuntime {
     state.sceneMode = mode
     if (mode === '2d') {
       currentViewer.scene.morphTo2D(0.8)
+      return
+    }
+    if (mode === 'columbus') {
+      currentViewer.scene.morphToColumbusView(0.8)
       return
     }
     currentViewer.scene.morphTo3D(0.8)
@@ -219,6 +248,7 @@ export function createGeoRuntime(): GeoRuntime {
       )
       configureViewer(viewer)
       await addBundledImagery(viewer)
+      await plugins.install(viewer)
       if (signal.aborted || disposed) {
         destroyViewer(viewer)
         viewer = undefined
@@ -257,6 +287,7 @@ export function createGeoRuntime(): GeoRuntime {
     disposed = true
     mountAbortController?.abort()
     interactions.dispose()
+    plugins.dispose()
     try {
       runtimeScope.dispose()
     } catch (error) {
@@ -271,6 +302,7 @@ export function createGeoRuntime(): GeoRuntime {
   return {
     viewerAccess: viewerAccessControl,
     interactions,
+    plugins,
     state: readonly(state),
     mount,
     resetCamera,

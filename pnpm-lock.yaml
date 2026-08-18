@@ -103,8 +103,8 @@ importers:
         specifier: ^2.3.2
         version: 2.3.2(vue@3.5.35(typescript@5.9.3))
       cesium:
-        specifier: 1.140.0
-        version: 1.140.0
+        specifier: 1.144.0
+        version: 1.144.0
       element-plus:
         specifier: ^2.14.3
         version: 2.14.3(vue@3.5.35(typescript@5.9.3))
@@ -202,16 +202,16 @@ packages:
   '@borewit/text-codec@0.2.2':
     resolution: {integrity: sha512-DDaRehssg1aNrH4+2hnj1B7vnUGEjU6OIlyRdkMd0aUdIUvKXrJfXsy8LVtXAy7DRvYVluWbMspsRhz2lcW0mQ==}
 
-  '@cesium/engine@24.0.0':
-    resolution: {integrity: sha512-zJ2gl0tyw/FFhBtvp6UYw+0JQJb2J9EiTJYvVSndc6+6qPR5GHLFzFjA1msLLxucfcpc7uI9R2pXNEPluheR/g==}
-    engines: {node: '>=20.19.0'}
+  '@cesium/engine@26.2.0':
+    resolution: {integrity: sha512-BsfHZpg6LvlUSaTfvzfEzo9JQd9+PtMbzoylwls+aRj6bnqGNTF5F2sMC1eja5L3wg725NyiWQ8s84sIM9Dr6g==}
+    engines: {node: '>=22.0.0'}
 
   '@cesium/wasm-splats@0.1.0-alpha.2':
     resolution: {integrity: sha512-t9pMkknv31hhIbLpMa8yPvmqfpvs5UkUjgqlQv9SeO8VerCXOYnyP8/486BDaFrztM0A7FMbRjsXtNeKvqQghA==}
 
-  '@cesium/widgets@14.5.0':
-    resolution: {integrity: sha512-h/hKVooXyOtUQJUtrfyBFGMIXb+Q3RLwqE6FzXfzyC0JQuuThLXCz8nRzCPbyiRuAR/aAYT/jbbhQrUxfiWqhQ==}
-    engines: {node: '>=20.19.0'}
+  '@cesium/widgets@16.1.1':
+    resolution: {integrity: sha512-um2JznRouJ2pfC0FNnEgJJU7WrCDrYFeyqCdiSsdbZgdW4q/R9ysDpj0VO/H2U4r4t6HDn9pA3HgAYpuIsdUWg==}
+    engines: {node: '>=22.0.0'}
 
   '@csstools/color-helpers@5.1.0':
     resolution: {integrity: sha512-S11EXWJyy0Mz5SYvRmY8nJYTFFd1LCNV+7cXyAgQtOOuzb4EsgfqDufL+9esx72/eLhsRdGZwaldu/h+E4t4BA==}
@@ -1807,9 +1807,9 @@ packages:
     resolution: {integrity: sha512-+ys997U96po4Kx/ABpBCqhA9EuxJaQWDQg7295H4hBphv3IZg0boBKuwYpt4YXp6MZ5AmZQnU/tyMTlRpaSejg==}
     engines: {node: '>= 0.4'}
 
-  cesium@1.140.0:
-    resolution: {integrity: sha512-3RvW0rvZWuXiS6regtNE5u9vt0uXohgpsRBIo6Qc922IIIamkitYiEdr4fg+u4qX4EoK9xS3BosCza7iPOExEQ==}
-    engines: {node: '>=20.19.0'}
+  cesium@1.144.0:
+    resolution: {integrity: sha512-g1TX13KvTUhX9zjlJNn3De5BwuHyzuQzp1+1ITpGJJmIORCGnxVKAiu9/OkQByTWNYKgNtoEuPLrnWFhl0ao5g==}
+    engines: {node: '>=22.0.0'}
 
   chai@5.3.3:
     resolution: {integrity: sha512-4zNhdJD/iOjSH0A05ea+Ke6MU5mmpQcbQsSOkgdaUMJ9zTlDTD/GYlwohmIE2u0gaxHYiVHEn1Fw9mZ/ktJWgw==}
@@ -2142,8 +2142,8 @@ packages:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
 
-  earcut@3.2.3:
-    resolution: {integrity: sha512-vnS4AVwp1KHAF13i1vp1/2D5evWy3k5u/iW/B81QVsUZtV8cv2tU0b2VNFlqvh4kYwrFMDdjPCfAmfyJW9y14Q==}
+  earcut@3.0.2:
+    resolution: {integrity: sha512-X7hshQbLyMJ/3RPhyObLARM2sNxxmRALLKx1+NVFFnQ9gKzmCrxm9+uLIAdBcvc8FNLpctqlQ2V6AE92Ol9UDQ==}
 
   ecdsa-sig-formatter@1.0.11:
     resolution: {integrity: sha512-nagl3RYrbNv6kQkeJIpt6NJZy8twLB/2vtz6yN9Z4vRKHN4/QZJIEbqohALSgwKdnksuY3k5Addp5lg8sVoVcQ==}
@@ -3204,8 +3204,8 @@ packages:
     resolution: {integrity: sha512-I4Prw6ivkd6p8PiYR1tXASOAOBzIJwu0TB7fqaX0c/8c3QAehNYmX57EijyGGGBt3c/BIowGwV03RVBtXvHEVg==}
     engines: {node: '>=18'}
 
-  pako@2.2.0:
-    resolution: {integrity: sha512-zJq6RP/5q+TO2OpFV3FHzlPnFjmkb7Nc99a5SNjJE+uu/PkpChs+NIZSSzbBoD+6kjiISXjfYdwj1ZRQ81dz/w==}
+  pako@3.0.1:
+    resolution: {integrity: sha512-GupotUUI0mlhugKjUs4bjOwLt3nrehy9Ys2dxC0GtgVef5cnKggkDMmf2bq2poCCuVXopWPmqsc9VDT2iJUy+w==}
 
   parse5@7.3.0:
     resolution: {integrity: sha512-IInvU7fabl34qmi9gY8XOVxhYyMyuH2xUNpb2q8/Y+7552KlejkRvqvD19nMoUW/uQGGbqNpA6Tufu5FL5BZgw==}
@@ -4188,7 +4188,7 @@ snapshots:
 
   '@borewit/text-codec@0.2.2': {}
 
-  '@cesium/engine@24.0.0':
+  '@cesium/engine@26.2.0':
     dependencies:
       '@cesium/wasm-splats': 0.1.0-alpha.2
       '@spz-loader/core': 0.3.1
@@ -4198,7 +4198,7 @@ snapshots:
       bitmap-sdf: 1.0.4
       dompurify: 3.4.13
       draco3d: 1.5.7
-      earcut: 3.2.3
+      earcut: 3.0.2
       grapheme-splitter: 1.0.4
       jsep: 1.4.0
       kdbush: 4.1.0
@@ -4206,7 +4206,7 @@ snapshots:
       lerc: 2.0.0
       mersenne-twister: 1.1.0
       meshoptimizer: 1.2.0
-      pako: 2.2.0
+      pako: 3.0.1
       protobufjs: 8.7.2
       rbush: 4.0.1
       topojson-client: 3.1.0
@@ -4214,9 +4214,9 @@ snapshots:
 
   '@cesium/wasm-splats@0.1.0-alpha.2': {}
 
-  '@cesium/widgets@14.5.0':
+  '@cesium/widgets@16.1.1':
     dependencies:
-      '@cesium/engine': 24.0.0
+      '@cesium/engine': 26.2.0
       nosleep.js: 0.12.0
 
   '@csstools/color-helpers@5.1.0':
@@ -5461,10 +5461,11 @@ snapshots:
       call-bind-apply-helpers: 1.0.2
       get-intrinsic: 1.3.0
 
-  cesium@1.140.0:
+  cesium@1.144.0:
     dependencies:
-      '@cesium/engine': 24.0.0
-      '@cesium/widgets': 14.5.0
+      '@cesium/engine': 26.2.0
+      '@cesium/widgets': 16.1.1
+      protobufjs: 8.7.2
 
   chai@5.3.3:
     dependencies:
@@ -5723,7 +5724,7 @@ snapshots:
       es-errors: 1.3.0
       gopd: 1.2.0
 
-  earcut@3.2.3: {}
+  earcut@3.0.2: {}
 
   ecdsa-sig-formatter@1.0.11:
     dependencies:
@@ -7018,7 +7019,7 @@ snapshots:
 
   p-map@7.0.6: {}
 
-  pako@2.2.0: {}
+  pako@3.0.1: {}
 
   parse5@7.3.0:
     dependencies:

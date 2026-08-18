@@ -8,6 +8,7 @@ interface ImportMetaEnv {
   readonly VITE_APP_CREATOR_NAME?: string
   readonly VITE_APP_CREATOR_FULL_NAME?: string
   readonly VITE_STORAGE_PREFIX?: string
+  readonly VITE_GEO_TIANDITU_TOKEN?: string
   readonly VITE_PORT?: string
   readonly VITE_BACKEND_PORT?: string
 }

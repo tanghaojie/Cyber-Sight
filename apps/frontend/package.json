@@ -10,7 +10,7 @@
   "dependencies": {
     "@cyber-ai-forge/api-contract": "workspace:*",
     "@element-plus/icons-vue": "^2.3.2",
-    "cesium": "1.140.0",
+    "cesium": "1.144.0",
     "element-plus": "^2.14.3",
     "js-cookie": "^3.0.8",
     "pinia": "^2.2.0",

@@ -10,7 +10,8 @@ export interface GeoInteractionContext {
 export interface GeoInteractionDefinition {
   readonly id: string
   readonly cursor?: string
-  start(context: GeoInteractionContext): Disposable | void
+  start(context: GeoInteractionContext): Disposable | void | Promise<Disposable | void>
+  onError?(error: unknown): void
 }
 
 export interface GeoInteractionState {
@@ -21,8 +22,10 @@ export interface GeoInteractionState {
 export interface GeoInteractionManager extends Disposable {
   readonly state: Readonly<GeoInteractionState>
   activate(definition: GeoInteractionDefinition): void
-  cancel(): void
+  cancel(reason?: GeoInteractionCancelReason): void
 }
+
+export type GeoInteractionCancelReason = 'switch' | 'cancel' | 'complete' | 'dispose' | 'error'
 
 interface ActiveInteraction {
   readonly definition: GeoInteractionDefinition
@@ -34,7 +37,7 @@ export function createGeoInteractionManager(): GeoInteractionManager {
   const state = reactive<GeoInteractionState>({})
   let activeInteraction: ActiveInteraction | undefined
 
-  function finish(active: ActiveInteraction): void {
+  function finish(active: ActiveInteraction, _reason: GeoInteractionCancelReason): void {
     if (activeInteraction !== active) {
       return
     }
@@ -49,14 +52,14 @@ export function createGeoInteractionManager(): GeoInteractionManager {
     }
   }
 
-  function cancel(): void {
+  function cancel(reason: GeoInteractionCancelReason = 'cancel'): void {
     if (activeInteraction) {
-      finish(activeInteraction)
+      finish(activeInteraction, reason)
     }
   }
 
   function activate(definition: GeoInteractionDefinition): void {
-    cancel()
+    cancel('switch')
     const scope = createDisposableScope()
     const abortController = new AbortController()
     const active = { definition, abortController, scope }
@@ -65,24 +68,36 @@ export function createGeoInteractionManager(): GeoInteractionManager {
     state.cursor = definition.cursor
 
     try {
-      const resource = definition.start({
+      const result = definition.start({
         signal: abortController.signal,
         scope,
         complete() {
-          finish(active)
+          finish(active, 'complete')
         },
       })
-      if (resource) {
-        scope.use(resource)
-      }
+      Promise.resolve(result)
+        .then(function registerInteractionResource(resource) {
+          if (resource && !abortController.signal.aborted && activeInteraction === active) {
+            scope.use(resource)
+          } else if (resource) {
+            resource.dispose()
+          }
+        })
+        .catch(function handleInteractionError(error: unknown) {
+          if (activeInteraction === active) {
+            finish(active, 'error')
+          }
+          definition.onError?.(error)
+        })
     } catch (error) {
-      finish(active)
+      finish(active, 'error')
+      definition.onError?.(error)
       throw error
     }
   }
 
   function dispose(): void {
-    cancel()
+    cancel('dispose')
   }
 
   return {
