@@ -39,6 +39,10 @@ status: completed
 
 无新的 Platform 文档治理阻塞。外部瓦片服务的网络可达性和令牌配置仍属于运行环境与人工验收边界。
 
+## 关联提交
+
+- 归档复核提交：`a9d350066b97c2264443bf7d10256283d90c429d`。
+
 ## 相关记录
 
 - [本次复核计划](../../../plans/2026-08-20-geo-documentation-archive-review.md)

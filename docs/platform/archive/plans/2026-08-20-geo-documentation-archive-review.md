@@ -59,6 +59,10 @@ trigger_commit: e9e68d0d3eef715cf6c2bdf13c4ad4077ab50f52
 
 本次复核未发现需要归档的旧 Platform Geo 设计或 ADR。底图服务是否可用仍取决于本地令牌和外部网络；浏览器人工验收不能替代真实生产网络、令牌和人工视觉验收。
 
+## 实际结果与关联提交
+
+- 归档复核提交：`a9d350066b97c2264443bf7d10256283d90c429d`。
+
 ## 相关设计、ADR 和 AI 日志
 
 - [Geo 当前设计](../../design/modules/geo.md)
