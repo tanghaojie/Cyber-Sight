@@ -30,7 +30,14 @@ export interface CompareController extends Disposable {
   disable(): void
 }
 
-export function createCompareController(viewer: Viewer): CompareController {
+export interface CompareControllerOptions {
+  readonly getLayerName?: (index: number) => string | undefined
+}
+
+export function createCompareController(
+  viewer: Viewer,
+  options: CompareControllerOptions = {},
+): CompareController {
   const tool = markRaw(new SceneCompareTool(viewer))
   const state = reactive<CompareState>({ enabled: false, splitPosition: 0.5, layers: [] })
   let session: SceneCompareSession | undefined
@@ -38,7 +45,7 @@ export function createCompareController(viewer: Viewer): CompareController {
   function refreshLayers(): void {
     state.layers = Array.from({ length: viewer.imageryLayers.length }, (_, index) => ({
       index,
-      label: `图层 ${index + 1}`,
+      label: options.getLayerName?.(index) ?? `图层 ${index + 1}`,
     }))
   }
 

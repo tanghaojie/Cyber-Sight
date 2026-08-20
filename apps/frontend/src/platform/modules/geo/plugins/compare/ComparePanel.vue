@@ -48,20 +48,6 @@
       />
     </label>
     <div class="geo-tool-panel__grid">
-      <button
-        type="button"
-        :disabled="!controller.state.enabled"
-        @click="controller.setEnabled(false)"
-      >
-        暂停
-      </button>
-      <button
-        type="button"
-        :disabled="controller.state.enabled"
-        @click="controller.setEnabled(true)"
-      >
-        显示
-      </button>
       <button type="button" @click="controller.disable">关闭对比</button>
     </div>
     <p v-if="controller.state.error" class="geo-tool-panel__error">{{ controller.state.error }}</p>

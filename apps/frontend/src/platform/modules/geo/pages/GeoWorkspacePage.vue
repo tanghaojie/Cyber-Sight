@@ -341,6 +341,10 @@ onBeforeUnmount(function disposeGeoPage() {
   background: radial-gradient(circle at 58% 38%, rgba(32, 90, 130, 0.4), transparent 30%), #07111c;
 }
 
+.geo-map-host :global(canvas) {
+  cursor: grab !important;
+}
+
 .geo-map-atmosphere {
   z-index: 5;
   pointer-events: none;

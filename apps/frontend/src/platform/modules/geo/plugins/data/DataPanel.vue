@@ -33,6 +33,15 @@
         </button>
       </div>
 
+      <label class="data-panel__toggle" title="开启后允许添加高德 GCJ-02 候选图层">
+        <input
+          type="checkbox"
+          :checked="controller.state.gcj02Enabled"
+          @change="controller.setGcj02Enabled(($event.target as HTMLInputElement).checked)"
+        />
+        <span>启用高德 GCJ-02 坐标校正</span>
+      </label>
+
       <div class="data-panel__catalog" aria-live="polite">
         <section
           v-for="group in filteredSourceGroups"
@@ -57,36 +66,33 @@
             <div class="data-panel__source-head">
               <div>
                 <strong>{{ item.source.label }}</strong>
-                <small
-                  >{{ item.source.coordinateSystem }} ·
-                  {{ sourceRoleLabel(item.source.role) }}</small
-                >
+                <small>{{ item.source.coordinateSystem }}</small>
               </div>
-              <span class="data-panel__source-status" :class="`is-${sourceStatusTone(item)}`">
-                {{ sourceStatus(item) }}
-              </span>
+              <div class="data-panel__source-tools">
+                <button
+                  class="data-panel__source-info"
+                  type="button"
+                  :title="item.source.description"
+                  :aria-label="`${item.source.label}描述`"
+                >
+                  i
+                </button>
+                <span class="data-panel__source-status" :class="`is-${sourceStatusTone(item)}`">
+                  {{ sourceStatus(item) }}
+                </span>
+                <button
+                  class="data-panel__source-action"
+                  type="button"
+                  :disabled="
+                    controller.state.busy || !item.availability.available || Boolean(item.layer)
+                  "
+                  :title="item.availability.reason || item.source.description"
+                  @click="addSource(item.source.id)"
+                >
+                  {{ sourceActionLabel(item) }}
+                </button>
+              </div>
             </div>
-            <p>{{ item.source.description }}</p>
-            <button
-              class="data-panel__source-action"
-              type="button"
-              :disabled="
-                controller.state.busy || !item.availability.available || Boolean(item.layer)
-              "
-              :title="item.availability.reason || item.source.description"
-              @click="addSource(item.source.id)"
-            >
-              {{ sourceActionLabel(item) }}
-            </button>
-            <small v-if="item.availability.reason" class="data-panel__source-message is-reason">
-              {{ item.availability.reason }}
-            </small>
-            <small v-else-if="item.layer?.error" class="data-panel__source-message is-error">
-              {{ item.layer.error }}
-            </small>
-            <small v-else-if="item.availability.warning" class="data-panel__source-message">
-              {{ item.availability.warning }}
-            </small>
           </article>
         </section>
         <p v-if="!filteredSourceGroups.length" class="data-panel__empty">没有匹配的数据源</p>
@@ -169,7 +175,6 @@
               ×
             </button>
           </div>
-          <small v-if="layer.warning" class="data-panel__warning">{{ layer.warning }}</small>
           <small v-if="layer.error" class="data-panel__error">{{ layer.error }}</small>
         </div>
       </div>
@@ -383,10 +388,6 @@ const filteredSourceGroups = computed<readonly ImagerySourceGroup[]>(function fi
     .filter((group) => group.sources.length > 0)
 })
 
-function sourceRoleLabel(role: GeoImagerySourceDefinition['role']): string {
-  return roleLabels[role]
-}
-
 function sourceStatus(item: ImagerySourceItem): string {
   if (item.loading) {
     return '加载中'
@@ -557,6 +558,19 @@ async function loadTileset(): Promise<void> {
   color: var(--geo-text, #eff8ff);
   background: color-mix(in srgb, var(--geo-accent, #45c8ff), transparent 87%);
 }
+.data-panel__toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 24px;
+  color: var(--geo-text-faint, #7890a2);
+  cursor: pointer;
+  font-size: 9px;
+}
+.data-panel__toggle input {
+  margin: 0;
+  accent-color: var(--geo-accent, #45c8ff);
+}
 .data-panel__catalog {
   display: grid;
   gap: 13px;
@@ -593,9 +607,11 @@ async function loadTileset(): Promise<void> {
   text-transform: uppercase;
 }
 .data-panel__source {
-  display: grid;
+  display: flex;
+  align-items: center;
   gap: 7px;
-  padding: 10px;
+  min-height: 34px;
+  padding: 5px 7px;
   border: 1px solid var(--geo-line, #263c4e);
   border-radius: 11px;
   background: color-mix(in srgb, var(--geo-surface-strong, #0e1c2a), transparent 12%);
@@ -622,9 +638,10 @@ async function loadTileset(): Promise<void> {
 }
 .data-panel__source-head {
   display: flex;
-  align-items: start;
+  align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 7px;
+  width: 100%;
 }
 .data-panel__source-head > div {
   min-width: 0;
@@ -639,9 +656,35 @@ async function loadTileset(): Promise<void> {
 }
 .data-panel__source-head small {
   display: block;
-  margin-top: 3px;
+  margin-top: 2px;
   color: var(--geo-text-faint, #7890a2);
   font-size: 8px;
+}
+.data-panel__source-tools {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+}
+.data-panel__source-info {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid var(--geo-line, #263c4e);
+  border-radius: 50%;
+  color: var(--geo-text-faint, #7890a2);
+  background: transparent;
+  cursor: help;
+  font-family: Georgia, serif;
+  font-size: 11px;
+  font-style: italic;
+  line-height: 16px;
+}
+.data-panel__source-info:hover,
+.data-panel__source-info:focus-visible {
+  outline: 0;
+  border-color: var(--geo-accent, #45c8ff);
+  color: var(--geo-accent, #45c8ff);
 }
 .data-panel__source-status {
   flex: 0 0 auto;
@@ -680,7 +723,8 @@ async function loadTileset(): Promise<void> {
   -webkit-line-clamp: 2;
 }
 .data-panel__source-action {
-  min-height: 29px;
+  min-height: 24px;
+  padding: 0 7px;
   border: 1px solid color-mix(in srgb, var(--geo-accent, #45c8ff), transparent 52%);
   border-radius: 7px;
   color: var(--geo-accent, #45c8ff);
@@ -701,15 +745,6 @@ async function loadTileset(): Promise<void> {
   background: var(--geo-surface-hover, #1b2a38);
   cursor: not-allowed;
   opacity: 0.85;
-}
-.data-panel__source-message {
-  color: #ffdc8a;
-  font-size: 8px;
-  line-height: 1.45;
-}
-.data-panel__source-message.is-reason,
-.data-panel__source-message.is-error {
-  color: #ffb0b8;
 }
 .data-panel__empty {
   margin: 0;
@@ -776,7 +811,6 @@ async function loadTileset(): Promise<void> {
   color: var(--geo-text, #eff8ff);
   background: var(--geo-surface-hover, #1b2a38);
 }
-.data-panel__warning,
 .data-panel__error {
   color: #ffcb78;
   font-size: 9px;

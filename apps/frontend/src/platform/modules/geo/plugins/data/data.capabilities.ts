@@ -2,6 +2,10 @@ import type { Cesium3DTileset } from 'cesium'
 import type { Disposable, DisposableScope } from '../../core/disposable'
 import { createGeoCapabilityToken } from '../../core/capability-registry'
 
+export interface ImageryLayerNamesCapability {
+  getName(index: number): string | undefined
+}
+
 export interface ActiveTilesetCapability {
   readonly current: Cesium3DTileset | undefined
   getCurrent(): Cesium3DTileset | undefined
@@ -17,6 +21,9 @@ export interface ActiveTilesetCapabilityPublisher extends ActiveTilesetCapabilit
 
 export const activeTilesetCapability =
   createGeoCapabilityToken<ActiveTilesetCapability>('data.activeTileset')
+
+export const imageryLayerNamesCapability =
+  createGeoCapabilityToken<ImageryLayerNamesCapability>('data.imageryLayerNames')
 
 export function createActiveTilesetCapability(): ActiveTilesetCapabilityPublisher {
   let current: Cesium3DTileset | undefined

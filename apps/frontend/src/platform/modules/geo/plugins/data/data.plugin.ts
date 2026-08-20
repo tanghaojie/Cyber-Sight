@@ -1,7 +1,11 @@
 import { defineComponent, h } from 'vue'
 import DataPanel from './DataPanel.vue'
 import type { GeoPluginDefinition, GeoPluginContext } from '../../core/geo-plugin'
-import { activeTilesetCapability, createActiveTilesetCapability } from './data.capabilities'
+import {
+  activeTilesetCapability,
+  createActiveTilesetCapability,
+  imageryLayerNamesCapability,
+} from './data.capabilities'
 import {
   createGeoDataController,
   type GeoDataController,
@@ -42,6 +46,15 @@ export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): Geo
         onActiveTilesetChange: activeTileset.setCurrent,
       })
       context.scope.use(controller)
+      context.capabilities.provide(
+        imageryLayerNamesCapability,
+        {
+          getName(index: number) {
+            return controller.state.imagery.find((layer) => layer.index === index)?.label
+          },
+        },
+        context.scope,
+      )
       if (!context.signal.aborted && !context.viewer.isDestroyed()) {
         const defaultSourceId = pluginOptions.tiandituToken?.trim()
           ? 'tianditu-image'

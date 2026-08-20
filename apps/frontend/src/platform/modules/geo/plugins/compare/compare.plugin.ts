@@ -2,6 +2,7 @@ import { defineComponent, h } from 'vue'
 import type { GeoPluginDefinition, GeoPluginContext } from '../../core/geo-plugin'
 import ComparePanel from './ComparePanel.vue'
 import { createCompareController, type CompareController } from './compare.controller'
+import { imageryLayerNamesCapability } from '../data/data.capabilities'
 
 function panelFor(controller: CompareController) {
   return defineComponent({
@@ -15,8 +16,12 @@ function panelFor(controller: CompareController) {
 export const comparePlugin: GeoPluginDefinition = {
   id: 'compare',
   order: 80,
+  requires: ['data'],
   install(context: GeoPluginContext) {
-    const controller = createCompareController(context.viewer)
+    const imageryLayerNames = context.capabilities.require(imageryLayerNamesCapability)
+    const controller = createCompareController(context.viewer, {
+      getLayerName: imageryLayerNames.getName,
+    })
     context.scope.use(controller)
     return {
       contributions: {
