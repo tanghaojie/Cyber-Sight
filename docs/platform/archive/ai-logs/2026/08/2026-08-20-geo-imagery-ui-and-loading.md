@@ -49,4 +49,4 @@ status: completed
 - [Geo 前端空间可视化工作台](../../../../design/modules/geo.md)
 - [Geo 影像默认源与失败隔离](../../../../decisions/ADR-20260820-geo-imagery-defaults.md)
 - [Geo 底图目录交互与默认加载修复计划](../../../../archive/plans/2026-08-20-geo-imagery-ui-and-loading.md)
-- 提交：待创建后补充
+- 提交：`d294531d92c33299d26dc6a72908d06652f08a89`
