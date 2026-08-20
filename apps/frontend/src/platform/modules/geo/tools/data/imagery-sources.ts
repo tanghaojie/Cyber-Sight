@@ -298,7 +298,7 @@ export function createGeoImageryCatalog(): readonly GeoImagerySourceDefinition[]
       coordinateSystem: 'WGS84',
       role: 'candidate',
       createProvider: () =>
-        createGoogleProvider('https://mt{s}.google.cn/vt/lyrs=y&hl=zh-CN&x={x}&y={y}&z={z}'),
+        createGoogleProvider('https://mt{s}.google.com/vt/lyrs=y&hl=zh-CN&x={x}&y={y}&z={z}'),
       checkAvailability: () => ({
         available: true,
         warning: '候选源的访问、CORS 和商业许可需要由部署方确认',
@@ -312,7 +312,7 @@ export function createGeoImageryCatalog(): readonly GeoImagerySourceDefinition[]
       coordinateSystem: 'WGS84',
       role: 'candidate',
       createProvider: () =>
-        createGoogleProvider('https://mt{s}.google.cn/vt/lyrs=s&hl=zh-CN&x={x}&y={y}&z={z}'),
+        createGoogleProvider('https://mt{s}.google.com/vt/lyrs=s&hl=zh-CN&x={x}&y={y}&z={z}'),
       checkAvailability: () => ({
         available: true,
         warning: '候选源的访问、CORS 和商业许可需要由部署方确认',
@@ -326,7 +326,7 @@ export function createGeoImageryCatalog(): readonly GeoImagerySourceDefinition[]
       coordinateSystem: 'WGS84',
       role: 'candidate',
       createProvider: () =>
-        createGoogleProvider('https://mt{s}.google.cn/vt/lyrs=h&hl=zh-CN&x={x}&y={y}&z={z}'),
+        createGoogleProvider('https://mt{s}.google.com/vt/lyrs=h&hl=zh-CN&x={x}&y={y}&z={z}'),
       checkAvailability: () => ({
         available: true,
         warning: '候选源的访问、CORS 和商业许可需要由部署方确认',
