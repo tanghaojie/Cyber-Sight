@@ -22,6 +22,7 @@
 - [2026-08-14 Geo 前端工作台](plans/2026-08-14-geo-frontend-workspace.md)：完成纯前端 Cesium 工作台、编译期插件和通用 Geo 能力迁移。
 - [2026-08-17 Geo 文档归档审查](plans/2026-08-17-geo-documentation-archive-review.md)：完成旧归档门禁接续并迁移到分域审计。
 - [2026-08-20 Forge 上游同步](plans/2026-08-20-forge-upstream-sync.md)：合并 Forge `70dbfbd` 并建立 Cyber-Sight Platform 审计基线。
+- [2026-08-20 Geo 底图目录交互与默认加载修复](plans/2026-08-20-geo-imagery-ui-and-loading.md)：修复底图目录扩展性、不可用源提示和远程候选默认加载导致的失败请求。
 
 ## AI 协作记录
 
@@ -36,5 +37,6 @@
 - [2026-08-14 Geo 模块设计与实施](ai-logs/2026/08/2026-08-14-geo-platform-design.md)
 - [2026-08-17 Geo 文档归档审查](ai-logs/2026/08/2026-08-17-geo-documentation-archive-review.md)
 - [2026-08-20 Forge 上游同步](ai-logs/2026/08/2026-08-20-forge-upstream-sync.md)
+- [2026-08-20 Geo 底图目录交互与默认加载修复](ai-logs/2026/08/2026-08-20-geo-imagery-ui-and-loading.md)
 
 Sight 等业务平台在自己的仓库维护本目录。

@@ -93,6 +93,23 @@ defineEmits<{ close: [] }>()
   min-height: 0;
   overflow: auto;
   padding: 18px;
+  scrollbar-color: color-mix(in srgb, var(--geo-accent), transparent 38%) transparent;
+  scrollbar-width: thin;
+}
+
+.geo-panel__body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.geo-panel__body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.geo-panel__body::-webkit-scrollbar-thumb {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--geo-accent), transparent 45%);
+  background-clip: padding-box;
 }
 
 @keyframes geo-panel-enter {

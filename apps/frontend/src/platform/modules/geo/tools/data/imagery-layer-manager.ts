@@ -20,6 +20,10 @@ export interface GeoImageryLayerSnapshot {
   readonly warning?: string
 }
 
+export interface GeoImageryLayerManagerOptions {
+  readonly onChange?: () => void
+}
+
 export interface AddImageryLayerOptions extends GeoImagerySourceOptions {
   readonly id?: string
   readonly show?: boolean
@@ -33,6 +37,7 @@ interface ManagedImageryLayer {
   readonly definition: GeoImagerySourceDefinition
   readonly layer: ImageryLayer
   readonly removeErrorListener?: () => void
+  status: 'ready' | 'failed'
   error?: string
   warning?: string
 }
@@ -69,6 +74,7 @@ function normalizeId(sourceId: GeoImagerySourceId, requestedId?: string): string
 export function createGeoImageryLayerManager(
   viewer: Viewer,
   catalog: readonly GeoImagerySourceDefinition[] = createGeoImageryCatalog(),
+  managerOptions: GeoImageryLayerManagerOptions = {},
 ): GeoImageryLayerManager {
   const definitions = new Map(
     catalog.map(function mapDefinition(definition) {
@@ -108,7 +114,7 @@ export function createGeoImageryLayerManager(
       show: managed.layer.show,
       alpha: managed.layer.alpha,
       index: viewer.imageryLayers.indexOf(managed.layer),
-      status: managed.error ? 'failed' : 'ready',
+      status: managed.status,
       error: managed.error,
       warning: managed.warning,
     }
@@ -158,6 +164,8 @@ export function createGeoImageryLayerManager(
       function onImageryError(error) {
         const message = error instanceof Error ? error.message : 'Imagery tile request failed'
         managed.error = message
+        managed.status = 'failed'
+        managerOptions.onChange?.()
       },
     )
     managed = {
@@ -165,6 +173,7 @@ export function createGeoImageryLayerManager(
       definition,
       layer,
       removeErrorListener,
+      status: 'ready',
       warning: availability.warning,
     }
     layers.set(id, managed)

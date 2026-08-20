@@ -29,6 +29,7 @@ export interface GeoDataState {
   resources: readonly GeoDataResourceSnapshot[]
   terrain: GeoTerrainSnapshot
   busy: boolean
+  loadingImagerySource?: GeoImagerySourceId
   error?: string
 }
 
@@ -64,7 +65,7 @@ export function createGeoDataController(
   viewer: Viewer,
   options: GeoDataControllerOptions = {},
 ): GeoDataController {
-  const imagery = createGeoImageryLayerManager(viewer, options.catalog ?? createGeoImageryCatalog())
+  const catalog = options.catalog ?? createGeoImageryCatalog()
   const browserOptions: GeoDataBrowserOptions = {
     signal: options.signal,
     onActiveTilesetChange: options.onActiveTilesetChange,
@@ -76,6 +77,7 @@ export function createGeoDataController(
     terrain: browser.getTerrain(),
     busy: false,
   })
+  let imagery: GeoImageryLayerManager
   let disposed = false
 
   function guard(): void {
@@ -93,6 +95,11 @@ export function createGeoDataController(
     })
     state.terrain = { ...browser.getTerrain() }
   }
+
+  imagery = createGeoImageryLayerManager(viewer, catalog, {
+    onChange: refresh,
+  })
+  state.terrain = browser.getTerrain()
 
   async function run<T>(operation: () => Promise<T>): Promise<T | undefined> {
     guard()
@@ -113,9 +120,16 @@ export function createGeoDataController(
     sourceId: GeoImagerySourceId,
     layerOptions: AddImageryLayerOptions = {},
   ): Promise<void> {
-    await run(async function addLayer() {
-      await imagery.add(sourceId, { ...options, ...layerOptions, signal: options.signal })
-    })
+    guard()
+    state.loadingImagerySource = sourceId
+    try {
+      await run(async function addLayer() {
+        await imagery.add(sourceId, { ...options, ...layerOptions, signal: options.signal })
+      })
+    } finally {
+      state.loadingImagerySource = undefined
+      refresh()
+    }
   }
 
   function removeImagery(id: string): void {

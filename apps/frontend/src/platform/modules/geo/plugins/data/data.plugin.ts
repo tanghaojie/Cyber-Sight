@@ -42,15 +42,14 @@ export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): Geo
         onActiveTilesetChange: activeTileset.setCurrent,
       })
       context.scope.use(controller)
-      if (
-        !context.signal.aborted &&
-        !context.viewer.isDestroyed() &&
-        pluginOptions.tiandituToken?.trim()
-      ) {
-        await controller.addImagery('tianditu-image')
-        await controller.addImagery('tianditu-image-annotation')
-      } else if (!context.signal.aborted && !context.viewer.isDestroyed()) {
-        await controller.addImagery('google-satellite')
+      if (!context.signal.aborted && !context.viewer.isDestroyed()) {
+        const defaultSourceId = pluginOptions.tiandituToken?.trim()
+          ? 'tianditu-image'
+          : 'natural-earth-ii'
+        await controller.addImagery(defaultSourceId)
+        if (defaultSourceId === 'tianditu-image') {
+          await controller.addImagery('tianditu-image-annotation')
+        }
       }
       const instance: GeoDataPluginInstance = {
         id: 'data',

@@ -1,6 +1,5 @@
 import { markRaw, reactive, readonly } from 'vue'
 import {
-  buildModuleUrl,
   Cartesian3,
   Cartographic,
   Color,
@@ -8,7 +7,6 @@ import {
   ScreenSpaceEventHandler,
   ScreenSpaceEventType,
   SceneMode,
-  TileMapServiceImageryProvider,
   Viewer,
 } from 'cesium'
 import 'cesium/Build/Cesium/Widgets/widgets.css'
@@ -83,13 +81,6 @@ function configureViewer(viewer: Viewer): void {
       roll: 0,
     },
   })
-}
-
-async function addBundledImagery(viewer: Viewer): Promise<void> {
-  const imageryProvider = await TileMapServiceImageryProvider.fromUrl(
-    buildModuleUrl('Assets/Textures/NaturalEarthII'),
-  )
-  viewer.imageryLayers.addImageryProvider(imageryProvider)
 }
 
 function registerRuntimeStatus(
@@ -247,7 +238,6 @@ export function createGeoRuntime(options: GeoRuntimeOptions = {}): GeoRuntime {
         }),
       )
       configureViewer(viewer)
-      await addBundledImagery(viewer)
       await plugins.install(viewer)
       if (signal.aborted || disposed) {
         destroyViewer(viewer)
