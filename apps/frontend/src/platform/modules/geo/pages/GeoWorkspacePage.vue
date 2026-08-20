@@ -341,7 +341,7 @@ onBeforeUnmount(function disposeGeoPage() {
   background: radial-gradient(circle at 58% 38%, rgba(32, 90, 130, 0.4), transparent 30%), #07111c;
 }
 
-.geo-map-host :global(canvas) {
+.geo-map-host :deep(canvas) {
   cursor: grab !important;
 }
 
@@ -353,7 +353,7 @@ onBeforeUnmount(function disposeGeoPage() {
     radial-gradient(circle at 50% 45%, transparent 48%, rgba(1, 6, 11, 0.24) 100%);
 }
 
-.geo-map-host--crosshair :global(canvas) {
+.geo-map-host--crosshair :deep(canvas) {
   cursor: crosshair !important;
 }
 
