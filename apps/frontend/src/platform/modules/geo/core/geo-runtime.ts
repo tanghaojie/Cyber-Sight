@@ -24,6 +24,7 @@ export interface GeoRuntimeState {
   error?: string
   longitude?: number
   latitude?: number
+  cameraHeading?: number
   surfaceHeight?: number
   cameraHeight?: number
   framesPerSecond?: number
@@ -38,6 +39,8 @@ export interface GeoRuntime {
   readonly state: Readonly<GeoRuntimeState>
   mount(container: HTMLElement): Promise<void>
   resetCamera(): void
+  resetNorth(): void
+  locateUser(): Promise<void>
   setSceneMode(mode: GeoSceneMode): void
   toggleFullscreen(target: HTMLElement): Promise<void>
   dispose(): void
@@ -90,6 +93,7 @@ function registerRuntimeStatus(
 ): void {
   function updateCameraHeight(): void {
     state.cameraHeight = viewer.camera.positionCartographic.height
+    state.cameraHeading = CesiumMath.toDegrees(viewer.camera.heading)
   }
 
   updateCameraHeight()
@@ -180,6 +184,62 @@ export function createGeoRuntime(options: GeoRuntimeOptions = {}): GeoRuntime {
         roll: 0,
       },
       duration: 1.2,
+    })
+  }
+
+  function resetNorth(): void {
+    const currentViewer = viewerAccessControl.require()
+    currentViewer.camera.flyTo({
+      destination: Cartesian3.clone(currentViewer.camera.position),
+      orientation: {
+        heading: 0,
+        pitch: currentViewer.camera.pitch,
+        roll: 0,
+      },
+      duration: 0.6,
+    })
+  }
+
+  function locateUser(): Promise<void> {
+    const currentViewer = viewerAccessControl.require()
+    if (!('geolocation' in navigator)) {
+      return Promise.reject(new Error('当前浏览器不支持网页定位'))
+    }
+    return new Promise<void>(function requestUserLocation(resolve, reject) {
+      navigator.geolocation.getCurrentPosition(
+        function flyToUser(position) {
+          if (disposed || currentViewer.isDestroyed()) {
+            reject(new Error('Geo 地图已关闭'))
+            return
+          }
+          const height = Math.max(position.coords.accuracy * 8, 5_000)
+          currentViewer.camera.flyTo({
+            destination: Cartesian3.fromDegrees(
+              position.coords.longitude,
+              position.coords.latitude,
+              height,
+            ),
+            orientation: {
+              heading: 0,
+              pitch: CesiumMath.toRadians(-58),
+              roll: 0,
+            },
+            duration: 1.2,
+            complete: resolve,
+            cancel: resolve,
+          })
+        },
+        function rejectUserLocation(error) {
+          const message =
+            error.code === GeolocationPositionError.PERMISSION_DENIED
+              ? '网页定位权限被拒绝'
+              : error.code === GeolocationPositionError.POSITION_UNAVAILABLE
+                ? '暂时无法取得当前位置'
+                : '网页定位请求超时'
+          reject(new Error(message))
+        },
+        { enableHighAccuracy: true, timeout: 10_000, maximumAge: 30_000 },
+      )
     })
   }
 
@@ -296,6 +356,8 @@ export function createGeoRuntime(options: GeoRuntimeOptions = {}): GeoRuntime {
     state: readonly(state),
     mount,
     resetCamera,
+    resetNorth,
+    locateUser,
     setSceneMode,
     toggleFullscreen,
     dispose,

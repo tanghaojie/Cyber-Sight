@@ -21,8 +21,10 @@ function panelFor(controller: MeasurementController) {
           startLabel: '开始测量',
           cancelLabel: '取消测量',
           clearLabel: '清除结果',
-          currentResultLabel: '当前结果',
-          emptyResultLabel: '暂无测量结果',
+          historyLabel: '历史测量结果',
+          historyEmptyLabel: '暂无历史测量结果',
+          clearAllLabel: '清除全部测量',
+          historyLocateLabel: '点击定位到地图位置',
           exitHintLabel: 'Esc 退出当前测量',
         })
     },

@@ -110,13 +110,20 @@ export class DrawingTool {
     }
     const displayedPositions = (): Cartesian3[] =>
       previewPosition ? [...positions, previewPosition] : [...positions]
+    const displayedLinePositions = (): Cartesian3[] => {
+      const currentPositions = displayedPositions()
+      if (mode === 'polygon' && completed && currentPositions.length >= 3) {
+        return [...currentPositions, currentPositions[0]]
+      }
+      return currentPositions
+    }
 
     const lineEntity = this.viewer.entities.add({
       polyline:
         mode === 'point'
           ? undefined
           : {
-              positions: new CallbackProperty(displayedPositions, false),
+              positions: new CallbackProperty(displayedLinePositions, false),
               width: 3,
               material: color,
               clampToGround: true,

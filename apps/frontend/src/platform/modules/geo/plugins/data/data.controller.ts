@@ -28,7 +28,6 @@ export interface GeoDataState {
   imagery: readonly GeoImageryLayerSnapshot[]
   resources: readonly GeoDataResourceSnapshot[]
   terrain: GeoTerrainSnapshot
-  gcj02Enabled: boolean
   busy: boolean
   loadingImagerySource?: GeoImagerySourceId
   error?: string
@@ -45,7 +44,6 @@ export interface GeoDataController {
   raiseImagery(id: string): void
   lowerImagery(id: string): void
   flyToImagery(id: string): void
-  setGcj02Enabled(enabled: boolean): void
   loadGeoJson(options: LoadGeoJsonOptions): Promise<void>
   loadModel(options: LoadModelOptions): Promise<void>
   loadTileset(options: LoadTilesetOptions): Promise<void>
@@ -68,7 +66,6 @@ export function createGeoDataController(
   options: GeoDataControllerOptions = {},
 ): GeoDataController {
   const catalog = options.catalog ?? createGeoImageryCatalog()
-  let allowGcj02 = Boolean(options.allowGcj02)
   const browserOptions: GeoDataBrowserOptions = {
     signal: options.signal,
     onActiveTilesetChange: options.onActiveTilesetChange,
@@ -78,7 +75,6 @@ export function createGeoDataController(
     imagery: [],
     resources: [],
     terrain: browser.getTerrain(),
-    gcj02Enabled: allowGcj02,
     busy: false,
   })
   let imagery: GeoImageryLayerManager
@@ -130,7 +126,6 @@ export function createGeoDataController(
       await run(async function addLayer() {
         await imagery.add(sourceId, {
           ...options,
-          allowGcj02,
           ...layerOptions,
           signal: options.signal,
         })
@@ -174,14 +169,6 @@ export function createGeoDataController(
   function flyToImagery(id: string): void {
     guard()
     imagery.flyTo(id)
-  }
-
-  function setGcj02Enabled(enabled: boolean): void {
-    guard()
-    allowGcj02 = enabled
-    state.gcj02Enabled = enabled
-    state.error = undefined
-    refresh()
   }
 
   async function loadGeoJson(loadOptions: LoadGeoJsonOptions): Promise<void> {
@@ -246,7 +233,7 @@ export function createGeoDataController(
       if (!source) {
         return { available: false, reason: `Unknown imagery source: ${sourceId}` }
       }
-      return source.checkAvailability({ ...options, allowGcj02 })
+      return source.checkAvailability(options)
     },
     addImagery,
     removeImagery,
@@ -255,7 +242,6 @@ export function createGeoDataController(
     raiseImagery,
     lowerImagery,
     flyToImagery,
-    setGcj02Enabled,
     loadGeoJson,
     loadModel,
     loadTileset,

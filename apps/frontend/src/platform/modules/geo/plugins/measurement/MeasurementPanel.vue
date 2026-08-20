@@ -48,24 +48,45 @@
       {{ controller.state.status === 'measuring' ? cancelLabel : startLabel }}
     </button>
 
-    <section class="measurement-result" aria-live="polite">
-      <div class="measurement-result__heading">
-        <span>{{ currentResultLabel }}</span>
+    <section class="measurement-history" aria-live="polite">
+      <div class="measurement-history__heading">
+        <span>{{ historyLabel }}</span>
         <button
           type="button"
-          :disabled="!hasResult"
-          :title="clearLabel"
-          :aria-label="clearLabel"
-          @click="controller.clearCurrent()"
+          :disabled="!controller.state.history.length"
+          :title="clearAllLabel"
+          :aria-label="clearAllLabel"
+          @click="controller.clearAll()"
         >
           <AppIcon name="trash" />
         </button>
       </div>
-      <div class="measurement-result__value">
-        <span aria-hidden="true"><i /><i /><i /></span>
-        <strong v-if="formattedResult">{{ formattedResult }}</strong>
-        <small v-else>{{ emptyResultLabel }}</small>
-      </div>
+      <p v-if="!controller.state.history.length" class="measurement-history__empty">
+        {{ historyEmptyLabel }}
+      </p>
+      <ul v-else class="measurement-history__list">
+        <li v-for="item in controller.state.history" :key="item.id">
+          <button
+            class="measurement-history__item"
+            type="button"
+            :title="`${item.mode} · ${historyLocateLabel}`"
+            @click="controller.flyTo(item.id)"
+          >
+            <span class="measurement-history__mode">{{ modeLabel(item.mode) }}</span>
+            <strong>{{ formatHistoryResult(item) }}</strong>
+            <small>{{ formatTimestamp(item.createdAt) }}</small>
+          </button>
+          <button
+            class="measurement-history__remove"
+            type="button"
+            :title="clearLabel"
+            :aria-label="clearLabel"
+            @click="controller.remove(item.id)"
+          >
+            <AppIcon name="close" />
+          </button>
+        </li>
+      </ul>
       <p v-if="controller.state.error" class="measurement-result__error">
         {{ controller.state.error }}
       </p>
@@ -76,9 +97,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import AppIcon from '@/foundation/components/AppIcon.vue'
-import type { MeasurementController } from './measurement.controller'
+import type {
+  MeasurementController,
+  MeasurementHistoryItem,
+  MeasurementMode,
+} from './measurement.controller'
 
 const props = defineProps<{
   controller: MeasurementController
@@ -93,36 +118,48 @@ const props = defineProps<{
   startLabel: string
   cancelLabel: string
   clearLabel: string
-  currentResultLabel: string
-  emptyResultLabel: string
+  historyLabel: string
+  historyEmptyLabel: string
+  clearAllLabel: string
+  historyLocateLabel: string
   exitHintLabel: string
 }>()
 
 const unit = ref<'meters' | 'kilometers'>('kilometers')
-const hasResult = computed(function hasMeasurementResult() {
-  return Boolean(
-    props.controller.state.resultMeters !== undefined ||
-    props.controller.state.resultSquareMeters !== undefined ||
-    props.controller.state.point,
-  )
-})
-const formattedResult = computed(function measurementResult() {
-  if (props.controller.state.resultSquareMeters !== undefined) {
-    return `${props.controller.state.resultSquareMeters.toFixed(1)} m²`
+
+function modeLabel(mode: MeasurementMode): string {
+  if (mode === 'distance') {
+    return props.distanceLabel
   }
-  if (props.controller.state.point) {
-    const point = props.controller.state.point
-    return `${point.longitude.toFixed(5)}, ${point.latitude.toFixed(5)}`
+  if (mode === 'area') {
+    return props.areaLabel
   }
-  const resultMeters = props.controller.state.resultMeters
-  if (resultMeters === undefined) {
-    return ''
+  return props.pointLabel ?? '点位'
+}
+
+function formatHistoryResult(item: MeasurementHistoryItem): string {
+  if (item.resultSquareMeters !== undefined) {
+    return `${item.resultSquareMeters.toFixed(1)} m²`
+  }
+  if (item.point) {
+    return `${item.point.longitude.toFixed(5)}, ${item.point.latitude.toFixed(5)} · ${item.point.height.toFixed(1)} m`
+  }
+  if (item.resultMeters === undefined) {
+    return '—'
   }
   if (unit.value === 'meters') {
-    return `${resultMeters.toFixed(1)} m`
+    return `${item.resultMeters.toFixed(1)} m`
   }
-  return `${(resultMeters / 1000).toFixed(2)} km`
-})
+  return `${(item.resultMeters / 1000).toFixed(2)} km`
+}
+
+function formatTimestamp(timestamp: number): string {
+  return new Intl.DateTimeFormat('zh-CN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(timestamp)
+}
 
 function toggleMeasurement(): void {
   if (props.controller.state.status === 'measuring') {
@@ -415,6 +452,122 @@ function startMode(mode: 'distance' | 'area'): void {
   color: #ff9ba7;
   font-size: 10px;
   line-height: 1.5;
+}
+
+.measurement-history {
+  display: grid;
+  gap: 11px;
+  padding-top: 17px;
+  border-top: 1px solid var(--geo-line);
+}
+
+.measurement-history__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.measurement-history__heading > span {
+  color: var(--geo-text-soft);
+  font-size: 10px;
+  font-weight: 690;
+}
+
+.measurement-history__heading button,
+.measurement-history__remove {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 9px;
+  color: var(--geo-text-faint);
+  background: transparent;
+}
+
+.measurement-history__heading button:hover:not(:disabled),
+.measurement-history__heading button:focus-visible,
+.measurement-history__remove:hover,
+.measurement-history__remove:focus-visible {
+  outline: 0;
+  color: var(--geo-text);
+  background: var(--geo-surface-hover);
+}
+
+.measurement-history__heading button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.measurement-history__empty {
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--geo-line);
+  border-radius: 11px;
+  color: var(--geo-text-faint);
+  font-size: 10px;
+  text-align: center;
+}
+
+.measurement-history__list {
+  display: grid;
+  gap: 7px;
+  max-height: 240px;
+  margin: 0;
+  padding: 0 3px 0 0;
+  overflow-y: auto;
+  list-style: none;
+  scrollbar-color: color-mix(in srgb, var(--geo-accent), transparent 35%) transparent;
+  scrollbar-width: thin;
+}
+
+.measurement-history__list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 32px;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--geo-line);
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--geo-surface-strong), transparent 14%);
+}
+
+.measurement-history__item {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+  padding: 7px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--geo-text);
+  background: transparent;
+  text-align: left;
+}
+
+.measurement-history__item:hover,
+.measurement-history__item:focus-visible {
+  outline: 0;
+  background: var(--geo-surface-hover);
+}
+
+.measurement-history__mode,
+.measurement-history__item small {
+  color: var(--geo-text-faint);
+  font-size: 9px;
+}
+
+.measurement-history__item strong {
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.measurement-history__remove {
+  width: 28px;
+  height: 28px;
 }
 
 .measurement-panel__exit {

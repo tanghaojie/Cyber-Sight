@@ -41,12 +41,15 @@
         :label="t('geo.views.workspace')"
         :scene-mode="runtime.state.sceneMode"
         :fullscreen="runtime.state.fullscreen"
-        :reset-label="t('geo.controls.resetCamera')"
+        :heading="runtime.state.cameraHeading ?? 0"
+        :locate-label="t('geo.controls.locateUser')"
+        :north-label="t('geo.controls.resetNorth')"
         :mode2d-label="t('geo.controls.mode2d')"
         :mode3d-label="t('geo.controls.mode3d')"
         :fullscreen-label="t('geo.controls.fullscreen')"
         :exit-fullscreen-label="t('geo.controls.exitFullscreen')"
-        @reset="runtime.resetCamera()"
+        @locate="locateUser"
+        @reset-north="runtime.resetNorth()"
         @toggle-mode="toggleSceneMode"
         @toggle-fullscreen="toggleFullscreen"
       />
@@ -121,8 +124,9 @@ interface GeoTaskItem extends GeoTaskRailItem {
 const { t } = useLocalization()
 const workspaceRoot = ref<HTMLElement>()
 const mapContainer = ref<HTMLElement>()
-const activeTaskId = ref('data')
+const activeTaskId = ref<string | undefined>('data')
 const panelOpen = ref(true)
+const locationError = ref<string>()
 const runtime = createGeoRuntime({ plugins: geoPlugins })
 provideGeoRuntime(runtime)
 
@@ -219,11 +223,23 @@ const activeInspectorComponent = computed<Component | undefined>(
   },
 )
 const activeHint = computed(function currentHint() {
+  if (locationError.value) {
+    return locationError.value
+  }
   if (runtime.interactions.state.activeId) {
     return `${t('geo.status.activeTool')} · ${runtime.interactions.state.activeId}`
   }
   return activeTask.value.description
 })
+
+async function locateUser(): Promise<void> {
+  locationError.value = undefined
+  try {
+    await runtime.locateUser()
+  } catch (error) {
+    locationError.value = error instanceof Error ? error.message : '网页定位失败'
+  }
+}
 
 async function mountWorkspace(): Promise<void> {
   const container = mapContainer.value
@@ -235,7 +251,10 @@ async function mountWorkspace(): Promise<void> {
     if (!tasks.value.some((task) => task.id === activeTaskId.value)) {
       activeTaskId.value = tasks.value[0]?.id ?? 'data'
     }
-    openTaskPanel(activeTaskId.value)
+    const taskId = activeTaskId.value
+    if (taskId) {
+      openTaskPanel(taskId)
+    }
   } catch {
     // GeoRuntime owns the diagnosable failure state rendered above.
   }
@@ -248,6 +267,7 @@ function selectTask(id: string): void {
       openTaskPanel(id)
     } else {
       runtime.plugins.setActivePanel(undefined)
+      activeTaskId.value = undefined
     }
     return
   }
@@ -273,6 +293,7 @@ function closePanel(): void {
   runtime.interactions.cancel('cancel')
   runtime.plugins.setActivePanel(undefined)
   panelOpen.value = false
+  activeTaskId.value = undefined
 }
 
 function toggleSceneMode(): void {
@@ -296,6 +317,7 @@ function handleEscape(event: KeyboardEvent): void {
   }
   runtime.plugins.setActivePanel(undefined)
   panelOpen.value = false
+  activeTaskId.value = undefined
 }
 
 onMounted(function mountGeoPage() {

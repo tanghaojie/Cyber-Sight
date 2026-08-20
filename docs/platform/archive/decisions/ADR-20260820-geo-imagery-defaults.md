@@ -3,11 +3,14 @@ title: Geo 影像默认源与失败隔离
 scope: platform
 repository: Cyber-Sight
 owner: project maintainers
-status: accepted
+status: superseded
 date: 2026-08-20
+superseded_by: ADR-20260820-geo-imagery-defaults-and-coordinate-correction.md
 ---
 
 # ADR-20260820：Geo 影像默认源与失败隔离
+
+> 本 ADR 已被 [Geo 影像默认源与坐标校正](../../decisions/ADR-20260820-geo-imagery-defaults-and-coordinate-correction.md) 取代。Natural Earth 默认底图的结论不再适用于当前 Geo 产品需求。
 
 ## 背景
 
@@ -53,6 +56,6 @@ Geo 数据插件在未配置天地图令牌时会自动回退到 Google 影像�
 
 ## 相关设计和计划
 
-- [Geo 前端空间可视化工作台](../design/modules/geo.md)
-- [Geo 底图目录交互与默认加载修复计划](../archive/plans/2026-08-20-geo-imagery-ui-and-loading.md)
-- [Geo 底图目录交互与默认加载修复协作记录](../archive/ai-logs/2026/08/2026-08-20-geo-imagery-ui-and-loading.md)
+- [Geo 前端空间可视化工作台](../../design/modules/geo.md)
+- [Geo 底图目录交互与默认加载修复计划](../plans/2026-08-20-geo-imagery-ui-and-loading.md)
+- [Geo 底图目录交互与默认加载修复协作记录](../ai-logs/2026/08/2026-08-20-geo-imagery-ui-and-loading.md)

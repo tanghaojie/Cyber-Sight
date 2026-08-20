@@ -18,11 +18,17 @@ import type { Disposable } from '../../core/disposable'
 export interface DistanceMeasurementOptions {
   readonly signal: AbortSignal
   onUpdate(distanceMeters: number): void
-  onComplete(distanceMeters: number): void
+  onComplete(result: DistanceMeasurement): void
   onCancel?(): void
 }
 
 export interface DistanceMeasurementSession extends Disposable {}
+
+export interface DistanceMeasurement {
+  readonly distanceMeters: number
+  readonly positions: readonly Cartesian3[]
+  readonly entities: readonly Entity[]
+}
 
 function segmentDistance(start: Cartesian3, end: Cartesian3): number {
   const startCartographic = Cartographic.fromCartesian(start)
@@ -160,7 +166,11 @@ export class DistanceMeasurementTool implements Disposable {
       }
       completed = true
       previewPosition = undefined
-      options.onComplete(totalDistance(positions))
+      options.onComplete({
+        distanceMeters: totalDistance(positions),
+        positions: positions.map((position) => Cartesian3.clone(position)),
+        entities: [...sessionEntities],
+      })
     }, ScreenSpaceEventType.LEFT_DOUBLE_CLICK)
 
     const session: DistanceMeasurementSession = {
@@ -210,6 +220,13 @@ export class DistanceMeasurementTool implements Disposable {
     this.sessions.clear()
     this.entities.forEach((entity) => this.viewer.entities.remove(entity))
     this.entities.clear()
+  }
+
+  remove(result: DistanceMeasurement): void {
+    result.entities.forEach((entity) => {
+      this.viewer.entities.remove(entity)
+      this.entities.delete(entity)
+    })
   }
 
   dispose(): void {

@@ -1,7 +1,7 @@
 <template>
   <div class="geo-map-controls" :aria-label="label">
-    <button type="button" :title="resetLabel" :aria-label="resetLabel" @click="$emit('reset')">
-      <AppIcon name="home" />
+    <button type="button" :title="locateLabel" :aria-label="locateLabel" @click="$emit('locate')">
+      <AppIcon name="map-pin" />
     </button>
     <button
       type="button"
@@ -11,7 +11,19 @@
     >
       <b>{{ sceneMode === '3d' ? '2D' : '3D' }}</b>
     </button>
-    <span class="geo-map-controls__compass" aria-hidden="true"><i /></span>
+    <button
+      class="geo-map-controls__compass"
+      type="button"
+      :title="northLabel"
+      :aria-label="northLabel"
+      @click="$emit('reset-north')"
+    >
+      <span
+        class="geo-map-controls__compass-needle"
+        aria-hidden="true"
+        :style="{ transform: `rotate(${-heading}deg)` }"
+      />
+    </button>
     <button
       type="button"
       :title="fullscreen ? exitFullscreenLabel : fullscreenLabel"
@@ -31,7 +43,9 @@ defineProps<{
   label: string
   sceneMode: GeoSceneMode
   fullscreen: boolean
-  resetLabel: string
+  heading: number
+  locateLabel: string
+  northLabel: string
   mode2dLabel: string
   mode3dLabel: string
   fullscreenLabel: string
@@ -39,7 +53,8 @@ defineProps<{
 }>()
 
 defineEmits<{
-  reset: []
+  locate: []
+  'reset-north': []
   'toggle-mode': []
   'toggle-fullscreen': []
 }>()
@@ -92,8 +107,14 @@ defineEmits<{
   border-radius: 0;
 }
 
-.geo-map-controls__compass::before,
-.geo-map-controls__compass::after {
+.geo-map-controls__compass-needle {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.18s ease;
+}
+
+.geo-map-controls__compass-needle::before,
+.geo-map-controls__compass-needle::after {
   position: absolute;
   left: 50%;
   width: 9px;
@@ -103,15 +124,21 @@ defineEmits<{
   transform: translateX(-50%);
 }
 
-.geo-map-controls__compass::before {
+.geo-map-controls__compass-needle::before {
   top: 5px;
   background: #ff6b6b;
 }
 
-.geo-map-controls__compass::after {
+.geo-map-controls__compass-needle::after {
   bottom: 5px;
   background: #dce8f0;
   transform: translateX(-50%) rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .geo-map-controls__compass-needle {
+    transition: none;
+  }
 }
 
 @media (max-width: 760px) {

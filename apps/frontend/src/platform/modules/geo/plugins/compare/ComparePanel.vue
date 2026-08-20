@@ -56,11 +56,40 @@
 
 <script setup lang="ts">
 import type { CompareController } from './compare.controller'
-import { ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
 const props = defineProps<{ controller: CompareController }>()
 const leftIndex = ref(0)
 const rightIndex = ref(1)
+
+function syncLayerSelection(): void {
+  const layers = props.controller.state.layers
+  if (!layers.length) {
+    leftIndex.value = 0
+    rightIndex.value = 1
+    return
+  }
+  const availableIndexes = new Set(layers.map((layer) => layer.index))
+  if (!availableIndexes.has(leftIndex.value)) {
+    leftIndex.value = layers[0].index
+  }
+  if (!availableIndexes.has(rightIndex.value) || rightIndex.value === leftIndex.value) {
+    rightIndex.value =
+      layers.find((layer) => layer.index !== leftIndex.value)?.index ?? leftIndex.value
+  }
+}
+
+onMounted(function refreshLayersWhenOpened() {
+  props.controller.refreshLayers()
+  syncLayerSelection()
+})
+
+watch(
+  () => props.controller.state.layers,
+  function updateLayerSelection() {
+    syncLayerSelection()
+  },
+)
 
 function enableComparison(): void {
   props.controller.enableLayerComparison(leftIndex.value, rightIndex.value)

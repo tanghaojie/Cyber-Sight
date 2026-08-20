@@ -31,6 +31,7 @@ function panelFor(controller: GeoDataController) {
 export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): GeoPluginDefinition {
   const pluginOptions: GeoDataControllerOptions = {
     ...options,
+    coordinateCorrection: options.coordinateCorrection ?? 'auto',
     tiandituToken:
       options.tiandituToken ?? (import.meta.env.VITE_GEO_TIANDITU_TOKEN as string | undefined),
   }
@@ -56,13 +57,8 @@ export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): Geo
         context.scope,
       )
       if (!context.signal.aborted && !context.viewer.isDestroyed()) {
-        const defaultSourceId = pluginOptions.tiandituToken?.trim()
-          ? 'tianditu-image'
-          : 'natural-earth-ii'
-        await controller.addImagery(defaultSourceId)
-        if (defaultSourceId === 'tianditu-image') {
-          await controller.addImagery('tianditu-image-annotation')
-        }
+        await controller.addImagery('google-hybrid')
+        await controller.addImagery('google-label')
       }
       const instance: GeoDataPluginInstance = {
         id: 'data',

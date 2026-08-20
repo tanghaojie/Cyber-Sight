@@ -9,6 +9,11 @@ import {
   WebMercatorTilingScheme,
   type ImageryProvider,
 } from 'cesium'
+import {
+  correctGcj02TileCoordinates,
+  resolveCoordinateCorrection,
+  type GeoCoordinateCorrection,
+} from './coordinate-correction'
 
 export type GeoImagerySourceId =
   | 'natural-earth-ii'
@@ -30,11 +35,8 @@ export type GeoImageryCoordinateSystem = 'WGS84' | 'GCJ-02'
 
 export interface GeoImagerySourceOptions {
   readonly tiandituToken?: string
-  /**
-   * Amap tiles are published in GCJ-02. The default is false on purpose: a
-   * WGS84 viewer must never silently mix the two coordinate systems.
-   */
-  readonly allowGcj02?: boolean
+  /** Automatically apply the source-specific correction when it is available. */
+  readonly coordinateCorrection?: GeoCoordinateCorrection
 }
 
 export interface GeoImagerySourceDefinition {
@@ -76,20 +78,6 @@ function tokenAvailability(options?: GeoImagerySourceOptions): GeoImageryAvailab
   }
 }
 
-function gcj02Availability(options?: GeoImagerySourceOptions): GeoImageryAvailability {
-  if (!options?.allowGcj02) {
-    return {
-      available: false,
-      reason: '高德瓦片使用 GCJ-02，未启用坐标校正前禁止与 WGS84 静默叠加',
-      warning: '启用前请确认许可和坐标转换方案',
-    }
-  }
-  return {
-    available: true,
-    warning: '当前仅允许显式启用，未内置 GCJ-02 到 WGS84 的通用纠偏',
-  }
-}
-
 function createTiandituProvider(
   layer: 'img' | 'vec' | 'cia' | 'cva',
   token: string,
@@ -110,14 +98,35 @@ function createTiandituProvider(
   })
 }
 
-function createAmapProvider(url: string): UrlTemplateImageryProvider {
+function createAmapProvider(
+  url: string,
+  correction: GeoCoordinateCorrection,
+): UrlTemplateImageryProvider {
+  const tilingScheme = new WebMercatorTilingScheme()
+  const customTags:
+    | Record<
+        string,
+        (provider: UrlTemplateImageryProvider, x: number, y: number, level: number) => number
+      >
+    | undefined =
+    correction === 'gcj02-to-wgs84'
+      ? {
+          amapX(_provider, x, y, level) {
+            return correctGcj02TileCoordinates(x, y, level, tilingScheme).x
+          },
+          amapY(_provider, x, y, level) {
+            return correctGcj02TileCoordinates(x, y, level, tilingScheme).y
+          },
+        }
+      : undefined
   return new UrlTemplateImageryProvider({
-    url,
+    url: url.replace('{x}', '{amapX}').replace('{y}', '{amapY}'),
     subdomains: ['1', '2', '3', '4'],
-    tilingScheme: new WebMercatorTilingScheme(),
+    tilingScheme,
     maximumLevel: 18,
     credit: '高德地图（GCJ-02）',
     enablePickFeatures: false,
+    customTags,
   })
 }
 
@@ -176,13 +185,16 @@ function createGcj02Source(
     ...definition,
     coordinateSystem: 'GCJ-02',
     createProvider(options) {
-      const availability = gcj02Availability(options)
-      if (!availability.available) {
-        throw new Error(availability.reason)
-      }
-      return createAmapProvider(url)
+      const correction = resolveCoordinateCorrection(
+        definition.coordinateSystem,
+        options?.coordinateCorrection,
+      )
+      return createAmapProvider(url, correction)
     },
-    checkAvailability: gcj02Availability,
+    checkAvailability: () => ({
+      available: true,
+      warning: '高德瓦片会按启动配置自动执行 GCJ-02 到 WGS84 的瓦片校正',
+    }),
   }
 }
 
@@ -220,7 +232,7 @@ export function createGeoImageryCatalog(): readonly GeoImagerySourceDefinition[]
         description: '天地图全球影像 WMTS',
         providerType: 'wmts',
         coordinateSystem: 'WGS84',
-        role: 'base',
+        role: 'candidate',
       },
       'img',
     ),
@@ -231,7 +243,7 @@ export function createGeoImageryCatalog(): readonly GeoImagerySourceDefinition[]
         description: '天地图全球矢量 WMTS',
         providerType: 'wmts',
         coordinateSystem: 'WGS84',
-        role: 'base',
+        role: 'candidate',
       },
       'vec',
     ),
@@ -242,7 +254,7 @@ export function createGeoImageryCatalog(): readonly GeoImagerySourceDefinition[]
         description: '叠加在天地图影像上的中文注记',
         providerType: 'wmts',
         coordinateSystem: 'WGS84',
-        role: 'overlay',
+        role: 'candidate',
       },
       'cia',
     ),
@@ -253,7 +265,7 @@ export function createGeoImageryCatalog(): readonly GeoImagerySourceDefinition[]
         description: '叠加在天地图矢量上的中文注记',
         providerType: 'wmts',
         coordinateSystem: 'WGS84',
-        role: 'overlay',
+        role: 'candidate',
       },
       'cva',
     ),
@@ -292,11 +304,11 @@ export function createGeoImageryCatalog(): readonly GeoImagerySourceDefinition[]
     ),
     {
       id: 'google-hybrid',
-      label: 'Google · 混合候选',
-      description: 'Google 影像和道路混合候选源，需自行确认访问和许可',
+      label: 'Google · 混合底图',
+      description: 'Google 影像和道路混合底图，需自行确认访问和许可',
       providerType: 'url-template',
       coordinateSystem: 'WGS84',
-      role: 'candidate',
+      role: 'base',
       createProvider: () =>
         createGoogleProvider('https://mt{s}.google.com/vt/lyrs=y&hl=zh-CN&x={x}&y={y}&z={z}'),
       checkAvailability: () => ({
@@ -320,11 +332,11 @@ export function createGeoImageryCatalog(): readonly GeoImagerySourceDefinition[]
     },
     {
       id: 'google-label',
-      label: 'Google · 注记候选',
-      description: 'Google 中文注记候选源，需自行确认访问和许可',
+      label: 'Google · 注记',
+      description: 'Google 中文注记覆盖层，需自行确认访问和许可',
       providerType: 'url-template',
       coordinateSystem: 'WGS84',
-      role: 'candidate',
+      role: 'overlay',
       createProvider: () =>
         createGoogleProvider('https://mt{s}.google.com/vt/lyrs=h&hl=zh-CN&x={x}&y={y}&z={z}'),
       checkAvailability: () => ({

@@ -1,6 +1,28 @@
 <template>
   <div class="geo-data-panel">
-    <section class="data-panel__section">
+    <div class="data-panel__tabs" role="tablist" aria-label="数据类型">
+      <button
+        v-for="tab in dataTabs"
+        :id="`geo-data-tab-${tab.id}`"
+        :key="tab.id"
+        type="button"
+        role="tab"
+        :aria-selected="activeTab === tab.id"
+        :aria-controls="`geo-data-panel-${tab.id}`"
+        :class="{ 'is-active': activeTab === tab.id }"
+        @click="activeTab = tab.id"
+      >
+        {{ tab.label }}
+      </button>
+    </div>
+
+    <section
+      v-if="activeTab === 'imagery'"
+      id="geo-data-panel-imagery"
+      class="data-panel__section data-panel__tab-panel"
+      role="tabpanel"
+      aria-labelledby="geo-data-tab-imagery"
+    >
       <div class="data-panel__heading">
         <div>
           <span>底图与注记</span>
@@ -32,15 +54,6 @@
           {{ filter.label }}<span>{{ filter.count }}</span>
         </button>
       </div>
-
-      <label class="data-panel__toggle" title="开启后允许添加高德 GCJ-02 候选图层">
-        <input
-          type="checkbox"
-          :checked="controller.state.gcj02Enabled"
-          @change="controller.setGcj02Enabled(($event.target as HTMLInputElement).checked)"
-        />
-        <span>启用高德 GCJ-02 坐标校正</span>
-      </label>
 
       <div class="data-panel__catalog" aria-live="polite">
         <section
@@ -124,6 +137,7 @@
             </label>
             <small
               >{{ layer.coordinateSystem }} ·
+              {{ layer.coordinateCorrection === 'gcj02-to-wgs84' ? '已自动校正' : 'WGS84' }} ·
               {{ layer.status === 'failed' ? '瓦片异常' : '已就绪' }}</small
             >
           </div>
@@ -180,7 +194,13 @@
       </div>
     </section>
 
-    <section class="data-panel__section">
+    <section
+      v-if="activeTab === 'terrain'"
+      id="geo-data-panel-terrain"
+      class="data-panel__section data-panel__tab-panel"
+      role="tabpanel"
+      aria-labelledby="geo-data-tab-terrain"
+    >
       <div class="data-panel__heading">
         <div><span>地形</span><small>当前场景表面</small></div>
         <strong>{{ controller.state.terrain.label }}</strong>
@@ -206,7 +226,13 @@
       }}</small>
     </section>
 
-    <section class="data-panel__section">
+    <section
+      v-if="activeTab === 'external'"
+      id="geo-data-panel-external"
+      class="data-panel__section data-panel__tab-panel"
+      role="tabpanel"
+      aria-labelledby="geo-data-tab-external"
+    >
       <div class="data-panel__heading">
         <div><span>外部数据</span><small>浏览器加载</small></div>
       </div>
@@ -248,7 +274,10 @@
       </button>
     </section>
 
-    <section v-if="controller.state.resources.length" class="data-panel__section">
+    <section
+      v-if="activeTab === 'external' && controller.state.resources.length"
+      class="data-panel__section"
+    >
       <div class="data-panel__heading">
         <div><span>已加载数据</span><small>当前会话</small></div>
       </div>
@@ -303,6 +332,7 @@ import type { GeoImageryLayerSnapshot } from '../../tools/data/imagery-layer-man
 import type { GeoDataController } from './data.controller'
 
 type SourceFilterId = 'all' | GeoImagerySourceDefinition['role']
+type DataTabId = 'imagery' | 'terrain' | 'external'
 
 interface SourceFilter {
   readonly id: SourceFilterId
@@ -329,6 +359,12 @@ const modelUrl = ref('')
 const tilesetUrl = ref('')
 const sourceQuery = ref('')
 const sourceFilter = ref<SourceFilterId>('all')
+const activeTab = ref<DataTabId>('imagery')
+const dataTabs: readonly { id: DataTabId; label: string }[] = [
+  { id: 'imagery', label: '底图与注记' },
+  { id: 'terrain', label: '地形' },
+  { id: 'external', label: '外部数据' },
+]
 const roleLabels: Record<GeoImagerySourceDefinition['role'], string> = {
   base: '底图',
   overlay: '注记',
@@ -455,6 +491,34 @@ async function loadTileset(): Promise<void> {
   display: grid;
   gap: 18px;
   min-width: 0;
+}
+.data-panel__tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--geo-line, #263c4e);
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--geo-surface-strong, #0e1c2a), transparent 16%);
+}
+.data-panel__tabs button {
+  min-height: 34px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--geo-text-faint, #7890a2);
+  background: transparent;
+  cursor: pointer;
+  font-size: 10px;
+}
+.data-panel__tabs button:hover,
+.data-panel__tabs button.is-active {
+  border-color: color-mix(in srgb, var(--geo-accent, #45c8ff), transparent 48%);
+  color: var(--geo-text, #eff8ff);
+  background: color-mix(in srgb, var(--geo-accent, #45c8ff), transparent 86%);
+}
+.data-panel__tab-panel {
+  min-height: 0;
 }
 .data-panel__section {
   display: grid;
