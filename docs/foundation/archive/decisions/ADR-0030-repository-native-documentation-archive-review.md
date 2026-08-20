@@ -7,7 +7,7 @@ superseded_by: ADR-0033
 
 # ADR-0030 Repository-native documentation reconstruction and archive review
 
-> This decision is superseded by [ADR-0033](../../decisions/ADR-0033-task-scoped-documentation-archive-audit.md).
+> This decision is superseded by [ADR-0033](ADR-0033-task-scoped-documentation-archive-audit.md), which was later replaced by the ownership-scoped audit model.
 
 ## Context
 

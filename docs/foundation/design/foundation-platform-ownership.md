@@ -2,7 +2,7 @@
 title: Forge、Foundation 与 Platform 所有权边界
 status: accepted
 owner: project maintainers
-updated: 2026-08-12
+updated: 2026-08-18
 ---
 
 # Forge、Foundation 与 Platform 所有权边界
@@ -44,12 +44,15 @@ Sight 当前没有业务表、业务迁移或需要保留的数据，因此本�
 
 `docs/templates` 是由 Forge 维护并随 Foundation 同步的公共模板目录。模板通过 `scope: foundation | forge | platform` 指示生成文档的目标作用域，三个作用域共用同一套模板，不复制平行版本。
 
+归档审计脚本和阈值属于 Foundation 共享协议；Foundation、Forge、Platform 分别拥有自己的审查 ledger 和活动计划。根 `.archive-audit.json` 属于仓库本地 Platform 保留配置：Forge 上游管理三个作用域，业务平台下游只管理 Platform，把 Foundation 作为 inherited 只读内容。下游发现 Foundation 文档问题时回 Forge 修复，不创建或更新 Foundation 归档任务。
+
 ## 同步所有权
 
 同步策略采用显式路径分类：
 
 - Foundation 路径接收 Forge 更新，业务平台保持只读。
 - Platform 路径和根 README 始终保留业务平台同步前版本。
+- 根 `.archive-audit.json` 按 Platform 路径保留，使下游角色不会被 Forge 上游配置覆盖。
 - Forge 路径不进入业务平台。
 - 根配置、锁文件、应用组合入口和 Foundation 数据库迁移属于集成控制文件，生成差异报告并执行专门验证。
 - 未匹配路径默认停止同步，不做静默猜测。

@@ -3,9 +3,9 @@
 ## 机器可读的归档治理文件
 
 - [归档触发策略](archive-policy.json)：阈值、范围和立即触发条件。
-- [归档审查台账](archive-ledger.json)：各范围最近一次完成审查的 Git 基线。
+- [Foundation 归档审查台账](archive-ledger.json)：Foundation 最近一次完成审查的 Git 基线；下游只读。
 
-这些文件由当前归档审查协议读取；它们记录归档机制的状态，不替代当前 Design、ADR 或代码事实。
+共享策略由当前归档审查协议读取；Foundation、Forge、Platform 的台账分别位于各自归档目录。它们记录归档机制的状态，不替代当前 Design、ADR 或代码事实。
 
 - 2026-08-06：[仓库原生文档重建与归档审查计划](plans/2026-08-06-repository-native-archive-review.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-06-repository-native-archive-review.md)。
@@ -40,11 +40,13 @@
 | 软删除、审计和有效记录唯一性               | ADR-0014、ADR-0015                       | [后端](../design/modules/backend.md)及用户、角色、菜单、字典模块设计                                                                        |
 | 分层文档和工程工作流                       | ADR-0016、ADR-0021 至 ADR-0023           | [文档治理](../design/documentation-governance.md)、[开发工作流](../design/developer-workflow.md)与[验证策略](../design/testing-strategy.md) |
 | JWT 会话和 LRU 读缓存                      | ADR-0019、ADR-0020                       | [认证模块](../design/modules/auth.md)                                                                                                       |
-| 文档归档触发协议                           | ADR-0030                                 | [按任务范围触发文档归档审计](../decisions/ADR-0033-task-scoped-documentation-archive-audit.md)                                              |
+| 文档归档触发协议                           | ADR-0030、ADR-0033                       | [共享协议与所有权分域的文档归档审计](../decisions/ADR-20260818-scope-owned-documentation-archive-audit.md)                                  |
 
 ## 完成计划与 AI 协作记录
 
 - 2026-08-13：[Forge 架构同步文档归档审查](plans/2026-08-13-documentation-archive-review.md)。
+- 2026-08-18：[分域文档归档审计重构](plans/2026-08-18-scope-owned-documentation-archive-audit.md)及其
+  [AI 协作记录](ai-logs/2026/08/2026-08-18-scope-owned-documentation-archive-audit.md)。
 - 2026-08-13：[集中前后端环境文件目录](plans/2026-08-13-env-directory.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-13-env-directory.md)。
 

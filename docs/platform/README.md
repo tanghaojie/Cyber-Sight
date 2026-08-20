@@ -10,3 +10,5 @@
 - `archive/`：历史设计、决策、计划和日志。
 
 Cyber-Sight 以 Forge 的 Foundation 为共享基线；平台品牌、业务模块、产品契约、配置和接入记录均由本目录独立维护。创建文档时使用公共[模板](../templates/)并设置 `scope: platform`。
+
+业务平台下游必须把根 `.archive-audit.json` 配置为 `platform-downstream`：只管理 `platform`，把 `foundation` 标记为 inherited，并排除 `forge`。可以从公共[下游归档审计配置模板](../templates/archive-audit-platform-downstream.json)复制；Foundation 问题返回上游处理，不得在下游修改 Foundation ledger。

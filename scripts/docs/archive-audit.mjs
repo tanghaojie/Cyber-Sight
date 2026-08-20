@@ -1,20 +1,19 @@
 import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { dirname, extname, join, relative, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
+import { classifyPath, parseManifest } from '../forge-sync.mjs'
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url))
-const repositoryRoot = resolve(scriptDirectory, '../..')
-const foundationDocsRoot = join(repositoryRoot, 'docs/foundation')
-const policyPath = join(foundationDocsRoot, 'archive/archive-policy.json')
-const ledgerPath = join(foundationDocsRoot, 'archive/archive-ledger.json')
+const defaultRepositoryRoot = resolve(scriptDirectory, '../..')
+const ownershipScopes = ['foundation', 'forge', 'platform']
 const adrFilenamePattern = /^ADR-(?:\d{4}|\d{8})-.+\.md$/i
 
 function readJson(filePath) {
   return JSON.parse(readFileSync(filePath, 'utf8'))
 }
 
-function runGit(args, allowFailure = false) {
+function runGit(repositoryRoot, args, allowFailure = false) {
   const result = spawnSync('git', args, {
     cwd: repositoryRoot,
     encoding: 'utf8',
@@ -27,16 +26,16 @@ function runGit(args, allowFailure = false) {
   return (result.stdout || '').trim()
 }
 
-function getCurrentCommit() {
-  return runGit(['rev-parse', 'HEAD'])
+function getCurrentCommit(repositoryRoot) {
+  return runGit(repositoryRoot, ['rev-parse', 'HEAD'])
 }
 
-function hasCommit(commit) {
-  return Boolean(runGit(['rev-parse', '--verify', `${commit}^{commit}`], true))
+function hasCommit(repositoryRoot, commit) {
+  return Boolean(runGit(repositoryRoot, ['rev-parse', '--verify', `${commit}^{commit}`], true))
 }
 
-function hasPathAtCommit(commit, filePath) {
-  return Boolean(runGit(['rev-parse', '--verify', `${commit}:${filePath}`], true))
+function hasPathAtCommit(repositoryRoot, commit, filePath) {
+  return Boolean(runGit(repositoryRoot, ['rev-parse', '--verify', `${commit}:${filePath}`], true))
 }
 
 function listFiles(directoryPath) {
@@ -83,21 +82,123 @@ function parseFrontMatter(filePath) {
   return values
 }
 
-function toRepositoryPath(filePath) {
+function toRepositoryPath(repositoryRoot, filePath) {
   return relative(repositoryRoot, filePath).replaceAll('\\', '/')
 }
 
-function getChangedPaths(commit) {
-  const output = runGit(['diff-tree', '--root', '--no-commit-id', '--name-only', '-r', commit])
+function splitScopes(value) {
+  return String(value || '')
+    .split(',')
+    .map((scope) => scope.trim())
+    .filter(Boolean)
+}
+
+function validateProfile(profile) {
+  if (profile.version !== 2) {
+    throw new Error('archive audit profile must use version 2')
+  }
+
+  if (!profile.repositoryRole || typeof profile.repositoryRole !== 'string') {
+    throw new Error('archive audit profile must declare repositoryRole')
+  }
+
+  for (const key of ['managedScopes', 'inheritedScopes', 'excludedScopes']) {
+    if (!Array.isArray(profile[key])) {
+      throw new Error(`archive audit profile must declare ${key}`)
+    }
+  }
+
+  if (!ownershipScopes.includes(profile.integrationOwner)) {
+    throw new Error('archive audit profile has an invalid integrationOwner')
+  }
+
+  const assignments = new Map()
+  for (const category of ['managedScopes', 'inheritedScopes', 'excludedScopes']) {
+    for (const scope of profile[category]) {
+      if (!ownershipScopes.includes(scope)) {
+        throw new Error(`archive audit profile has an invalid scope: ${scope}`)
+      }
+      if (assignments.has(scope)) {
+        throw new Error(`archive audit profile assigns ${scope} more than once`)
+      }
+      assignments.set(scope, category)
+    }
+  }
+
+  for (const scope of ownershipScopes) {
+    if (!assignments.has(scope)) {
+      throw new Error(`archive audit profile does not assign ${scope}`)
+    }
+  }
+
+  if (profile.excludedScopes.includes(profile.integrationOwner)) {
+    throw new Error('integrationOwner cannot be excluded')
+  }
+}
+
+function readRepositoryConfiguration(repositoryRoot) {
+  const policyPath = join(repositoryRoot, 'docs/foundation/archive/archive-policy.json')
+  const profilePath = join(repositoryRoot, '.archive-audit.json')
+  const manifestPath = join(repositoryRoot, '.forge-sync.yml')
+  const policy = readJson(policyPath)
+  const profile = readJson(profilePath)
+  const manifest = parseManifest(readFileSync(manifestPath, 'utf8'))
+
+  if (policy.version !== 2 || policy.scope !== 'ownership') {
+    throw new Error('archive policy must use version 2 ownership scope')
+  }
+  validateProfile(profile)
+
+  return { manifest, policy, profile }
+}
+
+function resolveOwnershipScope(filePath, manifest, profile) {
+  const classified = classifyPath(filePath, manifest)
+  return classified === 'integration' ? profile.integrationOwner : classified
+}
+
+function getChangedPaths(repositoryRoot, commit) {
+  const output = runGit(repositoryRoot, [
+    'diff-tree',
+    '--root',
+    '--no-commit-id',
+    '--name-only',
+    '-r',
+    commit,
+  ])
   return output ? output.split(/\r?\n/).filter(Boolean) : []
 }
 
-function getCommitMessage(commit) {
-  return runGit(['show', '-s', '--format=%B', commit])
+function getCommitMessage(repositoryRoot, commit) {
+  return runGit(repositoryRoot, ['show', '-s', '--format=%B', commit])
 }
 
-function getCommitsSince(baselineCommit) {
-  const output = runGit([
+function describePath(filePath) {
+  const moduleMatch = filePath.match(
+    /^(?:apps\/[^/]+|packages\/api-contract)\/src\/(?:foundation|platform)\/modules\/([^/]+)/,
+  )
+  let component = 'repository'
+
+  if (filePath.startsWith('apps/frontend/')) {
+    component = 'frontend'
+  } else if (filePath.startsWith('apps/backend/')) {
+    component = 'backend'
+  } else if (filePath.startsWith('packages/api-contract/')) {
+    component = 'api-contract'
+  } else if (filePath.startsWith('scripts/')) {
+    component = 'tooling'
+  } else if (filePath.startsWith('docs/')) {
+    component = 'documentation'
+  }
+
+  return {
+    component,
+    module: moduleMatch?.[1],
+  }
+}
+
+function getCommitsSince(repositoryRoot, baselineCommit, manifest, profile) {
+  const output = runGit(repositoryRoot, [
     'log',
     '--no-merges',
     '--format=%H%x09%aI%x09%s',
@@ -109,14 +210,25 @@ function getCommitsSince(baselineCommit) {
 
   return output.split(/\r?\n/).map((line) => {
     const [hash, authoredAt, subject] = line.split('\t')
-    const paths = getChangedPaths(hash)
-    const message = getCommitMessage(hash)
+    const paths = getChangedPaths(repositoryRoot, hash)
+    const pathEvidence = paths.map((filePath) => ({
+      path: filePath,
+      ownerScope: resolveOwnershipScope(filePath, manifest, profile),
+      ...describePath(filePath),
+    }))
+    const message = getCommitMessage(repositoryRoot, hash)
     return {
       hash,
       authoredAt,
       subject,
-      paths,
-      scopes: getScopes(paths),
+      paths: pathEvidence,
+      ownerScopes: [
+        ...new Set(
+          pathEvidence
+            .map((path) => path.ownerScope)
+            .filter((scope) => ownershipScopes.includes(scope)),
+        ),
+      ].sort(),
       aiAttributed: /Co-Authored-By:\s*-AI-/i.test(message),
     }
   })
@@ -127,7 +239,8 @@ function isDocumentationPath(filePath) {
     filePath.startsWith('docs/') ||
     filePath.endsWith('.md') ||
     filePath.endsWith('.mdx') ||
-    filePath === 'README.md'
+    filePath === 'README.md' ||
+    filePath === 'README.en.md'
   )
 }
 
@@ -141,119 +254,131 @@ function isGeneratedOnlyPath(filePath) {
   )
 }
 
-function isEffectiveCommit(commit, policy) {
-  const effectivePaths = commit.paths.filter((filePath) => {
-    if (isDocumentationPath(filePath) || isGeneratedOnlyPath(filePath)) {
-      return false
-    }
+function isEffectivePath(filePath, policy) {
+  if (isDocumentationPath(filePath) || isGeneratedOnlyPath(filePath)) {
+    return false
+  }
 
-    return !policy.exclusions.pathPrefixes.some((prefix) => filePath.startsWith(prefix))
-  })
+  return !policy.exclusions.pathPrefixes.some((prefix) => filePath.startsWith(prefix))
+}
 
+function isEffectiveCommitForScope(commit, scope, policy) {
   const subject = commit.subject.toLowerCase()
   const formattingOnly = policy.exclusions.subjectPatterns.some((pattern) =>
     new RegExp(pattern, 'i').test(subject),
   )
 
-  return effectivePaths.length > 0 && !formattingOnly
-}
-
-function getScopes(paths) {
-  const scopes = new Set()
-
-  for (const filePath of paths) {
-    const moduleMatch = filePath.match(
-      /^(?:apps\/[^/]+|packages\/api-contract)\/src\/(?:foundation|platform)\/modules\/([^/]+)/,
-    )
-
-    if (moduleMatch) {
-      scopes.add(moduleMatch[1])
-      continue
-    }
-
-    if (filePath.startsWith('apps/frontend/')) {
-      scopes.add('frontend')
-    } else if (filePath.startsWith('apps/backend/')) {
-      scopes.add('backend')
-    } else if (filePath.startsWith('packages/api-contract/')) {
-      scopes.add('api-contract')
-    } else if (filePath.startsWith('scripts/')) {
-      scopes.add('tooling')
-    }
+  if (formattingOnly) {
+    return false
   }
 
-  return scopes.size > 0 ? [...scopes].sort() : ['repository']
+  return commit.paths.some(
+    (path) => path.ownerScope === scope && isEffectivePath(path.path, policy),
+  )
 }
 
-function getNewAcceptedAdrs(baselineCommit) {
-  const decisionsDirectory = join(foundationDocsRoot, 'decisions')
+function getNewAcceptedAdrs(repositoryRoot, scope, baselineCommit) {
+  const decisionsDirectory = join(repositoryRoot, `docs/${scope}/decisions`)
   return listFiles(decisionsDirectory)
     .filter((filePath) => adrFilenamePattern.test(relative(decisionsDirectory, filePath)))
     .filter((filePath) => parseFrontMatter(filePath).status === 'accepted')
-    .filter((filePath) => !hasPathAtCommit(baselineCommit, toRepositoryPath(filePath)))
-    .map(toRepositoryPath)
+    .filter(
+      (filePath) =>
+        !hasPathAtCommit(
+          repositoryRoot,
+          baselineCommit,
+          toRepositoryPath(repositoryRoot, filePath),
+        ),
+    )
+    .map((filePath) => toRepositoryPath(repositoryRoot, filePath))
 }
 
-function getChangedPlanPaths(baselineCommit) {
+function getChangedPlanPaths(repositoryRoot, scope, baselineCommit) {
   const output = runGit(
+    repositoryRoot,
     [
       'diff',
       '--name-only',
       `${baselineCommit}..HEAD`,
       '--',
-      'docs/foundation/plans/active',
-      'docs/foundation/archive/plans',
+      `docs/${scope}/plans/active`,
+      `docs/${scope}/archive/plans`,
     ],
     true,
   )
   return output ? output.split(/\r?\n/).filter(Boolean) : []
 }
 
-function getCompletedPlans(baselineCommit) {
-  const changedPlanPaths = new Set(getChangedPlanPaths(baselineCommit))
+function getCompletedPlans(repositoryRoot, scope, baselineCommit) {
+  const changedPlanPaths = new Set(getChangedPlanPaths(repositoryRoot, scope, baselineCommit))
   const planFiles = [
-    ...listFiles(join(foundationDocsRoot, 'plans/active')),
-    ...listFiles(join(foundationDocsRoot, 'archive/plans')),
+    ...listFiles(join(repositoryRoot, `docs/${scope}/plans/active`)),
+    ...listFiles(join(repositoryRoot, `docs/${scope}/archive/plans`)),
   ]
 
   return planFiles
     .filter((filePath) => extname(filePath).toLowerCase() === '.md')
-    .filter((filePath) => changedPlanPaths.has(toRepositoryPath(filePath)))
+    .filter((filePath) => changedPlanPaths.has(toRepositoryPath(repositoryRoot, filePath)))
     .filter((filePath) => parseFrontMatter(filePath).status === 'completed')
-    .map(toRepositoryPath)
+    .map((filePath) => toRepositoryPath(repositoryRoot, filePath))
 }
 
-function findActiveArchivePlans() {
-  return listFiles(join(foundationDocsRoot, 'plans/active'))
-    .filter((filePath) => extname(filePath).toLowerCase() === '.md')
-    .map((filePath) => ({
-      path: toRepositoryPath(filePath),
-      ...parseFrontMatter(filePath),
-    }))
-    .filter((plan) => plan.type === 'documentation-archive-review')
+function findActiveArchivePlans(repositoryRoot) {
+  const plans = []
+
+  for (const directoryScope of ownershipScopes) {
+    const directory = join(repositoryRoot, `docs/${directoryScope}/plans/active`)
+    for (const filePath of listFiles(directory)) {
+      if (extname(filePath).toLowerCase() !== '.md') {
+        continue
+      }
+
+      const frontMatter = parseFrontMatter(filePath)
+      if (frontMatter.type !== 'documentation-archive-review') {
+        continue
+      }
+      if (['completed', 'cancelled', 'superseded'].includes(frontMatter.status)) {
+        continue
+      }
+
+      const scopes = new Set([
+        frontMatter.scope || directoryScope,
+        ...splitScopes(frontMatter.review_scopes || frontMatter.reviewScopes),
+      ])
+      plans.push({
+        path: toRepositoryPath(repositoryRoot, filePath),
+        directoryScope,
+        status: frontMatter.status,
+        scopes: [...scopes].filter((scope) => ownershipScopes.includes(scope)),
+        baselineCommit: frontMatter.baseline_commit || frontMatter.baselineCommit,
+      })
+    }
+  }
+
+  return plans
 }
 
-function findSupersededAdrs() {
-  return listFiles(join(foundationDocsRoot, 'decisions'))
-    .filter((filePath) =>
-      adrFilenamePattern.test(relative(join(foundationDocsRoot, 'decisions'), filePath)),
-    )
+function findSupersededAdrs(repositoryRoot, scope) {
+  const decisionsDirectory = join(repositoryRoot, `docs/${scope}/decisions`)
+  return listFiles(decisionsDirectory)
+    .filter((filePath) => adrFilenamePattern.test(relative(decisionsDirectory, filePath)))
     .filter((filePath) =>
       ['superseded', 'replaced', 'retired'].includes(parseFrontMatter(filePath).status),
     )
-    .map(toRepositoryPath)
+    .map((filePath) => toRepositoryPath(repositoryRoot, filePath))
 }
 
 function isLocalDocumentationLink(target) {
   return target && !/^(?:[a-z][a-z\d+.-]*:|\/\/|#)/i.test(target)
 }
 
-function findBrokenDocumentationLinks() {
+function findBrokenDocumentationLinks(repositoryRoot, manifest, profile) {
   const docsRoot = join(repositoryRoot, 'docs')
   const brokenLinks = []
 
   for (const filePath of listFiles(docsRoot)) {
-    if (toRepositoryPath(filePath).includes('/archive/')) {
+    const repositoryPath = toRepositoryPath(repositoryRoot, filePath)
+    if (repositoryPath.includes('/archive/')) {
       continue
     }
 
@@ -283,8 +408,9 @@ function findBrokenDocumentationLinks() {
       const targetPath = resolve(dirname(filePath), decodedTarget)
       if (!existsSync(targetPath)) {
         brokenLinks.push({
-          file: toRepositoryPath(filePath),
+          file: repositoryPath,
           target: decodedTarget,
+          ownerScope: resolveOwnershipScope(repositoryPath, manifest, profile),
         })
       }
     }
@@ -293,19 +419,33 @@ function findBrokenDocumentationLinks() {
   return brokenLinks
 }
 
-function detectArchitectureChanges(commits) {
-  const architecturePaths = new Set([
-    'docs/foundation/design/system-overview.md',
-    'docs/foundation/design/module-boundaries.md',
-  ])
-
-  return commits.some(
-    (commit) =>
-      commit.paths.some((filePath) => architecturePaths.has(filePath)) || commit.scopes.length >= 2,
-  )
+function matchesPathRule(filePath, rule) {
+  return rule.endsWith('/') ? filePath.startsWith(rule) : filePath === rule
 }
 
-function calculateDaysSince(dateValue) {
+function detectArchitectureChanges(commits, scope, policy) {
+  return commits.some((commit) => {
+    const effectiveOwnerScopes = [
+      ...new Set(
+        commit.paths
+          .filter((path) => isEffectivePath(path.path, policy))
+          .map((path) => path.ownerScope)
+          .filter((ownerScope) => ownershipScopes.includes(ownerScope)),
+      ),
+    ]
+
+    return (
+      (effectiveOwnerScopes.length >= 2 && effectiveOwnerScopes.includes(scope)) ||
+      commit.paths.some(
+        (path) =>
+          path.ownerScope === scope &&
+          policy.architecturePaths.some((rule) => matchesPathRule(path.path, rule)),
+      )
+    )
+  })
+}
+
+function calculateDaysSince(dateValue, now) {
   if (!dateValue) {
     return null
   }
@@ -315,157 +455,281 @@ function calculateDaysSince(dateValue) {
     return null
   }
 
-  return Math.max(0, Math.floor((Date.now() - reviewedAt.getTime()) / 86400000))
+  return Math.max(0, Math.floor((now.getTime() - reviewedAt.getTime()) / 86400000))
 }
 
-function buildReport() {
-  const policy = readJson(policyPath)
-  const ledger = readJson(ledgerPath)
-  const headCommit = getCurrentCommit()
-  const baseline = ledger.scopes.repository
+function readLedger(repositoryRoot, scope) {
+  const ledgerPath = join(repositoryRoot, `docs/${scope}/archive/archive-ledger.json`)
+  if (!existsSync(ledgerPath)) {
+    throw new Error(`${scope} archive ledger is missing`)
+  }
 
-  if (!baseline || !hasCommit(baseline.lastReviewedCommit)) {
+  const ledger = readJson(ledgerPath)
+  if (ledger.version !== 2 || ledger.scope !== scope) {
+    throw new Error(`${scope} archive ledger must use version 2 and matching scope`)
+  }
+
+  if (!ledger.lastReviewedCommit || !hasCommit(repositoryRoot, ledger.lastReviewedCommit)) {
+    throw new Error(`${scope} archive ledger has no valid baseline`)
+  }
+
+  return ledger
+}
+
+function compactCommit(commit) {
+  return {
+    hash: commit.hash,
+    authoredAt: commit.authoredAt,
+    subject: commit.subject,
+    ownerScopes: commit.ownerScopes,
+    components: [...new Set(commit.paths.map((path) => path.component))].sort(),
+    modules: [...new Set(commit.paths.map((path) => path.module).filter(Boolean))].sort(),
+    aiAttributed: commit.aiAttributed,
+  }
+}
+
+function buildManagedScopeReport({
+  activePlans,
+  brokenLinks,
+  manifest,
+  now,
+  policy,
+  profile,
+  repositoryRoot,
+  scope,
+}) {
+  let ledger
+  try {
+    ledger = readLedger(repositoryRoot, scope)
+  } catch (error) {
     return {
+      scope,
+      ownership: 'managed',
       status: 'BLOCKED',
       due: false,
-      generatedAt: new Date().toISOString(),
-      headCommit,
-      reasons: ['archive ledger has no valid repository baseline'],
+      reasons: [error.message],
+      planDirectory: `docs/${scope}/plans/active`,
+      activePlans: [],
     }
   }
 
-  const commits = getCommitsSince(baseline.lastReviewedCommit)
-  const effectiveCommits = commits.filter((commit) => isEffectiveCommit(commit, policy))
-  const scopeCounts = {}
-
-  for (const commit of effectiveCommits) {
-    for (const scope of commit.scopes) {
-      scopeCounts[scope] = (scopeCounts[scope] || 0) + 1
-    }
-  }
-
-  const newAcceptedAdrs = getNewAcceptedAdrs(baseline.lastReviewedCommit)
-  const completedPlans = getCompletedPlans(baseline.lastReviewedCommit)
-  const activeArchivePlans = findActiveArchivePlans()
-  const supersededAdrs = findSupersededAdrs()
-  const brokenLinks = findBrokenDocumentationLinks()
-  const architectureChanged = detectArchitectureChanges(commits)
-  const daysSinceReview = calculateDaysSince(baseline.lastReviewedAt)
+  const commits = getCommitsSince(repositoryRoot, ledger.lastReviewedCommit, manifest, profile)
+  const effectiveCommits = commits.filter((commit) =>
+    isEffectiveCommitForScope(commit, scope, policy),
+  )
+  const acceptedAdrs = getNewAcceptedAdrs(repositoryRoot, scope, ledger.lastReviewedCommit)
+  const completedPlans = getCompletedPlans(repositoryRoot, scope, ledger.lastReviewedCommit)
+  const scopeBrokenLinks = brokenLinks.filter((link) => link.ownerScope === scope)
+  const supersededAdrs = findSupersededAdrs(repositoryRoot, scope)
+  const architectureChanged = detectArchitectureChanges(commits, scope, policy)
+  const daysSinceReview = calculateDaysSince(ledger.lastReviewedAt, now)
   const reasons = []
 
-  const thresholdScopes = Object.entries(scopeCounts).filter(
-    ([, count]) => count >= policy.thresholds.effectiveCommits,
-  )
-
-  for (const [scope, count] of thresholdScopes) {
-    reasons.push(`${scope} effective commits reached ${count}`)
+  if (effectiveCommits.length >= policy.thresholds.effectiveCommits) {
+    reasons.push(`${scope} effective commits reached ${effectiveCommits.length}`)
   }
-
-  if (newAcceptedAdrs.length >= policy.thresholds.acceptedAdrs) {
-    reasons.push(`accepted ADRs reached ${newAcceptedAdrs.length}`)
+  if (acceptedAdrs.length >= policy.thresholds.acceptedAdrs) {
+    reasons.push(`${scope} accepted ADRs reached ${acceptedAdrs.length}`)
   }
-
   if (completedPlans.length >= policy.thresholds.completedFeatures) {
-    reasons.push(`completed features reached ${completedPlans.length}`)
+    reasons.push(`${scope} completed features reached ${completedPlans.length}`)
   }
-
   if (daysSinceReview !== null && daysSinceReview >= policy.thresholds.maxDaysSinceReview) {
-    reasons.push(`days since last review reached ${daysSinceReview}`)
+    reasons.push(`${scope} days since last review reached ${daysSinceReview}`)
   }
-
   if (architectureChanged && policy.immediateTriggers.includes('architecture_change')) {
-    reasons.push('architecture change detected')
+    reasons.push(`${scope} architecture change detected`)
   }
-
-  if (brokenLinks.length > 0 && policy.immediateTriggers.includes('document_conflict')) {
-    reasons.push(`broken documentation links detected: ${brokenLinks.length}`)
+  if (scopeBrokenLinks.length > 0 && policy.immediateTriggers.includes('document_conflict')) {
+    reasons.push(`${scope} broken documentation links detected: ${scopeBrokenLinks.length}`)
   }
-
   if (supersededAdrs.length > 0 && policy.immediateTriggers.includes('adr_superseded')) {
-    reasons.push(`superseded ADRs remain current: ${supersededAdrs.length}`)
+    reasons.push(`${scope} superseded ADRs remain current: ${supersededAdrs.length}`)
   }
 
-  const activeBlocked = activeArchivePlans.some((plan) => plan.status === 'blocked')
+  const matchingPlans = activePlans.filter(
+    (plan) => profile.managedScopes.includes(plan.directoryScope) && plan.scopes.includes(scope),
+  )
+  const blockedPlan = matchingPlans.some((plan) => plan.status === 'blocked')
   const due = reasons.length > 0
-  const status = activeBlocked
+  const status = blockedPlan
     ? 'BLOCKED'
-    : activeArchivePlans.length > 0
+    : due && matchingPlans.length > 0
       ? 'IN_PROGRESS'
       : due
         ? 'DUE'
         : 'NOT_DUE'
 
   return {
+    scope,
+    ownership: 'managed',
     status,
     due,
-    generatedAt: new Date().toISOString(),
-    headCommit,
     baseline: {
-      commit: baseline.lastReviewedCommit,
-      reviewedAt: baseline.lastReviewedAt,
+      commit: ledger.lastReviewedCommit,
+      reviewedAt: ledger.lastReviewedAt,
       daysSinceReview,
+      reviewId: ledger.reviewId,
     },
     reasons,
     summary: {
       commitsSinceReview: commits.length,
       effectiveCommits: effectiveCommits.length,
       humanLikeEffectiveCommits: effectiveCommits.filter((commit) => !commit.aiAttributed).length,
-      acceptedAdrs: newAcceptedAdrs.length,
+      acceptedAdrs: acceptedAdrs.length,
       completedFeatures: completedPlans.length,
-      scopeCounts,
     },
     evidence: {
-      commits: effectiveCommits.map((commit) => ({
-        hash: commit.hash,
-        authoredAt: commit.authoredAt,
-        subject: commit.subject,
-        scopes: commit.scopes,
-        aiAttributed: commit.aiAttributed,
-      })),
-      acceptedAdrs: newAcceptedAdrs,
+      commits: effectiveCommits.map(compactCommit),
+      acceptedAdrs,
       completedPlans,
-      brokenLinks,
+      brokenLinks: scopeBrokenLinks,
       supersededAdrs,
       architectureChanged,
     },
-    activePlans: activeArchivePlans.map((plan) => ({
-      path: plan.path,
-      status: plan.status,
-      scope: plan.scope,
-      baselineCommit: plan.baseline_commit || plan.baselineCommit,
-    })),
+    planDirectory: `docs/${scope}/plans/active`,
+    activePlans: matchingPlans,
   }
+}
+
+function buildInheritedScopeReport({ brokenLinks, repositoryRoot, scope }) {
+  const scopeBrokenLinks = brokenLinks.filter((link) => link.ownerScope === scope)
+  const supersededAdrs = findSupersededAdrs(repositoryRoot, scope)
+  const reasons = []
+
+  if (scopeBrokenLinks.length > 0) {
+    reasons.push(`${scope} inherited documentation links are broken: ${scopeBrokenLinks.length}`)
+  }
+  if (supersededAdrs.length > 0) {
+    reasons.push(`${scope} inherited superseded ADRs remain current: ${supersededAdrs.length}`)
+  }
+
+  return {
+    scope,
+    ownership: 'inherited',
+    status: reasons.length > 0 ? 'UPSTREAM_REQUIRED' : 'INHERITED',
+    due: false,
+    reasons,
+    evidence: {
+      brokenLinks: scopeBrokenLinks,
+      supersededAdrs,
+    },
+    upstreamAction:
+      reasons.length > 0 ? 'Fix in Forge and synchronize Foundation again' : undefined,
+  }
+}
+
+function aggregateStatus(scopeReports) {
+  if (scopeReports.some((report) => report.status === 'BLOCKED')) {
+    return 'BLOCKED'
+  }
+  if (scopeReports.some((report) => report.status === 'DUE')) {
+    return 'DUE'
+  }
+  if (scopeReports.some((report) => report.status === 'UPSTREAM_REQUIRED')) {
+    return 'UPSTREAM_REQUIRED'
+  }
+  if (scopeReports.some((report) => report.status === 'IN_PROGRESS')) {
+    return 'IN_PROGRESS'
+  }
+  return 'NOT_DUE'
+}
+
+export function buildReport(options = {}) {
+  const repositoryRoot = resolve(options.repositoryRoot || defaultRepositoryRoot)
+  const now = options.now ? new Date(options.now) : new Date()
+  const headCommit = getCurrentCommit(repositoryRoot)
+
+  let configuration
+  try {
+    configuration = readRepositoryConfiguration(repositoryRoot)
+  } catch (error) {
+    return {
+      version: 2,
+      status: 'BLOCKED',
+      due: false,
+      upstreamRequired: false,
+      generatedAt: now.toISOString(),
+      headCommit,
+      reasons: [error.message],
+      scopes: {},
+    }
+  }
+
+  const { manifest, policy, profile } = configuration
+  const activePlans = findActiveArchivePlans(repositoryRoot)
+  const brokenLinks = findBrokenDocumentationLinks(repositoryRoot, manifest, profile)
+  const scopeReports = ownershipScopes.map((scope) => {
+    if (profile.managedScopes.includes(scope)) {
+      return buildManagedScopeReport({
+        activePlans,
+        brokenLinks,
+        manifest,
+        now,
+        policy,
+        profile,
+        repositoryRoot,
+        scope,
+      })
+    }
+
+    if (profile.inheritedScopes.includes(scope)) {
+      return buildInheritedScopeReport({ brokenLinks, repositoryRoot, scope })
+    }
+
+    return {
+      scope,
+      ownership: 'excluded',
+      status: 'EXCLUDED',
+      due: false,
+      reasons: [],
+    }
+  })
+  const status = aggregateStatus(scopeReports)
+
+  return {
+    version: 2,
+    status,
+    due: scopeReports.some((report) => report.ownership === 'managed' && report.due),
+    upstreamRequired: scopeReports.some((report) => report.status === 'UPSTREAM_REQUIRED'),
+    generatedAt: now.toISOString(),
+    headCommit,
+    repositoryRole: profile.repositoryRole,
+    reasons: scopeReports.flatMap((report) => report.reasons),
+    scopes: Object.fromEntries(scopeReports.map((report) => [report.scope, report])),
+  }
+}
+
+export function shouldFailCi(report) {
+  return report.status === 'BLOCKED' || report.due || report.upstreamRequired
 }
 
 function printHumanReport(report) {
   console.log(`Documentation archive status: ${report.status}`)
-  if (report.baseline) {
-    console.log(`Baseline: ${report.baseline.commit}`)
-    console.log(`Current HEAD: ${report.headCommit}`)
+  if (report.repositoryRole) {
+    console.log(`Repository role: ${report.repositoryRole}`)
   }
+  console.log(`Current HEAD: ${report.headCommit}`)
 
-  if (report.reasons?.length > 0) {
-    console.log('Reasons:')
-    for (const reason of report.reasons) {
-      console.log(`- ${reason}`)
+  for (const scope of ownershipScopes) {
+    const scopeReport = report.scopes?.[scope]
+    if (!scopeReport) {
+      continue
     }
-  } else {
-    console.log('Reasons: none')
-  }
 
-  if (report.summary) {
     console.log(
-      `Evidence: ${report.summary.effectiveCommits} effective commits, ` +
-        `${report.summary.acceptedAdrs} accepted ADRs, ` +
-        `${report.summary.completedFeatures} completed features`,
+      `- ${scope}: ${scopeReport.status} (${scopeReport.ownership}, due=${scopeReport.due})`,
     )
+    for (const reason of scopeReport.reasons) {
+      console.log(`  - ${reason}`)
+    }
+    for (const plan of scopeReport.activePlans || []) {
+      console.log(`  - active plan: ${plan.path} (${plan.status})`)
+    }
   }
 
-  if (report.activePlans?.length > 0) {
-    console.log('Active archive plans:')
-    for (const plan of report.activePlans) {
-      console.log(`- ${plan.path} (${plan.status})`)
-    }
+  if (report.reasons?.length === 0) {
+    console.log('Reasons: none')
   }
 }
 
@@ -479,14 +743,16 @@ function main() {
     printHumanReport(report)
   }
 
-  if (args.has('--fail-on-due') && (report.status === 'DUE' || report.status === 'BLOCKED')) {
+  if (args.has('--fail-on-due') && shouldFailCi(report)) {
     process.exitCode = 10
   }
 }
 
-try {
-  main()
-} catch (error) {
-  console.error(`Documentation archive audit failed: ${error.message}`)
-  process.exitCode = 1
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  try {
+    main()
+  } catch (error) {
+    console.error(`Documentation archive audit failed: ${error.message}`)
+    process.exitCode = 1
+  }
 }

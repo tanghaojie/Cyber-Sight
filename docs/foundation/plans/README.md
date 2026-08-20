@@ -1,8 +1,7 @@
 # 活动计划
 
 `type: documentation-archive-review` 的计划是跨 AI 智能体共享的归档审查任务。涉及业务行为、API、数据模型、模块边界、架构、迁移、ADR、计划或文档治理的 AI 任务，在首次修改文件前运行
-`pnpm docs:archive:check`；发现 `DUE` 且没有同一范围的活动计划时，创建一个标准计划，发现 `IN_PROGRESS`
-时继续已有计划。只读问答、代码浏览、格式化、注释和单文件机械改动可以跳过。该协议不使用任何 AI 平台私有目录。
+`pnpm docs:archive:check`；只为报告中 `managed` 且 `DUE` 的作用域创建计划，`IN_PROGRESS` 时继续覆盖同一作用域的现有计划。跨作用域计划使用逗号分隔的 `review_scopes` 明确覆盖范围。下游不得为 `inherited` Foundation 创建本地计划。只读问答、代码浏览、格式化、注释和单文件机械改动可以跳过。该协议不使用任何 AI 平台私有目录。
 
 开始任务时检查 `plans/active/`，只读取与当前目标相同或直接相关的计划。
 

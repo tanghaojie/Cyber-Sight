@@ -1,10 +1,7 @@
 {
-  "version": 1,
-  "scopes": {
-    "repository": {
-      "lastReviewedCommit": "a23c38240d7d71f1aa5eb36438ffeda59c5f5355",
-      "lastReviewedAt": "2026-08-13T19:18:21+08:00",
-      "reviewId": "forge-architecture-sync"
-    }
-  }
+  "version": 2,
+  "scope": "foundation",
+  "lastReviewedCommit": "df4aa493731c93d47432e62bd6502a8563ffd990",
+  "lastReviewedAt": "2026-08-18T16:05:00+08:00",
+  "reviewId": "scope-owned-archive-audit-v2"
 }

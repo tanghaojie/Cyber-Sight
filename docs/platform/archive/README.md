@@ -1,5 +1,7 @@
 # Platform 历史归档
 
+- [Platform 归档审查台账](archive-ledger.json)：当前业务平台最近一次完成审查的 Git 基线；下游独立推进。
+
 历史决策见[决策归档索引](decisions/README.md)。
 
 ## 已归档设计

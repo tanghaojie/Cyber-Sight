@@ -129,11 +129,12 @@
 
 - AI 开始仓库任务时先判断任务范围。只读问答、代码浏览、格式化、注释和单文件机械改动可以跳过归档审计；涉及业务行为、API、数据模型、模块边界、架构、迁移、ADR、计划或文档治理的任务，必须在首次修改文件前运行 `pnpm docs:archive:check`。
 - 如果任务开始时范围不明确，或实施过程中扩大到上述范围，必须在首次修改相关文件前补运行归档审计。
-- 若结果为 `DUE`，必须创建或继续 `docs/foundation/plans/active/` 下 `type: documentation-archive-review` 的计划。
-- 若结果为 `IN_PROGRESS`，优先继续已有归档审查计划，不得创建重复计划。
+- 若 managed scope 结果为 `DUE`，必须在报告给出的 `docs/<scope>/plans/active/` 创建或继续 `type: documentation-archive-review` 的计划；跨作用域任务通过 `review_scopes` 显式声明，不得用一个无关计划掩盖其他作用域。
+- 若结果为 `IN_PROGRESS`，优先继续覆盖同一作用域的已有归档审查计划，不得创建重复计划；该状态的 `due` 仍为 `true`，不能让最终 CI 检查静默通过。
+- 若 inherited scope 结果为 `UPSTREAM_REQUIRED`，下游保留证据并要求先在 Forge 修复再同步，不得直接修改 `docs/foundation/**` 或推进 Foundation ledger。
 - 若结果为 `BLOCKED`，保留现有文档和证据，向维护者报告具体冲突，不得猜测后归档。
 - 合并前或 CI 必须运行 `pnpm docs:archive:check:ci`；没有 CI 的任务在最终验证阶段运行同一命令。
-- 归档触发、基线和阈值使用 `docs/foundation/archive/archive-policy.json` 与 `docs/foundation/archive/archive-ledger.json`；禁止使用 Codex、Claude 或其他单一 AI 平台的私有状态文件作为仓库协议。
+- 归档触发和阈值使用共享的 `docs/foundation/archive/archive-policy.json`；仓库角色由根 `.archive-audit.json` 显式声明，各所有权作用域的基线分别保存在 `docs/<scope>/archive/archive-ledger.json`。禁止使用仓库名称、Git remote、Codex、Claude 或其他平台私有状态推断角色或代替仓库协议。
 - 归档审查必须先根据当前代码、测试、契约、迁移和 Git 历史补充当前 Design/ADR，再归档已经被取代的历史内容。
 
 @RTK.md

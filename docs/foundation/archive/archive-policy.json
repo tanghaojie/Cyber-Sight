@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "scope": "module",
+  "version": 2,
+  "scope": "ownership",
   "thresholds": {
     "effectiveCommits": 20,
     "acceptedAdrs": 3,
@@ -8,6 +8,16 @@
     "maxDaysSinceReview": 30
   },
   "immediateTriggers": ["architecture_change", "document_conflict", "adr_superseded"],
+  "architecturePaths": [
+    ".archive-audit.json",
+    ".forge-sync.yml",
+    "AGENTS.md",
+    "docs/foundation/design/documentation-governance.md",
+    "docs/foundation/design/foundation-platform-ownership.md",
+    "docs/foundation/design/module-boundaries.md",
+    "docs/foundation/design/system-overview.md",
+    "scripts/docs/"
+  ],
   "exclusions": {
     "pathPrefixes": [".codegraph/", ".vscode/"],
     "subjectPatterns": ["^(chore: )?(format|prettier|lint)(\\b|:)", "^style(\\b|:)"]

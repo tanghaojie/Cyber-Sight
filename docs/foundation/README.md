@@ -60,10 +60,10 @@ pnpm docs:archive:check
 ```
 
 只读问答、代码浏览、格式化、注释和单文件机械改动可以跳过。若任务范围中途扩大，必须在修改相关文件前补运行。命令只读检查 Git 历史、当前文档、活动计划和归档基线，不依赖任何特定 AI 平台。若结果为
-`DUE`，AI 应在 `plans/active/` 创建或继续带有 `type: documentation-archive-review` 的归档审查计划；
-`IN_PROGRESS` 表示已有智能体创建了共享任务，`BLOCKED` 表示必须请求维护者确认。
+`DUE`，AI 应在报告指定的 `docs/<scope>/plans/active/` 创建或继续带有 `type: documentation-archive-review` 的归档审查计划；
+`IN_PROGRESS` 表示同一作用域已有共享任务但 CI 仍等待完成；`UPSTREAM_REQUIRED` 表示下游发现只读 Foundation 问题，必须回 Forge 修复；`BLOCKED` 表示必须请求维护者确认。
 
-合并前或 CI 使用以下入口，将 `DUE`/`BLOCKED` 转换为失败状态：
+合并前或 CI 使用以下入口，只要 managed scope 仍然 due、存在上游必修问题或处于 `BLOCKED` 就返回失败：
 
 ```text
 pnpm docs:archive:check:ci
@@ -72,4 +72,4 @@ pnpm docs:archive:check:ci
 归档审查不是单纯移动旧文件。AI 必须先通过代码、测试、API 契约、数据库迁移和 Git 历史补充当前
 Design/ADR，再将已被当前事实取代的 Design、文档、ADR、计划和 AI 协作记录归入 `archive/`。
 
-机器可读的触发策略和归档基线位于 `archive/archive-policy.json` 与 `archive/archive-ledger.json`。
+机器可读的共享触发策略位于 `archive/archive-policy.json`；仓库角色由根 `.archive-audit.json` 声明，Foundation、Forge、Platform 基线分别位于各自 `archive/archive-ledger.json`。下游只推进 Platform ledger。
