@@ -4,7 +4,7 @@ scope: platform
 repository: Cyber-Sight
 owner: project maintainers
 date: 2026-08-20
-status: active
+status: completed
 ---
 
 # 同步 Cyber AI Forge 2026-08-20 更新
@@ -32,14 +32,19 @@ status: active
 
 ## 验证结果
 
-实施完成后补充。
+- `pnpm format`：通过；
+- `pnpm format:check`：通过；
+- `pnpm lint`：通过；
+- `pnpm test`：143 个后端测试和 8 个脚本测试通过；首次沙箱执行因 esbuild 路径读取权限失败，正常环境重跑通过；
+- `pnpm build`：通过，保留既有 Sass legacy API、VueUse annotation、AdminLayout 动静态导入和 Cesium 大 chunk 警告；
+- `pnpm docs:archive:test`：4 个归档审计测试通过；
+- `pnpm docs:archive:check:ci`：完成 ledger 后执行。
 
 ## 未决问题与下一步
 
-- 合并后核对环境目录、共享组装点、锁文件和归档审计配置；
-- 前端运行行为和视觉需要维护者人工验收。
+- 前端运行行为和视觉需要维护者人工验收；本次没有应用源码变化。
 
 ## 相关设计、ADR、计划和提交
 
-- [Cyber AI Forge 上游同步](../../../design/upstream-synchronization.md)
-- [实施计划](../../../plans/active/2026-08-20-forge-upstream-sync.md)
+- [Cyber AI Forge 上游同步](../../../../design/upstream-synchronization.md)
+- [实施计划](../../../plans/2026-08-20-forge-upstream-sync.md)

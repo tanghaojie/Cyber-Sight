@@ -4,7 +4,7 @@ scope: platform
 repository: Cyber-Sight
 owner: project maintainers
 date: 2026-08-17
-status: active
+status: completed
 ---
 
 # Geo 功能交付后的文档归档审查协作记录
@@ -28,7 +28,11 @@ status: active
 - 创建 Platform 接续计划，保留审计基线、已完成证据和待 Forge 接续事项；
 - 维护者于 2026-08-18 明确授权 Geo 交付忽略当前 `DUE` 并提交，随后在 Forge 项目修正审计设计；本记录继续保持活动，等待 Forge 结果同步。
 
+## 完成结果
+
+2026-08-20 同步 Forge `70dbfbd` 后，Cyber-Sight 已切换为 `platform-downstream`，Foundation、Forge、Platform 状态不再混用。Platform ledger 以完成冲突修正后的 `edbc05d` 为首次下游审查基线，本接续事项完成。
+
 ## 相关计划
 
-- [Geo 文档归档审查计划](../../../plans/active/2026-08-17-geo-documentation-archive-review.md)
-- [Geo 当前设计](../../../design/modules/geo.md)
+- [Geo 文档归档审查计划](../../../plans/2026-08-17-geo-documentation-archive-review.md)
+- [Geo 当前设计](../../../../design/modules/geo.md)

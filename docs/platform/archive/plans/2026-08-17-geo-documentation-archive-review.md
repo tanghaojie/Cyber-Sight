@@ -3,10 +3,10 @@ title: Geo 功能交付后的文档归档审查
 type: documentation-archive-review
 scope: platform
 repository: Cyber-Sight
-status: active
+status: completed
 owner: project maintainers
 created: 2026-08-17
-updated: 2026-08-18
+updated: 2026-08-20
 baseline_commit: a23c38240d7d71f1aa5eb36438ffeda59c5f5355
 ---
 
@@ -29,10 +29,14 @@ Geo 完整功能交付的最终验证中，`pnpm docs:archive:check:ci` 从 Foun
 
 ## 待 Foundation/Forge 接续
 
-- [ ] 在 Cyber AI Forge 的 Foundation 作用域审查跨提交归档基线；
-- [ ] 按上游归档协议更新 Foundation 台账或活动审查计划；
-- [ ] 同步回 Cyber-Sight 后重新运行 `pnpm docs:archive:check:ci`；
-- [ ] 审查完成后归档本 Platform 接续计划和对应 AI 记录。
+- [x] Cyber AI Forge 在 Foundation 作用域完成所有权分域的归档审计设计；
+- [x] 上游建立独立 Foundation、Forge、Platform 台账和下游角色模板；
+- [x] 同步回 Cyber-Sight，并建立 `platform-downstream` 配置和本地 Platform 基线；
+- [x] 重新运行 `pnpm docs:archive:check:ci` 并归档本计划和对应 AI 记录。
+
+## 完成结果
+
+Forge `8b22250` 引入的新机制已经通过合并提交 `6c5ea8c` 进入 Cyber-Sight。下游只管理 Platform 归档状态，Foundation 为 inherited，Forge 被排除；旧机制的所有权冲突已消除。
 
 ## 边界
 
@@ -44,5 +48,5 @@ Geo 完整功能交付的最终验证中，`pnpm docs:archive:check:ci` 从 Foun
 
 - [Geo 当前设计](../../design/modules/geo.md)
 - [Geo 插件架构 ADR](../../decisions/ADR-20260814-geo-frontend-plugin-architecture.md)
-- [Geo 已完成实施计划](../../archive/plans/2026-08-14-geo-frontend-workspace.md)
-- [AI 协作记录](../../ai-logs/2026/08/2026-08-17-geo-documentation-archive-review.md)
+- [Geo 已完成实施计划](2026-08-14-geo-frontend-workspace.md)
+- [AI 协作记录](../ai-logs/2026/08/2026-08-17-geo-documentation-archive-review.md)

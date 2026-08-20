@@ -20,6 +20,8 @@
 - [2026-08-13 Forge 架构更新接入 Cyber-Sight](plans/2026-08-13-forge-architecture-sync.md)：完成 Foundation 同步、Platform 文档迁移和下游边界固化。
 - [2026-08-14 清理已移除推广站引用](plans/2026-08-14-remove-retired-marketing-site-references.md)：清理 README、同步清单、部署配置和当前文档中的失效引用。
 - [2026-08-14 Geo 前端工作台](plans/2026-08-14-geo-frontend-workspace.md)：完成纯前端 Cesium 工作台、编译期插件和通用 Geo 能力迁移。
+- [2026-08-17 Geo 文档归档审查](plans/2026-08-17-geo-documentation-archive-review.md)：完成旧归档门禁接续并迁移到分域审计。
+- [2026-08-20 Forge 上游同步](plans/2026-08-20-forge-upstream-sync.md)：合并 Forge `70dbfbd` 并建立 Cyber-Sight Platform 审计基线。
 
 ## AI 协作记录
 
@@ -32,5 +34,7 @@
 - [2026-08-13 Forge 架构更新接入 Cyber-Sight](ai-logs/2026/08/2026-08-13-forge-architecture-sync.md)
 - [2026-08-14 清理已移除推广站引用](ai-logs/2026/08/2026-08-14-remove-retired-marketing-site-references.md)
 - [2026-08-14 Geo 模块设计与实施](ai-logs/2026/08/2026-08-14-geo-platform-design.md)
+- [2026-08-17 Geo 文档归档审查](ai-logs/2026/08/2026-08-17-geo-documentation-archive-review.md)
+- [2026-08-20 Forge 上游同步](ai-logs/2026/08/2026-08-20-forge-upstream-sync.md)
 
 Sight 等业务平台在自己的仓库维护本目录。

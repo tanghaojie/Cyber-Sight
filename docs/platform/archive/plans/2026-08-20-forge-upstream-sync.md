@@ -3,7 +3,7 @@ title: 同步 Cyber AI Forge 2026-08-20 更新
 scope: platform
 repository: Cyber-Sight
 owner: project maintainers
-status: active
+status: completed
 created: 2026-08-20
 updated: 2026-08-20
 ---
@@ -42,10 +42,10 @@ updated: 2026-08-20
 
 - [x] 完成远端、分支、工作区和暂存区安全检查；
 - [x] 获取 `origin` 与 `upstream` 最新引用并创建同步分支；
-- [ ] 合并 Forge 并解决冲突；
-- [ ] 配置下游归档角色和 Platform ledger；
-- [ ] 更新设计、计划、AI 日志与索引；
-- [ ] 完成验证并创建带 AI trailer 的提交。
+- [x] 合并 Forge 并解决冲突；
+- [x] 配置下游归档角色和 Platform ledger；
+- [x] 更新设计、计划、AI 日志与索引；
+- [x] 完成验证并创建带 AI trailer 的提交。
 
 ## 测试与验证
 
@@ -57,9 +57,9 @@ updated: 2026-08-20
 
 ## 实际偏差和遗留问题
 
-实施完成后补充。
+上游合并只涉及归档审计脚本、测试和治理文档，没有应用源码、依赖或数据库迁移。冲突处理中保留 Cyber-Sight Platform 内容，采用 Forge Foundation 新规范，并继续排除 `docs/forge/**`。Forge 的 Foundation 决策索引错误引用下游品牌 ADR，已在同步分支修正。
 
 ## 相关设计、ADR 和 AI 日志
 
 - [Cyber AI Forge 上游同步](../../design/upstream-synchronization.md)
-- [AI 协作记录](../../ai-logs/2026/08/2026-08-20-forge-upstream-sync.md)
+- [AI 协作记录](../ai-logs/2026/08/2026-08-20-forge-upstream-sync.md)

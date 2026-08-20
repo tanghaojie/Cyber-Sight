@@ -105,3 +105,7 @@ pnpm docs:archive:check:ci
 ## 2026-08-11 配置状态
 
 当前 clone 已确认 `master` 跟踪 `origin/master`，默认推送远端和 `master` 的推送远端均为 `origin`，`pull.ff=only`、`fetch.prune=true`，且 `upstream` 的 push URL 为故意无效的 `DISABLED`。这些设置属于本地 `.git/config`，新 clone 仍须按本设计和人类指南重新配置；Cyber AI Forge 的 GitHub 服务端分支保护由维护者另行确认。
+
+## 2026-08-20 同步状态
+
+Cyber-Sight 已通过合并提交 `6c5ea8c` 接入 Forge `70dbfbd`，并采用所有权分域的归档审计。根 `.archive-audit.json` 固定为 `platform-downstream`：只管理 Platform、继承只读 Foundation、排除 Forge，Integration 归 Foundation。Platform 审查基线由本仓库独立维护，禁止复制 Forge 的 Platform ledger。
