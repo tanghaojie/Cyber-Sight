@@ -109,6 +109,12 @@ export function createGeoDataBrowser(
   }
   let disposed = false
 
+  function requestRender(): void {
+    if (!viewer.isDestroyed()) {
+      viewer.scene.requestRender()
+    }
+  }
+
   function assertActive(): void {
     if (disposed) {
       throw new Error('Geo data browser has been disposed')
@@ -135,6 +141,7 @@ export function createGeoDataBrowser(
   function cleanupDataSource(resource: GeoJsonDataSource): void {
     if (!viewer.isDestroyed() && viewer.dataSources.contains(resource)) {
       viewer.dataSources.remove(resource, true)
+      requestRender()
     }
   }
 
@@ -191,6 +198,7 @@ export function createGeoDataBrowser(
       viewer.dataSources.add(resource)
       added = true
       resources.set(id, managed)
+      requestRender()
       return snapshotFor(managed)
     } catch (error) {
       if (resource) {
@@ -236,6 +244,7 @@ export function createGeoDataBrowser(
         },
       }
       resources.set(id, managed)
+      requestRender()
       return snapshotFor(managed)
     } catch (error) {
       if (resource) {
@@ -281,6 +290,7 @@ export function createGeoDataBrowser(
       }
       resources.set(id, managed)
       notifyActiveTileset()
+      requestRender()
       return snapshotFor(managed)
     } catch (error) {
       if (resource) {
@@ -304,6 +314,7 @@ export function createGeoDataBrowser(
     if (managed.snapshot.kind === '3d-tiles') {
       notifyActiveTileset()
     }
+    requestRender()
     return removed
   }
 
@@ -318,6 +329,7 @@ export function createGeoDataBrowser(
       throw new Error(`Geo data resource not found: ${id}`)
     }
     managed.resource.show = show
+    requestRender()
   }
 
   async function flyTo(id: string, duration = 1.4): Promise<boolean> {
@@ -359,6 +371,7 @@ export function createGeoDataBrowser(
       }
       assertActive()
       viewer.scene.globe.terrainProvider = provider
+      requestRender()
       terrainSnapshot = { ...terrainSnapshot, status: 'ready' }
     } catch (error) {
       terrainSnapshot = {
@@ -385,6 +398,7 @@ export function createGeoDataBrowser(
       managed?.remove()
     })
     options.onActiveTilesetChange?.(undefined)
+    requestRender()
   }
 
   return {

@@ -68,6 +68,7 @@ export class SceneCompareTool {
         throw new Error('Scene comparison split position must be finite')
       }
       this.viewer.scene.splitPosition = Math.min(Math.max(value, 0), 1)
+      this.viewer.scene.requestRender()
     }
     const setEnabled = (nextEnabled: boolean): void => {
       if (stopped) {
@@ -76,6 +77,7 @@ export class SceneCompareTool {
       enabled = nextEnabled
       leftLayer.show = nextEnabled
       rightLayer.show = nextEnabled
+      this.viewer.scene.requestRender()
     }
     const stop = (): void => {
       if (stopped) {
@@ -88,6 +90,7 @@ export class SceneCompareTool {
       rightLayer.show = previousRightShow
       this.viewer.scene.splitPosition = previousSplitPosition
       ownedLayers.forEach((layer) => this.viewer.imageryLayers.remove(layer, true))
+      this.viewer.scene.requestRender()
       if (this.session === session) {
         this.session = undefined
       }

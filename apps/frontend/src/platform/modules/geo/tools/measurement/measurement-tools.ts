@@ -149,6 +149,7 @@ export class PointMeasurementTool {
         height: cartographic.height,
         entity,
       })
+      this.viewer.scene.requestRender()
       stop()
     }, ScreenSpaceEventType.LEFT_CLICK)
     this.activeSession = session
@@ -168,6 +169,7 @@ export class PointMeasurementTool {
     this.activeSession?.stop()
     this.entities.forEach((entity) => this.viewer.entities.remove(entity))
     this.entities.clear()
+    this.viewer.scene.requestRender()
   }
 
   dispose(): void {
@@ -257,6 +259,7 @@ export class AreaMeasurementTool {
         positions: positions.map((position) => Cartesian3.clone(position)),
         entities: [polygon],
       })
+      this.viewer.scene.requestRender()
       stop()
     }
     handler.setInputAction((event: ScreenSpaceEventHandler.PositionedEvent) => {
@@ -267,6 +270,7 @@ export class AreaMeasurementTool {
       positions.push(Cartesian3.clone(position))
       previewPosition = undefined
       options.onUpdate?.(calculateAreaSquareMeters(positions))
+      this.viewer.scene.requestRender()
     }, ScreenSpaceEventType.LEFT_CLICK)
     handler.setInputAction((event: ScreenSpaceEventHandler.MotionEvent) => {
       if (positions.length === 0 || stopped) {
@@ -274,6 +278,7 @@ export class AreaMeasurementTool {
       }
       previewPosition = pickGlobePosition(this.viewer, event.endPosition)
       options.onUpdate?.(calculateAreaSquareMeters(displayedPositions()))
+      this.viewer.scene.requestRender()
     }, ScreenSpaceEventType.MOUSE_MOVE)
     handler.setInputAction(finish, ScreenSpaceEventType.LEFT_DOUBLE_CLICK)
     this.activeSession = session
@@ -293,6 +298,7 @@ export class AreaMeasurementTool {
     this.activeSession?.stop()
     this.entities.forEach((entity) => this.viewer.entities.remove(entity))
     this.entities.clear()
+    this.viewer.scene.requestRender()
   }
 
   dispose(): void {

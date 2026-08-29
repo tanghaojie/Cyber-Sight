@@ -84,6 +84,12 @@ export function createGeoImageryLayerManager(
   const layers = new Map<string, ManagedImageryLayer>()
   let disposed = false
 
+  function requestRender(): void {
+    if (!viewer.isDestroyed()) {
+      viewer.scene.requestRender()
+    }
+  }
+
   function assertActive(signal?: AbortSignal): void {
     if (disposed) {
       throw new Error('Geo imagery layer manager has been disposed')
@@ -177,6 +183,7 @@ export function createGeoImageryLayerManager(
       warning: availability.warning,
     }
     layers.set(id, managed)
+    requestRender()
     return toSnapshot(id, managed)
   }
 
@@ -188,7 +195,9 @@ export function createGeoImageryLayerManager(
     }
     managed.removeErrorListener?.()
     layers.delete(id)
-    return viewer.imageryLayers.remove(managed.layer, true)
+    const removed = viewer.imageryLayers.remove(managed.layer, true)
+    requestRender()
+    return removed
   }
 
   function clear(): void {
@@ -198,31 +207,37 @@ export function createGeoImageryLayerManager(
   function setVisible(id: string, show: boolean): void {
     assertActive()
     find(id).layer.show = show
+    requestRender()
   }
 
   function setAlpha(id: string, alpha: number): void {
     assertActive()
     find(id).layer.alpha = clampAlpha(alpha)
+    requestRender()
   }
 
   function raise(id: string): void {
     assertActive()
     viewer.imageryLayers.raise(find(id).layer)
+    requestRender()
   }
 
   function lower(id: string): void {
     assertActive()
     viewer.imageryLayers.lower(find(id).layer)
+    requestRender()
   }
 
   function raiseToTop(id: string): void {
     assertActive()
     viewer.imageryLayers.raiseToTop(find(id).layer)
+    requestRender()
   }
 
   function lowerToBottom(id: string): void {
     assertActive()
     viewer.imageryLayers.lowerToBottom(find(id).layer)
+    requestRender()
   }
 
   function flyTo(id: string, duration = 1.4): boolean {
@@ -251,6 +266,7 @@ export function createGeoImageryLayerManager(
       viewer.imageryLayers.remove(managed.layer, true)
       layers.delete(id)
     })
+    requestRender()
   }
 
   return {

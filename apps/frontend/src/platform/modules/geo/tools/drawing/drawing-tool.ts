@@ -169,6 +169,7 @@ export class DrawingTool {
       }
       this.results.set(result.id, result)
       options.onComplete?.(result)
+      this.viewer.scene.requestRender()
     }
 
     const cancel = (): void => {
@@ -189,6 +190,7 @@ export class DrawingTool {
       addPointEntity(position)
       previewPosition = undefined
       options.onUpdate?.(clonePositions(positions))
+      this.viewer.scene.requestRender()
       if (mode === 'point') {
         complete()
       }
@@ -206,6 +208,7 @@ export class DrawingTool {
       }
       previewPosition = pickPosition(event.endPosition)
       options.onUpdate?.(clonePositions(displayedPositions()))
+      this.viewer.scene.requestRender()
     }, ScreenSpaceEventType.MOUSE_MOVE)
     handler.setInputAction(complete, ScreenSpaceEventType.LEFT_DOUBLE_CLICK)
 
@@ -227,6 +230,7 @@ export class DrawingTool {
       }
       if (!completed) {
         entities.forEach((entity) => this.viewer.entities.remove(entity))
+        this.viewer.scene.requestRender()
       }
       this.sessions.delete(session)
       if (this.activeSession === session) {
@@ -268,5 +272,6 @@ export class DrawingTool {
   private removeResult(result: DrawingResult): void {
     result.entities.forEach((entity) => this.viewer.entities.remove(entity))
     this.results.delete(result.id)
+    this.viewer.scene.requestRender()
   }
 }

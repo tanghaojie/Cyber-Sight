@@ -87,6 +87,7 @@ export class TilesetTools {
       translation,
       new Matrix4(),
     )
+    this.viewer.scene.requestRender()
   }
 
   setClippingPlane(normal: Cartesian3, distance: number): void {
@@ -103,6 +104,7 @@ export class TilesetTools {
     })
     this.ownClippingPlanes = collection
     this.tileset.clippingPlanes = collection
+    this.viewer.scene.requestRender()
   }
 
   clearClippingPlane(): void {
@@ -112,11 +114,13 @@ export class TilesetTools {
         this.ownClippingPlanes.destroy()
       }
       this.ownClippingPlanes = undefined
+      this.viewer.scene.requestRender()
     }
   }
 
   setSplitDirection(direction: SplitDirection): void {
     this.tileset.splitDirection = direction
+    this.viewer.scene.requestRender()
   }
 
   clear(): void {
@@ -126,6 +130,7 @@ export class TilesetTools {
     this.clearClippingPlane()
     this.tileset.modelMatrix = Matrix4.clone(this.originalModelMatrix, new Matrix4())
     this.tileset.splitDirection = SplitDirection.NONE
+    this.viewer.scene.requestRender()
   }
 
   stop(): void {
@@ -178,6 +183,7 @@ export class TilesetTools {
         picked.feature.color = color
       }
       options.onPick?.(picked)
+      this.viewer.scene.requestRender()
     }
     handler.setInputAction(onEvent, eventType)
     const stop = (): void => {
@@ -218,6 +224,7 @@ export class TilesetTools {
     }
     this.highlighted.feature.color = this.highlighted.color
     this.highlighted = undefined
+    this.viewer.scene.requestRender()
   }
 
   private restoreClassified(): void {
@@ -225,5 +232,6 @@ export class TilesetTools {
       feature.color = color
     })
     this.classified.clear()
+    this.viewer.scene.requestRender()
   }
 }

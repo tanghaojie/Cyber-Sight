@@ -1,5 +1,6 @@
 import { markRaw, reactive, readonly } from 'vue'
 import {
+  Cartesian2,
   Cartesian3,
   Cartographic,
   Color,
@@ -15,6 +16,7 @@ import { createGeoInteractionManager, type GeoInteractionManager } from './inter
 import { createGeoViewerAccess, type GeoViewerAccess } from './viewer-access'
 import { createGeoPluginRegistry, type GeoPluginRegistry } from './plugin-registry'
 import type { GeoPluginDefinition } from './geo-plugin'
+import { createGeoRenderPerformanceController } from './render-performance'
 
 export type GeoRuntimeStatus = 'idle' | 'mounting' | 'ready' | 'failed' | 'disposed'
 export type GeoSceneMode = '2d' | '3d' | 'columbus'
@@ -48,6 +50,9 @@ const SHANGHAI_VIEW = {
   latitude: 31.2304,
   height: 1_150_000,
 } as const
+
+const POINTER_PICK_INTERVAL_MS = 50
+const FPS_IDLE_TIMEOUT_MS = 1_500
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'Unknown Geo initialization error'
@@ -110,21 +115,71 @@ function registerRuntimeStatus(
   const removeMorphListener = viewer.scene.morphComplete.addEventListener(updateSceneMode)
   scope.defer(removeMorphListener)
 
-  const pointerHandler = new ScreenSpaceEventHandler(viewer.scene.canvas)
-  pointerHandler.setInputAction(function updatePointerPosition(
-    movement: ScreenSpaceEventHandler.MotionEvent,
-  ) {
-    const ray = viewer.camera.getPickRay(movement.endPosition)
-    const position = ray ? viewer.scene.globe.pick(ray, viewer.scene) : undefined
-    if (!position) {
+  let cameraMoving = false
+  let lastPointerPosition: Cartesian2 | undefined
+  let lastPointerPickAt = 0
+  let pointerPickTimer: ReturnType<typeof setTimeout> | undefined
+
+  function updatePointerPosition(position: Cartesian2): void {
+    lastPointerPickAt = performance.now()
+    const ray = viewer.camera.getPickRay(position)
+    const pickedPosition = ray ? viewer.scene.globe.pick(ray, viewer.scene) : undefined
+    if (!pickedPosition) {
       return
     }
-    const cartographic = Cartographic.fromCartesian(position)
+    const cartographic = Cartographic.fromCartesian(pickedPosition)
     state.longitude = CesiumMath.toDegrees(cartographic.longitude)
     state.latitude = CesiumMath.toDegrees(cartographic.latitude)
     state.surfaceHeight = cartographic.height
+  }
+
+  function clearPointerPickTimer(): void {
+    if (pointerPickTimer !== undefined) {
+      clearTimeout(pointerPickTimer)
+      pointerPickTimer = undefined
+    }
+  }
+
+  function schedulePointerPick(): void {
+    if (cameraMoving || !lastPointerPosition) {
+      return
+    }
+    const remaining = POINTER_PICK_INTERVAL_MS - (performance.now() - lastPointerPickAt)
+    if (remaining <= 0) {
+      clearPointerPickTimer()
+      updatePointerPosition(lastPointerPosition)
+      return
+    }
+    if (pointerPickTimer === undefined) {
+      pointerPickTimer = setTimeout(function runPointerPick() {
+        pointerPickTimer = undefined
+        if (!cameraMoving && lastPointerPosition) {
+          updatePointerPosition(lastPointerPosition)
+        }
+      }, remaining)
+    }
+  }
+
+  const removeMoveStartListener = viewer.camera.moveStart.addEventListener(function pausePicking() {
+    cameraMoving = true
+    clearPointerPickTimer()
+  })
+  const removeMoveEndListener = viewer.camera.moveEnd.addEventListener(function resumePicking() {
+    cameraMoving = false
+    schedulePointerPick()
+  })
+  scope.defer(removeMoveStartListener)
+  scope.defer(removeMoveEndListener)
+
+  const pointerHandler = new ScreenSpaceEventHandler(viewer.scene.canvas)
+  pointerHandler.setInputAction(function rememberPointerPosition(
+    movement: ScreenSpaceEventHandler.MotionEvent,
+  ) {
+    lastPointerPosition = Cartesian2.clone(movement.endPosition, lastPointerPosition)
+    schedulePointerPick()
   }, ScreenSpaceEventType.MOUSE_MOVE)
   scope.defer(function destroyPointerHandler() {
+    clearPointerPickTimer()
     if (!pointerHandler.isDestroyed()) {
       pointerHandler.destroy()
     }
@@ -132,7 +187,23 @@ function registerRuntimeStatus(
 
   let frameCount = 0
   let frameWindowStarted = performance.now()
+  let lastRenderedAt = frameWindowStarted
+  const fpsIdleTimer = setInterval(function clearIdleFps() {
+    if (document.hidden || performance.now() - lastRenderedAt >= FPS_IDLE_TIMEOUT_MS) {
+      state.framesPerSecond = undefined
+      frameCount = 0
+      frameWindowStarted = performance.now()
+    }
+  }, FPS_IDLE_TIMEOUT_MS / 2)
+
   const removePostRenderListener = viewer.scene.postRender.addEventListener(function trackFrames() {
+    if (document.hidden) {
+      state.framesPerSecond = undefined
+      frameCount = 0
+      frameWindowStarted = performance.now()
+      return
+    }
+    lastRenderedAt = performance.now()
     frameCount += 1
     const now = performance.now()
     const elapsed = now - frameWindowStarted
@@ -143,6 +214,9 @@ function registerRuntimeStatus(
     }
   })
   scope.defer(removePostRenderListener)
+  scope.defer(function clearFpsIdleTimer() {
+    clearInterval(fpsIdleTimer)
+  })
 }
 
 export interface GeoRuntimeOptions {
@@ -235,9 +309,12 @@ export function createGeoRuntime(options: GeoRuntimeOptions = {}): GeoRuntime {
           sceneModePicker: false,
           selectionIndicator: false,
           timeline: false,
+          requestRenderMode: true,
+          maximumRenderTimeChange: Number.POSITIVE_INFINITY,
         }),
       )
       configureViewer(viewer)
+      runtimeScope.use(createGeoRenderPerformanceController(viewer))
       await plugins.install(viewer)
       if (signal.aborted || disposed) {
         destroyViewer(viewer)

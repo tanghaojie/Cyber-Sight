@@ -144,6 +144,7 @@ export class DistanceMeasurementTool implements Disposable {
       addPoint(position)
       previewPosition = undefined
       options.onUpdate(totalDistance(positions))
+      this.viewer.scene.requestRender()
     }, ScreenSpaceEventType.LEFT_CLICK)
 
     handler.setInputAction((event: ScreenSpaceEventHandler.MotionEvent) => {
@@ -152,6 +153,7 @@ export class DistanceMeasurementTool implements Disposable {
       }
       previewPosition = pickGlobePosition(event.endPosition)
       options.onUpdate(totalDistance(measurementPositions()))
+      this.viewer.scene.requestRender()
     }, ScreenSpaceEventType.MOUSE_MOVE)
 
     handler.setInputAction(() => {
@@ -161,6 +163,7 @@ export class DistanceMeasurementTool implements Disposable {
       completed = true
       previewPosition = undefined
       options.onComplete(totalDistance(positions))
+      this.viewer.scene.requestRender()
     }, ScreenSpaceEventType.LEFT_DOUBLE_CLICK)
 
     const session: DistanceMeasurementSession = {
@@ -182,6 +185,7 @@ export class DistanceMeasurementTool implements Disposable {
             this.viewer.entities.remove(entity)
             this.entities.delete(entity)
           })
+          this.viewer.scene.requestRender()
         }
         this.sessions.delete(session)
         if (this.activeSession === session) {
@@ -210,6 +214,7 @@ export class DistanceMeasurementTool implements Disposable {
     this.sessions.clear()
     this.entities.forEach((entity) => this.viewer.entities.remove(entity))
     this.entities.clear()
+    this.viewer.scene.requestRender()
   }
 
   dispose(): void {

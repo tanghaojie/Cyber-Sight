@@ -79,6 +79,7 @@ export function setGeoSceneSettings(
   if (patch.shadowDarkness !== undefined) {
     viewer.scene.shadowMap.darkness = Math.min(1, Math.max(0, patch.shadowDarkness))
   }
+  viewer.scene.requestRender()
   return getGeoSceneSettings(viewer)
 }
 

@@ -143,6 +143,7 @@ export class TerrainAnalysisTool {
       currentHeight = options.waterHeight * progress
       // CallbackProperty reads the current height on every render frame.
       options.onProgress?.(currentHeight)
+      this.viewer.scene.requestRender()
       if (progress < 1) {
         animationFrame = requestAnimationFrame(update)
       }
@@ -158,6 +159,7 @@ export class TerrainAnalysisTool {
       }
       this.viewer.entities.remove(polygon)
       this.entities.delete(polygon)
+      this.viewer.scene.requestRender()
       if (this.activeSession === session) {
         this.activeSession = undefined
       }
@@ -248,6 +250,7 @@ export class TerrainAnalysisTool {
           },
         ],
       })
+      this.viewer.scene.requestRender()
       return
     }
     if (mode === 'contour') {
@@ -256,6 +259,7 @@ export class TerrainAnalysisTool {
         spacing: 100,
         width: 1.2,
       })
+      this.viewer.scene.requestRender()
       return
     }
     globe.material = Material.fromType(
@@ -265,10 +269,12 @@ export class TerrainAnalysisTool {
           'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAFElEQVR42mNkYPj/n4GBgYGJAQoAAN0BBy0lVwN3AAAAAElFTkSuQmCC',
       },
     )
+    this.viewer.scene.requestRender()
   }
 
   clearTerrainColorMode(): void {
     this.viewer.scene.globe.material = this.originalMaterial
+    this.viewer.scene.requestRender()
   }
 
   clear(): void {
