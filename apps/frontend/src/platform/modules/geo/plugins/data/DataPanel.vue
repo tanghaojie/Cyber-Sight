@@ -221,6 +221,40 @@
         ><span>模型 URL</span
         ><input v-model="modelUrl" type="url" placeholder="https://…/model.glb"
       /></label>
+      <div class="data-panel__model-placement">
+        <div class="data-panel__model-placement-heading">
+          <div><strong>模型放置</strong><small>WGS84 坐标 · 角度制</small></div>
+          <button type="button" @click="useViewCenter">使用视图中心</button>
+        </div>
+        <div class="data-panel__transform-grid">
+          <label
+            ><span>经度</span
+            ><input v-model.number="modelPlacement.longitude" type="number" step="0.000001"
+          /></label>
+          <label
+            ><span>纬度</span
+            ><input v-model.number="modelPlacement.latitude" type="number" step="0.000001"
+          /></label>
+          <label
+            ><span>高度 m</span
+            ><input v-model.number="modelPlacement.height" type="number" step="0.1"
+          /></label>
+          <label
+            ><span>缩放</span
+            ><input v-model.number="modelPlacement.scale" type="number" min="0.000001" step="0.1"
+          /></label>
+          <label
+            ><span>航向°</span
+            ><input v-model.number="modelPlacement.heading" type="number" step="1"
+          /></label>
+          <label
+            ><span>俯仰°</span><input v-model.number="modelPlacement.pitch" type="number" step="1"
+          /></label>
+          <label
+            ><span>翻滚°</span><input v-model.number="modelPlacement.roll" type="number" step="1"
+          /></label>
+        </div>
+      </div>
       <button
         class="data-panel__primary"
         type="button"
@@ -252,34 +286,101 @@
         :key="resource.id"
         class="data-panel__resource"
       >
-        <label
-          ><input
-            type="checkbox"
-            :checked="resource.show"
-            @change="
-              controller.setResourceVisible(
-                resource.id,
-                ($event.target as HTMLInputElement).checked,
-              )
-            "
-          /><span>{{ resource.label }}</span></label
+        <div class="data-panel__resource-summary">
+          <label
+            ><input
+              type="checkbox"
+              :checked="resource.show"
+              @change="
+                controller.setResourceVisible(
+                  resource.id,
+                  ($event.target as HTMLInputElement).checked,
+                )
+              "
+            /><span class="data-panel__resource-name"
+              ><strong>{{ resource.label }}</strong
+              ><small v-if="resource.modelTransform">{{
+                modelTransformSummary(resource.modelTransform)
+              }}</small></span
+            ></label
+          >
+          <button
+            v-if="resource.modelTransform"
+            class="data-panel__resource-adjust"
+            type="button"
+            :aria-expanded="expandedModelId === resource.id"
+            :title="expandedModelId === resource.id ? '收起模型调整' : '调整模型'"
+            @click="toggleModelEditor(resource)"
+          >
+            调整
+          </button>
+          <button
+            type="button"
+            aria-label="定位"
+            title="定位"
+            @click="controller.flyToResource(resource.id)"
+          >
+            ⌖
+          </button>
+          <button type="button" aria-label="移除" title="移除" @click="removeResource(resource.id)">
+            ×
+          </button>
+        </div>
+        <div
+          v-if="
+            resource.modelTransform && expandedModelId === resource.id && modelDrafts[resource.id]
+          "
+          class="data-panel__model-editor"
         >
-        <button
-          type="button"
-          aria-label="定位"
-          title="定位"
-          @click="controller.flyToResource(resource.id)"
-        >
-          ⌖
-        </button>
-        <button
-          type="button"
-          aria-label="移除"
-          title="移除"
-          @click="controller.removeResource(resource.id)"
-        >
-          ×
-        </button>
+          <div class="data-panel__transform-grid">
+            <label
+              ><span>经度</span
+              ><input
+                v-model.number="modelDrafts[resource.id].longitude"
+                type="number"
+                step="0.000001"
+            /></label>
+            <label
+              ><span>纬度</span
+              ><input
+                v-model.number="modelDrafts[resource.id].latitude"
+                type="number"
+                step="0.000001"
+            /></label>
+            <label
+              ><span>高度 m</span
+              ><input v-model.number="modelDrafts[resource.id].height" type="number" step="0.1"
+            /></label>
+            <label
+              ><span>缩放</span
+              ><input
+                v-model.number="modelDrafts[resource.id].scale"
+                type="number"
+                min="0.000001"
+                step="0.1"
+            /></label>
+            <label
+              ><span>航向°</span
+              ><input v-model.number="modelDrafts[resource.id].heading" type="number" step="1"
+            /></label>
+            <label
+              ><span>俯仰°</span
+              ><input v-model.number="modelDrafts[resource.id].pitch" type="number" step="1"
+            /></label>
+            <label
+              ><span>翻滚°</span
+              ><input v-model.number="modelDrafts[resource.id].roll" type="number" step="1"
+            /></label>
+          </div>
+          <button
+            class="data-panel__model-apply"
+            type="button"
+            :disabled="controller.state.busy"
+            @click="applyModelTransform(resource.id)"
+          >
+            应用变换
+          </button>
+        </div>
       </div>
     </section>
 
@@ -288,7 +389,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
+import type { GeoDataResourceSnapshot, GeoModelTransform } from '../../tools/data/data-browser'
 import type {
   GeoImageryAvailability,
   GeoImagerySourceDefinition,
@@ -321,6 +423,9 @@ interface ImagerySourceGroup {
 const props = defineProps<{ controller: GeoDataController }>()
 const geoJsonUrl = ref('')
 const modelUrl = ref('')
+const modelPlacement = reactive<GeoModelTransform>(props.controller.suggestModelTransform())
+const modelDrafts = reactive<Record<string, GeoModelTransform>>({})
+const expandedModelId = ref<string>()
 const tilesetUrl = ref('')
 const sourceQuery = ref('')
 const sourceFilter = ref<SourceFilterId>('all')
@@ -441,7 +546,51 @@ async function loadGeoJson(): Promise<void> {
 }
 
 async function loadModel(): Promise<void> {
-  await props.controller.loadModel({ url: modelUrl.value, label: '外部模型' })
+  await props.controller.loadModel({
+    url: modelUrl.value,
+    label: '外部模型',
+    transform: copyModelTransform(modelPlacement),
+  })
+}
+
+function copyModelTransform(transform: GeoModelTransform): GeoModelTransform {
+  return { ...transform }
+}
+
+function useViewCenter(): void {
+  Object.assign(modelPlacement, props.controller.suggestModelTransform())
+}
+
+function modelTransformSummary(transform: GeoModelTransform): string {
+  return `${transform.longitude.toFixed(4)}°, ${transform.latitude.toFixed(4)}° · ${transform.height.toFixed(1)} m · ×${transform.scale}`
+}
+
+function toggleModelEditor(resource: GeoDataResourceSnapshot): void {
+  if (!resource.modelTransform) {
+    return
+  }
+  if (expandedModelId.value === resource.id) {
+    expandedModelId.value = undefined
+    return
+  }
+  modelDrafts[resource.id] = copyModelTransform(resource.modelTransform)
+  expandedModelId.value = resource.id
+}
+
+async function applyModelTransform(id: string): Promise<void> {
+  const draft = modelDrafts[id]
+  if (!draft) {
+    return
+  }
+  await props.controller.updateModelTransform(id, copyModelTransform(draft))
+}
+
+function removeResource(id: string): void {
+  props.controller.removeResource(id)
+  delete modelDrafts[id]
+  if (expandedModelId.value === id) {
+    expandedModelId.value = undefined
+  }
 }
 
 async function loadTileset(): Promise<void> {
@@ -812,6 +961,72 @@ async function loadTileset(): Promise<void> {
   color: var(--geo-text-faint, #7890a2);
   font-size: 9px;
 }
+.data-panel__model-placement,
+.data-panel__model-editor {
+  display: grid;
+  gap: 9px;
+  padding: 10px;
+  border: 1px solid color-mix(in srgb, var(--geo-accent, #45c8ff), transparent 72%);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--geo-accent, #45c8ff), transparent 94%);
+}
+.data-panel__model-placement-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.data-panel__model-placement-heading strong,
+.data-panel__model-placement-heading small {
+  display: block;
+}
+.data-panel__model-placement-heading strong {
+  color: var(--geo-text, #eff8ff);
+  font-size: 10px;
+}
+.data-panel__model-placement-heading small {
+  margin-top: 2px;
+  color: var(--geo-text-faint, #7890a2);
+  font-size: 8px;
+}
+.data-panel__model-placement-heading button,
+.data-panel__model-apply {
+  min-height: 27px;
+  padding: 0 8px;
+  border: 1px solid color-mix(in srgb, var(--geo-accent, #45c8ff), transparent 50%);
+  border-radius: 7px;
+  color: var(--geo-accent, #45c8ff);
+  background: transparent;
+  cursor: pointer;
+  font-size: 9px;
+}
+.data-panel__transform-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+.data-panel__transform-grid label {
+  display: grid;
+  gap: 4px;
+  color: var(--geo-text-faint, #7890a2);
+  font-size: 8px;
+}
+.data-panel__transform-grid input {
+  width: 100%;
+  min-width: 0;
+  min-height: 29px;
+  box-sizing: border-box;
+  padding: 0 7px;
+  border: 1px solid var(--geo-line, #263c4e);
+  border-radius: 7px;
+  color: var(--geo-text, #eff8ff);
+  background: #091522;
+  font-size: 9px;
+}
+.data-panel__transform-grid input:focus {
+  outline: 0;
+  border-color: var(--geo-accent, #45c8ff);
+}
 .data-panel__primary {
   min-height: 34px;
   border: 1px solid color-mix(in srgb, var(--geo-accent, #45c8ff), transparent 40%);
@@ -828,10 +1043,52 @@ async function loadTileset(): Promise<void> {
 }
 .data-panel__resource {
   display: grid;
-  grid-template-columns: 1fr 24px 24px;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--geo-line, #263c4e);
+}
+.data-panel__resource-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 24px 24px;
   align-items: center;
   gap: 5px;
-  padding: 6px 0;
-  border-bottom: 1px solid var(--geo-line, #263c4e);
+}
+.data-panel__resource-name {
+  min-width: 0;
+}
+.data-panel__resource-name strong,
+.data-panel__resource-name small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.data-panel__resource-name small {
+  margin-top: 2px;
+  color: var(--geo-text-faint, #7890a2);
+  font-size: 8px;
+  font-weight: 400;
+}
+.data-panel__resource-summary .data-panel__resource-adjust {
+  width: auto;
+  padding: 0 7px;
+  color: var(--geo-accent, #45c8ff);
+  font-size: 8px;
+}
+.data-panel__model-editor {
+  margin-left: 23px;
+  border-color: var(--geo-line, #263c4e);
+  background: color-mix(in srgb, var(--geo-surface-strong, #0e1c2a), transparent 12%);
+}
+.data-panel__resource .data-panel__model-apply {
+  width: 100%;
+  height: auto;
+  min-height: 27px;
+  padding: 0 8px;
+  border: 1px solid color-mix(in srgb, var(--geo-accent, #45c8ff), transparent 50%);
+}
+.data-panel__resource .data-panel__model-apply:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 </style>

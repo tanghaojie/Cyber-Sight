@@ -1,10 +1,17 @@
 import { reactive, readonly, type DeepReadonly } from 'vue'
-import type { Cesium3DTileset, Viewer } from 'cesium'
+import {
+  Cartesian2,
+  Cartographic,
+  Math as CesiumMath,
+  type Cesium3DTileset,
+  type Viewer,
+} from 'cesium'
 import {
   createGeoDataBrowser,
   type GeoDataBrowser,
   type GeoDataBrowserOptions,
   type GeoDataResourceSnapshot,
+  type GeoModelTransform,
   type GeoTerrainResourceId,
   type GeoTerrainSnapshot,
   type LoadGeoJsonOptions,
@@ -50,6 +57,8 @@ export interface GeoDataController {
   removeResource(id: string): void
   setResourceVisible(id: string, show: boolean): void
   flyToResource(id: string): Promise<void>
+  suggestModelTransform(): GeoModelTransform
+  updateModelTransform(id: string, transform: GeoModelTransform): Promise<void>
   setTerrain(id: GeoTerrainResourceId, url?: string): Promise<void>
   refresh(): void
   dispose(): void
@@ -91,7 +100,10 @@ export function createGeoDataController(
       return { ...item }
     })
     state.resources = browser.list().map(function copyResource(item) {
-      return { ...item }
+      return {
+        ...item,
+        modelTransform: item.modelTransform ? { ...item.modelTransform } : undefined,
+      }
     })
     state.terrain = { ...browser.getTerrain() }
   }
@@ -175,7 +187,8 @@ export function createGeoDataController(
 
   async function loadModel(loadOptions: LoadModelOptions): Promise<void> {
     await run(async function load() {
-      await browser.loadModel(loadOptions)
+      const model = await browser.loadModel(loadOptions)
+      await browser.flyTo(model.id)
     })
   }
 
@@ -200,6 +213,32 @@ export function createGeoDataController(
   async function flyToResource(id: string): Promise<void> {
     await run(async function flyTo() {
       await browser.flyTo(id)
+    })
+  }
+
+  function suggestModelTransform(): GeoModelTransform {
+    guard()
+    const canvas = viewer.scene.canvas
+    const center = new Cartesian2(canvas.clientWidth / 2, canvas.clientHeight / 2)
+    const ray = viewer.camera.getPickRay(center)
+    const position = ray ? viewer.scene.globe.pick(ray, viewer.scene) : undefined
+    const cartographic = position
+      ? Cartographic.fromCartesian(position)
+      : viewer.camera.positionCartographic
+    return {
+      longitude: Number(CesiumMath.toDegrees(cartographic.longitude).toFixed(6)),
+      latitude: Number(CesiumMath.toDegrees(cartographic.latitude).toFixed(6)),
+      height: position ? Number(cartographic.height.toFixed(2)) : 0,
+      scale: 1,
+      heading: 0,
+      pitch: 0,
+      roll: 0,
+    }
+  }
+
+  async function updateModelTransform(id: string, transform: GeoModelTransform): Promise<void> {
+    await run(async function update() {
+      browser.updateModelTransform(id, transform)
     })
   }
 
@@ -244,6 +283,8 @@ export function createGeoDataController(
     removeResource,
     setResourceVisible,
     flyToResource,
+    suggestModelTransform,
+    updateModelTransform,
     setTerrain,
     refresh,
     dispose,

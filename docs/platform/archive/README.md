@@ -29,6 +29,8 @@
 - [2026-08-29 Geo 近期交付后的 Platform 文档归档审查](plans/2026-08-29-platform-documentation-archive-review.md)：复核渲染性能与外壳/指南针交付并推进 Platform 台账。
 - [2026-08-29 Geo 视图、地形与测量状态修复](plans/2026-08-29-geo-behavior-corrections.md)：让面板和结果持续表达 Viewer 的真实状态。
 - [2026-08-29 Geo 等高线交互修复](plans/2026-08-29-geo-contour-interaction.md)：移除等高线坐标输入，按真实地形状态提供可用性提示和材质交互。
+- [2026-08-29 Geo 行为修复后的 Platform 文档归档审查](plans/2026-08-29-platform-documentation-archive-review-2.md)：复核状态同步与等高线交付并推进 Platform 台账。
+- [2026-08-29 Geo 外部模型放置与定位闭环](plans/2026-08-29-geo-model-placement.md)：支持外部 glTF/GLB 的初始放置、会话变换编辑和模型定位。
 
 ## AI 协作记录
 
@@ -50,5 +52,7 @@
 - [2026-08-29 Geo 近期交付后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-29-platform-documentation-archive-review.md)
 - [2026-08-29 Geo 视图、地形与测量状态修复](ai-logs/2026/08/2026-08-29-geo-behavior-corrections.md)
 - [2026-08-29 Geo 等高线交互修复](ai-logs/2026/08/2026-08-29-geo-contour-interaction.md)
+- [2026-08-29 Geo 行为修复后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-29-platform-documentation-archive-review-2.md)
+- [2026-08-29 Geo 外部模型放置与定位闭环](ai-logs/2026/08/2026-08-29-geo-model-placement.md)
 
 Sight 等业务平台在自己的仓库维护本目录。

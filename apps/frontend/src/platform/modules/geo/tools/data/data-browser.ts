@@ -1,11 +1,17 @@
 import {
+  Cartesian3,
   Cesium3DTileset,
   CesiumTerrainProvider,
   createWorldTerrainAsync,
   EllipsoidTerrainProvider,
   GeoJsonDataSource,
+  HeadingPitchRange,
+  HeadingPitchRoll,
+  Math as CesiumMath,
+  Matrix4,
   Model,
   ShadowMode,
+  Transforms,
   type Cesium3DTileset as Cesium3DTilesetType,
   type TerrainProvider,
   type Viewer,
@@ -13,6 +19,16 @@ import {
 
 export type GeoDataResourceKind = 'geojson' | 'model' | '3d-tiles'
 export type GeoTerrainResourceId = 'ellipsoid' | 'cesium-world-terrain' | 'custom'
+
+export interface GeoModelTransform {
+  readonly longitude: number
+  readonly latitude: number
+  readonly height: number
+  readonly scale: number
+  readonly heading: number
+  readonly pitch: number
+  readonly roll: number
+}
 
 export interface GeoDataResourceSnapshot {
   readonly id: string
@@ -22,6 +38,7 @@ export interface GeoDataResourceSnapshot {
   readonly show: boolean
   readonly status: 'ready' | 'loading' | 'failed'
   readonly error?: string
+  readonly modelTransform?: GeoModelTransform
 }
 
 export interface GeoTerrainSnapshot {
@@ -45,6 +62,7 @@ export interface LoadModelOptions {
   readonly label?: string
   readonly url: string
   readonly modelMatrix?: Parameters<typeof Model.fromGltfAsync>[0]['modelMatrix']
+  readonly transform?: GeoModelTransform
   readonly show?: boolean
   readonly minimumPixelSize?: number
   readonly shadows?: ShadowMode
@@ -65,6 +83,7 @@ interface ManagedResource {
     label: string
     kind: GeoDataResourceKind
     url?: string
+    modelTransform?: GeoModelTransform
   }
   readonly resource: GeoJsonDataSource | Model | Cesium3DTilesetType
   readonly remove: () => boolean
@@ -78,6 +97,7 @@ export interface GeoDataBrowser {
   remove(id: string): boolean
   clear(): void
   setVisible(id: string, show: boolean): void
+  updateModelTransform(id: string, transform: GeoModelTransform): void
   flyTo(id: string, duration?: number): Promise<boolean>
   setTerrain(id: GeoTerrainResourceId, url?: string): Promise<GeoTerrainSnapshot>
   getTerrain(): GeoTerrainSnapshot
@@ -95,6 +115,39 @@ function normalizeId(kind: GeoDataResourceKind, requestedId?: string): string {
 
 function resourceShow(resource: GeoJsonDataSource | Model | Cesium3DTilesetType): boolean {
   return resource.show
+}
+
+function modelMatrixFromTransform(transform: GeoModelTransform): Matrix4 {
+  const values = [
+    transform.longitude,
+    transform.latitude,
+    transform.height,
+    transform.scale,
+    transform.heading,
+    transform.pitch,
+    transform.roll,
+  ]
+  if (values.some((value) => !Number.isFinite(value))) {
+    throw new Error('模型位置、缩放和旋转必须是有效数字')
+  }
+  if (transform.longitude < -180 || transform.longitude > 180) {
+    throw new Error('模型经度必须在 -180 到 180 之间')
+  }
+  if (transform.latitude < -90 || transform.latitude > 90) {
+    throw new Error('模型纬度必须在 -90 到 90 之间')
+  }
+  if (transform.scale <= 0) {
+    throw new Error('模型缩放必须大于 0')
+  }
+
+  const origin = Cartesian3.fromDegrees(transform.longitude, transform.latitude, transform.height)
+  const orientation = new HeadingPitchRoll(
+    CesiumMath.toRadians(transform.heading),
+    CesiumMath.toRadians(transform.pitch),
+    CesiumMath.toRadians(transform.roll),
+  )
+  const modelMatrix = Transforms.headingPitchRollToFixedFrame(origin, orientation)
+  return Matrix4.multiplyByUniformScale(modelMatrix, transform.scale, modelMatrix)
 }
 
 export function createGeoDataBrowser(
@@ -154,6 +207,9 @@ export function createGeoDataBrowser(
   function snapshotFor(managed: ManagedResource): GeoDataResourceSnapshot {
     return {
       ...managed.snapshot,
+      modelTransform: managed.snapshot.modelTransform
+        ? { ...managed.snapshot.modelTransform }
+        : undefined,
       show: resourceShow(managed.resource),
       status: 'ready',
     }
@@ -219,7 +275,9 @@ export function createGeoDataBrowser(
     try {
       resource = await Model.fromGltfAsync({
         url: options.url,
-        modelMatrix: options.modelMatrix,
+        modelMatrix: options.transform
+          ? modelMatrixFromTransform(options.transform)
+          : options.modelMatrix,
         show: options.show ?? true,
         minimumPixelSize: options.minimumPixelSize,
         shadows: options.shadows,
@@ -233,6 +291,7 @@ export function createGeoDataBrowser(
           label: options.label?.trim() || '3D 模型',
           kind: 'model',
           url: options.url,
+          modelTransform: options.transform ? { ...options.transform } : undefined,
         },
         resource,
         remove: () => {
@@ -332,11 +391,40 @@ export function createGeoDataBrowser(
     requestRender()
   }
 
+  function updateModelTransform(id: string, transform: GeoModelTransform): void {
+    assertActive()
+    const managed = resources.get(id)
+    if (!managed || managed.snapshot.kind !== 'model') {
+      throw new Error(`Geo model resource not found: ${id}`)
+    }
+    const model = managed.resource as Model
+    model.modelMatrix = modelMatrixFromTransform(transform)
+    managed.snapshot.modelTransform = { ...transform }
+    requestRender()
+  }
+
   async function flyTo(id: string, duration = 1.4): Promise<boolean> {
     assertActive()
     const managed = resources.get(id)
-    if (!managed || managed.snapshot.kind === 'model') {
+    if (!managed) {
       return false
+    }
+    if (managed.snapshot.kind === 'model') {
+      const model = managed.resource as Model
+      const range = Math.max(model.boundingSphere.radius * 2.5, 10)
+      return new Promise(function flyToModel(resolve) {
+        viewer.camera.flyToBoundingSphere(model.boundingSphere, {
+          duration,
+          offset: new HeadingPitchRange(0, CesiumMath.toRadians(-25), range),
+          complete() {
+            requestRender()
+            resolve(true)
+          },
+          cancel() {
+            resolve(false)
+          },
+        })
+      })
     }
     await viewer.flyTo(managed.resource as GeoJsonDataSource | Cesium3DTilesetType, { duration })
     return true
@@ -401,6 +489,7 @@ export function createGeoDataBrowser(
     remove,
     clear,
     setVisible,
+    updateModelTransform,
     flyTo,
     setTerrain,
     getTerrain,
