@@ -29,6 +29,7 @@ export interface GeoRuntimeState {
   surfaceHeight?: number
   cameraHeight?: number
   framesPerSecond?: number
+  heading: number
   sceneMode: GeoSceneMode
   fullscreen: boolean
 }
@@ -40,6 +41,7 @@ export interface GeoRuntime {
   readonly state: Readonly<GeoRuntimeState>
   mount(container: HTMLElement): Promise<void>
   resetCamera(): void
+  orientNorth(): void
   setSceneMode(mode: GeoSceneMode): void
   toggleFullscreen(target: HTMLElement): Promise<void>
   dispose(): void
@@ -93,13 +95,14 @@ function registerRuntimeStatus(
   state: GeoRuntimeState,
   scope: DisposableScope,
 ): void {
-  function updateCameraHeight(): void {
+  function updateCameraState(): void {
     state.cameraHeight = viewer.camera.positionCartographic.height
+    state.heading = CesiumMath.toDegrees(viewer.camera.heading)
   }
 
-  updateCameraHeight()
+  updateCameraState()
   viewer.camera.percentageChanged = 0.01
-  const removeCameraListener = viewer.camera.changed.addEventListener(updateCameraHeight)
+  const removeCameraListener = viewer.camera.changed.addEventListener(updateCameraState)
   scope.defer(removeCameraListener)
 
   function updateSceneMode(): void {
@@ -232,6 +235,7 @@ export function createGeoRuntime(options: GeoRuntimeOptions = {}): GeoRuntime {
   })
   const state = reactive<GeoRuntimeState>({
     status: 'idle',
+    heading: 0,
     sceneMode: '3d',
     fullscreen: false,
   })
@@ -254,6 +258,19 @@ export function createGeoRuntime(options: GeoRuntimeOptions = {}): GeoRuntime {
         roll: 0,
       },
       duration: 1.2,
+    })
+  }
+
+  function orientNorth(): void {
+    const currentViewer = viewerAccessControl.require()
+    currentViewer.camera.flyTo({
+      destination: Cartesian3.clone(currentViewer.camera.positionWC),
+      orientation: {
+        heading: 0,
+        pitch: currentViewer.camera.pitch,
+        roll: 0,
+      },
+      duration: 0.6,
     })
   }
 
@@ -373,6 +390,7 @@ export function createGeoRuntime(options: GeoRuntimeOptions = {}): GeoRuntime {
     state: readonly(state),
     mount,
     resetCamera,
+    orientNorth,
     setSceneMode,
     toggleFullscreen,
     dispose,

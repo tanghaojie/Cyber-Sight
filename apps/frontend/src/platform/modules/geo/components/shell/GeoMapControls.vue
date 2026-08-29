@@ -11,7 +11,19 @@
     >
       <b>{{ sceneMode === '3d' ? '2D' : '3D' }}</b>
     </button>
-    <span class="geo-map-controls__compass" aria-hidden="true"><i /></span>
+    <button
+      class="geo-map-controls__compass"
+      type="button"
+      :title="northLabel"
+      :aria-label="northLabel"
+      @click="$emit('orient-north')"
+    >
+      <span
+        class="geo-map-controls__compass-needle"
+        :style="{ transform: `rotate(${-heading}deg)` }"
+        aria-hidden="true"
+      />
+    </button>
     <button
       type="button"
       :title="fullscreen ? exitFullscreenLabel : fullscreenLabel"
@@ -31,7 +43,9 @@ defineProps<{
   label: string
   sceneMode: GeoSceneMode
   fullscreen: boolean
+  heading: number
   resetLabel: string
+  northLabel: string
   mode2dLabel: string
   mode3dLabel: string
   fullscreenLabel: string
@@ -40,6 +54,7 @@ defineProps<{
 
 defineEmits<{
   reset: []
+  'orient-north': []
   'toggle-mode': []
   'toggle-fullscreen': []
 }>()
@@ -49,7 +64,7 @@ defineEmits<{
 .geo-map-controls {
   position: absolute;
   z-index: 20;
-  top: 96px;
+  top: 22px;
   right: 22px;
   display: grid;
   gap: 4px;
@@ -85,15 +100,22 @@ defineEmits<{
   font-size: 12px;
 }
 
-.geo-map-controls__compass {
+.geo-map-controls button.geo-map-controls__compass {
   position: relative;
   border-top: 1px solid var(--geo-line);
   border-bottom: 1px solid var(--geo-line);
   border-radius: 0;
 }
 
-.geo-map-controls__compass::before,
-.geo-map-controls__compass::after {
+.geo-map-controls__compass-needle {
+  position: relative;
+  width: 24px;
+  height: 34px;
+  transform-origin: center;
+}
+
+.geo-map-controls__compass-needle::before,
+.geo-map-controls__compass-needle::after {
   position: absolute;
   left: 50%;
   width: 9px;
@@ -103,12 +125,12 @@ defineEmits<{
   transform: translateX(-50%);
 }
 
-.geo-map-controls__compass::before {
+.geo-map-controls__compass-needle::before {
   top: 5px;
   background: #ff6b6b;
 }
 
-.geo-map-controls__compass::after {
+.geo-map-controls__compass-needle::after {
   bottom: 5px;
   background: #dce8f0;
   transform: translateX(-50%) rotate(180deg);
@@ -116,7 +138,7 @@ defineEmits<{
 
 @media (max-width: 760px) {
   .geo-map-controls {
-    top: 82px;
+    top: 12px;
     right: 12px;
   }
 }

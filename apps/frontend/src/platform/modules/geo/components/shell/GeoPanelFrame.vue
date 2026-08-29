@@ -29,7 +29,7 @@ defineEmits<{ close: [] }>()
 .geo-panel {
   position: absolute;
   z-index: 19;
-  top: 96px;
+  top: 22px;
   bottom: 86px;
   left: 90px;
   width: min(322px, calc(100vw - 196px));

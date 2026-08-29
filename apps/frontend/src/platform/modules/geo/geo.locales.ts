@@ -3,9 +3,6 @@ import { defineLocalizationResource } from '@/foundation/shared/localization/loc
 export const localizationResource = defineLocalizationResource('geo', {
   'zh-CN': {
     'views.workspace': 'Geo 空间工作台',
-    'workspace.title': 'Geo 工作台',
-    'workspace.scene': '全球基础场景',
-    'workspace.localScene': '本地场景',
     'workspace.loading': '正在初始化三维场景',
     'workspace.loadingDetail': '正在准备 Viewer、影像与交互环境',
     'workspace.failed': '三维场景初始化失败',
@@ -47,6 +44,7 @@ export const localizationResource = defineLocalizationResource('geo', {
     'measurement.activeHint': '距离测量 · 单击添加节点，双击完成',
     'measurement.completeHint': '距离测量完成 · 可重新开始或清除结果',
     'controls.resetCamera': '复位相机',
+    'controls.orientNorth': '回正到正北',
     'controls.mode2d': '切换到二维',
     'controls.mode3d': '切换到三维',
     'controls.fullscreen': '进入全屏',
@@ -60,9 +58,6 @@ export const localizationResource = defineLocalizationResource('geo', {
   },
   'en-US': {
     'views.workspace': 'Geo workspace',
-    'workspace.title': 'Geo Workspace',
-    'workspace.scene': 'Global Base Scene',
-    'workspace.localScene': 'LOCAL SCENE',
     'workspace.loading': 'Initializing the 3D scene',
     'workspace.loadingDetail': 'Preparing the viewer, imagery, and interaction environment',
     'workspace.failed': 'The 3D scene could not be initialized',
@@ -104,6 +99,7 @@ export const localizationResource = defineLocalizationResource('geo', {
     'measurement.activeHint': 'Distance measurement · Click to add points, double-click to finish',
     'measurement.completeHint': 'Distance measurement complete · Restart or clear the result',
     'controls.resetCamera': 'Reset camera',
+    'controls.orientNorth': 'Orient north',
     'controls.mode2d': 'Switch to 2D',
     'controls.mode3d': 'Switch to 3D',
     'controls.fullscreen': 'Enter fullscreen',

@@ -19,7 +19,7 @@ defineProps<{
 .geo-inspector {
   position: absolute;
   z-index: 19;
-  top: 96px;
+  top: 22px;
   right: 78px;
   width: min(288px, calc(100vw - 520px));
   max-height: calc(100vh - 182px);

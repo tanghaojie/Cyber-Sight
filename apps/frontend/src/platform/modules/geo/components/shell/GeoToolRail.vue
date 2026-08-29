@@ -41,7 +41,7 @@ defineEmits<{
 .geo-tool-rail {
   position: absolute;
   z-index: 20;
-  top: 96px;
+  top: 22px;
   bottom: 86px;
   left: 22px;
   width: 58px;

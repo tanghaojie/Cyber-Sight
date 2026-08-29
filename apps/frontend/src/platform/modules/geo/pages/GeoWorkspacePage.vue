@@ -8,12 +8,6 @@
     <div class="geo-map-atmosphere" aria-hidden="true" />
 
     <template v-if="runtime.state.status === 'ready'">
-      <GeoTopBar
-        :title="t('geo.workspace.title')"
-        :scene-name="t('geo.workspace.scene')"
-        :session-label="t('geo.workspace.localScene')"
-      />
-
       <GeoToolRail
         :items="taskRailItems"
         :active-id="activeTaskId"
@@ -41,12 +35,15 @@
         :label="t('geo.views.workspace')"
         :scene-mode="runtime.state.sceneMode"
         :fullscreen="runtime.state.fullscreen"
+        :heading="runtime.state.heading"
         :reset-label="t('geo.controls.resetCamera')"
+        :north-label="t('geo.controls.orientNorth')"
         :mode2d-label="t('geo.controls.mode2d')"
         :mode3d-label="t('geo.controls.mode3d')"
         :fullscreen-label="t('geo.controls.fullscreen')"
         :exit-fullscreen-label="t('geo.controls.exitFullscreen')"
         @reset="runtime.resetCamera()"
+        @orient-north="runtime.orientNorth()"
         @toggle-mode="toggleSceneMode"
         @toggle-fullscreen="toggleFullscreen"
       />
@@ -103,7 +100,6 @@ import GeoPluginErrors from '../components/shell/GeoPluginErrors.vue'
 import GeoStatusBar from '../components/shell/GeoStatusBar.vue'
 import GeoTaskOverview from '../components/shell/GeoTaskOverview.vue'
 import GeoToolRail, { type GeoTaskRailItem } from '../components/shell/GeoToolRail.vue'
-import GeoTopBar from '../components/shell/GeoTopBar.vue'
 import { provideGeoRuntime } from '../core/geo-context'
 import type {
   GeoInspectorContribution,
