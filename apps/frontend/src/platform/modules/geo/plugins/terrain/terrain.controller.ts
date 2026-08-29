@@ -1,5 +1,11 @@
 import { markRaw, reactive, shallowReadonly } from 'vue'
-import { Cartesian3, Color, type TerrainProvider, type Viewer } from 'cesium'
+import {
+  Cartesian3,
+  Color,
+  EllipsoidTerrainProvider,
+  type TerrainProvider,
+  type Viewer,
+} from 'cesium'
 import type { Disposable } from '../../core/disposable'
 import {
   TerrainAnalysisTool,
@@ -10,11 +16,14 @@ import {
 
 export type TerrainStatus = 'idle' | 'running' | 'complete' | 'failed'
 
+const TERRAIN_REQUIRED_MESSAGE = '当前未加载地形，等高线无法使用。请先到数据面板加载地形。'
+
 export interface TerrainState {
   status: TerrainStatus
   progress: number
   sampled: TerrainSample[]
-  contourCount: number
+  terrainAvailable: boolean
+  contourInterval: number
   colorMode?: TerrainColorMode
   error?: string
 }
@@ -23,7 +32,7 @@ export interface TerrainController extends Disposable {
   readonly state: Readonly<TerrainState>
   sample(positions: readonly Cartesian3[]): Promise<void>
   startFlood(positions: readonly Cartesian3[], waterHeight: number, durationMs?: number): void
-  createContours(positions: readonly Cartesian3[], interval?: number): Promise<void>
+  setContour(interval?: number): void
   setTerrainColorMode(mode: TerrainColorMode): void
   clearTerrainColorMode(): void
   cancel(): void
@@ -39,10 +48,26 @@ export function createTerrainController(
     status: 'idle',
     progress: 0,
     sampled: [],
-    contourCount: 0,
+    terrainAvailable: !(viewer.scene.globe.terrainProvider instanceof EllipsoidTerrainProvider),
+    contourInterval: 100,
   })
   let operation: AbortController | undefined
   let floodSession: TerrainAnalysisSession | undefined
+
+  function captureTerrainProvider(provider: TerrainProvider): void {
+    state.terrainAvailable = !(provider instanceof EllipsoidTerrainProvider)
+    if (state.terrainAvailable && state.error === TERRAIN_REQUIRED_MESSAGE) {
+      state.status = 'idle'
+      state.error = undefined
+    }
+    if (!state.terrainAvailable && state.colorMode === 'contour') {
+      tool.clearTerrainColorMode()
+      state.colorMode = undefined
+    }
+  }
+
+  const removeTerrainProviderChanged =
+    viewer.scene.globe.terrainProviderChanged.addEventListener(captureTerrainProvider)
 
   async function sample(positions: readonly Cartesian3[]): Promise<void> {
     cancel()
@@ -103,46 +128,25 @@ export function createTerrainController(
     }
   }
 
-  async function createContours(positions: readonly Cartesian3[], interval = 25): Promise<void> {
-    cancel()
-    const request = new AbortController()
-    operation = request
-    state.status = 'running'
-    state.progress = 0
-    state.error = undefined
-    try {
-      const entities = await tool.createContours(positions, {
-        signal: request.signal,
-        interval,
-      })
-      if (operation !== request || request.signal.aborted) {
-        tool.removeEntities(entities)
-        return
-      }
-      state.contourCount = entities.length
-      state.status = 'complete'
-      state.progress = 1
-    } catch (error) {
-      if (operation !== request) {
-        return
-      }
-      if (request.signal.aborted) {
-        state.status = 'idle'
-        return
-      }
+  function setContour(interval = 100): void {
+    if (!state.terrainAvailable) {
       state.status = 'failed'
-      state.error = error instanceof Error ? error.message : 'Contour generation failed'
-    } finally {
-      if (operation === request) {
-        operation = undefined
-      }
+      state.error = TERRAIN_REQUIRED_MESSAGE
+      return
     }
+    const boundedInterval = Math.min(Math.max(interval, 1), 10_000)
+    state.contourInterval = boundedInterval
+    setTerrainColorMode('contour')
   }
 
   function setTerrainColorMode(mode: TerrainColorMode): void {
     try {
-      tool.setTerrainColorMode(mode)
+      tool.setTerrainColorMode(mode, state.contourInterval)
       state.colorMode = mode
+      if (state.status !== 'running') {
+        state.status = 'idle'
+      }
+      state.error = undefined
     } catch (error) {
       state.status = 'failed'
       state.error = error instanceof Error ? error.message : 'Terrain coloring failed'
@@ -170,7 +174,6 @@ export function createTerrainController(
     cancel()
     tool.clear()
     state.sampled = []
-    state.contourCount = 0
     state.progress = 0
     state.colorMode = undefined
     state.status = 'idle'
@@ -179,6 +182,7 @@ export function createTerrainController(
 
   function dispose(): void {
     cancel()
+    removeTerrainProviderChanged()
     tool.dispose()
   }
 
@@ -186,7 +190,7 @@ export function createTerrainController(
     state: shallowReadonly(state),
     sample,
     startFlood,
-    createContours,
+    setContour,
     setTerrainColorMode,
     clearTerrainColorMode,
     cancel,

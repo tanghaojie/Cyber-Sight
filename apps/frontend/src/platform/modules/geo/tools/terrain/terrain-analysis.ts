@@ -39,15 +39,6 @@ export interface TerrainAnalysisSession {
   dispose(): void
 }
 
-export interface ContourOptions {
-  readonly signal?: AbortSignal
-  readonly minHeight?: number
-  readonly maxHeight?: number
-  readonly interval?: number
-  readonly color?: Color
-  readonly maxLines?: number
-}
-
 export type TerrainColorMode = 'elevation' | 'contour' | 'slope' | 'aspect'
 
 function throwIfAborted(signal?: AbortSignal): void {
@@ -171,65 +162,7 @@ export class TerrainAnalysisTool {
     return session
   }
 
-  async createContours(
-    positions: readonly Cartesian3[],
-    options: ContourOptions = {},
-  ): Promise<readonly Entity[]> {
-    if (this.disposed) {
-      throw new Error('Terrain analysis tool has been disposed')
-    }
-    const samples = await this.sample(positions, {
-      signal: options.signal,
-      maxSamples: 200,
-    })
-    throwIfAborted(options.signal)
-    if (!samples.length) {
-      return []
-    }
-    const heights = samples.map((sample) => sample.height)
-    const minHeight = options.minHeight ?? Math.min(...heights)
-    const maxHeight = options.maxHeight ?? Math.max(...heights)
-    const interval = Math.max(options.interval ?? 25, 1)
-    const maxLines = Math.min(Math.max(options.maxLines ?? 24, 1), 48)
-    const created: Entity[] = []
-    try {
-      for (
-        let height = minHeight;
-        height <= maxHeight && created.length < maxLines;
-        height += interval
-      ) {
-        throwIfAborted(options.signal)
-        const contourPositions = samples.map(function atHeight(sample) {
-          const cartographic = Cartographic.clone(sample.sampled, new Cartographic())
-          cartographic.height = height
-          return Cartesian3.fromRadians(
-            cartographic.longitude,
-            cartographic.latitude,
-            cartographic.height,
-          )
-        })
-        const entity = this.viewer.entities.add({
-          polyline: {
-            positions: contourPositions,
-            width: 2,
-            material: options.color ?? Color.fromCssColorString('#ffc857'),
-            clampToGround: false,
-          },
-        })
-        this.entities.add(entity)
-        created.push(entity)
-      }
-    } catch (error) {
-      created.forEach((entity) => {
-        this.viewer.entities.remove(entity)
-        this.entities.delete(entity)
-      })
-      throw error
-    }
-    return created
-  }
-
-  setTerrainColorMode(mode: TerrainColorMode): void {
+  setTerrainColorMode(mode: TerrainColorMode, contourInterval = 100): void {
     if (this.disposed) {
       throw new Error('Terrain analysis tool has been disposed')
     }
@@ -256,7 +189,7 @@ export class TerrainAnalysisTool {
     if (mode === 'contour') {
       globe.material = Material.fromType(Material.ElevationContourType, {
         color: Color.fromCssColorString('#ffe08a'),
-        spacing: 100,
+        spacing: Math.min(Math.max(contourInterval, 1), 10_000),
         width: 1.2,
       })
       this.viewer.scene.requestRender()
@@ -282,13 +215,6 @@ export class TerrainAnalysisTool {
     this.entities.forEach((entity) => this.viewer.entities.remove(entity))
     this.entities.clear()
     this.clearTerrainColorMode()
-  }
-
-  removeEntities(entities: readonly Entity[]): void {
-    entities.forEach((entity) => {
-      this.viewer.entities.remove(entity)
-      this.entities.delete(entity)
-    })
   }
 
   stop(): void {

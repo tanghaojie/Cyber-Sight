@@ -33,11 +33,11 @@ export const terrainPlugin: GeoPluginDefinition = {
           },
           {
             id: 'contour-color',
-            kind: 'action',
+            kind: 'panel',
             groupId: 'terrain',
-            label: '等高线着色',
+            panelId: 'terrain.panel',
+            label: '等高线',
             labelKey: 'geo.tools.terrain.contourColor',
-            run: () => controller.setTerrainColorMode('contour'),
           },
           {
             id: 'clear-color',
