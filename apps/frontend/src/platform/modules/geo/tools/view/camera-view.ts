@@ -177,6 +177,10 @@ export function setGeoCameraLimits(
   const controller = viewer.scene.screenSpaceCameraController
   if (limits.minimumZoomDistance !== undefined) {
     controller.minimumZoomDistance = Math.max(0, limits.minimumZoomDistance)
+    controller.maximumZoomDistance = Math.max(
+      controller.minimumZoomDistance,
+      controller.maximumZoomDistance,
+    )
   }
   if (limits.maximumZoomDistance !== undefined) {
     controller.maximumZoomDistance = Math.max(

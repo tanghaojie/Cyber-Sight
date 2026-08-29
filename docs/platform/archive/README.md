@@ -26,6 +26,8 @@
 - [2026-08-20 Geo 底图文档归档复核](plans/2026-08-20-geo-documentation-archive-review.md)：复核 Geo 交付后的 Platform 文档一致性并推进归档台账。
 - [2026-08-29 Geo 渲染性能优化](plans/2026-08-29-geo-rendering-performance.md)：完成自适应渲染比例、空闲显式渲染、拾取节流与本地端口调整。
 - [2026-08-29 Geo 外壳精简与指南针交互修复](plans/2026-08-29-geo-shell-and-compass.md)：删除重复顶栏，让指南针反映真实 heading 并支持点击回正。
+- [2026-08-29 Geo 近期交付后的 Platform 文档归档审查](plans/2026-08-29-platform-documentation-archive-review.md)：复核渲染性能与外壳/指南针交付并推进 Platform 台账。
+- [2026-08-29 Geo 视图、地形与测量状态修复](plans/2026-08-29-geo-behavior-corrections.md)：让面板和结果持续表达 Viewer 的真实状态。
 
 ## AI 协作记录
 
@@ -44,5 +46,7 @@
 - [2026-08-20 Geo 底图文档归档复核](ai-logs/2026/08/2026-08-20-geo-documentation-archive-review.md)
 - [2026-08-29 Geo 渲染性能优化](ai-logs/2026/08/2026-08-29-geo-rendering-performance.md)
 - [2026-08-29 Geo 外壳精简与指南针交互修复](ai-logs/2026/08/2026-08-29-geo-shell-and-compass.md)
+- [2026-08-29 Geo 近期交付后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-29-platform-documentation-archive-review.md)
+- [2026-08-29 Geo 视图、地形与测量状态修复](ai-logs/2026/08/2026-08-29-geo-behavior-corrections.md)
 
 Sight 等业务平台在自己的仓库维护本目录。

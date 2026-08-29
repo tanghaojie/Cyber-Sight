@@ -24,7 +24,7 @@
       </button>
     </div>
 
-    <label class="measurement-field">
+    <label v-if="controller.state.mode !== 'point'" class="measurement-field">
       <span>{{ unitLabel }}</span>
       <select v-model="unit">
         <option value="kilometers">{{ unitKilometersLabel }}</option>
@@ -108,7 +108,10 @@ const hasResult = computed(function hasMeasurementResult() {
 })
 const formattedResult = computed(function measurementResult() {
   if (props.controller.state.resultSquareMeters !== undefined) {
-    return `${props.controller.state.resultSquareMeters.toFixed(1)} m²`
+    if (unit.value === 'meters') {
+      return `${props.controller.state.resultSquareMeters.toFixed(1)} m²`
+    }
+    return `${(props.controller.state.resultSquareMeters / 1_000_000).toFixed(2)} km²`
   }
   if (props.controller.state.point) {
     const point = props.controller.state.point

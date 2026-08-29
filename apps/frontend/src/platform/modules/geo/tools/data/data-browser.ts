@@ -344,6 +344,23 @@ export function createGeoDataBrowser(
 
   async function setTerrain(id: GeoTerrainResourceId, url?: string): Promise<GeoTerrainSnapshot> {
     assertActive()
+    let provider: TerrainProvider
+    if (id === 'ellipsoid') {
+      provider = new EllipsoidTerrainProvider()
+    } else if (id === 'cesium-world-terrain') {
+      provider = await createWorldTerrainAsync({
+        requestVertexNormals: true,
+        requestWaterMask: true,
+      })
+    } else {
+      if (!url) {
+        throw new Error('自定义地形需要 URL')
+      }
+      provider = await CesiumTerrainProvider.fromUrl(url)
+    }
+
+    assertActive()
+    viewer.scene.globe.terrainProvider = provider
     terrainSnapshot = {
       id,
       label:
@@ -352,34 +369,9 @@ export function createGeoDataBrowser(
           : id === 'cesium-world-terrain'
             ? 'Cesium World Terrain'
             : '自定义地形',
-      status: 'loading',
+      status: 'ready',
     }
-    try {
-      let provider: TerrainProvider
-      if (id === 'ellipsoid') {
-        provider = new EllipsoidTerrainProvider()
-      } else if (id === 'cesium-world-terrain') {
-        provider = await createWorldTerrainAsync({
-          requestVertexNormals: true,
-          requestWaterMask: true,
-        })
-      } else {
-        if (!url) {
-          throw new Error('自定义地形需要 URL')
-        }
-        provider = await CesiumTerrainProvider.fromUrl(url)
-      }
-      assertActive()
-      viewer.scene.globe.terrainProvider = provider
-      requestRender()
-      terrainSnapshot = { ...terrainSnapshot, status: 'ready' }
-    } catch (error) {
-      terrainSnapshot = {
-        ...terrainSnapshot,
-        status: 'failed',
-        error: error instanceof Error ? error.message : '地形加载失败',
-      }
-    }
+    requestRender()
     return terrainSnapshot
   }
 

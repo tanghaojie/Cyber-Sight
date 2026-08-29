@@ -54,6 +54,10 @@ export function createGeoViewController(viewer: Viewer): GeoViewController {
     state.limits = getGeoCameraLimits(viewer)
   }
 
+  const removeCameraChanged = viewer.camera.changed.addEventListener(capture)
+  const removeCameraMoveEnd = viewer.camera.moveEnd.addEventListener(capture)
+  const removeMorphComplete = viewer.scene.morphComplete.addEventListener(capture)
+
   function flyTo(id: GeoViewLocationId): void {
     guard()
     state.error = undefined
@@ -92,7 +96,13 @@ export function createGeoViewController(viewer: Viewer): GeoViewController {
   }
 
   function dispose(): void {
+    if (disposed) {
+      return
+    }
     disposed = true
+    removeCameraChanged()
+    removeCameraMoveEnd()
+    removeMorphComplete()
   }
 
   return {
