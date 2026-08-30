@@ -87,12 +87,4 @@ defineEmits<{ action: [] }>()
   font-size: 10px;
   font-weight: 780;
 }
-
-@media (max-width: 560px) {
-  .geo-load-state {
-    grid-template-columns: 1fr;
-    justify-items: center;
-    text-align: center;
-  }
-}
 </style>

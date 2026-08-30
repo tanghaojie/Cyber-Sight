@@ -118,38 +118,9 @@ defineEmits<{
   letter-spacing: 0.04em;
 }
 
-@media (max-height: 720px) and (min-width: 761px) {
+@media (max-height: 720px) {
   .geo-tool-rail__item {
     min-height: 49px;
-  }
-}
-
-@media (max-width: 760px) {
-  .geo-tool-rail {
-    top: auto;
-    right: 12px;
-    bottom: 68px;
-    left: 12px;
-    width: auto;
-    height: 58px;
-    align-items: center;
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 5px;
-    overflow-x: auto;
-    overflow-y: hidden;
-  }
-
-  .geo-tool-rail__item {
-    width: 100%;
-    min-height: 46px;
-    padding: 4px 2px;
-  }
-
-  .geo-tool-rail__indicator {
-    inset: auto 12px -6px;
-    width: auto;
-    height: 2px;
   }
 }
 </style>

@@ -135,11 +135,4 @@ defineEmits<{
   background: #dce8f0;
   transform: translateX(-50%) rotate(180deg);
 }
-
-@media (max-width: 760px) {
-  .geo-map-controls {
-    top: 12px;
-    right: 12px;
-  }
-}
 </style>

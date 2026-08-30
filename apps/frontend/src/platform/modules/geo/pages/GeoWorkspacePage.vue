@@ -368,11 +368,4 @@ onBeforeUnmount(function disposeGeoPage() {
   background: rgba(4, 10, 16, 0.62);
   backdrop-filter: blur(6px);
 }
-
-@media (max-width: 760px) {
-  .geo-workspace :global(.cesium-viewer-bottom) {
-    right: 14px;
-    bottom: 132px;
-  }
-}
 </style>

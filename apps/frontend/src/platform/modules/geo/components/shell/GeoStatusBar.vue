@@ -139,35 +139,6 @@ function height(value: number | undefined): string {
   }
 }
 
-@media (max-width: 1120px) {
-  .geo-statusbar > span:not(.geo-statusbar__position) {
-    min-width: 100px;
-    padding-inline: 11px;
-  }
-
-  .geo-statusbar__optional:nth-of-type(4),
-  .geo-statusbar__optional:nth-of-type(6) {
-    display: none;
-  }
-}
-
-@media (max-width: 760px) {
-  .geo-statusbar {
-    right: 12px;
-    bottom: 10px;
-    left: 12px;
-    min-height: 48px;
-  }
-
-  .geo-statusbar > span:not(.geo-statusbar__position) {
-    display: none;
-  }
-
-  .geo-statusbar strong {
-    padding-left: 8px;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .geo-statusbar__pulse {
     animation: none;

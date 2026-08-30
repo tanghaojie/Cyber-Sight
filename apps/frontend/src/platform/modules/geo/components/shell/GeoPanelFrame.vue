@@ -32,7 +32,7 @@ defineEmits<{ close: [] }>()
   top: 22px;
   bottom: 86px;
   left: 90px;
-  width: min(322px, calc(100vw - 196px));
+  width: 322px;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
@@ -120,17 +120,6 @@ defineEmits<{ close: [] }>()
   to {
     opacity: 1;
     transform: translateX(0) scale(1);
-  }
-}
-
-@media (max-width: 760px) {
-  .geo-panel {
-    top: auto;
-    right: 12px;
-    bottom: 136px;
-    left: 12px;
-    width: auto;
-    max-height: min(520px, calc(100vh - 220px));
   }
 }
 

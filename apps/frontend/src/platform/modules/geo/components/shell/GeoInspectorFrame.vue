@@ -21,7 +21,7 @@ defineProps<{
   z-index: 19;
   top: 22px;
   right: 78px;
-  width: min(288px, calc(100vw - 520px));
+  width: 288px;
   max-height: calc(100vh - 182px);
   overflow: hidden;
   border: 1px solid var(--geo-line);
@@ -62,12 +62,6 @@ defineProps<{
   from {
     opacity: 0;
     transform: translateX(8px) scale(0.985);
-  }
-}
-
-@media (max-width: 1024px) {
-  .geo-inspector {
-    display: none;
   }
 }
 

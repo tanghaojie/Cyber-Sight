@@ -20,7 +20,7 @@ defineProps<{
   z-index: 22;
   right: 78px;
   bottom: 74px;
-  width: min(330px, calc(100vw - 112px));
+  width: 330px;
   display: grid;
   gap: 5px;
   padding: 11px 13px;
@@ -42,14 +42,5 @@ defineProps<{
   color: rgba(255, 211, 216, 0.76);
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-@media (max-width: 760px) {
-  .geo-plugin-errors {
-    right: 12px;
-    bottom: 136px;
-    left: 12px;
-    width: auto;
-  }
 }
 </style>
