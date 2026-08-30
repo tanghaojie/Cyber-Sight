@@ -161,6 +161,7 @@ export function createGeoDataBrowser(
     status: 'ready',
   }
   let disposed = false
+  let terrainRequestVersion = 0
 
   function requestRender(): void {
     if (!viewer.isDestroyed()) {
@@ -432,21 +433,32 @@ export function createGeoDataBrowser(
 
   async function setTerrain(id: GeoTerrainResourceId, url?: string): Promise<GeoTerrainSnapshot> {
     assertActive()
+    const requestVersion = ++terrainRequestVersion
     let provider: TerrainProvider
-    if (id === 'ellipsoid') {
-      provider = new EllipsoidTerrainProvider()
-    } else if (id === 'cesium-world-terrain') {
-      provider = await createWorldTerrainAsync({
-        requestVertexNormals: true,
-        requestWaterMask: true,
-      })
-    } else {
-      if (!url) {
-        throw new Error('自定义地形需要 URL')
+    try {
+      if (id === 'ellipsoid') {
+        provider = new EllipsoidTerrainProvider()
+      } else if (id === 'cesium-world-terrain') {
+        provider = await createWorldTerrainAsync({
+          requestVertexNormals: true,
+          requestWaterMask: true,
+        })
+      } else {
+        if (!url) {
+          throw new Error('自定义地形需要 URL')
+        }
+        provider = await CesiumTerrainProvider.fromUrl(url)
       }
-      provider = await CesiumTerrainProvider.fromUrl(url)
+    } catch (error) {
+      if (requestVersion !== terrainRequestVersion) {
+        return terrainSnapshot
+      }
+      throw error
     }
 
+    if (requestVersion !== terrainRequestVersion) {
+      return terrainSnapshot
+    }
     assertActive()
     viewer.scene.globe.terrainProvider = provider
     terrainSnapshot = {
@@ -472,6 +484,7 @@ export function createGeoDataBrowser(
       return
     }
     disposed = true
+    terrainRequestVersion += 1
     ;[...resources.keys()].forEach(function disposeResource(id) {
       const managed = resources.get(id)
       resources.delete(id)

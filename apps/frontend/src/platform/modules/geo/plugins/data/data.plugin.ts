@@ -1,7 +1,12 @@
 import { defineComponent, h } from 'vue'
 import DataPanel from './DataPanel.vue'
 import type { GeoPluginDefinition, GeoPluginContext } from '../../core/geo-plugin'
-import { activeTilesetCapability, createActiveTilesetCapability } from './data.capabilities'
+import {
+  activeTilesetCapability,
+  createActiveTilesetCapability,
+  createImageryLayerCollectionCapability,
+  imageryLayerCollectionCapability,
+} from './data.capabilities'
 import {
   createGeoDataController,
   type GeoDataController,
@@ -35,11 +40,14 @@ export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): Geo
     order: 10,
     async install(context: GeoPluginContext) {
       const activeTileset = createActiveTilesetCapability()
+      const imageryLayers = createImageryLayerCollectionCapability()
       context.capabilities.provide(activeTilesetCapability, activeTileset, context.scope)
+      context.capabilities.provide(imageryLayerCollectionCapability, imageryLayers, context.scope)
       const controller = createGeoDataController(context.viewer, {
         ...pluginOptions,
         signal: context.signal,
         onActiveTilesetChange: activeTileset.setCurrent,
+        onImageryLayersChange: imageryLayers.setLayers,
       })
       context.scope.use(controller)
       if (!context.signal.aborted && !context.viewer.isDestroyed()) {

@@ -3,11 +3,11 @@
     <div class="geo-tool-panel__inputs">
       <label class="geo-tool-panel__field">
         <span>左侧图层</span>
-        <select v-model.number="leftIndex">
+        <select v-model="leftId">
           <option
             v-for="layer in controller.state.layers"
-            :key="`left-${layer.index}`"
-            :value="layer.index"
+            :key="`left-${layer.id}`"
+            :value="layer.id"
           >
             {{ layer.label }}
           </option>
@@ -15,11 +15,11 @@
       </label>
       <label class="geo-tool-panel__field">
         <span>右侧图层</span>
-        <select v-model.number="rightIndex">
+        <select v-model="rightId">
           <option
             v-for="layer in controller.state.layers"
-            :key="`right-${layer.index}`"
-            :value="layer.index"
+            :key="`right-${layer.id}`"
+            :value="layer.id"
           >
             {{ layer.label }}
           </option>
@@ -29,7 +29,7 @@
     <div class="geo-tool-panel__grid">
       <button
         type="button"
-        :disabled="controller.state.layers.length < 2"
+        :disabled="controller.state.layers.length < 2 || !leftId || !rightId || leftId === rightId"
         @click="enableComparison"
       >
         开始对比
@@ -72,14 +72,27 @@
 
 <script setup lang="ts">
 import type { CompareController } from './compare.controller'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 const props = defineProps<{ controller: CompareController }>()
-const leftIndex = ref(0)
-const rightIndex = ref(1)
+const leftId = ref('')
+const rightId = ref('')
+
+watch(
+  () => props.controller.state.layers.map((layer) => layer.id),
+  function synchronizeSelection(ids) {
+    if (!ids.includes(leftId.value)) {
+      leftId.value = ids[0] ?? ''
+    }
+    if (!ids.includes(rightId.value) || rightId.value === leftId.value) {
+      rightId.value = ids.find((id) => id !== leftId.value) ?? ''
+    }
+  },
+  { immediate: true },
+)
 
 function enableComparison(): void {
-  props.controller.enableLayerComparison(leftIndex.value, rightIndex.value)
+  props.controller.enableLayerComparison(leftId.value, rightId.value)
 }
 
 function onSplitInput(event: Event): void {

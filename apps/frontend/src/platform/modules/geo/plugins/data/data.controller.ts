@@ -30,6 +30,7 @@ import {
   type GeoImageryLayerManager,
   type GeoImageryLayerSnapshot,
 } from '../../tools/data/imagery-layer-manager'
+import type { GeoImageryLayerEntry } from './data.capabilities'
 
 export interface GeoDataState {
   imagery: readonly GeoImageryLayerSnapshot[]
@@ -68,6 +69,7 @@ export interface GeoDataControllerOptions extends GeoImagerySourceOptions {
   readonly catalog?: ReturnType<typeof createGeoImageryCatalog>
   readonly signal?: AbortSignal
   readonly onActiveTilesetChange?: (tileset: Cesium3DTileset | undefined) => void
+  readonly onImageryLayersChange?: (layers: readonly GeoImageryLayerEntry[]) => void
 }
 
 export function createGeoDataController(
@@ -88,6 +90,7 @@ export function createGeoDataController(
   })
   let imagery: GeoImageryLayerManager
   let disposed = false
+  let pendingOperations = 0
 
   function guard(): void {
     if (disposed) {
@@ -95,10 +98,21 @@ export function createGeoDataController(
     }
   }
 
+  function publishImageryLayers(layers: readonly GeoImageryLayerSnapshot[]): void {
+    options.onImageryLayersChange?.(
+      layers.flatMap(function mapLayer(item): GeoImageryLayerEntry[] {
+        const layer = imagery.getLayer(item.id)
+        return layer ? [{ id: item.id, label: item.label, index: item.index, layer }] : []
+      }),
+    )
+  }
+
   function refresh(): void {
-    state.imagery = imagery.list().map(function copyImagery(item) {
+    const imageryLayers = imagery.list()
+    state.imagery = imageryLayers.map(function copyImagery(item) {
       return { ...item }
     })
+    publishImageryLayers(imageryLayers)
     state.resources = browser.list().map(function copyResource(item) {
       return {
         ...item,
@@ -115,6 +129,7 @@ export function createGeoDataController(
 
   async function run<T>(operation: () => Promise<T>): Promise<T | undefined> {
     guard()
+    pendingOperations += 1
     state.busy = true
     state.error = undefined
     try {
@@ -123,8 +138,11 @@ export function createGeoDataController(
       state.error = error instanceof Error ? error.message : '数据操作失败'
       return undefined
     } finally {
-      state.busy = false
-      refresh()
+      pendingOperations -= 1
+      state.busy = pendingOperations > 0
+      if (!disposed) {
+        refresh()
+      }
     }
   }
 
@@ -146,6 +164,13 @@ export function createGeoDataController(
 
   function removeImagery(id: string): void {
     guard()
+    if (imagery.get(id)) {
+      publishImageryLayers(
+        imagery.list().filter(function excludeRemovedLayer(item) {
+          return item.id !== id
+        }),
+      )
+    }
     imagery.remove(id)
     refresh()
   }
@@ -253,6 +278,7 @@ export function createGeoDataController(
       return
     }
     disposed = true
+    options.onImageryLayersChange?.([])
     imagery.dispose()
     browser.dispose()
   }

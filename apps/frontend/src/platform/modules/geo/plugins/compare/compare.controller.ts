@@ -6,6 +6,10 @@ import {
   type SceneCompareOptions,
   type SceneCompareSession,
 } from '../../tools/compare/scene-compare'
+import type {
+  GeoImageryLayerReference,
+  ImageryLayerCollectionCapability,
+} from '../data/data.capabilities'
 
 export interface CompareState {
   enabled: boolean
@@ -16,6 +20,7 @@ export interface CompareState {
 }
 
 export interface CompareLayerOption {
+  readonly id: string
   readonly index: number
   readonly label: string
 }
@@ -24,14 +29,22 @@ export interface CompareController extends Disposable {
   readonly state: Readonly<CompareState>
   enable(options: SceneCompareOptions): void
   enableWithProviders(left: ImageryProvider, right: ImageryProvider): void
-  enableLayerComparison(leftIndex: number, rightIndex: number): void
+  enableLayerComparison(leftId: string, rightId: string): void
   refreshLayers(): void
   setSplitPosition(value: number): void
   setEnabled(enabled: boolean): void
   disable(): void
 }
 
-export function createCompareController(viewer: Viewer): CompareController {
+interface CompareSessionLayerIds {
+  readonly left: string
+  readonly right: string
+}
+
+export function createCompareController(
+  viewer: Viewer,
+  imageryLayers: ImageryLayerCollectionCapability,
+): CompareController {
   const tool = markRaw(new SceneCompareTool(viewer))
   const state = reactive<CompareState>({
     enabled: false,
@@ -40,29 +53,32 @@ export function createCompareController(viewer: Viewer): CompareController {
     layers: [],
   })
   let session: SceneCompareSession | undefined
+  let sessionLayerIds: CompareSessionLayerIds | undefined
 
   function refreshLayers(): void {
-    state.layers = Array.from({ length: viewer.imageryLayers.length }, (_, index) => ({
-      index,
-      label: `图层 ${index + 1}`,
-    }))
+    state.layers = imageryLayers.list().map(function mapLayer(layer) {
+      return { id: layer.id, index: layer.index, label: layer.label }
+    })
   }
 
-  function enable(options: SceneCompareOptions): void {
+  function enable(options: SceneCompareOptions, layerIds?: CompareSessionLayerIds): void {
     try {
       session?.stop()
       session = undefined
+      sessionLayerIds = undefined
       session = tool.enable({
         ...options,
         splitPosition: options.splitPosition ?? state.splitPosition,
       })
       state.enabled = true
       state.hasSession = true
+      sessionLayerIds = layerIds
       state.splitPosition = options.splitPosition ?? state.splitPosition
       state.error = undefined
     } catch (error) {
       state.enabled = false
       state.hasSession = false
+      sessionLayerIds = undefined
       state.error = error instanceof Error ? error.message : 'Scene comparison failed'
     }
   }
@@ -71,23 +87,19 @@ export function createCompareController(viewer: Viewer): CompareController {
     enable({ leftProvider: left, rightProvider: right })
   }
 
-  function enableLayerComparison(leftIndex: number, rightIndex: number): void {
-    if (leftIndex === rightIndex) {
+  function enableLayerComparison(leftId: string, rightId: string): void {
+    if (leftId === rightId) {
       state.error = '左右图层必须不同'
       return
     }
-    if (
-      leftIndex < 0 ||
-      rightIndex < 0 ||
-      leftIndex >= viewer.imageryLayers.length ||
-      rightIndex >= viewer.imageryLayers.length
-    ) {
+    const leftLayer = imageryLayers.getLayer(leftId)
+    const rightLayer = imageryLayers.getLayer(rightId)
+    if (!leftLayer || !rightLayer) {
       state.error = '选择的影像图层不存在'
+      refreshLayers()
       return
     }
-    const leftLayer = viewer.imageryLayers.get(leftIndex)
-    const rightLayer = viewer.imageryLayers.get(rightIndex)
-    enable({ leftLayer, rightLayer })
+    enable({ leftLayer, rightLayer }, { left: leftId, right: rightId })
   }
 
   function setSplitPosition(value: number): void {
@@ -120,16 +132,32 @@ export function createCompareController(viewer: Viewer): CompareController {
   function disable(): void {
     session?.stop()
     session = undefined
+    sessionLayerIds = undefined
     state.enabled = false
     state.hasSession = false
   }
 
   function dispose(): void {
+    layerSubscription.dispose()
     disable()
     tool.dispose()
   }
 
-  refreshLayers()
+  const layerSubscription = imageryLayers.subscribe(function synchronizeLayers(
+    layers: readonly GeoImageryLayerReference[],
+  ) {
+    state.layers = layers.map(function mapLayer(layer) {
+      return { id: layer.id, index: layer.index, label: layer.label }
+    })
+    if (
+      sessionLayerIds &&
+      (!imageryLayers.getLayer(sessionLayerIds.left) ||
+        !imageryLayers.getLayer(sessionLayerIds.right))
+    ) {
+      disable()
+      state.error = '参与对比的影像图层已被移除，对比会话已关闭'
+    }
+  })
   return {
     state: readonly(state),
     enable,

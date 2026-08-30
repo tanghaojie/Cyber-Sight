@@ -34,6 +34,7 @@
 - [2026-08-30 Geo 地形剖面采样修复](plans/2026-08-30-geo-terrain-profile.md)：接通地图画线、沿线高程采样与剖面展示工作流。
 - [2026-08-30 Geo 近期交付后的 Platform 文档归档审查](plans/2026-08-30-platform-documentation-archive-review.md)：复核模型放置与地形剖面交付并推进 Platform 台账。
 - [2026-08-30 Geo 对比会话状态修复](plans/2026-08-30-geo-compare-session-state.md)：修复虚假启用状态，并让暂停分屏保持影像可见。
+- [2026-08-30 Geo 地形与对比状态一致性修复](plans/2026-08-30-geo-terrain-and-compare-consistency.md)：实现地形最新请求生效，并让对比会话跟踪稳定影像图层生命周期。
 
 ## AI 协作记录
 
@@ -60,5 +61,6 @@
 - [2026-08-30 Geo 地形剖面采样修复](ai-logs/2026/08/2026-08-30-geo-terrain-profile.md)
 - [2026-08-30 Geo 近期交付后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-30-platform-documentation-archive-review.md)
 - [2026-08-30 Geo 对比会话状态修复](ai-logs/2026/08/2026-08-30-geo-compare-session-state.md)
+- [2026-08-30 Geo 地形与对比状态一致性修复](ai-logs/2026/08/2026-08-30-geo-terrain-and-compare-consistency.md)
 
 Sight 等业务平台在自己的仓库维护本目录。

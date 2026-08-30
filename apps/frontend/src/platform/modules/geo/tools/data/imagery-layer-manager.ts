@@ -59,6 +59,7 @@ export interface GeoImageryLayerManager {
   lowerToBottom(id: string): void
   flyTo(id: string, duration?: number): boolean
   get(id: string): GeoImageryLayerSnapshot | undefined
+  getLayer(id: string): ImageryLayer | undefined
   dispose(): void
 }
 
@@ -256,6 +257,10 @@ export function createGeoImageryLayerManager(
     return managed ? toSnapshot(id, managed) : undefined
   }
 
+  function getLayer(id: string): ImageryLayer | undefined {
+    return layers.get(id)?.layer
+  }
+
   function dispose(): void {
     if (disposed) {
       return
@@ -283,6 +288,7 @@ export function createGeoImageryLayerManager(
     lowerToBottom,
     flyTo,
     get,
+    getLayer,
     dispose,
   }
 }
