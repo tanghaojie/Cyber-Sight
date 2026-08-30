@@ -10,6 +10,7 @@
 
 ## 已完成计划
 
+- [2026-08-31 Geo 可收起状态栏与时间轴底部自适应](plans/2026-08-31-geo-collapsible-status-bar.md)：状态栏收起后只保留展开按钮，时间轴同步下沉并避让按钮。
 - [2026-08-30 Geo 时间轴与太阳光照](plans/2026-08-30-geo-time-and-solar-lighting.md)：以唯一 `viewer.clock` 实现 UTC 时间轴、太阳光照和独立阴影开关。
 - [2026-08-07 关于项目页面](plans/2026-08-07-about-project.md)
 - [2026-08-10 独立静态官网](plans/2026-08-10-marketing-site.md)、[视觉优化](plans/2026-08-10-marketing-site-visual-refinement.md)、[SEO 增强](plans/2026-08-10-website-seo.md)与[归档审查](plans/2026-08-10-marketing-site-follow-up-archive-review.md)
@@ -43,6 +44,7 @@
 
 ## AI 协作记录
 
+- [2026-08-31 Geo 可收起状态栏与时间轴底部自适应](ai-logs/2026/08/2026-08-31-geo-collapsible-status-bar.md)
 - [2026-08-30 Geo 时间轴与太阳光照](ai-logs/2026/08/2026-08-30-geo-time-and-solar-lighting.md)
 - [2026-08-07 关于项目页面](ai-logs/2026/08/2026-08-07-about-project.md)
 - [2026-08-10 独立静态官网](ai-logs/2026/08/2026-08-10-marketing-site.md)、[视觉优化](ai-logs/2026/08/2026-08-10-marketing-site-visual-refinement.md)、[SEO 增强](ai-logs/2026/08/2026-08-10-website-seo.md)与[语言切换显现修复](ai-logs/2026/08/2026-08-10-feature-locale-reveal.md)

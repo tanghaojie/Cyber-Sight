@@ -1,5 +1,10 @@
 <template>
-  <main ref="workspaceRoot" class="geo-workspace" :aria-label="t('geo.views.workspace')">
+  <main
+    ref="workspaceRoot"
+    class="geo-workspace"
+    :class="{ 'geo-workspace--status-collapsed': statusBarCollapsed }"
+    :aria-label="t('geo.views.workspace')"
+  >
     <div
       ref="mapContainer"
       class="geo-map-host"
@@ -75,6 +80,10 @@
         :height-label="t('geo.status.height')"
         :camera-label="t('geo.status.camera')"
         :fps-label="t('geo.status.fps')"
+        :collapsed="statusBarCollapsed"
+        :collapse-label="t('geo.status.collapse')"
+        :expand-label="t('geo.status.expand')"
+        @toggle="statusBarCollapsed = !statusBarCollapsed"
       />
     </template>
 
@@ -124,6 +133,7 @@ const workspaceRoot = ref<HTMLElement>()
 const mapContainer = ref<HTMLElement>()
 const activeTaskId = ref('data')
 const panelOpen = ref(true)
+const statusBarCollapsed = ref(false)
 const runtime = createGeoRuntime({ plugins: geoPlugins })
 provideGeoRuntime(runtime)
 
@@ -334,6 +344,8 @@ onBeforeUnmount(function disposeGeoPage() {
   --geo-surface-strong: rgba(6, 14, 23, 0.91);
   --geo-surface-hover: rgba(173, 218, 241, 0.09);
   --geo-shadow: 0 20px 54px rgba(0, 5, 10, 0.4);
+  --geo-bottom-dock-bottom: 74px;
+  --geo-credits-bottom: 158px;
   position: fixed;
   z-index: 0;
   inset: 0;
@@ -341,6 +353,11 @@ onBeforeUnmount(function disposeGeoPage() {
   color: var(--geo-text);
   background: #07111c;
   isolation: isolate;
+}
+
+.geo-workspace--status-collapsed {
+  --geo-bottom-dock-bottom: 14px;
+  --geo-credits-bottom: 98px;
 }
 
 .geo-map-host,
@@ -375,16 +392,18 @@ onBeforeUnmount(function disposeGeoPage() {
 
 .geo-workspace :global(.cesium-viewer-bottom) {
   right: 26px;
-  bottom: 158px;
+  bottom: var(--geo-credits-bottom);
   left: auto;
+  transition: bottom 0.18s ease;
 }
 
 .geo-bottom-docks {
   position: absolute;
   z-index: 20;
   right: 22px;
-  bottom: 74px;
+  bottom: var(--geo-bottom-dock-bottom);
   left: 74px;
+  transition: bottom 0.18s ease;
   pointer-events: none;
 }
 
@@ -392,5 +411,12 @@ onBeforeUnmount(function disposeGeoPage() {
   border-radius: 5px;
   background: rgba(4, 10, 16, 0.62);
   backdrop-filter: blur(6px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .geo-workspace :global(.cesium-viewer-bottom),
+  .geo-bottom-docks {
+    transition: none;
+  }
 }
 </style>

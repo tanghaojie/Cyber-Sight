@@ -1,27 +1,44 @@
 <template>
-  <footer class="geo-statusbar" aria-live="polite">
-    <span class="geo-statusbar__position"><AppIcon name="map-pin" /></span>
-    <span
-      ><small>{{ longitudeLabel }}</small
-      >{{ coordinate(longitude) }}</span
+  <footer
+    class="geo-statusbar"
+    :class="{ 'geo-statusbar--collapsed': collapsed }"
+    :aria-live="collapsed ? 'off' : 'polite'"
+  >
+    <button
+      type="button"
+      class="geo-statusbar__toggle"
+      :title="collapsed ? expandLabel : collapseLabel"
+      :aria-label="collapsed ? expandLabel : collapseLabel"
+      :aria-expanded="!collapsed"
+      @click="emit('toggle')"
     >
-    <span
-      ><small>{{ latitudeLabel }}</small
-      >{{ coordinate(latitude) }}</span
-    >
-    <span class="geo-statusbar__optional"
-      ><small>{{ heightLabel }}</small
-      >{{ height(surfaceHeight) }}</span
-    >
-    <span class="geo-statusbar__optional"
-      ><small>{{ cameraLabel }}</small
-      >{{ height(cameraHeight) }}</span
-    >
-    <span class="geo-statusbar__optional"
-      ><small>{{ fpsLabel }}</small
-      >{{ fps ?? '—' }}</span
-    >
-    <strong><i :class="{ 'geo-statusbar__pulse': active }" />{{ hint }}</strong>
+      <AppIcon name="chevron-down" />
+    </button>
+
+    <template v-if="!collapsed">
+      <span class="geo-statusbar__position"><AppIcon name="map-pin" /></span>
+      <span
+        ><small>{{ longitudeLabel }}</small
+        >{{ coordinate(longitude) }}</span
+      >
+      <span
+        ><small>{{ latitudeLabel }}</small
+        >{{ coordinate(latitude) }}</span
+      >
+      <span class="geo-statusbar__optional"
+        ><small>{{ heightLabel }}</small
+        >{{ height(surfaceHeight) }}</span
+      >
+      <span class="geo-statusbar__optional"
+        ><small>{{ cameraLabel }}</small
+        >{{ height(cameraHeight) }}</span
+      >
+      <span class="geo-statusbar__optional"
+        ><small>{{ fpsLabel }}</small
+        >{{ fps ?? '—' }}</span
+      >
+      <strong><i :class="{ 'geo-statusbar__pulse': active }" />{{ hint }}</strong>
+    </template>
   </footer>
 </template>
 
@@ -41,6 +58,13 @@ defineProps<{
   heightLabel: string
   cameraLabel: string
   fpsLabel: string
+  collapsed: boolean
+  collapseLabel: string
+  expandLabel: string
+}>()
+
+const emit = defineEmits<{
+  toggle: []
 }>()
 
 function coordinate(value: number | undefined): string {
@@ -65,17 +89,68 @@ function height(value: number | undefined): string {
   right: 22px;
   bottom: 14px;
   left: 22px;
+  box-sizing: border-box;
   min-height: 48px;
   display: flex;
   align-items: center;
   gap: 0;
-  padding: 6px 10px;
+  padding: 3px 10px;
   border: 1px solid var(--geo-line);
   border-radius: 15px;
   color: var(--geo-text-soft);
   background: var(--geo-surface-strong);
   box-shadow: var(--geo-shadow);
   backdrop-filter: blur(18px) saturate(125%);
+  transition:
+    right 0.18s ease,
+    width 0.18s ease,
+    min-height 0.18s ease,
+    padding 0.18s ease;
+}
+
+.geo-statusbar--collapsed {
+  right: auto;
+  width: 44px;
+  min-height: 44px;
+  padding: 1px;
+}
+
+.geo-statusbar__toggle {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  color: var(--geo-accent);
+  background: transparent;
+  cursor: pointer;
+}
+
+.geo-statusbar__toggle:hover {
+  background: var(--geo-surface-hover);
+}
+
+.geo-statusbar__toggle:focus-visible {
+  outline: 2px solid var(--geo-accent);
+  outline-offset: 2px;
+}
+
+.geo-statusbar__toggle :deep(.icon) {
+  width: 15px;
+  height: 15px;
+  transition: transform 0.18s ease;
+}
+
+.geo-statusbar--collapsed .geo-statusbar__toggle {
+  width: 100%;
+  height: 40px;
+}
+
+.geo-statusbar--collapsed .geo-statusbar__toggle :deep(.icon) {
+  transform: rotate(180deg);
 }
 
 .geo-statusbar > span:not(.geo-statusbar__position) {
@@ -140,6 +215,11 @@ function height(value: number | undefined): string {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .geo-statusbar,
+  .geo-statusbar__toggle :deep(.icon) {
+    transition: none;
+  }
+
   .geo-statusbar__pulse {
     animation: none;
   }
