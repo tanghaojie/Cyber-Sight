@@ -36,6 +36,7 @@
 - [2026-08-30 Geo 对比会话状态修复](plans/2026-08-30-geo-compare-session-state.md)：修复虚假启用状态，并让暂停分屏保持影像可见。
 - [2026-08-30 Geo 地形与对比状态一致性修复](plans/2026-08-30-geo-terrain-and-compare-consistency.md)：实现地形最新请求生效，并让对比会话跟踪稳定影像图层生命周期。
 - [2026-08-30 Geo 状态一致性交付后的 Platform 文档归档审查](plans/2026-08-30-platform-documentation-archive-review-2.md)：复核对比会话与地形状态一致性交付并推进 Platform 台账。
+- [2026-08-30 Geo 影像兜底与瓦片状态恢复](plans/2026-08-30-geo-imagery-fallback-and-recovery.md)：始终保留 Natural Earth 本地兜底，并让瞬时瓦片错误可从真实成功请求恢复。
 
 ## AI 协作记录
 
@@ -64,5 +65,6 @@
 - [2026-08-30 Geo 对比会话状态修复](ai-logs/2026/08/2026-08-30-geo-compare-session-state.md)
 - [2026-08-30 Geo 地形与对比状态一致性修复](ai-logs/2026/08/2026-08-30-geo-terrain-and-compare-consistency.md)
 - [2026-08-30 Geo 状态一致性交付后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-30-platform-documentation-archive-review-2.md)
+- [2026-08-30 Geo 影像兜底与瓦片状态恢复](ai-logs/2026/08/2026-08-30-geo-imagery-fallback-and-recovery.md)
 
 Sight 等业务平台在自己的仓库维护本目录。

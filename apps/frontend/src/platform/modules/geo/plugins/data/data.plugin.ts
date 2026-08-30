@@ -51,11 +51,9 @@ export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): Geo
       })
       context.scope.use(controller)
       if (!context.signal.aborted && !context.viewer.isDestroyed()) {
-        const defaultSourceId = pluginOptions.tiandituToken?.trim()
-          ? 'tianditu-image'
-          : 'natural-earth-ii'
-        await controller.addImagery(defaultSourceId)
-        if (defaultSourceId === 'tianditu-image') {
+        await controller.addImagery('natural-earth-ii')
+        if (pluginOptions.tiandituToken?.trim()) {
+          await controller.addImagery('tianditu-image')
           await controller.addImagery('tianditu-image-annotation')
         }
       }

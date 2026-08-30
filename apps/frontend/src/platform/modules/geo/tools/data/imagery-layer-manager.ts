@@ -1,4 +1,10 @@
-import { ImageryLayer, type Viewer } from 'cesium'
+import {
+  ImageryLayer,
+  type ImageryProvider,
+  type Request,
+  type TileProviderError,
+  type Viewer,
+} from 'cesium'
 import {
   createGeoImageryCatalog,
   type GeoImagerySourceDefinition,
@@ -15,7 +21,7 @@ export interface GeoImageryLayerSnapshot {
   readonly show: boolean
   readonly alpha: number
   readonly index: number
-  readonly status: 'ready' | 'loading' | 'failed'
+  readonly status: 'ready' | 'degraded'
   readonly error?: string
   readonly warning?: string
 }
@@ -36,8 +42,9 @@ interface ManagedImageryLayer {
   readonly snapshotId: string
   readonly definition: GeoImagerySourceDefinition
   readonly layer: ImageryLayer
-  readonly removeErrorListener?: () => void
-  status: 'ready' | 'failed'
+  removeErrorListener?: () => void
+  restoreRequestImage?: () => void
+  status: 'ready' | 'degraded'
   error?: string
   warning?: string
 }
@@ -70,6 +77,42 @@ function clampAlpha(alpha: number): number {
 function normalizeId(sourceId: GeoImagerySourceId, requestedId?: string): string {
   const value = requestedId?.trim()
   return value || sourceId
+}
+
+function observeSuccessfulTileRequests(
+  provider: ImageryProvider,
+  onSuccess: () => void,
+): () => void {
+  const originalRequestImage = provider.requestImage
+  let observing = true
+
+  function observedRequestImage(
+    x: number,
+    y: number,
+    level: number,
+    request?: Request,
+  ): ReturnType<ImageryProvider['requestImage']> {
+    const result = originalRequestImage.call(provider, x, y, level, request)
+    if (result) {
+      void result.then(
+        function observeSuccess() {
+          if (observing) {
+            onSuccess()
+          }
+        },
+        function ignoreObservedFailure() {},
+      )
+    }
+    return result
+  }
+
+  provider.requestImage = observedRequestImage
+  return function restoreRequestImage(): void {
+    observing = false
+    if (provider.requestImage === observedRequestImage) {
+      provider.requestImage = originalRequestImage
+    }
+  }
 }
 
 export function createGeoImageryLayerManager(
@@ -162,28 +205,41 @@ export function createGeoImageryLayerManager(
 
     const provider = await definition.createProvider(options)
     assertActive(options.signal)
-    const layer = viewer.imageryLayers.addImageryProvider(provider, options.index)
+    const layer = new ImageryLayer(provider)
     layer.show = options.show ?? true
     layer.alpha = clampAlpha(options.alpha ?? 1)
 
-    let managed: ManagedImageryLayer
-    const removeErrorListener = provider.errorEvent.addEventListener(
-      function onImageryError(error) {
-        const message = error instanceof Error ? error.message : 'Imagery tile request failed'
-        managed.error = message
-        managed.status = 'failed'
-        managerOptions.onChange?.()
-      },
-    )
-    managed = {
+    const managed: ManagedImageryLayer = {
       snapshotId: id,
       definition,
       layer,
-      removeErrorListener,
       status: 'ready',
       warning: availability.warning,
     }
+    managed.removeErrorListener = provider.errorEvent.addEventListener(function onImageryError(
+      error: TileProviderError,
+    ) {
+      managed.error = error.message || error.error?.message || 'Imagery tile request failed'
+      managed.status = 'degraded'
+      managerOptions.onChange?.()
+    })
+    managed.restoreRequestImage = observeSuccessfulTileRequests(provider, function onTileSuccess() {
+      if (managed.status === 'ready' && !managed.error) {
+        return
+      }
+      managed.status = 'ready'
+      managed.error = undefined
+      managerOptions.onChange?.()
+    })
     layers.set(id, managed)
+    try {
+      viewer.imageryLayers.add(layer, options.index)
+    } catch (error) {
+      layers.delete(id)
+      managed.removeErrorListener?.()
+      managed.restoreRequestImage?.()
+      throw error
+    }
     requestRender()
     return toSnapshot(id, managed)
   }
@@ -195,6 +251,7 @@ export function createGeoImageryLayerManager(
       return false
     }
     managed.removeErrorListener?.()
+    managed.restoreRequestImage?.()
     layers.delete(id)
     const removed = viewer.imageryLayers.remove(managed.layer, true)
     requestRender()
@@ -268,6 +325,7 @@ export function createGeoImageryLayerManager(
     disposed = true
     ;[...layers.entries()].forEach(function disposeLayer([id, managed]) {
       managed.removeErrorListener?.()
+      managed.restoreRequestImage?.()
       viewer.imageryLayers.remove(managed.layer, true)
       layers.delete(id)
     })
@@ -294,8 +352,8 @@ export function createGeoImageryLayerManager(
 }
 
 export function formatImageryCoverage(layer: GeoImageryLayerSnapshot): string {
-  if (layer.status === 'failed') {
-    return layer.error ?? '加载失败'
+  if (layer.status === 'degraded') {
+    return layer.error ?? '瓦片请求异常'
   }
   return `${layer.coordinateSystem} · ${layer.role}`
 }

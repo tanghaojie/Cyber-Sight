@@ -51,7 +51,7 @@
             :class="{
               'is-disabled': !item.availability.available,
               'is-loaded': item.layer,
-              'is-failed': item.layer?.status === 'failed',
+              'is-degraded': item.layer?.status === 'degraded',
             }"
           >
             <div class="data-panel__source-head">
@@ -100,7 +100,7 @@
           v-for="layer in controller.state.imagery"
           :key="layer.id"
           class="data-panel__layer"
-          :class="{ 'is-failed': layer.status === 'failed' }"
+          :class="{ 'is-degraded': layer.status === 'degraded' }"
         >
           <div class="data-panel__layer-main">
             <label>
@@ -118,7 +118,7 @@
             </label>
             <small
               >{{ layer.coordinateSystem }} ·
-              {{ layer.status === 'failed' ? '瓦片异常' : '已就绪' }}</small
+              {{ layer.status === 'degraded' ? '瓦片降级' : '已就绪' }}</small
             >
           </div>
           <div class="data-panel__layer-actions">
@@ -496,8 +496,8 @@ function sourceStatus(item: ImagerySourceItem): string {
   if (item.loading) {
     return '加载中'
   }
-  if (item.layer?.status === 'failed') {
-    return '瓦片异常'
+  if (item.layer?.status === 'degraded') {
+    return '瓦片降级'
   }
   if (item.layer) {
     return '已加载'
@@ -512,8 +512,8 @@ function sourceStatusTone(item: ImagerySourceItem): string {
   if (item.loading) {
     return 'loading'
   }
-  if (item.layer?.status === 'failed') {
-    return 'failed'
+  if (item.layer?.status === 'degraded') {
+    return 'degraded'
   }
   if (item.layer) {
     return 'loaded'
@@ -766,7 +766,7 @@ async function loadTileset(): Promise<void> {
   border-color: color-mix(in srgb, var(--geo-line, #263c4e), transparent 10%);
   opacity: 0.78;
 }
-.data-panel__source.is-failed {
+.data-panel__source.is-degraded {
   border-color: color-mix(in srgb, #ff9ca7, transparent 45%);
 }
 .data-panel__source-head {
@@ -813,7 +813,7 @@ async function loadTileset(): Promise<void> {
   color: #ffdc8a;
   background: color-mix(in srgb, #ffca63, transparent 84%);
 }
-.data-panel__source-status.is-failed {
+.data-panel__source-status.is-degraded {
   color: #ffb0b8;
   background: color-mix(in srgb, #ff7d8c, transparent 84%);
 }
@@ -879,7 +879,7 @@ async function loadTileset(): Promise<void> {
   border-radius: 9px;
   background: color-mix(in srgb, var(--geo-surface-strong, #0e1c2a), transparent 20%);
 }
-.data-panel__layer.is-failed {
+.data-panel__layer.is-degraded {
   border-color: color-mix(in srgb, #ff9ca7, transparent 50%);
 }
 .data-panel__layer-main {
