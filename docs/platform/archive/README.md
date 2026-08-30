@@ -38,6 +38,7 @@
 - [2026-08-30 Geo 状态一致性交付后的 Platform 文档归档审查](plans/2026-08-30-platform-documentation-archive-review-2.md)：复核对比会话与地形状态一致性交付并推进 Platform 台账。
 - [2026-08-30 Geo 影像兜底与瓦片状态恢复](plans/2026-08-30-geo-imagery-fallback-and-recovery.md)：始终保留 Natural Earth 本地兜底，并让瞬时瓦片错误可从真实成功请求恢复。
 - [2026-08-30 Geo 横向宽屏布局收敛](plans/2026-08-30-geo-wide-screen-only.md)：冻结横向 `1280×720` 最低支持基线并移除窄屏响应式布局。
+- [2026-08-30 Geo 影像与宽屏交付后的 Platform 文档归档审查](plans/2026-08-30-platform-documentation-archive-review-3.md)：复核影像恢复与宽屏交付并推进 Platform 台账。
 
 ## AI 协作记录
 
@@ -68,5 +69,6 @@
 - [2026-08-30 Geo 状态一致性交付后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-30-platform-documentation-archive-review-2.md)
 - [2026-08-30 Geo 影像兜底与瓦片状态恢复](ai-logs/2026/08/2026-08-30-geo-imagery-fallback-and-recovery.md)
 - [2026-08-30 Geo 横向宽屏布局收敛](ai-logs/2026/08/2026-08-30-geo-wide-screen-only.md)
+- [2026-08-30 Geo 影像与宽屏交付后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-30-platform-documentation-archive-review-3.md)
 
 Sight 等业务平台在自己的仓库维护本目录。

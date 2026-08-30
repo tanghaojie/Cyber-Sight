@@ -562,7 +562,7 @@ Viewer 的 `resolutionScale` 由页面级运行时拥有，不交给单个插件
 - 不复制旧项目中硬编码的天地图令牌。天地图令牌只能通过 `VITE_GEO_TIANDITU_TOKEN` 这类公开客户端运行时配置传入，并在界面中明确客户端令牌会暴露给最终用户；没有令牌时对应源显示为不可用，不影响其他底图；
 - 高德源的 GCJ-02 偏移必须由影像适配层显式处理或标明坐标限制，不能把偏移瓦片当作 WGS84 静默叠加；第三方公开瓦片仅作为可配置候选源，不承诺服务稳定性或商业使用许可；
 - Viewer 自带的后台式控件默认关闭，工作台 Shell 负责相机复位、2D/3D、全屏和状态反馈。
-- Geo 页面被编译为独立懒加载 chunk；当前完整功能构建的 Geo JavaScript chunk 约 `4.28 MB`，gzip 约 `1.16 MB`，Geo CSS 约 `57.44 kB`，gzip 约 `11.06 kB`。该体积不进入主应用首屏，功能稳定后再评估 `@cesium/engine`/widgets 拆分，不以牺牲 Viewer 契约和可维护性换取过早优化。
+- Geo 页面被编译为独立懒加载 chunk；当前完整功能构建的 Geo JavaScript chunk 约 `4.31 MB`，gzip 约 `1.17 MB`，Geo CSS 约 `66.92 kB`，gzip 约 `12.28 kB`。该体积不进入主应用首屏，功能稳定后再评估 `@cesium/engine`/widgets 拆分，不以牺牲 Viewer 契约和可维护性换取过早优化。
 
 Geo 的数据来源仅包括：
 
