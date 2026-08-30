@@ -58,6 +58,10 @@
 
       <GeoPluginErrors :title="t('geo.plugins.errors')" :errors="runtime.plugins.state.errors" />
 
+      <div v-if="bottomDocks.length" class="geo-bottom-docks">
+        <component :is="dock.component" v-for="dock in bottomDocks" :key="dock.id" />
+      </div>
+
       <GeoStatusBar
         :longitude="runtime.state.longitude"
         :latitude="runtime.state.latitude"
@@ -102,6 +106,7 @@ import GeoTaskOverview from '../components/shell/GeoTaskOverview.vue'
 import GeoToolRail, { type GeoTaskRailItem } from '../components/shell/GeoToolRail.vue'
 import { provideGeoRuntime } from '../core/geo-context'
 import type {
+  GeoBottomDockContribution,
   GeoInspectorContribution,
   GeoPanelContribution,
   GeoTaskGroupContribution,
@@ -214,6 +219,17 @@ const activeInspectorComponent = computed<Component | undefined>(
     return entry ? (entry.contribution as GeoInspectorContribution).component : undefined
   },
 )
+const bottomDocks = computed(function registeredBottomDocks() {
+  return runtime.plugins
+    .getContributions('bottomDock')
+    .map(function toBottomDock(entry) {
+      const contribution = entry.contribution as GeoBottomDockContribution
+      return { id: entry.id, component: contribution.component, order: contribution.order ?? 0 }
+    })
+    .sort(function compareBottomDocks(left, right) {
+      return left.order - right.order || left.id.localeCompare(right.id)
+    })
+})
 const activeHint = computed(function currentHint() {
   if (runtime.interactions.state.activeId) {
     return `${t('geo.status.activeTool')} · ${runtime.interactions.state.activeId}`
@@ -359,8 +375,17 @@ onBeforeUnmount(function disposeGeoPage() {
 
 .geo-workspace :global(.cesium-viewer-bottom) {
   right: 26px;
-  bottom: 66px;
+  bottom: 158px;
   left: auto;
+}
+
+.geo-bottom-docks {
+  position: absolute;
+  z-index: 20;
+  right: 22px;
+  bottom: 74px;
+  left: 74px;
+  pointer-events: none;
 }
 
 .geo-workspace :global(.cesium-widget-credits) {

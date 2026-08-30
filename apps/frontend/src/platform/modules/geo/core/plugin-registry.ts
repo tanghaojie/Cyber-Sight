@@ -7,6 +7,7 @@ import type { GeoEventMap } from './event-bus'
 import type { GeoInteractionManager } from './interaction-manager'
 import type {
   GeoActionTool,
+  GeoBottomDockContribution,
   GeoContributionKind,
   GeoInspectorContribution,
   GeoPanelContribution,
@@ -149,6 +150,9 @@ function contributionEntries(
   })
   contributions.statusItems?.forEach(function addStatusItem(statusItem: GeoStatusItemContribution) {
     add('statusItem', statusItem)
+  })
+  contributions.bottomDocks?.forEach(function addBottomDock(bottomDock: GeoBottomDockContribution) {
+    add('bottomDock', bottomDock)
   })
   return entries
 }

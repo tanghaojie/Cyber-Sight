@@ -62,9 +62,9 @@ const toggles: readonly { key: keyof GeoSceneSettings; label: string }[] = [
   { key: 'sun', label: '太阳' },
   { key: 'moon', label: '月亮' },
   { key: 'atmosphere', label: '大气层' },
-  { key: 'lighting', label: '地球光照' },
+  { key: 'lighting', label: '太阳光照' },
   { key: 'skyBox', label: '天空盒' },
-  { key: 'shadows', label: '场景阴影' },
+  { key: 'shadows', label: '太阳阴影' },
   { key: 'depthTestAgainstTerrain', label: '地形深度检测' },
   { key: 'groundAtmosphere', label: '地面大气' },
 ]

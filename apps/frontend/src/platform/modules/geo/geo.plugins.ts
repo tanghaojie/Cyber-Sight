@@ -6,12 +6,14 @@ import { measurementPlugin } from './plugins/measurement/measurement.plugin'
 import { modelPlugin } from './plugins/model/model.plugin'
 import { geoScenePlugin } from './plugins/scene/scene.plugin'
 import { terrainPlugin } from './plugins/terrain/terrain.plugin'
+import { geoTimePlugin } from './plugins/time/time.plugin'
 import { geoViewPlugin } from './plugins/view/view.plugin'
 
 export const geoPlugins: readonly GeoPluginDefinition[] = [
   geoDataPlugin,
   geoViewPlugin,
   geoScenePlugin,
+  geoTimePlugin,
   drawingPlugin,
   measurementPlugin,
   modelPlugin,

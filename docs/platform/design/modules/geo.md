@@ -4,7 +4,7 @@ scope: platform
 repository: Cyber-Sight
 status: active
 owner: project maintainers
-updated: 2026-08-30
+updated: 2026-08-31
 ---
 
 # Geo 前端空间可视化工作台
@@ -344,8 +344,23 @@ function startDistance(): void {
 - `panels`：按需加载的上下文面板组件；
 - `inspectors`：根据选中对象类型匹配的属性检查器；
 - `statusItems`：底部状态条片段。
+- `bottomDocks`：不随任务面板切换、常驻地图底部的工作区组件；只用于时间轴等横向全局上下文，不承载普通插件面板。
 
 每个贡献使用全局唯一的 `${pluginId}.${localId}` 标识、locales 文案键、图标、排序和可用性函数。工作台 Shell 只渲染注册表提供的排序结果，不 import 具体插件组件，也不包含标绘、测量或地形业务判断。
+
+### 仿真时间与太阳光照
+
+Geo 只使用 Viewer 自带的 `viewer.clock` 作为仿真时间源，并关闭 DataSource 自动接管 Clock，避免后加载数据源改写全局时间范围。Cesium 原生 `Animation` 和 `Timeline` 继续关闭；Time 插件通过 `bottomDocks` contribution 发布符合当前工作台视觉的底部时间轴，页面与 Shell 不直接导入 Time 组件。
+
+Time 插件默认把当天 UTC `00:00` 到次日 UTC `00:00` 配置为循环范围，提供播放/暂停、拖动定位、回到当前时刻和倍速控制。内部时间保持 `JulianDate`，界面明确显示 UTC。播放时主动请求场景渲染，以便太阳位置和未来动态对象随 Clock 更新；暂停后停止持续渲染并保留显式渲染模式的空闲收益。Time controller 只低频同步 Vue 展示状态，不在每次 tick 中手工更新动态实体位置。
+
+Scene 插件拥有太阳显示、地球光照和 ShadowMap 设置，并通过 `scene.solarLighting` capability 暴露最小太阳光照端口。Time 插件声明依赖 Scene，只消费该端口；禁止穿透导入 Scene controller。首版动态光照只实现：
+
+- 太阳驱动的地球昼夜光照，默认开启；
+- 太阳阴影，默认关闭并独立开关，以明确 GPU 成本；
+- 不实现月光、人工光源、天气或额外大气散射模拟。
+
+阴影是否可见还取决于地形、模型的阴影模式与设备能力，必须进入浏览器人工验收，静态检查和生产构建不能替代该结论。
 
 工具贡献使用判别联合，避免一个充满可选字段的万能接口：
 
@@ -513,6 +528,7 @@ Geo 前端工作台的计划内代码能力已经落地：
 - 数据插件提供多源影像目录、图层显示/排序/定位、GeoJSON、glTF/GLB 和 3D Tiles 会话加载；外部 glTF/GLB 使用 WGS84 经度、纬度、椭球高和本地 heading/pitch/roll 构造固定坐标框架，支持加载前取当前视图中心、设置统一缩放，加载成功后自动飞到模型，并可继续编辑变换或按真实包围球再次定位；Natural Earth II 始终作为配置远程默认底图的下层兜底，底图目录支持角色筛选、搜索、局部滚动和可恢复的瓦片降级状态；`activeTilesetCapability` 向模型插件发布当前 3D Tiles，而不是穿透导入插件内部实现；
 - 数据插件始终先加载本地 Natural Earth II，不再自动回退到 Google 等远程候选；配置天地图时在本地层上方叠加影像和注记，其他远程候选由用户主动添加；影像 provider 的瓦片错误以可恢复降级状态局部反馈；
 - 视图和场景插件提供全球/中国定位、相机参数、2D/3D/哥伦布模式、视距限制以及太阳、月亮、大气、光照、阴影、地球底色、深度检测等设置；视图 controller 订阅相机变化、移动结束和场景模式切换完成事件，让面板快照跟随真实 Viewer，并保证最小视距不高于最大视距；
+- Time 插件通过 `bottomDocks` contribution 提供 UTC 当日 24 小时循环时间轴，支持播放/暂停、拖动、回到当前时刻和 `1×` 至 `3600×` 倍速；Viewer 禁止 DataSource 自动接管 Clock，Scene 通过 capability 向时间轴提供默认开启的太阳光照与默认关闭的太阳阴影；
 - 标绘插件提供点、线、面交互和当前/全部结果清理；测量插件提供点位、距离、面积交互和结果清理；距离按米/千米显示，面积按平方米/平方千米显示，点位不显示单位选择；两者统一经 `InteractionManager` 互斥；
 - 模型插件提供 3D Tiles 高亮、分类、偏移、裁剪和平面分屏，并通过动态属性检查器展示选中对象；
 - 地形插件提供坐标批量采样、淹没动画、无需坐标的全地形等高线以及高程、坡度、坡向着色；等高线会跟随真实 terrain provider 状态禁用或自动清除，异步地形切换只提交最新请求；对比插件通过 `data.imageryLayers` capability 自动同步稳定图层 ID，任一参与图层移除时关闭会话；暂停只取消左右分屏方向并保持影像可见，恢复只能作用于仍存在的对比会话；
@@ -614,7 +630,9 @@ AI 辅助开发继续由 Sight 现有仓库能力承担；Geo 文档和源码无
 
 - [Geo 前端编译期插件架构](../../decisions/ADR-20260814-geo-frontend-plugin-architecture.md)
 - [Geo 影像默认源与失败隔离](../../decisions/ADR-20260820-geo-imagery-defaults.md)
+- [Geo 单一仿真时间与太阳光照](../../decisions/ADR-20260830-geo-simulation-time-and-solar-lighting.md)
 - [Geo 前端工作台实施计划](../../archive/plans/2026-08-14-geo-frontend-workspace.md)
 - [Geo 底图目录交互与默认加载修复计划](../../archive/plans/2026-08-20-geo-imagery-ui-and-loading.md)
+- [Geo 时间轴与太阳光照实施计划](../../archive/plans/2026-08-30-geo-time-and-solar-lighting.md)
 - [Geo 模块设计协作记录](../../archive/ai-logs/2026/08/2026-08-14-geo-platform-design.md)
 - [Geo 底图目录交互与默认加载修复协作记录](../../archive/ai-logs/2026/08/2026-08-20-geo-imagery-ui-and-loading.md)

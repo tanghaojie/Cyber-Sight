@@ -316,6 +316,7 @@ export function createGeoRuntime(options: GeoRuntimeOptions = {}): GeoRuntime {
       viewer = markRaw(
         new Viewer(container, {
           animation: false,
+          automaticallyTrackDataSourceClocks: false,
           baseLayer: false,
           baseLayerPicker: false,
           fullscreenButton: false,
