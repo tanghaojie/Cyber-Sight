@@ -7,21 +7,24 @@ import {
   type Viewer,
 } from 'cesium'
 import type { Disposable } from '../../core/disposable'
+import type { GeoInteractionManager } from '../../core/interaction-manager'
 import {
   TerrainAnalysisTool,
   type TerrainAnalysisSession,
   type TerrainColorMode,
-  type TerrainSample,
+  type TerrainProfileSample,
 } from '../../tools/terrain/terrain-analysis'
 
 export type TerrainStatus = 'idle' | 'running' | 'complete' | 'failed'
+export type TerrainActivity = 'drawing-profile' | 'sampling-profile' | 'flood'
 
 const TERRAIN_REQUIRED_MESSAGE = '当前未加载地形，等高线无法使用。请先到数据面板加载地形。'
 
 export interface TerrainState {
   status: TerrainStatus
+  activity?: TerrainActivity
   progress: number
-  sampled: TerrainSample[]
+  sampled: TerrainProfileSample[]
   terrainAvailable: boolean
   contourInterval: number
   colorMode?: TerrainColorMode
@@ -30,7 +33,7 @@ export interface TerrainState {
 
 export interface TerrainController extends Disposable {
   readonly state: Readonly<TerrainState>
-  sample(positions: readonly Cartesian3[]): Promise<void>
+  startProfile(): void
   startFlood(positions: readonly Cartesian3[], waterHeight: number, durationMs?: number): void
   setContour(interval?: number): void
   setTerrainColorMode(mode: TerrainColorMode): void
@@ -41,6 +44,7 @@ export interface TerrainController extends Disposable {
 
 export function createTerrainController(
   viewer: Viewer,
+  interactions: GeoInteractionManager,
   terrainProvider?: TerrainProvider,
 ): TerrainController {
   const tool = markRaw(new TerrainAnalysisTool(viewer, terrainProvider))
@@ -53,8 +57,19 @@ export function createTerrainController(
   })
   let operation: AbortController | undefined
   let floodSession: TerrainAnalysisSession | undefined
+  const PROFILE_INTERACTION_ID = 'terrain.profile'
 
   function captureTerrainProvider(provider: TerrainProvider): void {
+    if (
+      state.sampled.length ||
+      state.activity === 'drawing-profile' ||
+      state.activity === 'sampling-profile'
+    ) {
+      cancel()
+      tool.clearProfile()
+      state.sampled = []
+      state.progress = 0
+    }
     state.terrainAvailable = !(provider instanceof EllipsoidTerrainProvider)
     if (state.terrainAvailable && state.error === TERRAIN_REQUIRED_MESSAGE) {
       state.status = 'idle'
@@ -69,15 +84,16 @@ export function createTerrainController(
   const removeTerrainProviderChanged =
     viewer.scene.globe.terrainProviderChanged.addEventListener(captureTerrainProvider)
 
-  async function sample(positions: readonly Cartesian3[]): Promise<void> {
-    cancel()
+  async function sampleProfile(positions: readonly Cartesian3[]): Promise<void> {
+    operation?.abort()
     const request = new AbortController()
     operation = request
     state.status = 'running'
+    state.activity = 'sampling-profile'
     state.progress = 0
     state.error = undefined
     try {
-      state.sampled = await tool.sample(positions, {
+      state.sampled = await tool.sampleProfile(positions, {
         signal: request.signal,
         onProgress(completed, total) {
           state.progress = total ? completed / total : 1
@@ -87,6 +103,7 @@ export function createTerrainController(
         return
       }
       state.status = 'complete'
+      state.activity = undefined
       state.progress = 1
     } catch (error) {
       if (operation !== request) {
@@ -94,9 +111,11 @@ export function createTerrainController(
       }
       if (request.signal.aborted) {
         state.status = 'idle'
+        state.activity = undefined
         return
       }
       state.status = 'failed'
+      state.activity = undefined
       state.error = error instanceof Error ? error.message : 'Terrain sampling failed'
     } finally {
       if (operation === request) {
@@ -105,9 +124,49 @@ export function createTerrainController(
     }
   }
 
+  function startProfile(): void {
+    cancel()
+    state.sampled = []
+    state.status = 'running'
+    state.activity = 'drawing-profile'
+    state.progress = 0
+    state.error = undefined
+    try {
+      interactions.activate({
+        id: PROFILE_INTERACTION_ID,
+        cursor: 'crosshair',
+        start(interactionContext) {
+          return tool.startProfile({
+            signal: interactionContext.signal,
+            onComplete(positions) {
+              interactionContext.complete()
+              void sampleProfile(positions)
+            },
+            onCancel() {
+              if (state.activity === 'drawing-profile') {
+                state.status = 'idle'
+                state.activity = undefined
+              }
+            },
+          })
+        },
+        onError(error) {
+          state.status = 'failed'
+          state.activity = undefined
+          state.error = error instanceof Error ? error.message : 'Terrain profile drawing failed'
+        },
+      })
+    } catch (error) {
+      state.status = 'failed'
+      state.activity = undefined
+      state.error = error instanceof Error ? error.message : 'Terrain profile drawing failed'
+    }
+  }
+
   function startFlood(positions: readonly Cartesian3[], waterHeight: number, durationMs = 0): void {
     cancel()
     state.status = 'running'
+    state.activity = 'flood'
     state.progress = 0
     state.error = undefined
     try {
@@ -119,11 +178,13 @@ export function createTerrainController(
           state.progress = waterHeight === 0 ? 1 : Math.min(currentHeight / waterHeight, 1)
           if (state.progress >= 1) {
             state.status = 'complete'
+            state.activity = undefined
           }
         },
       })
     } catch (error) {
       state.status = 'failed'
+      state.activity = undefined
       state.error = error instanceof Error ? error.message : 'Flood analysis failed'
     }
   }
@@ -159,6 +220,9 @@ export function createTerrainController(
   }
 
   function cancel(): void {
+    if (interactions.state.activeId === PROFILE_INTERACTION_ID) {
+      interactions.cancel()
+    }
     operation?.abort()
     operation = undefined
     floodSession?.stop()
@@ -166,6 +230,7 @@ export function createTerrainController(
     tool.stop()
     if (state.status === 'running') {
       state.status = 'idle'
+      state.activity = undefined
       state.progress = 0
     }
   }
@@ -177,6 +242,7 @@ export function createTerrainController(
     state.progress = 0
     state.colorMode = undefined
     state.status = 'idle'
+    state.activity = undefined
     state.error = undefined
   }
 
@@ -188,7 +254,7 @@ export function createTerrainController(
 
   return {
     state: shallowReadonly(state),
-    sample,
+    startProfile,
     startFlood,
     setContour,
     setTerrainColorMode,

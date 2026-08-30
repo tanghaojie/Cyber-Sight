@@ -16,7 +16,7 @@ export const terrainPlugin: GeoPluginDefinition = {
   id: 'terrain',
   order: 70,
   install(context: GeoPluginContext) {
-    const controller = createTerrainController(context.viewer)
+    const controller = createTerrainController(context.viewer, context.interactions)
     context.scope.use(controller)
     return {
       contributions: {

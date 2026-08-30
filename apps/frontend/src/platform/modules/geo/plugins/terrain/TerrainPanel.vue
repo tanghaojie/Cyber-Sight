@@ -3,6 +3,62 @@
     <section class="terrain-panel__section terrain-panel__section--primary">
       <header class="terrain-panel__header">
         <div>
+          <h3>地形剖面</h3>
+          <p>在地图上单击添加折点，双击结束并沿线采样。</p>
+        </div>
+        <span v-if="controller.state.sampled.length" class="terrain-panel__badge">已采样</span>
+      </header>
+
+      <p v-if="!controller.state.terrainAvailable" class="terrain-panel__notice" role="status">
+        <strong>未加载可采样地形</strong>
+        <span>请先到“数据”面板加载 World Terrain 或自定义地形。</span>
+      </p>
+
+      <button
+        class="terrain-panel__button terrain-panel__button--primary"
+        type="button"
+        :disabled="!controller.state.terrainAvailable || isSamplingProfile"
+        @click="toggleProfile"
+      >
+        {{ isDrawingProfile ? '取消画线' : isSamplingProfile ? '正在采样…' : '绘制采样线' }}
+      </button>
+
+      <div v-if="profileStats" class="terrain-profile" aria-live="polite">
+        <svg
+          class="terrain-profile__chart"
+          viewBox="0 0 320 140"
+          role="img"
+          :aria-label="profileAriaLabel"
+        >
+          <defs>
+            <linearGradient id="terrain-profile-fill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#55d6ff" stop-opacity="0.42" />
+              <stop offset="1" stop-color="#55d6ff" stop-opacity="0.04" />
+            </linearGradient>
+          </defs>
+          <line x1="18" y1="122" x2="308" y2="122" class="terrain-profile__axis" />
+          <line x1="18" y1="12" x2="18" y2="122" class="terrain-profile__axis" />
+          <polygon :points="profileAreaPoints" fill="url(#terrain-profile-fill)" />
+          <polyline :points="profileLinePoints" class="terrain-profile__line" />
+        </svg>
+        <div class="terrain-profile__stats">
+          <span
+            >距离<strong>{{ formatDistance(profileStats.distance) }}</strong></span
+          >
+          <span
+            >最低<strong>{{ profileStats.minimum.toFixed(1) }} m</strong></span
+          >
+          <span
+            >最高<strong>{{ profileStats.maximum.toFixed(1) }} m</strong></span
+          >
+        </div>
+      </div>
+      <p v-else class="terrain-panel__hint">完成采样后将在这里显示沿线高程剖面。</p>
+    </section>
+
+    <section class="terrain-panel__section">
+      <header class="terrain-panel__header">
+        <div>
           <h3>等高线</h3>
           <p>基于当前地形绘制，无需输入坐标。</p>
         </div>
@@ -85,12 +141,12 @@
 
     <details class="terrain-panel__section terrain-panel__details">
       <summary>
-        <span>坐标分析</span>
-        <small>地形采样与淹没</small>
+        <span>坐标淹没</span>
+        <small>多边形水面模拟</small>
       </summary>
       <div class="terrain-panel__details-body">
         <p class="terrain-panel__hint">
-          每行输入一个经度、纬度和可选高程，例如：116.391,39.907,50。
+          每行输入一个经度、纬度和可选高程，至少三行，例如：116.391,39.907,50。
         </p>
         <label class="terrain-panel__field">
           <span>分析坐标</span>
@@ -103,10 +159,7 @@
             <span>米</span>
           </div>
         </label>
-        <div class="terrain-panel__grid">
-          <button type="button" @click="runSample">采样</button>
-          <button type="button" @click="runFlood">淹没</button>
-        </div>
+        <button type="button" @click="runFlood">开始淹没</button>
       </div>
     </details>
 
@@ -138,9 +191,54 @@ const positionsText = ref('116.391,39.907,50\n116.405,39.907,50\n116.405,39.918,
 const waterHeight = ref(80)
 const contourInterval = ref(props.controller.state.contourInterval)
 const inputError = ref('')
+const isDrawingProfile = computed(() => props.controller.state.activity === 'drawing-profile')
+const isSamplingProfile = computed(() => props.controller.state.activity === 'sampling-profile')
+const profileStats = computed(function terrainProfileStats() {
+  const sampled = props.controller.state.sampled
+  if (!sampled.length) {
+    return undefined
+  }
+  const heights = sampled.map((sample) => sample.height)
+  return {
+    distance: sampled.at(-1)?.distanceMeters ?? 0,
+    minimum: Math.min(...heights),
+    maximum: Math.max(...heights),
+  }
+})
+const profileLinePoints = computed(function terrainProfileLinePoints() {
+  const sampled = props.controller.state.sampled
+  const stats = profileStats.value
+  if (!stats || !sampled.length) {
+    return ''
+  }
+  const heightRange = Math.max(stats.maximum - stats.minimum, 1)
+  const distance = Math.max(stats.distance, 1)
+  return sampled
+    .map(function toChartPoint(sample) {
+      const x = 18 + (sample.distanceMeters / distance) * 290
+      const y = 122 - ((sample.height - stats.minimum) / heightRange) * 110
+      return `${x.toFixed(2)},${y.toFixed(2)}`
+    })
+    .join(' ')
+})
+const profileAreaPoints = computed(function terrainProfileAreaPoints() {
+  return profileLinePoints.value ? `18,122 ${profileLinePoints.value} 308,122` : ''
+})
+const profileAriaLabel = computed(function terrainProfileAriaLabel() {
+  const stats = profileStats.value
+  return stats
+    ? `地形剖面，总距离 ${formatDistance(stats.distance)}，最低高程 ${stats.minimum.toFixed(1)} 米，最高高程 ${stats.maximum.toFixed(1)} 米`
+    : '地形剖面'
+})
 
 const statusText = computed(function formatStatus() {
   if (props.controller.state.status === 'running') {
+    if (props.controller.state.activity === 'drawing-profile') {
+      return '正在画采样线 · 单击添加折点，双击结束，Esc 取消'
+    }
+    if (props.controller.state.activity === 'sampling-profile') {
+      return `正在采样地形 · ${Math.round(props.controller.state.progress * 100)}%`
+    }
     return `分析中 · ${Math.round(props.controller.state.progress * 100)}%`
   }
   if (props.controller.state.status === 'complete') {
@@ -185,11 +283,18 @@ function applyContour(): void {
   props.controller.setContour(interval)
 }
 
-async function runSample(): Promise<void> {
-  const positions = parsePositions()
-  if (positions) {
-    await props.controller.sample(positions)
+function toggleProfile(): void {
+  if (isDrawingProfile.value) {
+    props.controller.cancel()
+    return
   }
+  props.controller.startProfile()
+}
+
+function formatDistance(distanceMeters: number): string {
+  return distanceMeters >= 1000
+    ? `${(distanceMeters / 1000).toFixed(2)} km`
+    : `${distanceMeters.toFixed(1)} m`
 }
 
 function runFlood(): void {
@@ -255,6 +360,56 @@ function runFlood(): void {
   color: var(--geo-accent, #55d6ff);
   background: rgb(85 214 255 / 9%);
   font-size: 11px;
+}
+
+.terrain-profile {
+  display: grid;
+  gap: 10px;
+}
+
+.terrain-profile__chart {
+  width: 100%;
+  min-height: 126px;
+  overflow: visible;
+  border: 1px solid var(--geo-line, rgb(117 167 199 / 18%));
+  border-radius: 10px;
+  background: rgb(4 15 25 / 58%);
+}
+
+.terrain-profile__axis {
+  stroke: rgb(141 164 184 / 35%);
+  stroke-width: 1;
+}
+
+.terrain-profile__line {
+  fill: none;
+  stroke: var(--geo-accent, #55d6ff);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+}
+
+.terrain-profile__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.terrain-profile__stats span {
+  display: grid;
+  gap: 3px;
+  padding: 8px;
+  border: 1px solid var(--geo-line, rgb(117 167 199 / 18%));
+  border-radius: 8px;
+  color: var(--geo-text-faint, #8da4b8);
+  background: rgb(4 15 25 / 38%);
+  font-size: 10px;
+}
+
+.terrain-profile__stats strong {
+  color: var(--geo-text, #eaf6ff);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
 }
 
 .terrain-panel__notice {
