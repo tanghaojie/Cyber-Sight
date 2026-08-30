@@ -75,8 +75,8 @@ export class SceneCompareTool {
         return
       }
       enabled = nextEnabled
-      leftLayer.show = nextEnabled
-      rightLayer.show = nextEnabled
+      leftLayer.splitDirection = nextEnabled ? SplitDirection.LEFT : SplitDirection.NONE
+      rightLayer.splitDirection = nextEnabled ? SplitDirection.RIGHT : SplitDirection.NONE
       this.viewer.scene.requestRender()
     }
     const stop = (): void => {
@@ -105,8 +105,7 @@ export class SceneCompareTool {
       dispose: stop,
     }
     try {
-      leftLayer.splitDirection = SplitDirection.LEFT
-      rightLayer.splitDirection = SplitDirection.RIGHT
+      setEnabled(true)
       setSplitPosition(options.splitPosition ?? 0.5)
     } catch (error) {
       leftLayer.splitDirection = previousLeftDirection

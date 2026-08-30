@@ -1,0 +1,67 @@
+---
+title: Geo 近期交付后的 Platform 文档归档审查
+type: documentation-archive-review
+scope: platform
+repository: Cyber-Sight
+owner: project maintainers
+status: completed
+created: 2026-08-30
+updated: 2026-08-30
+baseline_commit: fe27e9df2121593330516df6c0e206541b314d51
+trigger_commit: 8183b36b292037a783d12d588665306176805d3b
+---
+
+# Geo 近期交付后的 Platform 文档归档审查
+
+## 目标
+
+复核 Platform 台账基线之后的 Geo 外部模型放置和地形剖面交付，确认当前实现、设计、完成计划与 AI 记录一致，并推进 Platform 归档台账。
+
+## 背景与设计依据
+
+`pnpm docs:archive:check` 返回 `platform: DUE`，原因是台账基线后的已完成功能达到阈值。本次只审查 Cyber-Sight 自有的 `platform` 作用域。
+
+## 范围
+
+- 审查 `fe27e9d..8183b36` 的 Platform 代码和文档变更；
+- 核对 Geo 当前设计、完成计划和 AI 记录；
+- 判断是否存在需要归档的已取代 Platform Design 或 ADR；
+- 更新 Platform 归档索引和台账。
+
+## 非目标
+
+- 不修改 inherited Foundation 文档；
+- 不执行 Forge 上游同步；
+- 不在归档审查中改变 Geo 业务行为。
+
+## 前置条件和风险
+
+- 当前暂存区与工作区在任务开始时均为空；
+- 只以当前代码、设计和 Git 证据确认事实，无法证明的历史意图不写入现行规范。
+
+## 实施任务
+
+- [x] 核对基线后的提交和文件变更；
+- [x] 复核模型放置与地形剖面的设计和交付记录；
+- [x] 记录审查结论并更新归档索引；
+- [x] 推进 Platform 台账并归档本计划及 AI 记录；
+- [x] 确认 `pnpm docs:archive:check:ci` 返回 `NOT_DUE`。
+
+## 测试与验证
+
+- `pnpm docs:archive:check:ci`；
+- `pnpm format:check`；
+- `git diff --check`。
+
+## 发布与回滚
+
+本审查只调整 Platform 文档生命周期和台账，不改变运行时；若验证失败，保留活动计划并停止推进台账。
+
+## 实际偏差和遗留问题
+
+`fe27e9d..8183b36` 的模型放置和地形剖面交付均已准确同步到当前 Geo Design，并各自保留完成计划与 AI 记录。未发现需要归档的旧 Platform Design 或 ADR；前端交互继续由维护者人工验收。
+
+## 相关设计、ADR 和 AI 日志
+
+- [Geo 前端空间可视化工作台](../../design/modules/geo.md)
+- [本次审查 AI 记录](../ai-logs/2026/08/2026-08-30-platform-documentation-archive-review.md)

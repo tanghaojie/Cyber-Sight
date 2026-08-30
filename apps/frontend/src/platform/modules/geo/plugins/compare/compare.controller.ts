@@ -9,6 +9,7 @@ import {
 
 export interface CompareState {
   enabled: boolean
+  hasSession: boolean
   splitPosition: number
   layers: readonly CompareLayerOption[]
   error?: string
@@ -32,7 +33,12 @@ export interface CompareController extends Disposable {
 
 export function createCompareController(viewer: Viewer): CompareController {
   const tool = markRaw(new SceneCompareTool(viewer))
-  const state = reactive<CompareState>({ enabled: false, splitPosition: 0.5, layers: [] })
+  const state = reactive<CompareState>({
+    enabled: false,
+    hasSession: false,
+    splitPosition: 0.5,
+    layers: [],
+  })
   let session: SceneCompareSession | undefined
 
   function refreshLayers(): void {
@@ -45,15 +51,18 @@ export function createCompareController(viewer: Viewer): CompareController {
   function enable(options: SceneCompareOptions): void {
     try {
       session?.stop()
+      session = undefined
       session = tool.enable({
         ...options,
         splitPosition: options.splitPosition ?? state.splitPosition,
       })
       state.enabled = true
+      state.hasSession = true
       state.splitPosition = options.splitPosition ?? state.splitPosition
       state.error = undefined
     } catch (error) {
       state.enabled = false
+      state.hasSession = false
       state.error = error instanceof Error ? error.message : 'Scene comparison failed'
     }
   }
@@ -96,14 +105,23 @@ export function createCompareController(viewer: Viewer): CompareController {
   }
 
   function setEnabled(enabled: boolean): void {
-    session?.setEnabled(enabled)
-    state.enabled = enabled
+    if (!session) {
+      state.enabled = false
+      if (enabled) {
+        state.error = '请先开始对比'
+      }
+      return
+    }
+    session.setEnabled(enabled)
+    state.enabled = session.enabled
+    state.error = undefined
   }
 
   function disable(): void {
     session?.stop()
     session = undefined
     state.enabled = false
+    state.hasSession = false
   }
 
   function dispose(): void {
