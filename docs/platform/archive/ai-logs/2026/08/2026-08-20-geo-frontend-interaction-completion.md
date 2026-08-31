@@ -41,6 +41,6 @@ status: completed
 ## 相关设计、ADR、计划和提交
 
 - [Geo 前端空间可视化工作台](../../../../design/modules/geo.md)
-- [Geo 影像默认源与坐标校正](../../../../decisions/ADR-20260820-geo-imagery-defaults-and-coordinate-correction.md)
+- [Geo 影像默认源与坐标校正](../../../decisions/ADR-20260820-geo-imagery-defaults-and-coordinate-correction.md)
 - [Geo 前端交互完善计划](../../../../archive/plans/2026-08-20-geo-frontend-interaction-completion.md)
 - 关联提交：`feat(geo): complete frontend map interactions`

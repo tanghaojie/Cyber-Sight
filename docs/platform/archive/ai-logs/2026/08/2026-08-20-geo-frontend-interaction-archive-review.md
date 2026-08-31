@@ -34,4 +34,4 @@ Google、高德、天地图的网络、CORS、限频、令牌和许可仍需维�
 
 - [本次复核计划](../../../../archive/plans/2026-08-20-geo-frontend-interaction-archive-review.md)
 - [Geo 当前设计](../../../../design/modules/geo.md)
-- [Geo 影像默认源与坐标校正 ADR](../../../../decisions/ADR-20260820-geo-imagery-defaults-and-coordinate-correction.md)
+- [Geo 影像默认源与坐标校正 ADR](../../../decisions/ADR-20260820-geo-imagery-defaults-and-coordinate-correction.md)

@@ -56,7 +56,7 @@ trigger_commit: c0105142a598c97d34d0a0c926f4885957c36ab5
 ## 相关记录
 
 - [Geo 当前设计](../../design/modules/geo.md)
-- [Geo 影像默认源与坐标校正 ADR](../../decisions/ADR-20260820-geo-imagery-defaults-and-coordinate-correction.md)
+- [Geo 影像默认源与坐标校正 ADR](../decisions/ADR-20260820-geo-imagery-defaults-and-coordinate-correction.md)
 - [Geo 前端交互完善计划](../../archive/plans/2026-08-20-geo-frontend-interaction-completion.md)
 - [Geo 前端交互完善 AI 记录](../../archive/ai-logs/2026/08/2026-08-20-geo-frontend-interaction-completion.md)
 - [本次归档复核 AI 记录](../ai-logs/2026/08/2026-08-20-geo-frontend-interaction-archive-review.md)

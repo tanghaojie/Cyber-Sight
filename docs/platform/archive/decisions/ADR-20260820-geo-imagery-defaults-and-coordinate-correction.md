@@ -3,12 +3,15 @@ title: Geo 影像默认源、失败隔离与坐标校正
 scope: platform
 repository: Cyber-Sight
 owner: project maintainers
-status: accepted
+status: superseded
 date: 2026-08-20
 supersedes: ADR-20260820-geo-imagery-defaults.md
+superseded_by: ADR-20260831-geo-google-hybrid-default.md
 ---
 
 # ADR-20260820：Geo 影像默认源、失败隔离与坐标校正
+
+> 本 ADR 已被 [Geo Google 混合默认底图](../../decisions/ADR-20260831-geo-google-hybrid-default.md) 取代。Natural Earth II 与天地图的自动启动加载不再适用于当前 Geo 产品需求；坐标校正和可恢复瓦片状态由新 ADR 延续。
 
 ## 背景
 

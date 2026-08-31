@@ -486,7 +486,7 @@ Cesium Viewer、DataSource、Primitive、ScreenSpaceEventHandler 等对象保持
 - 高德 GCJ-02 坐标校正由启动配置默认启用；影像适配层按源坐标系自动选择 GCJ-02 到 WGS84 的瓦片校正策略，并以可扩展策略类型预留其他坐标系转换；
 - 目录列表拥有独立的最大高度和 Geo 样式滚动条，新增源不会无限拉长整个上下文面板；
 - 用户主动加载远程候选源时，加载中、已加载和瓦片请求失败均在源卡片和当前图层列表中反馈，失败只影响对应源。
-- Natural Earth II 始终作为默认远程底图下方的本地兜底层；配置天地图时先加载本地层，再叠加天地图影像与注记。远程瓦片缺失或请求失败时，本地层继续填充场景，不能让首屏只剩地球底色；用户主动隐藏或移除兜底层除外。
+- Geo 启动阶段只加载 Google · 混合底图；Natural Earth II、天地图影像和天地图注记均保留在目录中，只有用户主动添加时才创建图层。Google 服务不可用时只反馈该图层的可恢复降级状态，不自动切换或叠加其他底图。
 - 单次瓦片请求失败只把对应图层标记为可恢复的 `degraded`，并保留最近错误用于诊断；后续任一真实瓦片请求成功后恢复为 `ready` 并清除最近错误。不得把一次异步瓦片错误永久解释为整套服务不可用。
 
 ### OpenSky 实时航班交互约定
@@ -549,8 +549,8 @@ Geo 前端工作台的计划内代码能力已经落地：
 - 插件注册表、capability registry、event bus、独立 `DisposableScope`、`AbortSignal`、拓扑安装、重复/缺失/循环依赖校验、局部错误隔离和动态 UI contributions 已实现；
 - 动态任务轨、上下文面板、右侧属性检查器、插件错误提示、网页定位、右上地图控制、可收起状态条以及初始化、失败和重试状态均按审定方向实现；状态条收起后不渲染坐标、FPS 或活动工具信息，右上指南针显示真实相机 heading 并支持点击回正；
 - Shell 已移除按视口宽度隐藏、重排、缩窄或裁剪内容的媒体查询，上下文面板、属性检查器和错误提示使用审定的桌面固定宽度；
-- 数据插件提供多源影像目录、图层显示/排序/定位、GeoJSON、glTF/GLB 和 3D Tiles 会话加载；外部 glTF/GLB 使用 WGS84 经度、纬度、椭球高和本地 heading/pitch/roll 构造固定坐标框架，支持加载前取当前视图中心、设置统一缩放，加载成功后自动飞到模型，并可继续编辑变换或按真实包围球再次定位；Natural Earth II 始终作为配置远程默认底图的下层兜底，底图目录支持角色筛选、搜索、局部滚动和可恢复的瓦片降级状态；`activeTilesetCapability` 向模型插件发布当前 3D Tiles，而不是穿透导入插件内部实现；
-- 数据插件始终先加载本地 Natural Earth II，不再自动回退到 Google 等远程候选；配置天地图时在本地层上方叠加影像和注记，其他远程候选由用户主动添加；影像 provider 的瓦片错误以可恢复降级状态局部反馈；
+- 数据插件提供多源影像目录、图层显示/排序/定位、GeoJSON、glTF/GLB 和 3D Tiles 会话加载；外部 glTF/GLB 使用 WGS84 经度、纬度、椭球高和本地 heading/pitch/roll 构造固定坐标框架，支持加载前取当前视图中心、设置统一缩放，加载成功后自动飞到模型，并可继续编辑变换或按真实包围球再次定位；启动只加载 Google · 混合底图，底图目录支持角色筛选、搜索、局部滚动和可恢复的瓦片降级状态；`activeTilesetCapability` 向模型插件发布当前 3D Tiles，而不是穿透导入插件内部实现；
+- 数据插件启动时只添加 Google · 混合底图；Natural Earth II、天地图影像/矢量/注记与其他候选源均由用户主动添加，`VITE_GEO_TIANDITU_TOKEN` 不再改变启动图层集合；影像 provider 的瓦片错误以可恢复降级状态局部反馈；
 - 高德候选源由影像适配层按默认 `auto` 策略执行 GCJ-02 到 WGS84 的瓦片坐标校正；当前图层同时展示坐标校正与降级状态；
 - 视图和场景插件提供全球/中国定位、相机参数、2D/3D/哥伦布模式、视距限制以及太阳、月亮、大气、光照、阴影、地球底色、深度检测等设置；视图 controller 订阅相机变化、移动结束和场景模式切换完成事件，让面板快照跟随真实 Viewer，并保证最小视距不高于最大视距；
 - Time 插件通过 `bottomDocks` contribution 提供 UTC 当日 24 小时循环时间轴，支持播放/暂停、拖动、回到当前时刻和 `1×` 至 `3600×` 倍速；工作台 Shell 根据状态条开合状态调整所有底部 dock 的占位，展开时横向贯通并位于状态条上方，侧栏同步缩短，收起时下沉到底部并避让展开按钮；Viewer 禁止 DataSource 自动接管 Clock，Scene 通过 capability 向时间轴提供默认开启的太阳光照与默认关闭的太阳阴影；
@@ -600,7 +600,7 @@ Viewer 的 `resolutionScale` 由页面级运行时拥有，不交给单个插件
 
 - 维护者已把本地运行环境升级为 Node `24.19.0`；Geo 从兼容 Node 20 的临时基线升级到当前 npm 稳定版 `cesium@1.144.0`，其官方 Node 要求为 `>=22.0.0`；
 - Vite 使用 `vite-plugin-static-copy@3.1.4` 复制 Cesium 的 `Workers`、`ThirdParty`、`Assets` 和 `Widgets` 到 `/cesiumStatic/`，开发和生产共用同一 `CESIUM_BASE_URL`；
-- 默认底图始终先加载本地 Natural Earth II；配置天地图令牌时再在其上叠加天地图影像与注记，避免远程默认源失败后首屏失去地图内容。目录仍提供天地图影像/矢量及独立注记、高德影像/矢量及注记、Google 影像/道路/地形候选源，具体可用项由浏览器网络、CORS、许可和运行时配置共同决定，其他远程候选只在用户主动选择后加载；
+- 默认底图只加载 Google · 混合底图；目录仍提供 Natural Earth II、天地图影像/矢量及独立注记、高德影像/矢量及注记、Google 影像/道路/地形候选源，具体可用项由浏览器网络、CORS、许可和运行时配置共同决定，除默认 Google · 混合底图外的所有源只在用户主动选择后加载；
 - 不复制旧项目中硬编码的天地图令牌。天地图令牌只能通过 `VITE_GEO_TIANDITU_TOKEN` 这类公开客户端运行时配置传入，并在界面中明确客户端令牌会暴露给最终用户；没有令牌时对应源显示为不可用，不影响其他底图；
 - 高德源的 GCJ-02 偏移由启动时的自动坐标校正策略转换到 WGS84 瓦片请求；坐标校正策略以可扩展类型保留其他转换实现，第三方公开瓦片仍仅作为可配置候选源，不承诺服务稳定性或商业使用许可；
 - Viewer 自带的后台式控件默认关闭，工作台 Shell 负责相机复位、2D/3D、全屏和状态反馈。
@@ -621,7 +621,7 @@ Geo 的数据来源仅包括：
 
 - WebGL 不可用或 Viewer 初始化失败：展示阻塞说明和重试，不渲染失效工具面板；
 - Cesium Worker、Widget 或 Asset 路径错误：开发与生产构建分别验证，初始化失败时保留可诊断信息；
-- 外部服务 CORS、限频、令牌或网络失败：影像图层按既有 `degraded -> ready` 规则恢复；OpenSky 由后端代理隔离 CORS，限频、超时、网络或异常响应返回局部业务错误并保留前端上次成功状态；Natural Earth II 和当前 terrain provider 不受影响；
+- 外部服务 CORS、限频、令牌或网络失败：影像图层按既有 `degraded -> ready` 规则恢复；Google · 混合底图失败不会自动加载 Natural Earth II 或天地图；OpenSky 由后端代理隔离 CORS，限频、超时、网络或异常响应返回局部业务错误并保留前端上次成功状态；当前 terrain provider 不受影响；
 - 数据插件增删或排序影像图层：通过稳定 ID capability 同步对比候选；活动会话的参与图层被移除时立即恢复 split 状态并关闭会话，排序不得让会话误绑定到其他图层；
 - 插件激活失败：回滚该插件创建的事件、临时实体和 UI 状态，并恢复可选择工具状态；
 - 连续切换工具或路由：幂等清理，防止事件重复、Primitive 泄漏和幽灵提示；
@@ -657,7 +657,7 @@ AI 辅助开发继续由 Sight 现有仓库能力承担；Geo 文档和源码无
 ## 关联记录
 
 - [Geo 前端编译期插件架构](../../decisions/ADR-20260814-geo-frontend-plugin-architecture.md)
-- [Geo 影像默认源、失败隔离与坐标校正](../../decisions/ADR-20260820-geo-imagery-defaults-and-coordinate-correction.md)
+- [Geo Google 混合默认底图](../../decisions/ADR-20260831-geo-google-hybrid-default.md)
 - [Geo 单一仿真时间与太阳光照](../../decisions/ADR-20260830-geo-simulation-time-and-solar-lighting.md)
 - [Geo OpenSky 实时航班数据边界](../../decisions/ADR-20260831-geo-opensky-live-flight-tracking.md)
 - [Geo OpenSky 实时航线展示计划](../../archive/plans/2026-08-31-geo-opensky-live-flights.md)

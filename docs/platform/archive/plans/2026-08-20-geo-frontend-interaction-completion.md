@@ -18,7 +18,7 @@ updated: 2026-08-20
 
 - Geo 工作台遵循 `docs/platform/design/modules/geo.md` 的插件、纯 Cesium 工具、controller 和 Shell 分层。
 - 用户明确要求 Google 底图/注记启动默认、天地图候选、高德 GCJ-02 启动自动校正、数据分类 Tab 和完整的地图工具交互。
-- 既有 Natural Earth 默认源 ADR 与本轮产品要求冲突，已由 `ADR-20260820-geo-imagery-defaults-and-coordinate-correction.md` 取代。
+- 既有 Natural Earth 默认源 ADR 与本轮产品要求冲突，已由 `ADR-20260820-geo-imagery-defaults-and-coordinate-correction.md` 取代；该决策随后于 2026-08-31 归档。
 
 ## 范围
 
@@ -75,5 +75,5 @@ updated: 2026-08-20
 ## 相关设计、ADR 和 AI 日志
 
 - [Geo 前端空间可视化工作台](../../design/modules/geo.md)
-- [Geo 影像默认源与坐标校正](../../decisions/ADR-20260820-geo-imagery-defaults-and-coordinate-correction.md)
+- [Geo 影像默认源与坐标校正](../decisions/ADR-20260820-geo-imagery-defaults-and-coordinate-correction.md)
 - [Geo 前端交互完善协作记录](../../archive/ai-logs/2026/08/2026-08-20-geo-frontend-interaction-completion.md)
