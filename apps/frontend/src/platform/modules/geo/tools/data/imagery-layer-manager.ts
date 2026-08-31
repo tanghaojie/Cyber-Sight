@@ -11,6 +11,7 @@ import {
   type GeoImagerySourceId,
   type GeoImagerySourceOptions,
 } from './imagery-sources'
+import { resolveCoordinateCorrection, type GeoCoordinateCorrection } from './coordinate-correction'
 
 export interface GeoImageryLayerSnapshot {
   readonly id: string
@@ -18,6 +19,7 @@ export interface GeoImageryLayerSnapshot {
   readonly label: string
   readonly role: GeoImagerySourceDefinition['role']
   readonly coordinateSystem: GeoImagerySourceDefinition['coordinateSystem']
+  readonly coordinateCorrection: GeoCoordinateCorrection
   readonly show: boolean
   readonly alpha: number
   readonly index: number
@@ -47,6 +49,7 @@ interface ManagedImageryLayer {
   status: 'ready' | 'degraded'
   error?: string
   warning?: string
+  coordinateCorrection: GeoCoordinateCorrection
 }
 
 export interface GeoImageryLayerManager {
@@ -161,6 +164,7 @@ export function createGeoImageryLayerManager(
       label: managed.definition.label,
       role: managed.definition.role,
       coordinateSystem: managed.definition.coordinateSystem,
+      coordinateCorrection: managed.coordinateCorrection,
       show: managed.layer.show,
       alpha: managed.layer.alpha,
       index: viewer.imageryLayers.indexOf(managed.layer),
@@ -215,6 +219,10 @@ export function createGeoImageryLayerManager(
       layer,
       status: 'ready',
       warning: availability.warning,
+      coordinateCorrection: resolveCoordinateCorrection(
+        definition.coordinateSystem,
+        options.coordinateCorrection,
+      ),
     }
     managed.removeErrorListener = provider.errorEvent.addEventListener(function onImageryError(
       error: TileProviderError,

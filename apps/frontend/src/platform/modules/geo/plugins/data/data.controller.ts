@@ -155,7 +155,11 @@ export function createGeoDataController(
     state.loadingImagerySource = sourceId
     try {
       await run(async function addLayer() {
-        await imagery.add(sourceId, { ...options, ...layerOptions, signal: options.signal })
+        await imagery.add(sourceId, {
+          ...options,
+          ...layerOptions,
+          signal: options.signal,
+        })
       })
     } finally {
       state.loadingImagerySource = undefined

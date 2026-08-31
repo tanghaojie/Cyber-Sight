@@ -76,7 +76,6 @@ export function createModelController(
     try {
       interactions.activate({
         id: `model.${kind}`,
-        cursor: 'crosshair',
         start(context) {
           const modelTools = ensureTools()
           interactionSession =

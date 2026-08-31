@@ -90,7 +90,6 @@ watch(
   },
   { immediate: true },
 )
-
 function enableComparison(): void {
   props.controller.enableLayerComparison(leftId.value, rightId.value)
 }

@@ -30,6 +30,9 @@
 - [2026-08-20 Forge 上游同步](plans/2026-08-20-forge-upstream-sync.md)：合并 Forge `70dbfbd` 并建立 Cyber-Sight Platform 审计基线。
 - [2026-08-20 Geo 底图目录交互与默认加载修复](plans/2026-08-20-geo-imagery-ui-and-loading.md)：修复底图目录扩展性、不可用源提示和远程候选默认加载导致的失败请求。
 - [2026-08-20 Geo 底图文档归档复核](plans/2026-08-20-geo-documentation-archive-review.md)：复核 Geo 交付后的 Platform 文档一致性并推进归档台账。
+- [2026-08-20 Geo 数据面板与地图交互精简](plans/2026-08-20-geo-panel-interaction-refinement.md)：精简底图/图层面板、补充高德开关、对比真实图层名和地图光标交互。
+- [2026-08-20 Geo 前端交互完善](plans/2026-08-20-geo-frontend-interaction-completion.md)：完成 Google 默认源、坐标校正、地图工具和测量历史交互。
+- [2026-08-20 Geo 前端交互完善后的 Platform 文档归档复核](plans/2026-08-20-geo-frontend-interaction-archive-review.md)：复核本轮 Geo 交付后的 Platform 文档一致性并推进归档台账。
 - [2026-08-29 Geo 渲染性能优化](plans/2026-08-29-geo-rendering-performance.md)：完成自适应渲染比例、空闲显式渲染、拾取节流与本地端口调整。
 - [2026-08-29 Geo 外壳精简与指南针交互修复](plans/2026-08-29-geo-shell-and-compass.md)：删除重复顶栏，让指南针反映真实 heading 并支持点击回正。
 - [2026-08-29 Geo 近期交付后的 Platform 文档归档审查](plans/2026-08-29-platform-documentation-archive-review.md)：复核渲染性能与外壳/指南针交付并推进 Platform 台账。
@@ -67,6 +70,9 @@
 - [2026-08-20 Forge 上游同步](ai-logs/2026/08/2026-08-20-forge-upstream-sync.md)
 - [2026-08-20 Geo 底图目录交互与默认加载修复](ai-logs/2026/08/2026-08-20-geo-imagery-ui-and-loading.md)
 - [2026-08-20 Geo 底图文档归档复核](ai-logs/2026/08/2026-08-20-geo-documentation-archive-review.md)
+- [2026-08-20 Geo 数据面板与地图交互精简](ai-logs/2026/08/2026-08-20-geo-panel-interaction-refinement.md)
+- [2026-08-20 Geo 前端交互完善](ai-logs/2026/08/2026-08-20-geo-frontend-interaction-completion.md)
+- [2026-08-20 Geo 前端交互完善后的 Platform 文档归档复核](ai-logs/2026/08/2026-08-20-geo-frontend-interaction-archive-review.md)
 - [2026-08-29 Geo 渲染性能优化](ai-logs/2026/08/2026-08-29-geo-rendering-performance.md)
 - [2026-08-29 Geo 外壳精简与指南针交互修复](ai-logs/2026/08/2026-08-29-geo-shell-and-compass.md)
 - [2026-08-29 Geo 近期交付后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-29-platform-documentation-archive-review.md)

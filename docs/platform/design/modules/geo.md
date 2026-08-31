@@ -424,6 +424,8 @@ interface GeoInteractionDefinition {
 
 `InteractionManager` 为每次激活创建子 `DisposableScope`。开始新交互前，它以 `switch` 原因取消旧交互，销毁旧 scope，清理鼠标样式、提示、事件处理器和临时对象，再启动新交互。完成、用户取消、插件失败、Viewer 失败和页面卸载分别使用明确原因结束；重复取消必须安全。
 
+Geo 地图画布默认使用 `grab` 光标；标绘和测量交互声明 `crosshair`，仅在这些交互激活期间覆盖为十字光标。
+
 完整调用路径为：
 
 ```text
@@ -479,7 +481,9 @@ Cesium Viewer、DataSource、Primitive、ScreenSpaceEventHandler 等对象保持
 数据插件的底图与注记目录采用“角色筛选 + 搜索 + 局部滚动”的渐进披露方式：
 
 - 底图、注记和候选源按 `role` 分组，首屏显示分组数量和当前筛选结果；
-- 源卡片同时展示坐标系、描述、当前状态和禁用原因；缺少公开令牌或未启用坐标校正时可以保持不可用，但不能只以灰色表现；
+- 源卡片收敛展示名称、坐标系、当前状态和添加按钮；描述通过可访问的 `i` 图标 tooltip 提供，warning 不在卡片中展开；
+- 数据面板以 Tab 分开展示“底图与注记”“地形”“外部数据”，避免把三类内容堆叠在同一个长面板中；
+- 高德 GCJ-02 坐标校正由启动配置默认启用；影像适配层按源坐标系自动选择 GCJ-02 到 WGS84 的瓦片校正策略，并以可扩展策略类型预留其他坐标系转换；
 - 目录列表拥有独立的最大高度和 Geo 样式滚动条，新增源不会无限拉长整个上下文面板；
 - 用户主动加载远程候选源时，加载中、已加载和瓦片请求失败均在源卡片和当前图层列表中反馈，失败只影响对应源。
 - Natural Earth II 始终作为默认远程底图下方的本地兜底层；配置天地图时先加载本地层，再叠加天地图影像与注记。远程瓦片缺失或请求失败时，本地层继续填充场景，不能让首屏只剩地球底色；用户主动隐藏或移除兜底层除外。
@@ -519,7 +523,7 @@ Cesium Viewer、DataSource、Primitive、ScreenSpaceEventHandler 等对象保持
 - 左侧 48–56px 工具轨：数据、视图、场景、标绘、测量、分析等任务入口；
 - 按需上下文面板：默认关闭，打开后约 320px，可折叠；同一时刻只展示一个主要任务面板；
 - 右侧属性检查器：仅在选中图层、模型或对象时出现；
-- 右上地图控制：相机复位、2D/3D、真实指南针和全屏等高频地图动作；指南针跟随相机 heading 旋转，点击只将当前视角回正到正北朝上，不改变位置或俯仰角；
+- 右上地图控制：网页定位、2D/3D、真实指南针和全屏等高频地图动作；指南针跟随相机 heading 旋转，点击后只把当前视角回正到正北朝上，不改变位置或俯仰角；
 - 底部轻量状态条：鼠标经纬度、高程、相机高度、FPS/加载状态和活动工具提示；允许用户手动收起，收起后只保留展开按钮，不显示任何状态信息。
 
 视觉采用高对比深色半透明表面、克制的强调色、8px 间距体系和至少 40px 的可点击控件。避免旧站的大面积灰色 Ribbon、永久 300px 侧栏、连续装饰动画和无层级图标平铺。
@@ -541,16 +545,17 @@ Cesium Viewer、DataSource、Primitive、ScreenSpaceEventHandler 等对象保持
 Geo 前端工作台的计划内代码能力已经落地：
 
 - `registerViews.ts` 登记组件键 `geo`，页面继续依赖 Forge 菜单的 `/geo`、空布局配置，不增加静态路由；
-- `GeoWorkspacePage.vue` 创建带内置插件定义的页面级 `GeoRuntime`，由运行时统一安装插件、取消活动交互、逆序释放插件资源并销毁 Viewer；
+- `GeoWorkspacePage.vue` 创建带内置插件定义的页面级 `GeoRuntime`，由运行时统一安装插件、取消活动交互、逆序释放插件资源并销毁 Viewer；面板关闭后清除任务轨活动项，导航按钮不保留高亮；
 - 插件注册表、capability registry、event bus、独立 `DisposableScope`、`AbortSignal`、拓扑安装、重复/缺失/循环依赖校验、局部错误隔离和动态 UI contributions 已实现；
-- 动态任务轨、上下文面板、右侧属性检查器、插件错误提示、右上地图控制、可收起状态条以及初始化、失败和重试状态均按审定方向实现；状态条收起后不渲染坐标、FPS 或活动工具信息，右上指南针显示真实相机 heading 并支持点击回正；
+- 动态任务轨、上下文面板、右侧属性检查器、插件错误提示、网页定位、右上地图控制、可收起状态条以及初始化、失败和重试状态均按审定方向实现；状态条收起后不渲染坐标、FPS 或活动工具信息，右上指南针显示真实相机 heading 并支持点击回正；
 - Shell 已移除按视口宽度隐藏、重排、缩窄或裁剪内容的媒体查询，上下文面板、属性检查器和错误提示使用审定的桌面固定宽度；
 - 数据插件提供多源影像目录、图层显示/排序/定位、GeoJSON、glTF/GLB 和 3D Tiles 会话加载；外部 glTF/GLB 使用 WGS84 经度、纬度、椭球高和本地 heading/pitch/roll 构造固定坐标框架，支持加载前取当前视图中心、设置统一缩放，加载成功后自动飞到模型，并可继续编辑变换或按真实包围球再次定位；Natural Earth II 始终作为配置远程默认底图的下层兜底，底图目录支持角色筛选、搜索、局部滚动和可恢复的瓦片降级状态；`activeTilesetCapability` 向模型插件发布当前 3D Tiles，而不是穿透导入插件内部实现；
 - 数据插件始终先加载本地 Natural Earth II，不再自动回退到 Google 等远程候选；配置天地图时在本地层上方叠加影像和注记，其他远程候选由用户主动添加；影像 provider 的瓦片错误以可恢复降级状态局部反馈；
+- 高德候选源由影像适配层按默认 `auto` 策略执行 GCJ-02 到 WGS84 的瓦片坐标校正；当前图层同时展示坐标校正与降级状态；
 - 视图和场景插件提供全球/中国定位、相机参数、2D/3D/哥伦布模式、视距限制以及太阳、月亮、大气、光照、阴影、地球底色、深度检测等设置；视图 controller 订阅相机变化、移动结束和场景模式切换完成事件，让面板快照跟随真实 Viewer，并保证最小视距不高于最大视距；
 - Time 插件通过 `bottomDocks` contribution 提供 UTC 当日 24 小时循环时间轴，支持播放/暂停、拖动、回到当前时刻和 `1×` 至 `3600×` 倍速；工作台 Shell 根据状态条开合状态调整所有底部 dock 的占位，展开时横向贯通并位于状态条上方，侧栏同步缩短，收起时下沉到底部并避让展开按钮；Viewer 禁止 DataSource 自动接管 Clock，Scene 通过 capability 向时间轴提供默认开启的太阳光照与默认关闭的太阳阴影；
 - Flight 插件默认关闭，用户开启后通过认证后端代理按当前视域立即请求并每 30 秒轮询 OpenSky；独立 `CustomDataSource` 显示最多 600 架未落地航空器及每架最多 12 个墙钟样本的会话短轨迹，手动刷新始终重新计算视域，超大视域在前后端同时拒绝，关闭或页面销毁会中止请求、停止轮询并清空图层；
-- 标绘插件提供点、线、面交互和当前/全部结果清理；测量插件提供点位、距离、面积交互和结果清理；距离按米/千米显示，面积按平方米/平方千米显示，点位不显示单位选择；两者统一经 `InteractionManager` 互斥；
+- 标绘插件提供点、线、面交互和当前/全部结果清理；测量插件提供点位、距离、面积、历史结果定位、单项删除和全部清理；距离按米/千米显示，面积按平方米/平方千米显示，点位不显示单位选择；两者统一经 `InteractionManager` 互斥；
 - 模型插件提供 3D Tiles 高亮、分类、偏移、裁剪和平面分屏，并通过动态属性检查器展示选中对象；
 - 地形插件提供坐标批量采样、淹没动画、无需坐标的全地形等高线以及高程、坡度、坡向着色；等高线会跟随真实 terrain provider 状态禁用或自动清除，异步地形切换只提交最新请求；对比插件通过 `data.imageryLayers` capability 自动同步稳定图层 ID，任一参与图层移除时关闭会话；暂停只取消左右分屏方向并保持影像可见，恢复只能作用于仍存在的对比会话；
 - 所有 Cesium 算法保留在不依赖 Vue 的 `tools/**`，插件 controller 负责接入生命周期和 UI，`.vue` 面板只收集输入、展示状态并调用 controller。
@@ -597,7 +602,7 @@ Viewer 的 `resolutionScale` 由页面级运行时拥有，不交给单个插件
 - Vite 使用 `vite-plugin-static-copy@3.1.4` 复制 Cesium 的 `Workers`、`ThirdParty`、`Assets` 和 `Widgets` 到 `/cesiumStatic/`，开发和生产共用同一 `CESIUM_BASE_URL`；
 - 默认底图始终先加载本地 Natural Earth II；配置天地图令牌时再在其上叠加天地图影像与注记，避免远程默认源失败后首屏失去地图内容。目录仍提供天地图影像/矢量及独立注记、高德影像/矢量及注记、Google 影像/道路/地形候选源，具体可用项由浏览器网络、CORS、许可和运行时配置共同决定，其他远程候选只在用户主动选择后加载；
 - 不复制旧项目中硬编码的天地图令牌。天地图令牌只能通过 `VITE_GEO_TIANDITU_TOKEN` 这类公开客户端运行时配置传入，并在界面中明确客户端令牌会暴露给最终用户；没有令牌时对应源显示为不可用，不影响其他底图；
-- 高德源的 GCJ-02 偏移必须由影像适配层显式处理或标明坐标限制，不能把偏移瓦片当作 WGS84 静默叠加；第三方公开瓦片仅作为可配置候选源，不承诺服务稳定性或商业使用许可；
+- 高德源的 GCJ-02 偏移由启动时的自动坐标校正策略转换到 WGS84 瓦片请求；坐标校正策略以可扩展类型保留其他转换实现，第三方公开瓦片仍仅作为可配置候选源，不承诺服务稳定性或商业使用许可；
 - Viewer 自带的后台式控件默认关闭，工作台 Shell 负责相机复位、2D/3D、全屏和状态反馈。
 - Geo 页面被编译为独立懒加载 chunk；当前完整功能构建的 Geo JavaScript chunk 为 `4,319.18 kB`，gzip 为 `1,171.23 kB`，Geo CSS 为 `75.36 kB`，gzip 为 `13.58 kB`。该体积不进入主应用首屏，功能稳定后再评估 `@cesium/engine`/widgets 拆分，不以牺牲 Viewer 契约和可维护性换取过早优化。
 
@@ -652,13 +657,15 @@ AI 辅助开发继续由 Sight 现有仓库能力承担；Geo 文档和源码无
 ## 关联记录
 
 - [Geo 前端编译期插件架构](../../decisions/ADR-20260814-geo-frontend-plugin-architecture.md)
-- [Geo 影像默认源与失败隔离](../../decisions/ADR-20260820-geo-imagery-defaults.md)
+- [Geo 影像默认源、失败隔离与坐标校正](../../decisions/ADR-20260820-geo-imagery-defaults-and-coordinate-correction.md)
 - [Geo 单一仿真时间与太阳光照](../../decisions/ADR-20260830-geo-simulation-time-and-solar-lighting.md)
 - [Geo OpenSky 实时航班数据边界](../../decisions/ADR-20260831-geo-opensky-live-flight-tracking.md)
 - [Geo OpenSky 实时航线展示计划](../../archive/plans/2026-08-31-geo-opensky-live-flights.md)
 - [Geo 前端工作台实施计划](../../archive/plans/2026-08-14-geo-frontend-workspace.md)
 - [Geo 底图目录交互与默认加载修复计划](../../archive/plans/2026-08-20-geo-imagery-ui-and-loading.md)
+- [Geo 前端交互完善计划](../../archive/plans/2026-08-20-geo-frontend-interaction-completion.md)
 - [Geo 时间轴与太阳光照实施计划](../../archive/plans/2026-08-30-geo-time-and-solar-lighting.md)
 - [Geo 工作台与地形人工验收问题修复计划](../../archive/plans/2026-08-31-geo-workbench-terrain-acceptance-fixes.md)
 - [Geo 模块设计协作记录](../../archive/ai-logs/2026/08/2026-08-14-geo-platform-design.md)
+- [Geo 前端交互完善协作记录](../../archive/ai-logs/2026/08/2026-08-20-geo-frontend-interaction-completion.md)
 - [Geo 底图目录交互与默认加载修复协作记录](../../archive/ai-logs/2026/08/2026-08-20-geo-imagery-ui-and-loading.md)

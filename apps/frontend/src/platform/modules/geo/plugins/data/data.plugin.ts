@@ -32,6 +32,7 @@ function panelFor(controller: GeoDataController) {
 export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): GeoPluginDefinition {
   const pluginOptions: GeoDataControllerOptions = {
     ...options,
+    coordinateCorrection: options.coordinateCorrection ?? 'auto',
     tiandituToken:
       options.tiandituToken ?? (import.meta.env.VITE_GEO_TIANDITU_TOKEN as string | undefined),
   }

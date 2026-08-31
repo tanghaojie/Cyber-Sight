@@ -1,8 +1,11 @@
+import { BoundingSphere, Cartesian3, HeadingPitchRange, type Viewer } from 'cesium'
 import { markRaw, reactive, shallowReadonly } from 'vue'
-import type { Viewer } from 'cesium'
 import type { Disposable } from '../../core/disposable'
 import type { GeoInteractionManager } from '../../core/interaction-manager'
-import { DistanceMeasurementTool } from '../../tools/measurement/distance-measurement'
+import {
+  DistanceMeasurementTool,
+  type DistanceMeasurement,
+} from '../../tools/measurement/distance-measurement'
 import {
   AreaMeasurementTool,
   PointMeasurementTool,
@@ -13,12 +16,26 @@ import {
 export type MeasurementStatus = 'idle' | 'measuring' | 'complete' | 'failed'
 export type MeasurementMode = 'point' | 'distance' | 'area'
 
+export interface MeasurementHistoryItem {
+  readonly id: string
+  readonly mode: MeasurementMode
+  readonly createdAt: number
+  readonly resultMeters?: number
+  readonly resultSquareMeters?: number
+  readonly point?: {
+    readonly longitude: number
+    readonly latitude: number
+    readonly height: number
+  }
+}
+
 export interface MeasurementState {
   status: MeasurementStatus
   mode?: MeasurementMode
   resultMeters?: number
   resultSquareMeters?: number
   point?: PointMeasurement
+  history: readonly MeasurementHistoryItem[]
   error?: string
 }
 
@@ -29,6 +46,8 @@ export interface MeasurementController extends Disposable {
   startArea(): void
   cancel(): void
   clearCurrent(): void
+  remove(id: string): void
+  flyTo(id: string): boolean
   clearAll(): void
   clear(): void
 }
@@ -37,6 +56,14 @@ const POINT_INTERACTION_ID = 'measurement.point'
 const DISTANCE_INTERACTION_ID = 'measurement.distance'
 const AREA_INTERACTION_ID = 'measurement.area'
 
+type MeasurementHistoryInput = Omit<MeasurementHistoryItem, 'id' | 'createdAt'>
+
+interface MeasurementRecord {
+  readonly item: MeasurementHistoryItem
+  readonly positions: readonly Cartesian3[]
+  readonly remove: () => void
+}
+
 export function createMeasurementController(
   viewer: Viewer,
   interactions: GeoInteractionManager,
@@ -44,12 +71,43 @@ export function createMeasurementController(
   const tool = markRaw(new DistanceMeasurementTool(viewer))
   const pointTool = markRaw(new PointMeasurementTool(viewer))
   const areaTool = markRaw(new AreaMeasurementTool(viewer))
-  const state = reactive<MeasurementState>({ status: 'idle' })
+  const state = reactive<MeasurementState>({ status: 'idle', history: [] })
+  const records = new Map<string, MeasurementRecord>()
+  let historySequence = 0
+  let currentHistoryId: string | undefined
 
   function resetResult(): void {
     state.resultMeters = undefined
     state.resultSquareMeters = undefined
     state.point = undefined
+    currentHistoryId = undefined
+  }
+
+  function refreshHistory(): void {
+    state.history = [...records.values()].map(function copyHistory(record) {
+      return record.item
+    })
+  }
+
+  function addHistory(
+    input: MeasurementHistoryInput,
+    positions: readonly Cartesian3[],
+    remove: () => void,
+  ): void {
+    const id = `measurement-${Date.now()}-${historySequence + 1}`
+    historySequence += 1
+    const item: MeasurementHistoryItem = {
+      ...input,
+      id,
+      createdAt: Date.now(),
+    }
+    records.set(id, {
+      item,
+      positions: positions.map((position) => Cartesian3.clone(position)),
+      remove,
+    })
+    currentHistoryId = id
+    refreshHistory()
   }
 
   function startPoint(): void {
@@ -67,11 +125,26 @@ export function createMeasurementController(
             onComplete(point) {
               state.point = point
               state.status = 'complete'
+              addHistory(
+                {
+                  mode: 'point',
+                  point: {
+                    longitude: point.longitude,
+                    latitude: point.latitude,
+                    height: point.height,
+                  },
+                },
+                [point.position],
+                function removePoint() {
+                  pointTool.remove(point)
+                },
+              )
               interactionContext.complete()
             },
             onCancel() {
               if (state.status === 'measuring') {
                 state.status = 'idle'
+                resetResult()
               }
             },
           })
@@ -100,9 +173,16 @@ export function createMeasurementController(
             onUpdate(distanceMeters) {
               state.resultMeters = distanceMeters
             },
-            onComplete(distanceMeters) {
-              state.resultMeters = distanceMeters
+            onComplete(result: DistanceMeasurement) {
+              state.resultMeters = result.distanceMeters
               state.status = 'complete'
+              addHistory(
+                { mode: 'distance', resultMeters: result.distanceMeters },
+                result.positions,
+                function removeDistance() {
+                  tool.remove(result)
+                },
+              )
               interactionContext.complete()
             },
             onCancel() {
@@ -140,11 +220,19 @@ export function createMeasurementController(
             onComplete(result: AreaMeasurement) {
               state.resultSquareMeters = result.areaSquareMeters
               state.status = 'complete'
+              addHistory(
+                { mode: 'area', resultSquareMeters: result.areaSquareMeters },
+                result.positions,
+                function removeArea() {
+                  areaTool.remove(result)
+                },
+              )
               interactionContext.complete()
             },
             onCancel() {
               if (state.status === 'measuring') {
                 state.status = 'idle'
+                resetResult()
               }
             },
           })
@@ -172,17 +260,40 @@ export function createMeasurementController(
     }
   }
 
+  function remove(id: string): void {
+    const record = records.get(id)
+    if (!record) {
+      return
+    }
+    record.remove()
+    records.delete(id)
+    if (currentHistoryId === id) {
+      resetResult()
+      state.status = 'idle'
+    }
+    refreshHistory()
+  }
+
   function clearCurrent(): void {
     cancel()
-    if (state.mode === 'point') {
-      pointTool.clear()
-    } else if (state.mode === 'area') {
-      areaTool.clear()
-    } else {
-      tool.clear()
+    if (currentHistoryId) {
+      remove(currentHistoryId)
     }
-    resetResult()
     state.status = 'idle'
+    resetResult()
+  }
+
+  function flyTo(id: string): boolean {
+    const record = records.get(id)
+    if (!record || !record.positions.length) {
+      return false
+    }
+    const sphere = BoundingSphere.fromPoints([...record.positions])
+    viewer.camera.flyToBoundingSphere(sphere, {
+      duration: 1.2,
+      offset: new HeadingPitchRange(0, -Math.PI / 4, Math.max(sphere.radius * 3, 1_000)),
+    })
+    return true
   }
 
   function clearAll(): void {
@@ -190,6 +301,8 @@ export function createMeasurementController(
     tool.clear()
     pointTool.clear()
     areaTool.clear()
+    records.clear()
+    refreshHistory()
     resetResult()
     state.status = 'idle'
     state.error = undefined
@@ -200,7 +313,7 @@ export function createMeasurementController(
   }
 
   function dispose(): void {
-    cancel()
+    clearAll()
     tool.dispose()
     pointTool.dispose()
     areaTool.dispose()
@@ -213,6 +326,8 @@ export function createMeasurementController(
     startArea,
     cancel,
     clearCurrent,
+    remove,
+    flyTo,
     clearAll,
     clear,
     dispose,

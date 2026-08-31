@@ -1,6 +1,28 @@
 <template>
   <div class="geo-data-panel">
-    <section class="data-panel__section">
+    <div class="data-panel__tabs" role="tablist" aria-label="数据类型">
+      <button
+        v-for="tab in dataTabs"
+        :id="`geo-data-tab-${tab.id}`"
+        :key="tab.id"
+        type="button"
+        role="tab"
+        :aria-selected="activeTab === tab.id"
+        :aria-controls="`geo-data-panel-${tab.id}`"
+        :class="{ 'is-active': activeTab === tab.id }"
+        @click="activeTab = tab.id"
+      >
+        {{ tab.label }}
+      </button>
+    </div>
+
+    <section
+      v-if="activeTab === 'imagery'"
+      id="geo-data-panel-imagery"
+      class="data-panel__section data-panel__tab-panel"
+      role="tabpanel"
+      aria-labelledby="geo-data-tab-imagery"
+    >
       <div class="data-panel__heading">
         <div>
           <span>底图与注记</span>
@@ -57,36 +79,33 @@
             <div class="data-panel__source-head">
               <div>
                 <strong>{{ item.source.label }}</strong>
-                <small
-                  >{{ item.source.coordinateSystem }} ·
-                  {{ sourceRoleLabel(item.source.role) }}</small
-                >
+                <small>{{ item.source.coordinateSystem }}</small>
               </div>
-              <span class="data-panel__source-status" :class="`is-${sourceStatusTone(item)}`">
-                {{ sourceStatus(item) }}
-              </span>
+              <div class="data-panel__source-tools">
+                <button
+                  class="data-panel__source-info"
+                  type="button"
+                  :title="item.source.description"
+                  :aria-label="`${item.source.label}描述`"
+                >
+                  i
+                </button>
+                <span class="data-panel__source-status" :class="`is-${sourceStatusTone(item)}`">
+                  {{ sourceStatus(item) }}
+                </span>
+                <button
+                  class="data-panel__source-action"
+                  type="button"
+                  :disabled="
+                    controller.state.busy || !item.availability.available || Boolean(item.layer)
+                  "
+                  :title="item.availability.reason || item.source.description"
+                  @click="addSource(item.source.id)"
+                >
+                  {{ sourceActionLabel(item) }}
+                </button>
+              </div>
             </div>
-            <p>{{ item.source.description }}</p>
-            <button
-              class="data-panel__source-action"
-              type="button"
-              :disabled="
-                controller.state.busy || !item.availability.available || Boolean(item.layer)
-              "
-              :title="item.availability.reason || item.source.description"
-              @click="addSource(item.source.id)"
-            >
-              {{ sourceActionLabel(item) }}
-            </button>
-            <small v-if="item.availability.reason" class="data-panel__source-message is-reason">
-              {{ item.availability.reason }}
-            </small>
-            <small v-else-if="item.layer?.error" class="data-panel__source-message is-error">
-              {{ item.layer.error }}
-            </small>
-            <small v-else-if="item.availability.warning" class="data-panel__source-message">
-              {{ item.availability.warning }}
-            </small>
           </article>
         </section>
         <p v-if="!filteredSourceGroups.length" class="data-panel__empty">没有匹配的数据源</p>
@@ -118,6 +137,7 @@
             </label>
             <small
               >{{ layer.coordinateSystem }} ·
+              {{ layer.coordinateCorrection === 'gcj02-to-wgs84' ? '已自动校正' : 'WGS84' }} ·
               {{ layer.status === 'degraded' ? '瓦片降级' : '已就绪' }}</small
             >
           </div>
@@ -169,13 +189,18 @@
               ×
             </button>
           </div>
-          <small v-if="layer.warning" class="data-panel__warning">{{ layer.warning }}</small>
           <small v-if="layer.error" class="data-panel__error">{{ layer.error }}</small>
         </div>
       </div>
     </section>
 
-    <section class="data-panel__section">
+    <section
+      v-if="activeTab === 'terrain'"
+      id="geo-data-panel-terrain"
+      class="data-panel__section data-panel__tab-panel"
+      role="tabpanel"
+      aria-labelledby="geo-data-tab-terrain"
+    >
       <div class="data-panel__heading">
         <div><span>地形</span><small>当前场景表面</small></div>
         <strong class="data-panel__terrain-state">
@@ -216,7 +241,13 @@
       }}</small>
     </section>
 
-    <section class="data-panel__section">
+    <section
+      v-if="activeTab === 'external'"
+      id="geo-data-panel-external"
+      class="data-panel__section data-panel__tab-panel"
+      role="tabpanel"
+      aria-labelledby="geo-data-tab-external"
+    >
       <div class="data-panel__heading">
         <div><span>外部数据</span><small>浏览器加载</small></div>
       </div>
@@ -292,7 +323,10 @@
       </button>
     </section>
 
-    <section v-if="controller.state.resources.length" class="data-panel__section">
+    <section
+      v-if="activeTab === 'external' && controller.state.resources.length"
+      class="data-panel__section"
+    >
       <div class="data-panel__heading">
         <div><span>已加载数据</span><small>当前会话</small></div>
       </div>
@@ -415,6 +449,7 @@ import type { GeoImageryLayerSnapshot } from '../../tools/data/imagery-layer-man
 import type { GeoDataController } from './data.controller'
 
 type SourceFilterId = 'all' | GeoImagerySourceDefinition['role']
+type DataTabId = 'imagery' | 'terrain' | 'external'
 
 interface SourceFilter {
   readonly id: SourceFilterId
@@ -444,6 +479,12 @@ const expandedModelId = ref<string>()
 const tilesetUrl = ref('')
 const sourceQuery = ref('')
 const sourceFilter = ref<SourceFilterId>('all')
+const activeTab = ref<DataTabId>('imagery')
+const dataTabs: readonly { id: DataTabId; label: string }[] = [
+  { id: 'imagery', label: '底图与注记' },
+  { id: 'terrain', label: '地形' },
+  { id: 'external', label: '外部数据' },
+]
 const roleLabels: Record<GeoImagerySourceDefinition['role'], string> = {
   base: '底图',
   overlay: '注记',
@@ -502,10 +543,6 @@ const filteredSourceGroups = computed<readonly ImagerySourceGroup[]>(function fi
     })
     .filter((group) => group.sources.length > 0)
 })
-
-function sourceRoleLabel(role: GeoImagerySourceDefinition['role']): string {
-  return roleLabels[role]
-}
 
 function sourceStatus(item: ImagerySourceItem): string {
   if (item.loading) {
@@ -618,6 +655,34 @@ async function loadTileset(): Promise<void> {
   display: grid;
   gap: 18px;
   min-width: 0;
+}
+.data-panel__tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--geo-line, #263c4e);
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--geo-surface-strong, #0e1c2a), transparent 16%);
+}
+.data-panel__tabs button {
+  min-height: 34px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--geo-text-faint, #7890a2);
+  background: transparent;
+  cursor: pointer;
+  font-size: 10px;
+}
+.data-panel__tabs button:hover,
+.data-panel__tabs button.is-active {
+  border-color: color-mix(in srgb, var(--geo-accent, #45c8ff), transparent 48%);
+  color: var(--geo-text, #eff8ff);
+  background: color-mix(in srgb, var(--geo-accent, #45c8ff), transparent 86%);
+}
+.data-panel__tab-panel {
+  min-height: 0;
 }
 .data-panel__section {
   display: grid;
@@ -734,6 +799,19 @@ async function loadTileset(): Promise<void> {
   color: var(--geo-text, #eff8ff);
   background: color-mix(in srgb, var(--geo-accent, #45c8ff), transparent 87%);
 }
+.data-panel__toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 24px;
+  color: var(--geo-text-faint, #7890a2);
+  cursor: pointer;
+  font-size: 9px;
+}
+.data-panel__toggle input {
+  margin: 0;
+  accent-color: var(--geo-accent, #45c8ff);
+}
 .data-panel__catalog {
   display: grid;
   gap: 13px;
@@ -770,9 +848,11 @@ async function loadTileset(): Promise<void> {
   text-transform: uppercase;
 }
 .data-panel__source {
-  display: grid;
+  display: flex;
+  align-items: center;
   gap: 7px;
-  padding: 10px;
+  min-height: 34px;
+  padding: 5px 7px;
   border: 1px solid var(--geo-line, #263c4e);
   border-radius: 11px;
   background: color-mix(in srgb, var(--geo-surface-strong, #0e1c2a), transparent 12%);
@@ -799,9 +879,10 @@ async function loadTileset(): Promise<void> {
 }
 .data-panel__source-head {
   display: flex;
-  align-items: start;
+  align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 7px;
+  width: 100%;
 }
 .data-panel__source-head > div {
   min-width: 0;
@@ -816,9 +897,35 @@ async function loadTileset(): Promise<void> {
 }
 .data-panel__source-head small {
   display: block;
-  margin-top: 3px;
+  margin-top: 2px;
   color: var(--geo-text-faint, #7890a2);
   font-size: 8px;
+}
+.data-panel__source-tools {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+}
+.data-panel__source-info {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid var(--geo-line, #263c4e);
+  border-radius: 50%;
+  color: var(--geo-text-faint, #7890a2);
+  background: transparent;
+  cursor: help;
+  font-family: Georgia, serif;
+  font-size: 11px;
+  font-style: italic;
+  line-height: 16px;
+}
+.data-panel__source-info:hover,
+.data-panel__source-info:focus-visible {
+  outline: 0;
+  border-color: var(--geo-accent, #45c8ff);
+  color: var(--geo-accent, #45c8ff);
 }
 .data-panel__source-status {
   flex: 0 0 auto;
@@ -857,7 +964,8 @@ async function loadTileset(): Promise<void> {
   -webkit-line-clamp: 2;
 }
 .data-panel__source-action {
-  min-height: 29px;
+  min-height: 24px;
+  padding: 0 7px;
   border: 1px solid color-mix(in srgb, var(--geo-accent, #45c8ff), transparent 52%);
   border-radius: 7px;
   color: var(--geo-accent, #45c8ff);
@@ -878,15 +986,6 @@ async function loadTileset(): Promise<void> {
   background: var(--geo-surface-hover, #1b2a38);
   cursor: not-allowed;
   opacity: 0.85;
-}
-.data-panel__source-message {
-  color: #ffdc8a;
-  font-size: 8px;
-  line-height: 1.45;
-}
-.data-panel__source-message.is-reason,
-.data-panel__source-message.is-error {
-  color: #ffb0b8;
 }
 .data-panel__empty {
   margin: 0;
@@ -953,7 +1052,6 @@ async function loadTileset(): Promise<void> {
   color: var(--geo-text, #eff8ff);
   background: var(--geo-surface-hover, #1b2a38);
 }
-.data-panel__warning,
 .data-panel__error {
   color: #ffcb78;
   font-size: 9px;

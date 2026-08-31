@@ -42,6 +42,7 @@ export interface GeoRuntime {
   mount(container: HTMLElement): Promise<void>
   resetCamera(): void
   orientNorth(): void
+  locateUser(): Promise<void>
   setSceneMode(mode: GeoSceneMode): void
   toggleFullscreen(target: HTMLElement): Promise<void>
   dispose(): void
@@ -274,6 +275,48 @@ export function createGeoRuntime(options: GeoRuntimeOptions = {}): GeoRuntime {
     })
   }
 
+  function locateUser(): Promise<void> {
+    const currentViewer = viewerAccessControl.require()
+    if (!('geolocation' in navigator)) {
+      return Promise.reject(new Error('当前浏览器不支持网页定位'))
+    }
+    return new Promise<void>(function requestUserLocation(resolve, reject) {
+      navigator.geolocation.getCurrentPosition(
+        function flyToUser(position) {
+          if (disposed || currentViewer.isDestroyed()) {
+            reject(new Error('Geo 地图已关闭'))
+            return
+          }
+          const height = Math.max(position.coords.accuracy * 8, 5_000)
+          currentViewer.camera.flyTo({
+            destination: Cartesian3.fromDegrees(
+              position.coords.longitude,
+              position.coords.latitude,
+              height,
+            ),
+            orientation: {
+              heading: 0,
+              pitch: CesiumMath.toRadians(-58),
+              roll: 0,
+            },
+            duration: 1.2,
+            complete: resolve,
+            cancel: resolve,
+          })
+        },
+        function rejectUserLocation(error) {
+          const message =
+            error.code === GeolocationPositionError.PERMISSION_DENIED
+              ? '网页定位权限被拒绝'
+              : error.code === GeolocationPositionError.POSITION_UNAVAILABLE
+                ? '暂时无法取得当前位置'
+                : '网页定位请求超时'
+          reject(new Error(message))
+        },
+        { enableHighAccuracy: true, timeout: 10_000, maximumAge: 30_000 },
+      )
+    })
+  }
   function setSceneMode(mode: GeoSceneMode): void {
     const currentViewer = viewerAccessControl.require()
     state.sceneMode = mode
@@ -392,6 +435,7 @@ export function createGeoRuntime(options: GeoRuntimeOptions = {}): GeoRuntime {
     mount,
     resetCamera,
     orientNorth,
+    locateUser,
     setSceneMode,
     toggleFullscreen,
     dispose,

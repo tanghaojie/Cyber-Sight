@@ -1,7 +1,7 @@
 <template>
   <div class="geo-map-controls" :aria-label="label">
-    <button type="button" :title="resetLabel" :aria-label="resetLabel" @click="$emit('reset')">
-      <AppIcon name="home" />
+    <button type="button" :title="locateLabel" :aria-label="locateLabel" @click="$emit('locate')">
+      <AppIcon name="map-pin" />
     </button>
     <button
       type="button"
@@ -44,7 +44,7 @@ defineProps<{
   sceneMode: GeoSceneMode
   fullscreen: boolean
   heading: number
-  resetLabel: string
+  locateLabel: string
   northLabel: string
   mode2dLabel: string
   mode3dLabel: string
@@ -53,8 +53,8 @@ defineProps<{
 }>()
 
 defineEmits<{
-  reset: []
   'orient-north': []
+  locate: []
   'toggle-mode': []
   'toggle-fullscreen': []
 }>()
@@ -112,6 +112,7 @@ defineEmits<{
   width: 24px;
   height: 34px;
   transform-origin: center;
+  transition: transform 0.18s ease;
 }
 
 .geo-map-controls__compass-needle::before,
@@ -134,5 +135,10 @@ defineEmits<{
   bottom: 5px;
   background: #dce8f0;
   transform: translateX(-50%) rotate(180deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .geo-map-controls__compass-needle {
+    transition: none;
+  }
 }
 </style>

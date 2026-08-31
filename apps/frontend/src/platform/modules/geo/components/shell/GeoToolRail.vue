@@ -28,7 +28,7 @@ export interface GeoTaskRailItem {
 
 defineProps<{
   items: readonly GeoTaskRailItem[]
-  activeId: string
+  activeId?: string
   label: string
 }>()
 

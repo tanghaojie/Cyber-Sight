@@ -172,6 +172,11 @@ export class PointMeasurementTool {
     this.viewer.scene.requestRender()
   }
 
+  remove(result: PointMeasurement): void {
+    this.viewer.entities.remove(result.entity)
+    this.entities.delete(result.entity)
+  }
+
   dispose(): void {
     if (this.disposed) {
       return
@@ -299,6 +304,13 @@ export class AreaMeasurementTool {
     this.entities.forEach((entity) => this.viewer.entities.remove(entity))
     this.entities.clear()
     this.viewer.scene.requestRender()
+  }
+
+  remove(result: AreaMeasurement): void {
+    result.entities.forEach((entity) => {
+      this.viewer.entities.remove(entity)
+      this.entities.delete(entity)
+    })
   }
 
   dispose(): void {
