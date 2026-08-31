@@ -2,6 +2,7 @@
 
 当前 Platform 决策：
 
+- [Geo OpenSky 实时航班数据边界](ADR-20260831-geo-opensky-live-flight-tracking.md)：确定后端匿名代理、当前视域轮询、会话短轨迹和墙钟/仿真时间边界。
 - [Geo 前端编译期插件架构](ADR-20260814-geo-frontend-plugin-architecture.md)：确定真实 Viewer 命名、纯工具与 Vue UI 分层、编译期插件、互斥交互和资源清理边界。
 - [Geo 单一仿真时间与太阳光照](ADR-20260830-geo-simulation-time-and-solar-lighting.md)：确定唯一 `viewer.clock`、自定义底部时间轴、Scene 光照 capability 和太阳阴影边界。
 - [Geo 影像默认源与失败隔离](ADR-20260820-geo-imagery-defaults.md)：确定无配置环境使用本地默认底图，远程候选源仅主动加载并局部报告失败。

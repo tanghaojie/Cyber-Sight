@@ -2,6 +2,7 @@ import type { GeoPluginDefinition } from './core/geo-plugin'
 import { comparePlugin } from './plugins/compare/compare.plugin'
 import { geoDataPlugin } from './plugins/data/data.plugin'
 import { drawingPlugin } from './plugins/drawing/drawing.plugin'
+import { geoFlightPlugin } from './plugins/flight/flight.plugin'
 import { measurementPlugin } from './plugins/measurement/measurement.plugin'
 import { modelPlugin } from './plugins/model/model.plugin'
 import { geoScenePlugin } from './plugins/scene/scene.plugin'
@@ -14,6 +15,7 @@ export const geoPlugins: readonly GeoPluginDefinition[] = [
   geoViewPlugin,
   geoScenePlugin,
   geoTimePlugin,
+  geoFlightPlugin,
   drawingPlugin,
   measurementPlugin,
   modelPlugin,

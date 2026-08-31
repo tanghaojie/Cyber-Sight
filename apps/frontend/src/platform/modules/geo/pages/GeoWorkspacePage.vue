@@ -158,6 +158,12 @@ const taskDefinitions = computed<readonly GeoTaskItem[]>(function taskMetadata()
       description: t('geo.tasks.sceneDescription'),
     },
     {
+      id: 'flight',
+      label: t('geo.tasks.flight'),
+      icon: 'activity',
+      description: t('geo.tasks.flightDescription'),
+    },
+    {
       id: 'drawing',
       label: t('geo.tasks.drawing'),
       icon: 'edit',

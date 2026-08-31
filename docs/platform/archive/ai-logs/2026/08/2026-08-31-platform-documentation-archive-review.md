@@ -1,0 +1,50 @@
+---
+title: Geo 时间与状态栏交付后的 Platform 文档归档审查协作记录
+scope: platform
+repository: Cyber-Sight
+owner: project maintainers
+date: 2026-08-31
+status: completed
+---
+
+# Geo 时间与状态栏交付后的 Platform 文档归档审查协作记录
+
+## 用户目标和约束
+
+用户要求在 Geo 中增加可开关的 OpenSky 实时航线展示。功能实施前归档审计返回 Platform `DUE`，因此按仓库协议先完成本作用域归档审查。
+
+## 关键问答与确认
+
+- 本次审查只覆盖 `platform`，不修改 inherited Foundation 或同步上游；
+- 审查范围为 `bf4bdcc..b27b06c`；
+- 归档审查不改变 Geo 业务行为，前端交互继续由维护者人工验收。
+
+## AI 的重要假设
+
+- 当前代码、现行设计、ADR 和 Git diff 是事实来源；
+- 上一轮归档闭环、时间轴与太阳光照、可收起状态栏是本次周期审查证据。
+
+## 方案和执行摘要
+
+- 核对台账基线、提交和文件清单；
+- 对照当前 Geo Design、插件架构与仿真时间 ADR、完成计划与 AI 记录；
+- 判断是否存在被当前实现取代的 Design 或 ADR，并推进 Platform ledger。
+
+## 验证结果
+
+- `fa25b16` 完成上一轮 Platform 归档闭环，`0a1dd5c` 实现时间轴与太阳光照，`b27b06c` 实现可收起状态栏与底部 dock 自适应；
+- 当前 Geo Design 已描述上述实现，两个功能均有完成计划与 AI 记录；
+- Geo 插件架构 ADR 与仿真时间 ADR 仍有效，未发现需要归档的 Platform Design 或 ADR；
+- Platform ledger 推进到 `b27b06c4c0dcc9465e92f6eb1603668ecbfb1d56`；
+- `pnpm docs:archive:check:ci` 返回 `NOT_DUE`。
+
+## 未决问题与下一步
+
+归档审查已完成，下一步进入 OpenSky 实时航线功能的设计和实施。前端真实交互仍由维护者人工验收。
+
+## 相关设计、ADR、计划和提交
+
+- [Geo 当前设计](../../../design/modules/geo.md)
+- [插件架构 ADR](../../../decisions/ADR-20260814-geo-frontend-plugin-architecture.md)
+- [仿真时间 ADR](../../../decisions/ADR-20260830-geo-simulation-time-and-solar-lighting.md)
+- [本次审查计划](../../../archive/plans/2026-08-31-platform-documentation-archive-review.md)
