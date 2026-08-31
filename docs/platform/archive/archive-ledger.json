@@ -1,7 +1,7 @@
 {
   "version": 2,
   "scope": "platform",
-  "lastReviewedCommit": "b27b06c4c0dcc9465e92f6eb1603668ecbfb1d56",
+  "lastReviewedCommit": "e5e53d5783abfec2a94d50169e215c7f3877b185",
   "lastReviewedAt": "2026-08-31T00:00:00+08:00",
-  "reviewId": "cyber-sight-platform-geo-time-status-review-2026-08-31"
+  "reviewId": "cyber-sight-platform-geo-acceptance-fixes-review-2026-08-31"
 }
