@@ -1,6 +1,6 @@
 # Platform 实施计划
 
-最近完成：[Geo 模拟飞机尺寸航向与单航线](../archive/plans/2026-08-31-geo-flight-icon-scale-heading-and-route.md)。
+最近完成：[Geo 飞机显示修复后的 Platform 文档归档审查](../archive/plans/2026-08-31-platform-documentation-archive-review-7.md)。
 
 当前没有活动计划。
 
