@@ -31,7 +31,7 @@ Geo 延续维护者开源项目 `vue3-cesium-typescript-start-up-template` 的�
 - 环境效果、标绘、测量、模型/3D Tiles 工具和地形分析；
 - 编译期插件注册、互斥交互工具管理、局部失败隔离和统一清理协议；
 - 对旧项目通用 Geo 能力的分阶段迁移与现代化 UI 重组；
-- OpenSky 实时航空器状态的后端代理、共享契约和前端会话展示；
+- 纯前端模拟航线、Viewer 生命周期和前端会话展示；
 - 前后端构建、类型、格式、后端测试和维护者人工浏览器验收。
 
 ### 明确不做
@@ -55,24 +55,20 @@ Geo 延续维护者开源项目 `vue3-cesium-typescript-start-up-template` 的�
 
 ## 模块边界
 
-稳定模块名为 `geo`，在共享契约、后端和前端使用一致的 Platform 所有权目录：
+稳定模块名为 `geo`，当前只存在于前端 Platform 所有权目录：
 
 ```text
-packages/api-contract/src/platform/modules/geo/
-apps/backend/src/platform/modules/geo/
 apps/frontend/src/platform/modules/geo/
 ```
 
-Geo 拥有 OpenSky 视域查询契约与无存储代理、Viewer 生命周期、纯 Cesium 工具、工作台页面、内置插件、Geo 运行状态和地图专属组件。Foundation 不得依赖 Geo；其他 Platform 模块不得导入 Geo 页面、Cesium 实例、插件内部状态或内部组件。后端代理不得访问前端实现，前端只依赖共享契约和自身 `geo.api.ts`，不能直接调用 OpenSky。
+Geo 拥有模拟航线、Viewer 生命周期、纯 Cesium 工具、工作台页面、内置插件、Geo 运行状态和地图专属组件。Foundation 不得依赖 Geo；其他 Platform 模块不得导入 Geo 页面、Cesium 实例、插件内部状态或内部组件。Geo 不提供后端、HTTP 契约或外部航班数据访问。
 
 ### 公共文件
 
 登记以下表意公共文件：
 
 - `registerViews.ts`：以稳定组件键 `geo` 登记工作台懒加载器，供 Forge 菜单管理生成动态路由。
-- `geo.api.ts`：前端 Geo 对自身后端接口的类型化访问边界；
-- `geo.module.ts`、`geo.controller.ts`、`geo.service.ts`：后端装配、HTTP 适配和 OpenSky 代理边界；
-- `geo.schema.ts`：共享查询、航空器状态和响应 Schema，由 Platform 契约入口导出。
+- `tools/flight/simulated-flight-layer.ts`：前端模拟航线和 Cesium 实体的纯工具边界；
 
 若后续其他 Platform 模块出现真实的地图嵌入需求，再评审并登记最小公共端口；本阶段不预先导出 Cesium Viewer、store 或组件集合，也不创建 `index.ts` barrel。
 
@@ -489,15 +485,13 @@ Cesium Viewer、DataSource、Primitive、ScreenSpaceEventHandler 等对象保持
 - Geo 启动阶段只加载 Google · 混合底图；Natural Earth II、天地图影像和天地图注记均保留在目录中，只有用户主动添加时才创建图层。Google 服务不可用时只反馈该图层的可恢复降级状态，不自动切换或叠加其他底图。
 - 单次瓦片请求失败只把对应图层标记为可恢复的 `degraded`，并保留最近错误用于诊断；后续任一真实瓦片请求成功后恢复为 `ready` 并清除最近错误。不得把一次异步瓦片错误永久解释为整套服务不可用。
 
-### OpenSky 实时航班交互约定
+### 前端模拟航班交互约定
 
-- Flight 插件作为独立“航班”任务组编译期注册，默认关闭；打开面板不自动请求，只有用户开启后才获取数据；
-- 每次请求使用当前相机可见矩形构造 `lamin/lomin/lamax/lomax`，每 30 秒刷新并允许手动刷新；全球级超大视域只提示用户放大地图，不调用上游；
-- 后端匿名代理负责 CORS、查询校验、10 秒超时、上游响应校验与字段规范化，不保存 OpenSky 数据，不持有账号密钥；路由要求已认证用户；
-- 前端只显示有效经纬度且未落地的航空器，单次渲染最多 600 架；标签以呼号为主、ICAO24 为兜底，每架最多保留 12 个本次会话采样点；
-- 关闭功能立即中止进行中的请求、停止轮询、清空 DataSource、Entity 和轨迹缓存；离开页面通过插件 scope 执行相同清理；
-- OpenSky 成功空结果会清空当前目标并显示零架；上游限频、断网或业务错误保留上一次成功画面并显示局部错误，不能把错误转换为空数组；
-- 实时快照按墙钟更新常量位置和会话轨迹，不改变 `viewer.clock`。完整历史回放、插值飞行和跨日时间范围属于后续独立需求。
+- Flight 插件作为独立“航班”任务组编译期注册，默认关闭；开启后立即创建内置模拟航线，不发出 HTTP 请求；
+- 每架航空器使用固定起终点和与 UTC 当日对齐的 `SampledPositionProperty`；`VelocityOrientationProperty` 根据速度方向给出航向，`PathGraphics` 显示本次时间轴中的有限轨迹；
+- 模拟航线只消费已有 `viewer.clock`，播放、暂停、拖动或回到现在都会反映在飞机位置；不得创建第二个 Clock 或在 `clock.onTick` 逐帧重写实体位置；
+- 面板、任务描述和实体名称必须明确标示为模拟数据，不宣称真实航班、时刻表、机场或覆盖范围；
+- 关闭或页面销毁立即清空 `CustomDataSource` 及其实体；不保留数据、不访问网络且不产生上游错误。
 
 ### 地形分析交互约定
 
@@ -554,7 +548,7 @@ Geo 前端工作台的计划内代码能力已经落地：
 - 高德候选源由影像适配层按默认 `auto` 策略执行 GCJ-02 到 WGS84 的瓦片坐标校正；当前图层同时展示坐标校正与降级状态；
 - 视图和场景插件提供全球/中国定位、相机参数、2D/3D/哥伦布模式、视距限制以及太阳、月亮、大气、光照、阴影、地球底色、深度检测等设置；视图 controller 订阅相机变化、移动结束和场景模式切换完成事件，让面板快照跟随真实 Viewer，并保证最小视距不高于最大视距。Cesium 场景形态过渡帧中的 heading、pitch 和 roll 可能暂不可用，快照与 Shell 指南针必须保留上一次有效朝向或使用稳定默认值，不能把未定义值传给角度转换；
 - Time 插件通过 `bottomDocks` contribution 提供 UTC 当日 24 小时循环时间轴，支持播放/暂停、拖动、回到当前时刻和 `1×` 至 `3600×` 倍速；工作台 Shell 根据状态条开合状态调整所有底部 dock 的占位，展开时横向贯通并位于状态条上方，侧栏同步缩短，收起时下沉到底部并避让展开按钮；Viewer 禁止 DataSource 自动接管 Clock，Scene 通过 capability 向时间轴提供默认开启的太阳光照与默认关闭的太阳阴影；
-- Flight 插件默认关闭，用户开启后通过认证后端代理按当前视域立即请求并每 30 秒轮询 OpenSky；独立 `CustomDataSource` 显示最多 600 架未落地航空器及每架最多 12 个墙钟样本的会话短轨迹，手动刷新始终重新计算视域，超大视域在前后端同时拒绝，关闭或页面销毁会中止请求、停止轮询并清空图层；
+- Flight 插件默认关闭，用户开启后以独立 `CustomDataSource` 显示内置模拟航线；实体由唯一 `viewer.clock` 的时间样本插值定位并展示有限轨迹，关闭或页面销毁会清空图层且不会产生网络请求；
 - 标绘插件提供点、线、面交互和当前/全部结果清理；测量插件提供点位、距离、面积、历史结果定位、单项删除和全部清理；距离按米/千米显示，面积按平方米/平方千米显示，点位不显示单位选择；两者统一经 `InteractionManager` 互斥；
 - 模型插件提供 3D Tiles 高亮、分类、偏移、裁剪和平面分屏，并通过动态属性检查器展示选中对象；
 - 地形插件提供坐标批量采样、淹没动画、无需坐标的全地形等高线以及高程、坡度、坡向着色；等高线会跟随真实 terrain provider 状态禁用或自动清除，异步地形切换只提交最新请求；对比插件通过 `data.imageryLayers` capability 自动同步稳定图层 ID，任一参与图层移除时关闭会话；暂停只取消左右分屏方向并保持影像可见，恢复只能作用于仍存在的对比会话；
@@ -610,7 +604,7 @@ Geo 的数据来源仅包括：
 
 - 随前端构建发布的 TypeScript/JSON 配置；
 - 维护者明确选择、许可和配置的浏览器可访问影像、地形、GeoJSON、模型或 3D Tiles 服务；
-- 经 Platform `geo` 后端匿名代理取得的 OpenSky 当前视域航空器状态；
+- 随前端构建发布的模拟航线和航空器展示数据；
 - 用户在当前页面会话中产生的标绘、测量和分析结果。
 
 本阶段不提供数据源新增表单、场景保存或多人共享。除非后续单独设计，业务状态只保存在内存中；可以复用已有浏览器偏好能力保存纯 UI 偏好，但不得把它描述为场景持久化。
@@ -621,7 +615,7 @@ Geo 的数据来源仅包括：
 
 - WebGL 不可用或 Viewer 初始化失败：展示阻塞说明和重试，不渲染失效工具面板；
 - Cesium Worker、Widget 或 Asset 路径错误：开发与生产构建分别验证，初始化失败时保留可诊断信息；
-- 外部服务 CORS、限频、令牌或网络失败：影像图层按既有 `degraded -> ready` 规则恢复；Google · 混合底图失败不会自动加载 Natural Earth II 或天地图；OpenSky 由后端代理隔离 CORS，限频、超时、网络或异常响应返回局部业务错误并保留前端上次成功状态；当前 terrain provider 不受影响；
+- 外部服务 CORS、限频、令牌或网络失败：影像图层按既有 `degraded -> ready` 规则恢复；Google · 混合底图失败不会自动加载 Natural Earth II 或天地图；模拟航班不依赖网络，当前 terrain provider 不受影响；
 - 数据插件增删或排序影像图层：通过稳定 ID capability 同步对比候选；活动会话的参与图层被移除时立即恢复 split 状态并关闭会话，排序不得让会话误绑定到其他图层；
 - 插件激活失败：回滚该插件创建的事件、临时实体和 UI 状态，并恢复可选择工具状态；
 - 连续切换工具或路由：幂等清理，防止事件重复、Primitive 泄漏和幽灵提示；
@@ -641,7 +635,7 @@ Geo 的数据来源仅包括：
 3. 工具轨、上下文面板、属性检查器和状态条的层级、开合与焦点可理解；状态条收起后不显示信息，时间轴下沉且不遮挡展开按钮；
 4. 所有已实现任务组均可进入，互斥鼠标工具切换后没有残留事件或临时实体；
 5. 影像、地形、模型和 3D Tiles 单项加载失败不影响其他能力；
-6. OpenSky 默认关闭，开启后按当前视域显示航空器和会话短轨迹，移动视域、手动刷新、关闭、空结果、超大视域和上游失败状态符合约定；
+6. 模拟航班默认关闭；开启后出现明确标示的模拟航空器和轨迹，时间轴播放、暂停与拖动会驱动位置，关闭和页面离开后无残留实体或网络错误；
 7. 相机、图层、场景、标绘、测量、三维模型、地形分析和分屏能力按阶段验收；
 8. 开发与生产构建的 Cesium Worker、Widget、字体和静态资源路径一致；
 9. 连续进入/退出页面和长时间操作后没有明显资源累积或重复响应。
@@ -650,7 +644,7 @@ Geo 的数据来源仅包括：
 
 ## 后续演进边界
 
-现有 Geo 后端只承担 OpenSky 无存储代理。只有用户明确提出场景保存、共享、管理或服务端空间计算后，才扩展 Geo 后端和数据模型。只有出现第二个真实消费者后，才评审把 Viewer 或插件端口提升为跨 Platform 模块公共能力。
+当前 Geo 不包含后端。只有用户明确提出场景保存、共享、管理、服务端空间计算或真实航班数据后，才重新设计后端和数据接入边界。只有出现第二个真实消费者后，才评审把 Viewer 或插件端口提升为跨 Platform 模块公共能力。
 
 AI 辅助开发继续由 Sight 现有仓库能力承担；Geo 文档和源码无需复制一套 AI 基础设施。若以后要向产品用户提供 AI 地图操作，应作为新的业务需求重新设计，不能从本设计推导实现授权。
 
@@ -659,7 +653,7 @@ AI 辅助开发继续由 Sight 现有仓库能力承担；Geo 文档和源码无
 - [Geo 前端编译期插件架构](../../decisions/ADR-20260814-geo-frontend-plugin-architecture.md)
 - [Geo Google 混合默认底图](../../decisions/ADR-20260831-geo-google-hybrid-default.md)
 - [Geo 单一仿真时间与太阳光照](../../decisions/ADR-20260830-geo-simulation-time-and-solar-lighting.md)
-- [Geo OpenSky 实时航班数据边界](../../decisions/ADR-20260831-geo-opensky-live-flight-tracking.md)
+- [Geo 前端模拟航班数据](../../decisions/ADR-20260831-geo-simulated-flight-data.md)
 - [Geo OpenSky 实时航线展示计划](../../archive/plans/2026-08-31-geo-opensky-live-flights.md)
 - [Geo 前端工作台实施计划](../../archive/plans/2026-08-14-geo-frontend-workspace.md)
 - [Geo 底图目录交互与默认加载修复计划](../../archive/plans/2026-08-20-geo-imagery-ui-and-loading.md)

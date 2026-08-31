@@ -28,42 +28,33 @@
         <small>{{ state.enabled ? 'AIRBORNE' : 'STANDBY' }}</small>
       </article>
       <article>
-        <span>{{ t('geo.flight.remaining') }}</span>
-        <strong>{{ state.rateLimitRemaining ?? '—' }}</strong>
-        <small>OPEN SKY</small>
+        <span>{{ t('geo.flight.source') }}</span>
+        <strong>SIM</strong>
+        <small>LOCAL ONLY</small>
       </article>
     </div>
 
     <dl class="geo-flight-panel__details">
       <div>
-        <dt>{{ t('geo.flight.lastUpdate') }}</dt>
-        <dd>{{ formatUpdatedAt(state.lastUpdatedAt) }}</dd>
+        <dt>{{ t('geo.flight.timeline') }}</dt>
+        <dd>{{ t('geo.flight.timelineValue') }}</dd>
       </div>
       <div>
-        <dt>{{ t('geo.flight.viewport') }}</dt>
-        <dd>{{ state.viewport ?? t('geo.flight.unavailable') }}</dd>
+        <dt>{{ t('geo.flight.scope') }}</dt>
+        <dd>{{ t('geo.flight.scopeValue') }}</dd>
       </div>
     </dl>
 
     <button
       type="button"
       class="geo-flight-panel__refresh"
-      :disabled="!state.enabled || state.loading"
-      @click="controller.refresh"
+      :disabled="!state.enabled"
+      @click="controller.reset"
     >
       <span aria-hidden="true">↻</span>
-      {{ state.loading ? t('geo.flight.refreshing') : t('geo.flight.refresh') }}
+      {{ t('geo.flight.reset') }}
     </button>
 
-    <p v-if="state.error" class="geo-flight-panel__message geo-flight-panel__message--error">
-      {{ state.error }}
-    </p>
-    <p
-      v-else-if="state.enabled && !state.loading && state.lastUpdatedAt && !state.aircraftCount"
-      class="geo-flight-panel__message"
-    >
-      {{ t('geo.flight.empty') }}
-    </p>
     <p class="geo-flight-panel__notice">{{ t('geo.flight.researchNotice') }}</p>
   </section>
 </template>
@@ -75,17 +66,6 @@ import type { GeoFlightController } from './flight.controller'
 const props = defineProps<{ controller: GeoFlightController }>()
 const { t } = useLocalization()
 const state = props.controller.state
-
-function formatUpdatedAt(value: string | undefined): string {
-  if (!value) {
-    return t('geo.flight.notUpdated')
-  }
-  return new Intl.DateTimeFormat(undefined, {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  }).format(new Date(value))
-}
 </script>
 
 <style scoped>

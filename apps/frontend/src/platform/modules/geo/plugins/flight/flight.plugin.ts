@@ -1,6 +1,6 @@
 import { defineComponent, h } from 'vue'
 import type { GeoPluginDefinition, GeoPluginContext } from '../../core/geo-plugin'
-import { createOpenSkyFlightLayer } from '../../tools/flight/open-sky-flight-layer'
+import { createSimulatedFlightLayer } from '../../tools/flight/simulated-flight-layer'
 import FlightPanel from './FlightPanel.vue'
 import { createGeoFlightController, type GeoFlightController } from './flight.controller'
 
@@ -17,20 +17,20 @@ export const geoFlightPlugin: GeoPluginDefinition = {
   id: 'flight',
   order: 38,
   async install(context: GeoPluginContext) {
-    const layer = await createOpenSkyFlightLayer(context.viewer)
+    const layer = await createSimulatedFlightLayer(context.viewer)
     if (context.signal.aborted) {
       layer.dispose()
       throw new DOMException('Geo flight plugin installation was aborted', 'AbortError')
     }
 
-    const controller = createGeoFlightController(context.viewer, layer)
+    const controller = createGeoFlightController(layer)
     context.scope.use(controller)
     return {
       contributions: {
         groups: [
           {
             id: 'flight',
-            label: '实时航班',
+            label: '模拟航班',
             labelKey: 'geo.tasks.flight',
             icon: 'activity',
             order: 38,
@@ -42,7 +42,7 @@ export const geoFlightPlugin: GeoPluginDefinition = {
             kind: 'panel',
             groupId: 'flight',
             panelId: 'flight.panel',
-            label: '实时航班',
+            label: '模拟航班',
             labelKey: 'geo.flight.title',
             icon: 'activity',
           },
