@@ -1,5 +1,12 @@
 <template>
-  <section class="geo-time-dock" :aria-label="t('geo.time.timeline')">
+  <section
+    class="geo-time-dock"
+    :class="{
+      'geo-time-dock--collapsed': collapsed,
+      'geo-time-dock--joined-with-status': joinedWithStatus,
+    }"
+    :aria-label="t('geo.time.timeline')"
+  >
     <div class="geo-time-dock__controls">
       <button
         type="button"
@@ -11,6 +18,7 @@
         {{ controller.state.playing ? 'Ⅱ' : '▶' }}
       </button>
       <button
+        v-if="!collapsed"
         type="button"
         class="geo-time-dock__now"
         :title="t('geo.time.now')"
@@ -28,7 +36,7 @@
       </select>
     </div>
 
-    <div class="geo-time-dock__track">
+    <div v-if="!collapsed" class="geo-time-dock__track">
       <span>{{ formatBoundary(controller.state.startTime) }}</span>
       <input
         type="range"
@@ -42,7 +50,7 @@
       <span>{{ formatBoundary(controller.state.stopTime) }}</span>
     </div>
 
-    <div class="geo-time-dock__lighting">
+    <div v-if="!collapsed" class="geo-time-dock__lighting">
       <label>
         <input type="checkbox" :checked="solarLighting.state.lighting" @change="setLighting" />
         <i aria-hidden="true" />
@@ -54,11 +62,23 @@
         <span>{{ t('geo.time.shadows') }}</span>
       </label>
     </div>
+
+    <button
+      type="button"
+      class="geo-time-dock__toggle"
+      :title="collapsed ? expandLabel : collapseLabel"
+      :aria-label="collapsed ? expandLabel : collapseLabel"
+      :aria-expanded="!collapsed"
+      @click="emit('update:collapsed', !collapsed)"
+    >
+      <AppIcon name="chevron-down" />
+    </button>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import AppIcon from '@/foundation/components/AppIcon.vue'
 import { useLocalization } from '@/foundation/modules/localization/localization'
 import type { GeoSolarLightingCapability } from '../scene/scene.capabilities'
 import type { GeoTimeController } from './time.controller'
@@ -66,6 +86,14 @@ import type { GeoTimeController } from './time.controller'
 const props = defineProps<{
   controller: GeoTimeController
   solarLighting: GeoSolarLightingCapability
+  collapsed: boolean
+  joinedWithStatus: boolean
+  collapseLabel: string
+  expandLabel: string
+}>()
+
+const emit = defineEmits<{
+  'update:collapsed': [collapsed: boolean]
 }>()
 
 const { t } = useLocalization()
@@ -127,7 +155,7 @@ function setShadows(event: Event): void {
 .geo-time-dock {
   min-height: 70px;
   display: grid;
-  grid-template-columns: auto minmax(260px, 1fr) auto;
+  grid-template-columns: auto minmax(260px, 1fr) auto auto;
   align-items: center;
   gap: 18px;
   padding: 10px 14px;
@@ -138,6 +166,19 @@ function setShadows(event: Event): void {
   box-shadow: var(--geo-shadow);
   backdrop-filter: blur(18px) saturate(125%);
   pointer-events: auto;
+}
+
+.geo-time-dock--joined-with-status {
+  border-bottom: 0;
+  border-radius: 15px 15px 0 0;
+  box-shadow: none;
+}
+
+.geo-time-dock--collapsed {
+  min-height: 44px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 5px 10px;
 }
 
 .geo-time-dock__controls,
@@ -159,6 +200,22 @@ function setShadows(event: Event): void {
   border-radius: 9px;
   color: var(--geo-text);
   background: rgba(17, 33, 46, 0.88);
+}
+
+.geo-time-dock__toggle {
+  width: 32px;
+  display: grid;
+  place-items: center;
+}
+
+.geo-time-dock__toggle :deep(.icon) {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.18s ease;
+}
+
+.geo-time-dock--collapsed .geo-time-dock__toggle :deep(.icon) {
+  transform: rotate(180deg);
 }
 
 .geo-time-dock button {
@@ -189,6 +246,10 @@ function setShadows(event: Event): void {
   font-size: 11px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+.geo-time-dock--collapsed strong {
+  min-width: 0;
 }
 
 .geo-time-dock select {
@@ -268,7 +329,8 @@ function setShadows(event: Event): void {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .geo-time-dock__lighting i::after {
+  .geo-time-dock__lighting i::after,
+  .geo-time-dock__toggle :deep(.icon) {
     transition: none;
   }
 }

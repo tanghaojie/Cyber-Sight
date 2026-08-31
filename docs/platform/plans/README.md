@@ -1,6 +1,6 @@
 # Platform 实施计划
 
-最近完成：[Geo 飞机显示修复后的 Platform 文档归档审查](../archive/plans/2026-08-31-platform-documentation-archive-review-7.md)。
+最近完成：[Geo 底部工作台折叠交互](../archive/plans/2026-08-31-geo-bottom-workbench.md)。
 
 当前没有活动计划。
 

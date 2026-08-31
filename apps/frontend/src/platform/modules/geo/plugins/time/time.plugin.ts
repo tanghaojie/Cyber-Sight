@@ -10,8 +10,26 @@ import { createGeoTimeController, type GeoTimeController } from './time.controll
 function dockFor(controller: GeoTimeController, solarLighting: GeoSolarLightingCapability) {
   return defineComponent({
     name: 'GeoTimePluginDock',
-    setup() {
-      return () => h(TimeDock, { controller, solarLighting })
+    props: {
+      collapsed: { type: Boolean, default: false },
+      joinedWithStatus: { type: Boolean, default: false },
+      collapseLabel: { type: String, required: true },
+      expandLabel: { type: String, required: true },
+    },
+    emits: ['update:collapsed'],
+    setup(props, { emit }) {
+      return () =>
+        h(TimeDock, {
+          controller,
+          solarLighting,
+          collapsed: props.collapsed,
+          joinedWithStatus: props.joinedWithStatus,
+          collapseLabel: props.collapseLabel,
+          expandLabel: props.expandLabel,
+          'onUpdate:collapsed': function updateCollapsed(collapsed: boolean) {
+            emit('update:collapsed', collapsed)
+          },
+        })
     },
   })
 }

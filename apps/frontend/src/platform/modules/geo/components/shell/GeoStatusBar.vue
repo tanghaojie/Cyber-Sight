@@ -1,7 +1,11 @@
 <template>
   <footer
     class="geo-statusbar"
-    :class="{ 'geo-statusbar--collapsed': collapsed }"
+    :class="{
+      'geo-statusbar--collapsed': collapsed,
+      'geo-statusbar--compact': compact,
+      'geo-statusbar--joined-with-dock': joinedWithDock,
+    }"
     :aria-live="collapsed ? 'off' : 'polite'"
   >
     <button
@@ -29,7 +33,7 @@
         ><small>{{ heightLabel }}</small
         >{{ height(surfaceHeight) }}</span
       >
-      <span class="geo-statusbar__optional"
+      <span class="geo-statusbar__optional geo-statusbar__camera"
         ><small>{{ cameraLabel }}</small
         >{{ height(cameraHeight) }}</span
       >
@@ -59,6 +63,8 @@ defineProps<{
   cameraLabel: string
   fpsLabel: string
   collapsed: boolean
+  compact: boolean
+  joinedWithDock: boolean
   collapseLabel: string
   expandLabel: string
 }>()
@@ -113,6 +119,20 @@ function height(value: number | undefined): string {
   width: 44px;
   min-height: 44px;
   padding: 1px;
+}
+
+.geo-statusbar--joined-with-dock {
+  border-top: 0;
+  border-radius: 0 0 15px 15px;
+}
+
+.geo-statusbar--joined-with-dock::before {
+  position: absolute;
+  top: 0;
+  right: 12px;
+  left: 12px;
+  border-top: 1px solid var(--geo-line);
+  content: '';
 }
 
 .geo-statusbar__toggle {
@@ -202,6 +222,10 @@ function height(value: number | undefined): string {
   flex: 0 0 auto;
   border-radius: 50%;
   background: var(--geo-accent);
+}
+
+.geo-statusbar--compact .geo-statusbar__camera {
+  display: none;
 }
 
 .geo-statusbar__pulse {

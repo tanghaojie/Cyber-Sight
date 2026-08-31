@@ -10,6 +10,7 @@
 
 ## 已完成计划
 
+- [2026-08-31 Geo 底部工作台折叠交互](plans/2026-08-31-geo-bottom-workbench.md)：将状态条与时间轴合并为连续底部工作台，并让两者可独立收起。
 - [2026-08-31 Geo 飞机显示修复后的 Platform 文档归档审查](plans/2026-08-31-platform-documentation-archive-review-7.md)：复核 Canvas 图标、尺寸航向与单航线修复，并将 Platform ledger 推进到 `38c1737`。
 - [2026-08-31 Geo 模拟飞机尺寸航向与单航线](plans/2026-08-31-geo-flight-icon-scale-heading-and-route.md)：放大飞机、按可见前进方向旋转机头，并删除动态短轨迹。
 - [2026-08-31 Geo 模拟飞机透明 Canvas 图标](plans/2026-08-31-geo-aircraft-canvas-icon.md)：以透明 Canvas 飞机轮廓替代 Cesium 黑色 SVG 占位。
@@ -64,6 +65,7 @@
 
 ## AI 协作记录
 
+- [2026-08-31 Geo 底部工作台折叠交互](ai-logs/2026/08/2026-08-31-geo-bottom-workbench.md)
 - [2026-08-31 Geo 飞机显示修复后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-31-platform-documentation-archive-review-7.md)
 - [2026-08-31 Geo 模拟飞机尺寸航向与单航线](ai-logs/2026/08/2026-08-31-geo-flight-icon-scale-heading-and-route.md)
 - [2026-08-31 Geo 模拟飞机透明 Canvas 图标](ai-logs/2026/08/2026-08-31-geo-aircraft-canvas-icon.md)

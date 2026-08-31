@@ -5,6 +5,7 @@
     :class="{
       'geo-workspace--status-collapsed': statusBarCollapsed,
       'geo-workspace--has-bottom-docks': bottomDocks.length > 0,
+      'geo-workspace--bottom-docks-collapsed': bottomDocksCollapsed,
     }"
     :aria-label="t('geo.views.workspace')"
   >
@@ -67,7 +68,16 @@
       <GeoPluginErrors :title="t('geo.plugins.errors')" :errors="runtime.plugins.state.errors" />
 
       <div v-if="bottomDocks.length" class="geo-bottom-docks">
-        <component :is="dock.component" v-for="dock in bottomDocks" :key="dock.id" />
+        <component
+          :is="dock.component"
+          v-for="dock in bottomDocks"
+          :key="dock.id"
+          :collapsed="bottomDockCollapsed[dock.id] ?? false"
+          :joined-with-status="!statusBarCollapsed"
+          :collapse-label="t('geo.time.collapse')"
+          :expand-label="t('geo.time.expand')"
+          @update:collapsed="setBottomDockCollapsed(dock.id, $event)"
+        />
       </div>
 
       <GeoStatusBar
@@ -84,6 +94,8 @@
         :camera-label="t('geo.status.camera')"
         :fps-label="t('geo.status.fps')"
         :collapsed="statusBarCollapsed"
+        :compact="bottomDocks.length > 0 && !bottomDocksCollapsed"
+        :joined-with-dock="bottomDocks.length > 0 && !statusBarCollapsed"
         :collapse-label="t('geo.status.collapse')"
         :expand-label="t('geo.status.expand')"
         @toggle="statusBarCollapsed = !statusBarCollapsed"
@@ -137,6 +149,7 @@ const mapContainer = ref<HTMLElement>()
 const activeTaskId = ref<string | undefined>('data')
 const panelOpen = ref(true)
 const statusBarCollapsed = ref(false)
+const bottomDockCollapsed = ref<Record<string, boolean>>({})
 const locationError = ref<string>()
 const runtime = createGeoRuntime({ plugins: geoPlugins })
 provideGeoRuntime(runtime)
@@ -250,6 +263,12 @@ const bottomDocks = computed(function registeredBottomDocks() {
       return left.order - right.order || left.id.localeCompare(right.id)
     })
 })
+const bottomDocksCollapsed = computed(function allBottomDocksCollapsed() {
+  return (
+    bottomDocks.value.length > 0 &&
+    bottomDocks.value.every((dock) => bottomDockCollapsed.value[dock.id] === true)
+  )
+})
 const activeHint = computed(function currentHint() {
   if (locationError.value) {
     return locationError.value
@@ -324,6 +343,10 @@ function closePanel(): void {
   activeTaskId.value = undefined
 }
 
+function setBottomDockCollapsed(id: string, collapsed: boolean): void {
+  bottomDockCollapsed.value = { ...bottomDockCollapsed.value, [id]: collapsed }
+}
+
 function toggleSceneMode(): void {
   runtime.setSceneMode(runtime.state.sceneMode === '3d' ? '2d' : '3d')
 }
@@ -372,10 +395,11 @@ onBeforeUnmount(function disposeGeoPage() {
   --geo-surface-strong: rgba(6, 14, 23, 0.91);
   --geo-surface-hover: rgba(173, 218, 241, 0.09);
   --geo-shadow: 0 20px 54px rgba(0, 5, 10, 0.4);
-  --geo-bottom-dock-bottom: 74px;
-  --geo-bottom-dock-height: 92px;
+  --geo-statusbar-height: 48px;
+  --geo-bottom-dock-bottom: calc(14px + var(--geo-statusbar-height) - 1px);
+  --geo-bottom-dock-height: 70px;
   --geo-side-bottom: 86px;
-  --geo-credits-bottom: 158px;
+  --geo-credits-bottom: calc(var(--geo-bottom-dock-bottom) + var(--geo-bottom-dock-height) + 16px);
   position: fixed;
   z-index: 0;
   inset: 0;
@@ -387,7 +411,11 @@ onBeforeUnmount(function disposeGeoPage() {
 
 .geo-workspace--status-collapsed {
   --geo-bottom-dock-bottom: 14px;
-  --geo-credits-bottom: 98px;
+  --geo-credits-bottom: calc(var(--geo-bottom-dock-bottom) + var(--geo-bottom-dock-height) + 16px);
+}
+
+.geo-workspace--bottom-docks-collapsed {
+  --geo-bottom-dock-height: 44px;
 }
 
 .geo-workspace--has-bottom-docks {
@@ -447,6 +475,11 @@ onBeforeUnmount(function disposeGeoPage() {
 
 .geo-workspace--status-collapsed .geo-bottom-docks {
   left: 74px;
+}
+
+.geo-workspace--status-collapsed.geo-workspace--bottom-docks-collapsed .geo-bottom-docks {
+  width: min(360px, calc(100% - 96px));
+  left: auto;
 }
 
 .geo-workspace :global(.cesium-widget-credits) {
