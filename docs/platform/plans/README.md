@@ -1,6 +1,6 @@
 # Platform 实施计划
 
-最近完成：[Geo 模拟飞机本地 SVG 图标](../archive/plans/2026-08-31-geo-aircraft-icon-asset.md)。
+最近完成：[Geo 航班修复后的 Platform 文档归档审查](../archive/plans/2026-08-31-platform-documentation-archive-review-6.md)。
 
 当前没有活动计划。
 

@@ -6,7 +6,7 @@ review_scopes:
   - platform
 repository: Cyber-Sight
 owner: project maintainers
-status: active
+status: completed
 created: 2026-08-31
 updated: 2026-08-31
 baseline_commit: 6334d948dfbdc31d91bd0d1332798b846ba2e742
@@ -33,5 +33,11 @@ trigger_commit: ba7079be77a9a84416dc932b814833f719de337d
 ## 实施任务
 
 - [x] 记录 `DUE` 证据并创建活动归档审查计划；
-- [ ] 复核完成的 Geo 航班修复及当前文档；
-- [ ] 推进 ledger、归档记录并通过最终 CI。
+- [x] 复核完成的 Geo 航班修复及当前文档；
+- [x] 推进 ledger、归档记录并通过最终 CI。
+
+## 实际结果
+
+- 复核 `8e61ddb`、`ba7079b` 和 `2595da9`：删除实时航班链路、完整连接模拟航线并将飞机 billboard 改为实际发布的本地 SVG，均已由当前 Geo 设计、ADR、完成计划和协作记录准确描述；
+- 没有发现需要新增 ADR、归档现行设计或修改 Foundation 文档的情况；
+- ledger 推进至 `2595da9` 后，活动审查归档并运行最终 CI；预期状态为 `NOT_DUE`。
