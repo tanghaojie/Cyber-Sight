@@ -1,4 +1,4 @@
-import { reactive, readonly } from 'vue'
+import { reactive, readonly, shallowReactive } from 'vue'
 import type { Viewer } from 'cesium'
 import { createGeoCapabilityRegistry, type GeoCapabilityRegistry } from './capability-registry'
 import { createDisposableScope, type Disposable, type DisposableScope } from './disposable'
@@ -175,7 +175,10 @@ export function createGeoPluginRegistry(
   const installed = new Map<string, InstalledPlugin>()
   const installedOrder: string[] = []
   const contributionMap = new Map<string, GeoRegisteredContribution>()
-  const contributionList: GeoRegisteredContribution[] = []
+  // Shell computed values can be evaluated before asynchronous plugin installation completes.
+  // Keep the collection shallow so later contribution publication invalidates those values
+  // without proxying plugin-owned component definitions or controllers.
+  const contributionList = shallowReactive<GeoRegisteredContribution[]>([])
   const busyToolIds = new Set<string>()
   const capabilities = options.capabilities ?? createGeoCapabilityRegistry()
   const events = options.events ?? createGeoEventBus<GeoEventMap>()

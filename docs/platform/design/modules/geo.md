@@ -352,7 +352,7 @@ function startDistance(): void {
 - `statusItems`：底部状态条片段。
 - `bottomDocks`：不随任务面板切换、常驻地图底部的工作区组件；只用于时间轴等横向全局上下文，不承载普通插件面板。
 
-每个贡献使用全局唯一的 `${pluginId}.${localId}` 标识、locales 文案键、图标、排序和可用性函数。工作台 Shell 只渲染注册表提供的排序结果，不 import 具体插件组件，也不包含标绘、测量或地形业务判断。
+每个贡献使用全局唯一的 `${pluginId}.${localId}` 标识、locales 文案键、图标、排序和可用性函数。注册表以浅响应式集合发布贡献：Shell 即使先于异步插件安装计算，也会在成功发布或销毁贡献后重新渲染；集合不深度代理插件自有组件或 controller。工作台 Shell 只渲染注册表提供的排序结果，不 import 具体插件组件，也不包含标绘、测量或地形业务判断。
 
 当存在 `bottomDocks` 时，Shell 让 dock 在工作台底部横向贯通；工具轨和上下文面板使用同一底部预留量，在 dock 与状态条上方结束，不能与其重叠。展开的上下文面板默认宽 420px，使用者可从右侧拖拽到 360px 至 640px 的桌面范围；键盘焦点位于拖拽柄时也可用左右方向键微调。状态条收起后 dock 仍避让展开按钮。
 
@@ -546,7 +546,7 @@ Geo 前端工作台的计划内代码能力已经落地：
 
 - `registerViews.ts` 登记组件键 `geo`，页面继续依赖 Forge 菜单的 `/geo`、空布局配置，不增加静态路由；
 - `GeoWorkspacePage.vue` 创建带内置插件定义的页面级 `GeoRuntime`，由运行时统一安装插件、取消活动交互、逆序释放插件资源并销毁 Viewer；面板关闭后清除任务轨活动项，导航按钮不保留高亮；
-- 插件注册表、capability registry、event bus、独立 `DisposableScope`、`AbortSignal`、拓扑安装、重复/缺失/循环依赖校验、局部错误隔离和动态 UI contributions 已实现；
+- 插件注册表、capability registry、event bus、独立 `DisposableScope`、`AbortSignal`、拓扑安装、重复/缺失/循环依赖校验、局部错误隔离和动态 UI contributions 已实现；贡献集合为浅响应式，Shell 在异步安装完成后会重新渲染新发布的 dock、任务组等 UI；
 - 动态任务轨、上下文面板、右侧属性检查器、插件错误提示、网页定位、右上地图控制、可收起状态条以及初始化、失败和重试状态均按审定方向实现；状态条收起后不渲染坐标、FPS 或活动工具信息，右上指南针显示真实相机 heading 并支持点击回正；
 - Shell 已移除按视口宽度隐藏、重排、缩窄或裁剪内容的媒体查询，上下文面板、属性检查器和错误提示使用审定的桌面固定宽度；
 - 数据插件提供多源影像目录、图层显示/排序/定位、GeoJSON、glTF/GLB 和 3D Tiles 会话加载；外部 glTF/GLB 使用 WGS84 经度、纬度、椭球高和本地 heading/pitch/roll 构造固定坐标框架，支持加载前取当前视图中心、设置统一缩放，加载成功后自动飞到模型，并可继续编辑变换或按真实包围球再次定位；启动只加载 Google · 混合底图，底图目录支持角色筛选、搜索、局部滚动和可恢复的瓦片降级状态；`activeTilesetCapability` 向模型插件发布当前 3D Tiles，而不是穿透导入插件内部实现；

@@ -10,6 +10,7 @@
 
 ## 已完成计划
 
+- [2026-08-31 Geo 时间轴插件贡献响应性修复](plans/2026-08-31-geo-timeline-reactivity.md)：让异步发布的时间轴贡献重新触发工作台渲染。
 - [2026-08-31 Geo 2D 场景过渡相机状态修复](plans/2026-08-31-geo-2d-morph-camera-status.md)：让 2D/3D 过渡帧安全表达相机姿态，不再中断 Cesium 渲染。
 - [2026-08-31 Geo Google 默认底图提交后的 Platform 文档归档审查](plans/2026-08-31-platform-documentation-archive-review-4.md)：以默认底图实现提交为新 Platform 审计基线。
 - [2026-08-31 Geo 默认底图调整后的 Platform 文档归档审查](plans/2026-08-31-platform-documentation-archive-review-3.md)：复核 Google · 混合默认底图决策并推进 Platform 台账。
@@ -55,6 +56,7 @@
 
 ## AI 协作记录
 
+- [2026-08-31 Geo 时间轴插件贡献响应性修复](ai-logs/2026/08/2026-08-31-geo-timeline-reactivity.md)
 - [2026-08-31 Geo 2D 场景过渡相机状态修复](ai-logs/2026/08/2026-08-31-geo-2d-morph-camera-status.md)
 - [2026-08-31 Geo Google 默认底图提交后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-31-platform-documentation-archive-review-4.md)
 - [2026-08-31 Geo 默认底图调整后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-31-platform-documentation-archive-review-3.md)
