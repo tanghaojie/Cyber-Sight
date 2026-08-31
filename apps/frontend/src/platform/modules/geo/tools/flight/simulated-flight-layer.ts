@@ -1,5 +1,6 @@
 import {
   ArcType,
+  CallbackProperty,
   Cartesian2,
   Cartesian3,
   Cartographic,
@@ -11,6 +12,7 @@ import {
   LabelStyle,
   NearFarScalar,
   SampledPositionProperty,
+  SceneTransforms,
   VelocityOrientationProperty,
   VerticalOrigin,
   type Viewer,
@@ -140,6 +142,60 @@ function createAircraftIcon(): HTMLCanvasElement {
   return canvas
 }
 
+function createAircraftRotation(
+  viewer: Viewer,
+  position: SampledPositionProperty,
+): CallbackProperty {
+  const currentPosition = new Cartesian3()
+  const nextPosition = new Cartesian3()
+  const previousPosition = new Cartesian3()
+  const currentWindowPosition = new Cartesian2()
+  const nextWindowPosition = new Cartesian2()
+
+  function rotationFor(start: Cartesian3, end: Cartesian3): number | undefined {
+    const startWindowPosition = SceneTransforms.worldToWindowCoordinates(
+      viewer.scene,
+      start,
+      currentWindowPosition,
+    )
+    const endWindowPosition = SceneTransforms.worldToWindowCoordinates(
+      viewer.scene,
+      end,
+      nextWindowPosition,
+    )
+    if (!startWindowPosition || !endWindowPosition) {
+      return undefined
+    }
+
+    const deltaX = endWindowPosition.x - startWindowPosition.x
+    const deltaY = endWindowPosition.y - startWindowPosition.y
+    if (Math.abs(deltaX) < 0.01 && Math.abs(deltaY) < 0.01) {
+      return undefined
+    }
+    return Math.atan2(-deltaX, -deltaY)
+  }
+
+  return new CallbackProperty(function aircraftRotation(time): number {
+    if (!time) {
+      return 0
+    }
+    const current = position.getValue(time, currentPosition)
+    if (!current) {
+      return 0
+    }
+
+    const nextTime = JulianDate.addSeconds(time, 30, new JulianDate())
+    const next = position.getValue(nextTime, nextPosition)
+    if (next) {
+      return rotationFor(current, next) ?? 0
+    }
+
+    const previousTime = JulianDate.addSeconds(time, -30, new JulianDate())
+    const previous = position.getValue(previousTime, previousPosition)
+    return previous ? (rotationFor(previous, current) ?? 0) : 0
+  }, false)
+}
+
 function positionFor(
   geodesic: EllipsoidGeodesic,
   progress: number,
@@ -220,18 +276,12 @@ export async function createSimulatedFlightLayer(viewer: Viewer): Promise<Simula
         id: `simulated-flight:${definition.id}`,
         name: `模拟航班 ${definition.callsign}`,
         orientation: new VelocityOrientationProperty(position),
-        path: {
-          leadTime: 1_200,
-          material: TRACK_COLOR,
-          resolution: SAMPLE_INTERVAL_SECONDS,
-          trailTime: 7_200,
-          width: 1.5,
-        },
         billboard: {
           disableDepthTestDistance: Number.POSITIVE_INFINITY,
           image: aircraftIcon,
-          scale: 0.48,
-          scaleByDistance: new NearFarScalar(20_000, 0.62, 3_000_000, 0.3),
+          rotation: createAircraftRotation(viewer, position),
+          scale: 0.86,
+          scaleByDistance: new NearFarScalar(20_000, 1, 3_000_000, 0.5),
           verticalOrigin: VerticalOrigin.CENTER,
         },
         position,

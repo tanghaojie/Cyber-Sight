@@ -1,6 +1,6 @@
 # Platform 实施计划
 
-最近完成：[Geo 模拟飞机透明 Canvas 图标](../archive/plans/2026-08-31-geo-aircraft-canvas-icon.md)。
+最近完成：[Geo 模拟飞机尺寸航向与单航线](../archive/plans/2026-08-31-geo-flight-icon-scale-heading-and-route.md)。
 
 当前没有活动计划。
 
