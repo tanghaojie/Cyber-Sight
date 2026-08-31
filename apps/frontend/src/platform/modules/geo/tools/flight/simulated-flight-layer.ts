@@ -20,7 +20,6 @@ const AIRCRAFT_OUTLINE_COLOR = Color.fromCssColorString('#06111c')
 const TRACK_COLOR = Color.fromCssColorString('#4cc9f0').withAlpha(0.58)
 const SAMPLE_INTERVAL_SECONDS = 300
 const JOURNEYS_PER_DAY = 4
-const AIRCRAFT_ICON_URL = '/geo/aircraft.svg'
 
 interface GeoCoordinate {
   readonly longitude: number
@@ -105,6 +104,42 @@ function routeProgress(progress: number, phase: number): number {
   return cycleProgress <= 0.5 ? cycleProgress * 2 : (1 - cycleProgress) * 2
 }
 
+function createAircraftIcon(): HTMLCanvasElement {
+  const canvas = document.createElement('canvas')
+  canvas.height = 64
+  canvas.width = 64
+  const context = canvas.getContext('2d')
+  if (!context) {
+    throw new Error('无法创建模拟飞机图标画布')
+  }
+
+  context.fillStyle = '#49c9ff'
+  context.lineJoin = 'round'
+  context.lineWidth = 3
+  context.strokeStyle = '#06111c'
+  context.beginPath()
+  context.moveTo(32, 4)
+  context.lineTo(39, 25)
+  context.lineTo(57, 33)
+  context.lineTo(57, 38)
+  context.lineTo(39, 36)
+  context.lineTo(39, 52)
+  context.lineTo(46, 59)
+  context.lineTo(42, 61)
+  context.lineTo(32, 56)
+  context.lineTo(22, 61)
+  context.lineTo(18, 59)
+  context.lineTo(25, 52)
+  context.lineTo(25, 36)
+  context.lineTo(7, 38)
+  context.lineTo(7, 33)
+  context.lineTo(25, 25)
+  context.closePath()
+  context.fill()
+  context.stroke()
+  return canvas
+}
+
 function positionFor(
   geodesic: EllipsoidGeodesic,
   progress: number,
@@ -146,6 +181,7 @@ function createPositionProperty(
 
 export async function createSimulatedFlightLayer(viewer: Viewer): Promise<SimulatedFlightLayer> {
   const dataSource = new CustomDataSource('geo-simulated-flights')
+  const aircraftIcon = createAircraftIcon()
   await viewer.dataSources.add(dataSource)
   let disposed = false
 
@@ -193,7 +229,7 @@ export async function createSimulatedFlightLayer(viewer: Viewer): Promise<Simula
         },
         billboard: {
           disableDepthTestDistance: Number.POSITIVE_INFINITY,
-          image: AIRCRAFT_ICON_URL,
+          image: aircraftIcon,
           scale: 0.48,
           scaleByDistance: new NearFarScalar(20_000, 0.62, 3_000_000, 0.3),
           verticalOrigin: VerticalOrigin.CENTER,

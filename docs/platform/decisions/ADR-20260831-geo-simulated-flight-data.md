@@ -17,7 +17,7 @@ Geo 需要可演示的航空器和航迹，但 OpenSky、adsb.fi 等公开 ADS-B
 
 - 删除 Platform `geo` 后端模块、OpenSky HTTP 契约、服务测试和前端 API 调用；
 - 航班插件只提供内置、明确标注为模拟的航线；
-- 所有位置样本绑定已有的 `viewer.clock`，使用 `SampledPositionProperty`、`VelocityOrientationProperty` 和路径图形展示，不创建第二个 Clock，也不手动在每个 tick 写入位置；每条航线另以始末点之间的完整大圆线稳定呈现，活动位置使用随前端构建发布的本地 SVG 飞机图标而非点位；
+- 所有位置样本绑定已有的 `viewer.clock`，使用 `SampledPositionProperty`、`VelocityOrientationProperty` 和路径图形展示，不创建第二个 Clock，也不手动在每个 tick 写入位置；每条航线另以始末点之间的完整大圆线稳定呈现，活动位置使用透明 Canvas 绘制的飞机轮廓而非点位；
 - 默认关闭；开启时创建本次会话实体，关闭或销毁时清空 `CustomDataSource`；不保存数据且不访问网络。
 
 ## 结果与限制
