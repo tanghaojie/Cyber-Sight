@@ -1,4 +1,5 @@
 import {
+  ArcType,
   Cartesian2,
   Cartesian3,
   Cartographic,
@@ -11,14 +12,19 @@ import {
   NearFarScalar,
   SampledPositionProperty,
   VelocityOrientationProperty,
+  VerticalOrigin,
   type Viewer,
 } from 'cesium'
 
-const AIRCRAFT_COLOR = Color.fromCssColorString('#49c9ff')
 const AIRCRAFT_OUTLINE_COLOR = Color.fromCssColorString('#06111c')
 const TRACK_COLOR = Color.fromCssColorString('#4cc9f0').withAlpha(0.58)
 const SAMPLE_INTERVAL_SECONDS = 300
 const JOURNEYS_PER_DAY = 4
+const AIRCRAFT_ICON = `data:image/svg+xml,${encodeURIComponent(`
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+    <path fill="#49c9ff" stroke="#06111c" stroke-width="3" stroke-linejoin="round" d="M34 3c3 0 5 2 5 5v17l18 11v6L39 36v14l7 6v5l-14-5-14 5v-5l7-6V36L7 42v-6l18-11V8c0-3 2-5 5-5h4Z"/>
+  </svg>
+`)}`
 
 interface GeoCoordinate {
   readonly longitude: number
@@ -164,6 +170,21 @@ export async function createSimulatedFlightLayer(viewer: Viewer): Promise<Simula
     for (const definition of SIMULATED_FLIGHTS) {
       const position = createPositionProperty(definition, start, stop)
       dataSource.entities.add({
+        id: `simulated-flight-route:${definition.id}`,
+        name: `模拟航线 ${definition.callsign}`,
+        polyline: {
+          arcType: ArcType.GEODESIC,
+          material: TRACK_COLOR.withAlpha(0.8),
+          positions: Cartesian3.fromDegreesArray([
+            definition.origin.longitude,
+            definition.origin.latitude,
+            definition.destination.longitude,
+            definition.destination.latitude,
+          ]),
+          width: 1.5,
+        },
+      })
+      dataSource.entities.add({
         id: `simulated-flight:${definition.id}`,
         name: `模拟航班 ${definition.callsign}`,
         orientation: new VelocityOrientationProperty(position),
@@ -174,13 +195,12 @@ export async function createSimulatedFlightLayer(viewer: Viewer): Promise<Simula
           trailTime: 7_200,
           width: 1.5,
         },
-        point: {
-          color: AIRCRAFT_COLOR,
+        billboard: {
           disableDepthTestDistance: Number.POSITIVE_INFINITY,
-          outlineColor: AIRCRAFT_OUTLINE_COLOR,
-          outlineWidth: 2,
-          pixelSize: 8,
-          scaleByDistance: new NearFarScalar(20_000, 1.2, 3_000_000, 0.62),
+          image: AIRCRAFT_ICON,
+          scale: 0.48,
+          scaleByDistance: new NearFarScalar(20_000, 0.62, 3_000_000, 0.3),
+          verticalOrigin: VerticalOrigin.CENTER,
         },
         position,
         label: {
