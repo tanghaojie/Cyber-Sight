@@ -10,6 +10,7 @@
 
 ## 已完成计划
 
+- [2026-08-31 Geo Google 默认底图提交后的 Platform 文档归档审查](plans/2026-08-31-platform-documentation-archive-review-4.md)：以默认底图实现提交为新 Platform 审计基线。
 - [2026-08-31 Geo 默认底图调整后的 Platform 文档归档审查](plans/2026-08-31-platform-documentation-archive-review-3.md)：复核 Google · 混合默认底图决策并推进 Platform 台账。
 - [2026-08-31 Geo Google 混合默认底图](plans/2026-08-31-geo-google-hybrid-default.md)：启动时仅加载 Google · 混合底图，其他影像源改为用户主动添加。
 - [2026-08-31 Geo 人工验收修复后的 Platform 文档归档审查](plans/2026-08-31-platform-documentation-archive-review-2.md)：复核 Geo 人工验收修复并推进 Platform 台账。
@@ -53,6 +54,7 @@
 
 ## AI 协作记录
 
+- [2026-08-31 Geo Google 默认底图提交后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-31-platform-documentation-archive-review-4.md)
 - [2026-08-31 Geo 默认底图调整后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-31-platform-documentation-archive-review-3.md)
 - [2026-08-31 Geo Google 混合默认底图](ai-logs/2026/08/2026-08-31-geo-google-hybrid-default.md)
 - [2026-08-31 Geo 人工验收修复后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-31-platform-documentation-archive-review-2.md)
