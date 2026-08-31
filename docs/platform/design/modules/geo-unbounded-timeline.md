@@ -2,7 +2,7 @@
 title: Geo 无界时间轴与每日循环航线方案
 scope: platform
 repository: Cyber-Sight
-status: draft
+status: active
 owner: project maintainers
 updated: 2026-08-31
 ---
@@ -107,11 +107,11 @@ flowchart LR
 
 维护者人工验收至少覆盖：1 分钟、24 小时、1 月和 10 年窗口的刻度可读性；持续向过去/未来平移；缩放锚点稳定；平移不改变昼夜而定位改变昼夜；播放、暂停、倍速和回到现在；每日航班在不同日期同一 UTC 时刻复现、航段外隐藏；以及重复进入/退出后无重复监听器或实体。
 
-当前 24 小时循环实现保持有效，直到本方案的实施计划完成并通过验证。届时更新 Geo 模块设计和两份相关 ADR，以实际实现替换当前事实。
+实现已采用 `ClockRange.UNBOUNDED`、独立可见窗口、UTC 自适应刻度和每日循环航段。静态验证通过；时间轴手势、刻度可读性、太阳变化和航班循环仍需维护者按本设计进行浏览器人工验收。
 
 ## 相关计划和 AI 日志
 
-- [实施计划](../../plans/active/2026-08-31-geo-unbounded-timeline-and-daily-flight-cycle.md)
-- [协作记录](../../ai-logs/2026/08/2026-08-31-geo-unbounded-timeline-and-daily-flight-cycle.md)
+- [实施计划](../../archive/plans/2026-08-31-geo-unbounded-timeline-and-daily-flight-cycle.md)
+- [协作记录](../../archive/ai-logs/2026/08/2026-08-31-geo-unbounded-timeline-and-daily-flight-cycle.md)
 - [当前单一仿真时间 ADR](../../decisions/ADR-20260830-geo-simulation-time-and-solar-lighting.md)
 - [当前模拟航班 ADR](../../decisions/ADR-20260831-geo-simulated-flight-data.md)

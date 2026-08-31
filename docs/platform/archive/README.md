@@ -10,6 +10,7 @@
 
 ## 已完成计划
 
+- [2026-08-31 Geo 无界时间轴与每日循环航线](plans/2026-08-31-geo-unbounded-timeline-and-daily-flight-cycle.md)：将时间轴升级为无界 UTC 可见窗口，并让模拟航班按每日 UTC 航段循环。
 - [2026-08-31 Geo 底部工作台折叠交互](plans/2026-08-31-geo-bottom-workbench.md)：将状态条与时间轴合并为连续底部工作台，并让两者可独立收起。
 - [2026-08-31 Geo 飞机显示修复后的 Platform 文档归档审查](plans/2026-08-31-platform-documentation-archive-review-7.md)：复核 Canvas 图标、尺寸航向与单航线修复，并将 Platform ledger 推进到 `38c1737`。
 - [2026-08-31 Geo 模拟飞机尺寸航向与单航线](plans/2026-08-31-geo-flight-icon-scale-heading-and-route.md)：放大飞机、按可见前进方向旋转机头，并删除动态短轨迹。
@@ -72,6 +73,7 @@
 - [2026-08-31 Geo 航班修复后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-31-platform-documentation-archive-review-6.md)
 - [2026-08-31 Geo 模拟飞机本地 SVG 图标](ai-logs/2026/08/2026-08-31-geo-aircraft-icon-asset.md)
 - [2026-08-31 Geo 模拟航线完整连线与飞机图标](ai-logs/2026/08/2026-08-31-geo-flight-route-and-icon.md)
+- [2026-08-31 Geo 无界时间轴与每日循环航线](ai-logs/2026/08/2026-08-31-geo-unbounded-timeline-and-daily-flight-cycle.md)
 - [2026-08-31 Geo 时间轴响应性修复后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-31-platform-documentation-archive-review-5.md)
 - [2026-08-31 Geo 时间轴插件贡献响应性修复](ai-logs/2026/08/2026-08-31-geo-timeline-reactivity.md)
 - [2026-08-31 Geo 2D 场景过渡相机状态修复](ai-logs/2026/08/2026-08-31-geo-2d-morph-camera-status.md)

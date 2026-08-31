@@ -3,7 +3,7 @@ title: Geo 无界时间轴与每日循环航线
 scope: platform
 repository: Cyber-Sight
 owner: project maintainers
-status: draft
+status: completed
 created: 2026-08-31
 updated: 2026-08-31
 ---
@@ -39,15 +39,15 @@ updated: 2026-08-31
 
 ## 实施任务
 
-- [ ] 冻结 `GeoTimeController` 的窗口与仿真时间接口，采用 `ClockRange.UNBOUNDED` 并保留单一 `viewer.clock`。
-- [ ] 实现 1 分钟至 10 年的窗口平移、锚点缩放、UTC 自适应刻度、游标定位、键盘等价操作与“回到现在”。
-- [ ] 让播放/暂停、倍速和显式渲染只作用于仿真时间，确保纯窗口操作不触发场景渲染。
-- [ ] 将模拟航线改为 UTC 每日航段循环；航段外隐藏飞机，保留完整大圆线和既有航向表现。
-- [ ] 更新 Geo 当前设计、两份相关 ADR、文档索引和协作记录；完成后归档计划与日志。
+- [x] 冻结 `GeoTimeController` 的窗口与仿真时间接口，采用 `ClockRange.UNBOUNDED` 并保留单一 `viewer.clock`。
+- [x] 实现 1 分钟至 10 年的窗口平移、锚点缩放、UTC 自适应刻度、游标定位、键盘等价操作与“回到现在”。
+- [x] 让播放/暂停、倍速和显式渲染只作用于仿真时间，确保纯窗口操作不触发场景渲染。
+- [x] 将模拟航线改为 UTC 每日航段循环；航段外隐藏飞机，保留完整大圆线和既有航向表现。
+- [x] 更新 Geo 当前设计、两份相关 ADR、文档索引和协作记录；完成后归档计划与日志。
 
 ## 测试与验证
 
-- 执行 `pnpm format`、`pnpm format:check`、`pnpm lint`、`pnpm architecture:check`、前端生产构建、`pnpm docs:archive:check:ci` 与 `git diff --check`；
+- 已执行 `pnpm format`、`pnpm format:check`、`pnpm lint`、`pnpm architecture:check`、前端生产构建、`pnpm docs:archive:check:ci` 与 `git diff --check`；
 - 人工验收 1 分钟、24 小时、1 月、10 年窗口，跨日期平移、缩放锚点、定位/播放对太阳的影响，以及每日航班的重复、隐藏和资源清理；
 - 不创建或运行前端自动化、组件或浏览器测试。
 
@@ -57,9 +57,9 @@ updated: 2026-08-31
 
 ## 实际偏差和遗留问题
 
-尚未实施。若实际窗口刻度在最低支持桌面宽度不可读，应只调整刻度选择与标签密度，不能降低 1 分钟最小窗口或 10 年最大窗口以外的已确认时间语义。
+实现没有偏离已确认的时间语义。受限 Windows 沙箱拒绝 Vite/esbuild 读取配置目录，已在授权环境以同一命令完成前端生产构建。由于仓库前端验证边界，时间轴手势、刻度可读性、太阳变化、每日航段显示和资源释放仍须维护者人工浏览器验收；若最低支持桌面宽度的刻度不可读，只调整刻度选择与标签密度，不能改变 1 分钟至 10 年窗口语义。
 
 ## 相关设计和 AI 日志
 
 - [设计方案](../../design/modules/geo-unbounded-timeline.md)
-- [协作记录](../../ai-logs/2026/08/2026-08-31-geo-unbounded-timeline-and-daily-flight-cycle.md)
+- [协作记录](../ai-logs/2026/08/2026-08-31-geo-unbounded-timeline-and-daily-flight-cycle.md)

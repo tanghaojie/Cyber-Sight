@@ -31,8 +31,8 @@ Geo 已隐藏 Cesium 原生 `Animation` 与 `Timeline` 控件，但 Viewer 仍�
 采用方案 3：
 
 - Geo 只使用 Viewer 自带的 `viewer.clock`，关闭 DataSource 自动接管 Clock，并禁止 Time、Scene 或未来 Flight 插件创建第二个 `Clock`；
-- Time 插件把当天 UTC `00:00` 至次日 UTC `00:00` 作为默认循环范围，内部继续使用 Cesium `JulianDate`，界面明确显示 UTC；
-- 时间轴提供播放/暂停、拖动定位、回到当前时刻和倍速控制；时钟停止时不持续请求渲染；
+- Time 插件使用 `ClockRange.UNBOUNDED`；`startTime`/`stopTime` 不再作为播放或 UI 边界。可见窗口独立于 `currentTime`，可持续平移，单屏范围限制为 1 分钟至 10 年，内部继续使用 Cesium `JulianDate`，界面明确显示 UTC；
+- 时间轴提供播放/暂停、游标定位、空白区域平移、围绕指针缩放、回到当前时刻和倍速控制；时钟停止时不持续请求渲染，平移或缩放窗口不请求场景渲染；
 - 扩展插件契约增加窄范围 `bottomDocks` contribution，工作台 Shell 只按注册表结果渲染常驻底部组件，不直接导入 Time 组件；
 - Scene 插件通过 capability 发布太阳光照端口，Time 插件只消费该端口，不穿透读取 Scene controller；
 - 本阶段动态光照只包含太阳驱动的地球光照与太阳阴影。太阳光照默认开启；阴影因 GPU 成本默认关闭并提供独立开关；不实现月光、人工光源、天气或大气散射模拟。
@@ -47,18 +47,19 @@ Geo 已隐藏 Cesium 原生 `Animation` 与 `Timeline` 控件，但 Viewer 仍�
 ## 负面结果与风险
 
 - 播放时需要持续请求渲染，GPU 占用会高于静止场景；
-- 24 小时 UTC 范围是首版固定策略，跨日事件和任意业务时间范围需要后续扩展；
+- 无界时钟让太阳和未来动态能力可跨日运行；可见窗口需要显式限制为 1 分钟至 10 年，以避免无效日期、拥挤刻度和不可读标签；
 - 阴影效果取决于地形、模型的阴影模式和设备能力，静态类型/构建验证不能替代浏览器人工验收。
 
 ## 验证和复审条件
 
-- 拖动、播放、暂停、倍速和循环必须只改变 `viewer.clock`；
+- 游标定位、播放、暂停和倍速必须只改变 `viewer.clock`；平移和缩放只改变 Time 插件的可见窗口状态；
 - 开启太阳光照后，时间变化应改变地球明暗；阴影关闭时不得承担阴影渲染成本；
 - 页面重复进入/退出后不得累积 Clock 监听器；
-- 若引入跨日业务事件、真实航班或第二种光源，应复审时间范围和太阳光照端口。
+- 若引入真实航班、时区选择或第二种光源，应复审时间范围、循环语义和太阳光照端口。
 
 ## 相关设计和计划
 
 - [Geo 前端空间可视化工作台](../design/modules/geo.md)
 - [Geo 前端编译期插件架构](ADR-20260814-geo-frontend-plugin-architecture.md)
 - [Geo 时间轴与太阳光照实施计划](../archive/plans/2026-08-30-geo-time-and-solar-lighting.md)
+- [Geo 无界时间轴与每日循环航线实施计划](../archive/plans/2026-08-31-geo-unbounded-timeline-and-daily-flight-cycle.md)

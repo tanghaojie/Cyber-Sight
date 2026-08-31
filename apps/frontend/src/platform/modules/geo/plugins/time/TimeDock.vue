@@ -37,17 +37,45 @@
     </div>
 
     <div v-if="!collapsed" class="geo-time-dock__track">
-      <span>{{ formatBoundary(controller.state.startTime) }}</span>
-      <input
-        type="range"
-        min="0"
-        max="1000"
-        step="1"
-        :value="progress"
+      <div class="geo-time-dock__boundaries">
+        <span>{{ formatBoundary(controller.state.viewportStart) }}</span>
+        <span>{{ formatBoundary(controller.state.viewportStop) }}</span>
+      </div>
+      <div
+        ref="timelineTrack"
+        class="geo-time-dock__ruler"
+        role="group"
+        tabindex="0"
         :aria-label="t('geo.time.scrub')"
-        @input="setProgress"
-      />
-      <span>{{ formatBoundary(controller.state.stopTime) }}</span>
+        @keydown="onRulerKeydown"
+        @pointerdown="onPointerDown"
+        @pointermove="onPointerMove"
+        @pointerup="onPointerUp"
+        @pointercancel="onPointerUp"
+        @wheel.prevent="onWheel"
+      >
+        <span
+          v-for="tick in minorTicks"
+          :key="`minor:${tick.time}`"
+          class="geo-time-dock__tick geo-time-dock__tick--minor"
+          :style="{ left: `${tick.offset}%` }"
+        />
+        <span
+          v-for="tick in majorTicks"
+          :key="`major:${tick.time}`"
+          class="geo-time-dock__tick geo-time-dock__tick--major"
+          :style="{ left: `${tick.offset}%` }"
+        >
+          <i />
+          <em>{{ tick.label }}</em>
+        </span>
+        <span
+          v-if="currentTimeVisible"
+          class="geo-time-dock__cursor"
+          :style="{ left: `${currentTimeOffset}%` }"
+          aria-hidden="true"
+        />
+      </div>
     </div>
 
     <div v-if="!collapsed" class="geo-time-dock__lighting">
@@ -77,11 +105,29 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import AppIcon from '@/foundation/components/AppIcon.vue'
 import { useLocalization } from '@/foundation/modules/localization/localization'
 import type { GeoSolarLightingCapability } from '../scene/scene.capabilities'
 import type { GeoTimeController } from './time.controller'
+
+interface TickDefinition {
+  readonly step: number
+  readonly unit: 'second' | 'minute' | 'hour' | 'day' | 'month' | 'year'
+}
+
+interface TimelineTick {
+  readonly label: string
+  readonly offset: number
+  readonly time: number
+}
+
+interface PointerSession {
+  readonly pointerId: number
+  lastClientX: number
+  moved: boolean
+  seeking: boolean
+}
 
 const props = defineProps<{
   controller: GeoTimeController
@@ -97,6 +143,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useLocalization()
+const timelineTrack = ref<HTMLElement>()
 const speeds = [1, 10, 60, 600, 3600] as const
 const currentFormatter = new Intl.DateTimeFormat('zh-CN', {
   timeZone: 'UTC',
@@ -109,33 +156,191 @@ const currentFormatter = new Intl.DateTimeFormat('zh-CN', {
 })
 const boundaryFormatter = new Intl.DateTimeFormat('zh-CN', {
   timeZone: 'UTC',
+  year: 'numeric',
   month: '2-digit',
   day: '2-digit',
   hour: '2-digit',
   minute: '2-digit',
   hour12: false,
 })
+let pointerSession: PointerSession | undefined
 
-const progress = computed(function timelineProgress() {
-  const duration = props.controller.state.stopTime - props.controller.state.startTime
-  if (duration <= 0) {
-    return 0
+const viewportDuration = computed(function currentViewportDuration() {
+  return props.controller.state.viewportStop - props.controller.state.viewportStart
+})
+
+const tickDefinitions = computed(function selectTickDefinitions() {
+  const duration = viewportDuration.value
+  if (duration <= 5 * 60 * 1000) {
+    return { major: { unit: 'second', step: 30 }, minor: { unit: 'second', step: 5 } } as const
   }
-  return Math.round(
-    ((props.controller.state.currentTime - props.controller.state.startTime) / duration) * 1000,
+  if (duration <= 60 * 60 * 1000) {
+    return { major: { unit: 'minute', step: 5 }, minor: { unit: 'minute', step: 1 } } as const
+  }
+  if (duration <= 6 * 60 * 60 * 1000) {
+    return { major: { unit: 'minute', step: 30 }, minor: { unit: 'minute', step: 5 } } as const
+  }
+  if (duration <= 24 * 60 * 60 * 1000) {
+    return { major: { unit: 'hour', step: 3 }, minor: { unit: 'minute', step: 30 } } as const
+  }
+  if (duration <= 7 * 24 * 60 * 60 * 1000) {
+    return { major: { unit: 'day', step: 1 }, minor: { unit: 'hour', step: 6 } } as const
+  }
+  if (duration <= 31 * 24 * 60 * 60 * 1000) {
+    return { major: { unit: 'day', step: 7 }, minor: { unit: 'day', step: 1 } } as const
+  }
+  if (duration <= 365.25 * 24 * 60 * 60 * 1000) {
+    return { major: { unit: 'month', step: 1 }, minor: { unit: 'day', step: 7 } } as const
+  }
+  if (duration <= 5 * 365.25 * 24 * 60 * 60 * 1000) {
+    return { major: { unit: 'month', step: 3 }, minor: { unit: 'month', step: 1 } } as const
+  }
+  return { major: { unit: 'year', step: 1 }, minor: { unit: 'month', step: 3 } } as const
+})
+
+const majorTicks = computed(function visibleMajorTicks() {
+  return buildTicks(tickDefinitions.value.major, true)
+})
+
+const minorTicks = computed(function visibleMinorTicks() {
+  return buildTicks(tickDefinitions.value.minor, false)
+})
+
+const currentTimeOffset = computed(function currentTimelineOffset() {
+  return (
+    ((props.controller.state.currentTime - props.controller.state.viewportStart) /
+      viewportDuration.value) *
+    100
   )
 })
+
+const currentTimeVisible = computed(function isCurrentTimeVisible() {
+  return currentTimeOffset.value >= 0 && currentTimeOffset.value <= 100
+})
+
+function alignToTick(epochMilliseconds: number, definition: TickDefinition): Date {
+  const date = new Date(epochMilliseconds)
+  date.setUTCMilliseconds(0)
+  switch (definition.unit) {
+    case 'second':
+      date.setUTCSeconds(Math.floor(date.getUTCSeconds() / definition.step) * definition.step)
+      break
+    case 'minute':
+      date.setUTCSeconds(0)
+      date.setUTCMinutes(Math.floor(date.getUTCMinutes() / definition.step) * definition.step)
+      break
+    case 'hour':
+      date.setUTCSeconds(0, 0)
+      date.setUTCMinutes(0)
+      date.setUTCHours(Math.floor(date.getUTCHours() / definition.step) * definition.step)
+      break
+    case 'day':
+      date.setUTCHours(0, 0, 0, 0)
+      break
+    case 'month':
+      date.setUTCHours(0, 0, 0, 0)
+      date.setUTCDate(1)
+      date.setUTCMonth(Math.floor(date.getUTCMonth() / definition.step) * definition.step)
+      break
+    case 'year':
+      date.setUTCHours(0, 0, 0, 0)
+      date.setUTCDate(1)
+      date.setUTCMonth(0)
+      date.setUTCFullYear(Math.floor(date.getUTCFullYear() / definition.step) * definition.step)
+      break
+  }
+  return date
+}
+
+function advanceTick(date: Date, definition: TickDefinition): void {
+  switch (definition.unit) {
+    case 'second':
+      date.setUTCSeconds(date.getUTCSeconds() + definition.step)
+      break
+    case 'minute':
+      date.setUTCMinutes(date.getUTCMinutes() + definition.step)
+      break
+    case 'hour':
+      date.setUTCHours(date.getUTCHours() + definition.step)
+      break
+    case 'day':
+      date.setUTCDate(date.getUTCDate() + definition.step)
+      break
+    case 'month':
+      date.setUTCMonth(date.getUTCMonth() + definition.step)
+      break
+    case 'year':
+      date.setUTCFullYear(date.getUTCFullYear() + definition.step)
+      break
+  }
+}
+
+function formatTick(epochMilliseconds: number, definition: TickDefinition): string {
+  const date = new Date(epochMilliseconds)
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(date.getUTCDate()).padStart(2, '0')
+  const hours = String(date.getUTCHours()).padStart(2, '0')
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0')
+  const seconds = String(date.getUTCSeconds()).padStart(2, '0')
+  switch (definition.unit) {
+    case 'second':
+      return `${hours}:${minutes}:${seconds}`
+    case 'minute':
+    case 'hour':
+      return `${month}/${day} ${hours}:${minutes}`
+    case 'day':
+      return `${month}/${day}`
+    case 'month':
+      return `${date.getUTCFullYear()}-${month}`
+    case 'year':
+      return String(date.getUTCFullYear())
+  }
+}
+
+function buildTicks(definition: TickDefinition, includeLabels: boolean): TimelineTick[] {
+  const start = props.controller.state.viewportStart
+  const stop = props.controller.state.viewportStop
+  const duration = stop - start
+  const cursor = alignToTick(start, definition)
+  const ticks: TimelineTick[] = []
+  let iterations = 0
+
+  while (cursor.getTime() < start && iterations < 1000) {
+    advanceTick(cursor, definition)
+    iterations += 1
+  }
+  while (cursor.getTime() <= stop && iterations < 1000) {
+    const time = cursor.getTime()
+    ticks.push({
+      time,
+      offset: ((time - start) / duration) * 100,
+      label: includeLabels ? formatTick(time, definition) : '',
+    })
+    advanceTick(cursor, definition)
+    iterations += 1
+  }
+  return ticks
+}
 
 function formatCurrentTime(value: number): string {
   return `${currentFormatter.format(value)} UTC`
 }
 
 function formatBoundary(value: number): string {
-  return boundaryFormatter.format(value)
+  return `${boundaryFormatter.format(value)} UTC`
 }
 
-function setProgress(event: Event): void {
-  props.controller.setProgress(Number((event.target as HTMLInputElement).value) / 1000)
+function timeAtClientX(clientX: number): number | undefined {
+  const track = timelineTrack.value
+  if (!track) {
+    return undefined
+  }
+  const rect = track.getBoundingClientRect()
+  if (rect.width <= 0) {
+    return undefined
+  }
+  const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width))
+  return props.controller.state.viewportStart + viewportDuration.value * ratio
 }
 
 function setMultiplier(event: Event): void {
@@ -149,11 +354,117 @@ function setLighting(event: Event): void {
 function setShadows(event: Event): void {
   props.solarLighting.setShadows((event.target as HTMLInputElement).checked)
 }
+
+function onPointerDown(event: PointerEvent): void {
+  if (event.button !== 0 || !timelineTrack.value) {
+    return
+  }
+  event.preventDefault()
+  const rect = timelineTrack.value.getBoundingClientRect()
+  const cursorX = rect.left + (currentTimeOffset.value / 100) * rect.width
+  pointerSession = {
+    pointerId: event.pointerId,
+    lastClientX: event.clientX,
+    moved: false,
+    seeking: currentTimeVisible.value && Math.abs(event.clientX - cursorX) <= 12,
+  }
+  timelineTrack.value.setPointerCapture(event.pointerId)
+  if (pointerSession.seeking) {
+    const time = timeAtClientX(event.clientX)
+    if (time !== undefined) {
+      props.controller.seek(time)
+    }
+  }
+}
+
+function onPointerMove(event: PointerEvent): void {
+  if (!pointerSession || pointerSession.pointerId !== event.pointerId || !timelineTrack.value) {
+    return
+  }
+  const deltaX = event.clientX - pointerSession.lastClientX
+  if (Math.abs(deltaX) > 1) {
+    pointerSession.moved = true
+  }
+  pointerSession.lastClientX = event.clientX
+  if (pointerSession.seeking) {
+    const time = timeAtClientX(event.clientX)
+    if (time !== undefined) {
+      props.controller.seek(time)
+    }
+    return
+  }
+  const width = timelineTrack.value.getBoundingClientRect().width
+  if (width > 0 && deltaX !== 0) {
+    props.controller.panViewport(-deltaX / width)
+  }
+}
+
+function onPointerUp(event: PointerEvent): void {
+  if (!pointerSession || pointerSession.pointerId !== event.pointerId) {
+    return
+  }
+  if (!pointerSession.seeking && !pointerSession.moved) {
+    const time = timeAtClientX(event.clientX)
+    if (time !== undefined) {
+      props.controller.seek(time)
+    }
+  }
+  if (timelineTrack.value?.hasPointerCapture(event.pointerId)) {
+    timelineTrack.value.releasePointerCapture(event.pointerId)
+  }
+  pointerSession = undefined
+}
+
+function onWheel(event: WheelEvent): void {
+  const anchor = timeAtClientX(event.clientX)
+  if (anchor === undefined) {
+    return
+  }
+  props.controller.zoomViewport(anchor, Math.pow(1.0015, event.deltaY))
+}
+
+function onRulerKeydown(event: KeyboardEvent): void {
+  const anchor = currentTimeVisible.value
+    ? props.controller.state.currentTime
+    : (props.controller.state.viewportStart + props.controller.state.viewportStop) / 2
+  switch (event.key) {
+    case 'ArrowLeft':
+      event.preventDefault()
+      props.controller.panViewport(-0.2)
+      break
+    case 'ArrowRight':
+      event.preventDefault()
+      props.controller.panViewport(0.2)
+      break
+    case 'PageUp':
+      event.preventDefault()
+      props.controller.panViewport(-0.8)
+      break
+    case 'PageDown':
+      event.preventDefault()
+      props.controller.panViewport(0.8)
+      break
+    case '+':
+    case '=':
+      event.preventDefault()
+      props.controller.zoomViewport(anchor, 0.75)
+      break
+    case '-':
+    case '_':
+      event.preventDefault()
+      props.controller.zoomViewport(anchor, 1.35)
+      break
+    case 'Home':
+      event.preventDefault()
+      props.controller.resetToNow()
+      break
+  }
+}
 </script>
 
 <style scoped>
 .geo-time-dock {
-  min-height: 70px;
+  min-height: 78px;
   display: grid;
   grid-template-columns: auto minmax(260px, 1fr) auto auto;
   align-items: center;
@@ -183,7 +494,6 @@ function setShadows(event: Event): void {
 
 .geo-time-dock__controls,
 .geo-time-dock__lighting,
-.geo-time-dock__track,
 .geo-time-dock__lighting label {
   display: flex;
   align-items: center;
@@ -260,20 +570,90 @@ function setShadows(event: Event): void {
 
 .geo-time-dock__track {
   min-width: 0;
-  gap: 10px;
 }
 
-.geo-time-dock__track span {
+.geo-time-dock__boundaries {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
   color: var(--geo-text-faint);
   font-family: var(--font-display);
   font-size: 9px;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
-.geo-time-dock__track input {
-  width: 100%;
-  accent-color: var(--geo-accent);
-  cursor: pointer;
+.geo-time-dock__ruler {
+  position: relative;
+  height: 32px;
+  overflow: hidden;
+  border-top: 1px solid var(--geo-line-strong);
+  outline: none;
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.geo-time-dock__ruler:focus-visible {
+  outline: 2px solid var(--geo-accent);
+  outline-offset: 4px;
+}
+
+.geo-time-dock__tick,
+.geo-time-dock__cursor {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.geo-time-dock__tick {
+  width: 1px;
+  background: var(--geo-line-strong);
+}
+
+.geo-time-dock__tick--minor {
+  height: 5px;
+}
+
+.geo-time-dock__tick--major {
+  height: 11px;
+}
+
+.geo-time-dock__tick--major i {
+  display: block;
+  height: 11px;
+}
+
+.geo-time-dock__tick--major em {
+  position: absolute;
+  top: 13px;
+  left: 4px;
+  color: var(--geo-text-faint);
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.geo-time-dock__cursor {
+  z-index: 1;
+  width: 2px;
+  height: 100%;
+  background: var(--geo-accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--geo-accent), transparent 45%);
+}
+
+.geo-time-dock__cursor::before {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--geo-accent);
+  content: '';
+  transform: translate(-50%, -25%);
 }
 
 .geo-time-dock__lighting {

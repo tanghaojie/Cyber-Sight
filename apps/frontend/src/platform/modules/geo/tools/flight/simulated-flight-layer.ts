@@ -1,6 +1,7 @@
 import {
   ArcType,
   CallbackProperty,
+  CallbackPositionProperty,
   Cartesian2,
   Cartesian3,
   Cartographic,
@@ -11,18 +12,15 @@ import {
   JulianDate,
   LabelStyle,
   NearFarScalar,
-  SampledPositionProperty,
   SceneTransforms,
   VelocityOrientationProperty,
   VerticalOrigin,
+  type PositionProperty,
   type Viewer,
 } from 'cesium'
 
 const AIRCRAFT_OUTLINE_COLOR = Color.fromCssColorString('#06111c')
 const TRACK_COLOR = Color.fromCssColorString('#4cc9f0').withAlpha(0.58)
-const SAMPLE_INTERVAL_SECONDS = 300
-const JOURNEYS_PER_DAY = 4
-
 interface GeoCoordinate {
   readonly longitude: number
   readonly latitude: number
@@ -31,9 +29,10 @@ interface GeoCoordinate {
 interface SimulatedFlightDefinition {
   readonly callsign: string
   readonly destination: GeoCoordinate
+  readonly departureSeconds: number
+  readonly durationSeconds: number
   readonly id: string
   readonly origin: GeoCoordinate
-  readonly phase: number
 }
 
 const SIMULATED_FLIGHTS: readonly SimulatedFlightDefinition[] = [
@@ -42,56 +41,64 @@ const SIMULATED_FLIGHTS: readonly SimulatedFlightDefinition[] = [
     callsign: 'SIM 101',
     origin: { longitude: 116.4074, latitude: 39.9042 },
     destination: { longitude: 121.4737, latitude: 31.2304 },
-    phase: 0.03,
+    departureSeconds: 30 * 60,
+    durationSeconds: 2 * 60 * 60,
   },
   {
     id: 'sim-202',
     callsign: 'SIM 202',
     origin: { longitude: 113.2644, latitude: 23.1291 },
     destination: { longitude: 104.0665, latitude: 30.5728 },
-    phase: 0.16,
+    departureSeconds: 3 * 60 * 60,
+    durationSeconds: 2 * 60 * 60,
   },
   {
     id: 'sim-303',
     callsign: 'SIM 303',
     origin: { longitude: 108.9398, latitude: 34.3416 },
     destination: { longitude: 114.0579, latitude: 22.5431 },
-    phase: 0.29,
+    departureSeconds: 5 * 60 * 60 + 30 * 60,
+    durationSeconds: 2 * 60 * 60,
   },
   {
     id: 'sim-404',
     callsign: 'SIM 404',
     origin: { longitude: 87.6168, latitude: 43.8256 },
     destination: { longitude: 120.1551, latitude: 30.2741 },
-    phase: 0.42,
+    departureSeconds: 8 * 60 * 60,
+    durationSeconds: 2 * 60 * 60,
   },
   {
     id: 'sim-505',
     callsign: 'SIM 505',
     origin: { longitude: 102.8329, latitude: 24.8801 },
     destination: { longitude: 118.7969, latitude: 32.0603 },
-    phase: 0.55,
+    departureSeconds: 10 * 60 * 60 + 30 * 60,
+    durationSeconds: 2 * 60 * 60,
   },
   {
     id: 'sim-606',
     callsign: 'SIM 606',
     origin: { longitude: 126.5349, latitude: 45.8038 },
     destination: { longitude: 123.4315, latitude: 41.8057 },
-    phase: 0.68,
+    departureSeconds: 13 * 60 * 60,
+    durationSeconds: 2 * 60 * 60,
   },
   {
     id: 'sim-707',
     callsign: 'SIM 707',
     origin: { longitude: 91.1322, latitude: 29.6604 },
     destination: { longitude: 106.5516, latitude: 29.563 },
-    phase: 0.81,
+    departureSeconds: 15 * 60 * 60 + 30 * 60,
+    durationSeconds: 2 * 60 * 60,
   },
   {
     id: 'sim-808',
     callsign: 'SIM 808',
     origin: { longitude: 120.3826, latitude: 36.0671 },
     destination: { longitude: 118.0894, latitude: 24.4798 },
-    phase: 0.94,
+    departureSeconds: 18 * 60 * 60,
+    durationSeconds: 2 * 60 * 60,
   },
 ]
 
@@ -99,11 +106,6 @@ export interface SimulatedFlightLayer {
   show(): number
   clear(): void
   dispose(): void
-}
-
-function routeProgress(progress: number, phase: number): number {
-  const cycleProgress = (progress * JOURNEYS_PER_DAY + phase) % 1
-  return cycleProgress <= 0.5 ? cycleProgress * 2 : (1 - cycleProgress) * 2
 }
 
 function createAircraftIcon(): HTMLCanvasElement {
@@ -142,10 +144,7 @@ function createAircraftIcon(): HTMLCanvasElement {
   return canvas
 }
 
-function createAircraftRotation(
-  viewer: Viewer,
-  position: SampledPositionProperty,
-): CallbackProperty {
+function createAircraftRotation(viewer: Viewer, position: PositionProperty): CallbackProperty {
   const currentPosition = new Cartesian3()
   const nextPosition = new Cartesian3()
   const previousPosition = new Cartesian3()
@@ -212,27 +211,39 @@ function positionFor(
   )
 }
 
-function createPositionProperty(
+function createDailyPositionProperty(
   definition: SimulatedFlightDefinition,
-  start: JulianDate,
-  stop: JulianDate,
-): SampledPositionProperty {
-  const property = new SampledPositionProperty()
+): CallbackPositionProperty {
   const origin = Cartographic.fromDegrees(definition.origin.longitude, definition.origin.latitude)
   const destination = Cartographic.fromDegrees(
     definition.destination.longitude,
     definition.destination.latitude,
   )
   const geodesic = new EllipsoidGeodesic(origin, destination)
-  const duration = JulianDate.secondsDifference(stop, start)
-  const samplePosition = new Cartesian3()
-
-  for (let seconds = 0; seconds <= duration; seconds += SAMPLE_INTERVAL_SECONDS) {
-    const time = JulianDate.addSeconds(start, Math.min(seconds, duration), new JulianDate())
-    const progress = routeProgress(seconds / duration, definition.phase)
-    property.addSample(time, positionFor(geodesic, progress, samplePosition))
-  }
-  return property
+  const positionScratch = new Cartesian3()
+  return new CallbackPositionProperty(function dailyFlightPosition(
+    time,
+    result,
+  ): Cartesian3 | undefined {
+    if (!time) {
+      return undefined
+    }
+    const currentDate = JulianDate.toDate(time)
+    const secondsSinceMidnight =
+      currentDate.getUTCHours() * 60 * 60 +
+      currentDate.getUTCMinutes() * 60 +
+      currentDate.getUTCSeconds() +
+      currentDate.getUTCMilliseconds() / 1000
+    const elapsedSeconds = secondsSinceMidnight - definition.departureSeconds
+    if (elapsedSeconds < 0 || elapsedSeconds > definition.durationSeconds) {
+      return undefined
+    }
+    return positionFor(
+      geodesic,
+      elapsedSeconds / definition.durationSeconds,
+      result ?? positionScratch,
+    )
+  }, false)
 }
 
 export async function createSimulatedFlightLayer(viewer: Viewer): Promise<SimulatedFlightLayer> {
@@ -253,10 +264,8 @@ export async function createSimulatedFlightLayer(viewer: Viewer): Promise<Simula
     }
 
     dataSource.entities.removeAll()
-    const start = JulianDate.clone(viewer.clock.startTime)
-    const stop = JulianDate.clone(viewer.clock.stopTime)
     for (const definition of SIMULATED_FLIGHTS) {
-      const position = createPositionProperty(definition, start, stop)
+      const position = createDailyPositionProperty(definition)
       dataSource.entities.add({
         id: `simulated-flight-route:${definition.id}`,
         name: `模拟航线 ${definition.callsign}`,
