@@ -10,6 +10,7 @@
 
 ## 已完成计划
 
+- [2026-08-31 Geo 模拟飞机本地 SVG 图标](plans/2026-08-31-geo-aircraft-icon-asset.md)：以 Vite `public` 静态 SVG 替代未加载的内联 data URI。
 - [2026-08-31 Geo 模拟航线完整连线与飞机图标](plans/2026-08-31-geo-flight-route-and-icon.md)：每条模拟航线完整连接起终点，活动航空器由内置飞机图标表示。
 - [2026-08-31 Geo 前端模拟航班](plans/2026-08-31-geo-simulated-flights.md)：删除实时数据和后端 Geo 模块，改用唯一时间轴驱动的离线模拟航线。
 - [2026-08-31 Geo 时间轴响应性修复后的 Platform 文档归档审查](plans/2026-08-31-platform-documentation-archive-review-5.md)：复核 Geo 修复记录并将 Platform ledger 推进到时间轴响应性修复提交。
@@ -59,6 +60,7 @@
 
 ## AI 协作记录
 
+- [2026-08-31 Geo 模拟飞机本地 SVG 图标](ai-logs/2026/08/2026-08-31-geo-aircraft-icon-asset.md)
 - [2026-08-31 Geo 模拟航线完整连线与飞机图标](ai-logs/2026/08/2026-08-31-geo-flight-route-and-icon.md)
 - [2026-08-31 Geo 时间轴响应性修复后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-31-platform-documentation-archive-review-5.md)
 - [2026-08-31 Geo 时间轴插件贡献响应性修复](ai-logs/2026/08/2026-08-31-geo-timeline-reactivity.md)

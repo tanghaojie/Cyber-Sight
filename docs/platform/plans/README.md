@@ -1,6 +1,6 @@
 # Platform 实施计划
 
-最近完成：[Geo 模拟航线完整连线与飞机图标](../archive/plans/2026-08-31-geo-flight-route-and-icon.md)。
+最近完成：[Geo 模拟飞机本地 SVG 图标](../archive/plans/2026-08-31-geo-aircraft-icon-asset.md)。
 
 当前没有活动计划。
 
