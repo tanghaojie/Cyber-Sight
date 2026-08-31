@@ -61,6 +61,13 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'Unknown Geo initialization error'
 }
 
+function getCameraHeadingInDegrees(viewer: Viewer, fallback: number): number {
+  const heading = viewer.camera.heading
+  return typeof heading === 'number' && Number.isFinite(heading)
+    ? CesiumMath.toDegrees(heading)
+    : fallback
+}
+
 function destroyViewer(viewer: Viewer | undefined): void {
   if (viewer && !viewer.isDestroyed()) {
     viewer.destroy()
@@ -98,7 +105,7 @@ function registerRuntimeStatus(
 ): void {
   function updateCameraState(): void {
     state.cameraHeight = viewer.camera.positionCartographic.height
-    state.heading = CesiumMath.toDegrees(viewer.camera.heading)
+    state.heading = getCameraHeadingInDegrees(viewer, state.heading)
   }
 
   updateCameraState()

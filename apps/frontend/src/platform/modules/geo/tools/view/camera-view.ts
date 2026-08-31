@@ -86,6 +86,10 @@ function fromSceneMode(mode: SceneMode): GeoSceneMode {
   return '3D'
 }
 
+function degreesOrZero(radians: number | undefined): number {
+  return typeof radians === 'number' && Number.isFinite(radians) ? CesiumMath.toDegrees(radians) : 0
+}
+
 export function listGeoViewLocations(): readonly GeoViewLocation[] {
   return LOCATION_DEFINITIONS
 }
@@ -140,9 +144,9 @@ export function getGeoCameraSnapshot(viewer: Viewer): GeoCameraSnapshot {
     longitude: CesiumMath.toDegrees(cartographic.longitude),
     latitude: CesiumMath.toDegrees(cartographic.latitude),
     height: cartographic.height,
-    heading: CesiumMath.toDegrees(viewer.camera.heading),
-    pitch: CesiumMath.toDegrees(viewer.camera.pitch),
-    roll: CesiumMath.toDegrees(viewer.camera.roll),
+    heading: degreesOrZero(viewer.camera.heading),
+    pitch: degreesOrZero(viewer.camera.pitch),
+    roll: degreesOrZero(viewer.camera.roll),
     sceneMode: getGeoSceneMode(viewer),
   }
 }
