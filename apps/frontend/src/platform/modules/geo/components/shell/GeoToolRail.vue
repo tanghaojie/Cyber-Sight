@@ -42,7 +42,7 @@ defineEmits<{
   position: absolute;
   z-index: 20;
   top: 22px;
-  bottom: 86px;
+  bottom: var(--geo-side-bottom, 86px);
   left: 22px;
   width: 58px;
   display: flex;

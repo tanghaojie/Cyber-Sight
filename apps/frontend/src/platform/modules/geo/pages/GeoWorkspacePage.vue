@@ -2,7 +2,10 @@
   <main
     ref="workspaceRoot"
     class="geo-workspace"
-    :class="{ 'geo-workspace--status-collapsed': statusBarCollapsed }"
+    :class="{
+      'geo-workspace--status-collapsed': statusBarCollapsed,
+      'geo-workspace--has-bottom-docks': bottomDocks.length > 0,
+    }"
     :aria-label="t('geo.views.workspace')"
   >
     <div
@@ -351,6 +354,8 @@ onBeforeUnmount(function disposeGeoPage() {
   --geo-surface-hover: rgba(173, 218, 241, 0.09);
   --geo-shadow: 0 20px 54px rgba(0, 5, 10, 0.4);
   --geo-bottom-dock-bottom: 74px;
+  --geo-bottom-dock-height: 92px;
+  --geo-side-bottom: 86px;
   --geo-credits-bottom: 158px;
   position: fixed;
   z-index: 0;
@@ -364,6 +369,10 @@ onBeforeUnmount(function disposeGeoPage() {
 .geo-workspace--status-collapsed {
   --geo-bottom-dock-bottom: 14px;
   --geo-credits-bottom: 98px;
+}
+
+.geo-workspace--has-bottom-docks {
+  --geo-side-bottom: calc(var(--geo-bottom-dock-bottom) + var(--geo-bottom-dock-height) + 16px);
 }
 
 .geo-map-host,
@@ -408,9 +417,13 @@ onBeforeUnmount(function disposeGeoPage() {
   z-index: 20;
   right: 22px;
   bottom: var(--geo-bottom-dock-bottom);
-  left: 74px;
+  left: 22px;
   transition: bottom 0.18s ease;
   pointer-events: none;
+}
+
+.geo-workspace--status-collapsed .geo-bottom-docks {
+  left: 74px;
 }
 
 .geo-workspace :global(.cesium-widget-credits) {

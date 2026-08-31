@@ -10,6 +10,7 @@
 
 ## 已完成计划
 
+- [2026-08-31 Geo 工作台与地形人工验收问题修复](plans/2026-08-31-geo-workbench-terrain-acceptance-fixes.md)：修复底部 dock 避让、可调整面板、地形切换反馈、着色、交互淹没与剖面线清除。
 - [2026-08-31 Geo OpenSky 实时航线展示](plans/2026-08-31-geo-opensky-live-flights.md)：通过无存储后端代理和默认关闭的 Flight 插件展示当前视域航空器及会话短轨迹。
 - [2026-08-31 Geo 时间与状态栏交付后的 Platform 文档归档审查](plans/2026-08-31-platform-documentation-archive-review.md)：复核时间轴、太阳光照和可收起状态栏交付并推进 Platform 台账。
 - [2026-08-31 Geo 可收起状态栏与时间轴底部自适应](plans/2026-08-31-geo-collapsible-status-bar.md)：状态栏收起后只保留展开按钮，时间轴同步下沉并避让按钮。
@@ -46,6 +47,7 @@
 
 ## AI 协作记录
 
+- [2026-08-31 Geo 工作台与地形人工验收问题修复](ai-logs/2026/08/2026-08-31-geo-workbench-terrain-acceptance-fixes.md)
 - [2026-08-31 Geo OpenSky 实时航线展示](ai-logs/2026/08/2026-08-31-geo-opensky-live-flights.md)
 - [2026-08-31 Geo 时间与状态栏交付后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-31-platform-documentation-archive-review.md)
 - [2026-08-31 Geo 可收起状态栏与时间轴底部自适应](ai-logs/2026/08/2026-08-31-geo-collapsible-status-bar.md)

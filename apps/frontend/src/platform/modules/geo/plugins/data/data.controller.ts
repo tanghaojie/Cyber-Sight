@@ -91,6 +91,7 @@ export function createGeoDataController(
   let imagery: GeoImageryLayerManager
   let disposed = false
   let pendingOperations = 0
+  let terrainRequestVersion = 0
 
   function guard(): void {
     if (disposed) {
@@ -268,9 +269,31 @@ export function createGeoDataController(
   }
 
   async function setTerrain(id: GeoTerrainResourceId, url?: string): Promise<void> {
-    await run(async function set() {
-      await browser.setTerrain(id, url)
+    guard()
+    const requestVersion = ++terrainRequestVersion
+    const label =
+      id === 'ellipsoid'
+        ? '椭球体地形'
+        : id === 'cesium-world-terrain'
+          ? 'Cesium World Terrain'
+          : '自定义地形'
+    state.terrain = { id, label, status: 'loading' }
+    const terrain = await run(async function set() {
+      return browser.setTerrain(id, url)
     })
+    if (disposed || requestVersion !== terrainRequestVersion) {
+      return
+    }
+    if (terrain) {
+      state.terrain = { ...terrain }
+      return
+    }
+    state.terrain = {
+      id,
+      label,
+      status: 'failed',
+      error: state.error ?? '地形切换失败',
+    }
   }
 
   function dispose(): void {

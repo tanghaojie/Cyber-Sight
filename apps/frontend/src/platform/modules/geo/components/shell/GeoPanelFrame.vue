@@ -1,5 +1,5 @@
 <template>
-  <aside class="geo-panel" :aria-label="title">
+  <aside class="geo-panel" :aria-label="title" :style="{ '--geo-panel-width': `${panelWidth}px` }">
     <header class="geo-panel__header">
       <div>
         <span>{{ eyebrow }}</span>
@@ -10,10 +10,23 @@
       </button>
     </header>
     <div class="geo-panel__body"><slot /></div>
+    <div
+      class="geo-panel__resize-handle"
+      role="separator"
+      aria-orientation="vertical"
+      aria-label="拖动调整面板宽度"
+      aria-valuemin="360"
+      :aria-valuemax="maximumPanelWidth"
+      :aria-valuenow="panelWidth"
+      tabindex="0"
+      @pointerdown="startResize"
+      @keydown="resizeWithKeyboard"
+    />
   </aside>
 </template>
 
 <script setup lang="ts">
+import { computed, onBeforeUnmount, ref } from 'vue'
 import AppIcon from '@/foundation/components/AppIcon.vue'
 
 defineProps<{
@@ -23,6 +36,56 @@ defineProps<{
 }>()
 
 defineEmits<{ close: [] }>()
+
+const MINIMUM_PANEL_WIDTH = 360
+const PREFERRED_PANEL_WIDTH = 420
+const MAXIMUM_PANEL_WIDTH = 640
+
+const panelWidth = ref(PREFERRED_PANEL_WIDTH)
+const maximumPanelWidth = computed(function panelMaximumWidth() {
+  if (typeof window === 'undefined') {
+    return MAXIMUM_PANEL_WIDTH
+  }
+  return Math.max(MINIMUM_PANEL_WIDTH, Math.min(MAXIMUM_PANEL_WIDTH, window.innerWidth - 260))
+})
+let resizeStartX = 0
+let resizeStartWidth = PREFERRED_PANEL_WIDTH
+
+function clampPanelWidth(value: number): number {
+  return Math.min(Math.max(value, MINIMUM_PANEL_WIDTH), maximumPanelWidth.value)
+}
+
+function updateResize(event: PointerEvent): void {
+  panelWidth.value = clampPanelWidth(resizeStartWidth + event.clientX - resizeStartX)
+}
+
+function stopResize(): void {
+  document.body.style.removeProperty('user-select')
+  window.removeEventListener('pointermove', updateResize)
+  window.removeEventListener('pointerup', stopResize)
+}
+
+function startResize(event: PointerEvent): void {
+  if (event.button !== 0) {
+    return
+  }
+  event.preventDefault()
+  resizeStartX = event.clientX
+  resizeStartWidth = panelWidth.value
+  document.body.style.setProperty('user-select', 'none')
+  window.addEventListener('pointermove', updateResize)
+  window.addEventListener('pointerup', stopResize, { once: true })
+}
+
+function resizeWithKeyboard(event: KeyboardEvent): void {
+  if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
+    return
+  }
+  event.preventDefault()
+  panelWidth.value = clampPanelWidth(panelWidth.value + (event.key === 'ArrowRight' ? 20 : -20))
+}
+
+onBeforeUnmount(stopResize)
 </script>
 
 <style scoped>
@@ -30,9 +93,9 @@ defineEmits<{ close: [] }>()
   position: absolute;
   z-index: 19;
   top: 22px;
-  bottom: 86px;
+  bottom: var(--geo-side-bottom, 86px);
   left: 90px;
-  width: 322px;
+  width: var(--geo-panel-width);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
@@ -43,6 +106,41 @@ defineEmits<{ close: [] }>()
   box-shadow: var(--geo-shadow);
   backdrop-filter: blur(22px) saturate(120%);
   animation: geo-panel-enter 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.geo-panel__resize-handle {
+  position: absolute;
+  z-index: 1;
+  top: 14px;
+  right: -6px;
+  bottom: 14px;
+  width: 12px;
+  border-radius: 999px;
+  cursor: col-resize;
+}
+
+.geo-panel__resize-handle::after {
+  position: absolute;
+  top: 50%;
+  left: 4px;
+  width: 3px;
+  height: 42px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--geo-accent), transparent 55%);
+  content: '';
+  opacity: 0;
+  transform: translateY(-50%);
+  transition: opacity 0.16s ease;
+}
+
+.geo-panel:hover .geo-panel__resize-handle::after,
+.geo-panel__resize-handle:focus-visible::after {
+  opacity: 1;
+}
+
+.geo-panel__resize-handle:focus-visible {
+  outline: 2px solid var(--geo-accent);
+  outline-offset: 2px;
 }
 
 .geo-panel__header {

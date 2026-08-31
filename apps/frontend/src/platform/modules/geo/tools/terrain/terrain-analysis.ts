@@ -70,6 +70,26 @@ function pickGlobePosition(viewer: Viewer, screenPosition: Cartesian2): Cartesia
   return ray ? viewer.scene.globe.pick(ray, viewer.scene) : undefined
 }
 
+function createColorRamp(stops: readonly { offset: number; color: string }[]): HTMLCanvasElement {
+  if (typeof document === 'undefined') {
+    throw new Error('Terrain color ramps require a browser document')
+  }
+  const canvas = document.createElement('canvas')
+  canvas.width = 256
+  canvas.height = 1
+  const context = canvas.getContext('2d')
+  if (!context) {
+    throw new Error('Terrain color ramp canvas is unavailable')
+  }
+  const gradient = context.createLinearGradient(0, 0, canvas.width, 0)
+  stops.forEach(function addStop(stop) {
+    gradient.addColorStop(stop.offset, stop.color)
+  })
+  context.fillStyle = gradient
+  context.fillRect(0, 0, canvas.width, canvas.height)
+  return canvas
+}
+
 function interpolateProfilePositions(
   positions: readonly Cartesian3[],
   maxSamples: number,
@@ -115,6 +135,7 @@ export class TerrainAnalysisTool {
   private readonly profileEntities = new Set<Entity>()
   private readonly originalMaterial: CesiumMaterial | undefined
   private activeSession?: TerrainAnalysisSession
+  private profileSession?: TerrainAnalysisSession
   private disposed = false
 
   constructor(
@@ -207,6 +228,9 @@ export class TerrainAnalysisTool {
       if (this.activeSession === session) {
         this.activeSession = undefined
       }
+      if (this.profileSession === session) {
+        this.profileSession = undefined
+      }
       this.viewer.scene.requestRender()
     }
     const session: TerrainAnalysisSession = { stop, dispose: stop }
@@ -264,6 +288,7 @@ export class TerrainAnalysisTool {
       window.addEventListener('keydown', onKeyDown)
     }
     this.activeSession = session
+    this.profileSession = session
     this.viewer.scene.requestRender()
     return session
   }
@@ -415,7 +440,22 @@ export class TerrainAnalysisTool {
       mode === 'slope' ? Material.SlopeRampMaterialType : Material.AspectRampMaterialType,
       {
         image:
-          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAFElEQVR42mNkYPj/n4GBgYGJAQoAAN0BBy0lVwN3AAAAAElFTkSuQmCC',
+          mode === 'slope'
+            ? createColorRamp([
+                { offset: 0, color: '#214f84' },
+                { offset: 0.28, color: '#4db17b' },
+                { offset: 0.58, color: '#e5c76a' },
+                { offset: 0.82, color: '#df7749' },
+                { offset: 1, color: '#f2f4f5' },
+              ])
+            : createColorRamp([
+                { offset: 0, color: '#d84a46' },
+                { offset: 0.2, color: '#e7bf4b' },
+                { offset: 0.4, color: '#63b96c' },
+                { offset: 0.6, color: '#4bb9d9' },
+                { offset: 0.8, color: '#486ec8' },
+                { offset: 1, color: '#c05abe' },
+              ]),
       },
     )
     this.viewer.scene.requestRender()
@@ -443,8 +483,8 @@ export class TerrainAnalysisTool {
   }
 
   clearProfile(): void {
-    this.activeSession?.stop()
-    this.activeSession = undefined
+    this.profileSession?.stop()
+    this.profileSession = undefined
     this.clearProfileEntities()
     this.viewer.scene.requestRender()
   }

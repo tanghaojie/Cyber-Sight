@@ -22,6 +22,14 @@
       >
         {{ isDrawingProfile ? '取消画线' : isSamplingProfile ? '正在采样…' : '绘制采样线' }}
       </button>
+      <button
+        v-if="controller.state.sampled.length || isDrawingProfile || isSamplingProfile"
+        class="terrain-panel__button"
+        type="button"
+        @click="controller.clearProfile"
+      >
+        清除采样线
+      </button>
 
       <div v-if="profileStats" class="terrain-profile" aria-live="polite">
         <svg
@@ -74,7 +82,7 @@
 
       <label class="terrain-panel__field">
         <span>等高距</span>
-        <div class="terrain-panel__number-input">
+        <div class="terrain-panel__number-input terrain-panel__number-input--stepper">
           <input
             v-model.number="contourInterval"
             type="number"
@@ -83,6 +91,24 @@
             step="1"
             :disabled="!controller.state.terrainAvailable"
           />
+          <div class="terrain-panel__number-stepper" aria-label="调整等高距">
+            <button
+              type="button"
+              :disabled="!controller.state.terrainAvailable"
+              aria-label="增加等高距"
+              @click="adjustContourInterval(1)"
+            >
+              +
+            </button>
+            <button
+              type="button"
+              :disabled="!controller.state.terrainAvailable"
+              aria-label="减少等高距"
+              @click="adjustContourInterval(-1)"
+            >
+              −
+            </button>
+          </div>
           <span>米</span>
         </div>
       </label>
@@ -141,17 +167,11 @@
 
     <details class="terrain-panel__section terrain-panel__details">
       <summary>
-        <span>坐标淹没</span>
+        <span>交互淹没</span>
         <small>多边形水面模拟</small>
       </summary>
       <div class="terrain-panel__details-body">
-        <p class="terrain-panel__hint">
-          每行输入一个经度、纬度和可选高程，至少三行，例如：116.391,39.907,50。
-        </p>
-        <label class="terrain-panel__field">
-          <span>分析坐标</span>
-          <textarea v-model="positionsText" rows="4" spellcheck="false" />
-        </label>
+        <p class="terrain-panel__hint">单击地图添加边界点，双击闭合范围；按 Esc 可取消绘制。</p>
         <label class="terrain-panel__field">
           <span>水面高程</span>
           <div class="terrain-panel__number-input">
@@ -159,7 +179,9 @@
             <span>米</span>
           </div>
         </label>
-        <button type="button" @click="runFlood">开始淹没</button>
+        <button type="button" :disabled="isDrawingFlood || isFlooding" @click="runFlood">
+          {{ isDrawingFlood ? '正在绘制范围…' : isFlooding ? '正在淹没…' : '绘制淹没范围' }}
+        </button>
       </div>
     </details>
 
@@ -183,16 +205,16 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Cartesian3 } from 'cesium'
 import type { TerrainController } from './terrain.controller'
 
 const props = defineProps<{ controller: TerrainController }>()
-const positionsText = ref('116.391,39.907,50\n116.405,39.907,50\n116.405,39.918,50')
 const waterHeight = ref(80)
 const contourInterval = ref(props.controller.state.contourInterval)
 const inputError = ref('')
 const isDrawingProfile = computed(() => props.controller.state.activity === 'drawing-profile')
 const isSamplingProfile = computed(() => props.controller.state.activity === 'sampling-profile')
+const isDrawingFlood = computed(() => props.controller.state.activity === 'drawing-flood')
+const isFlooding = computed(() => props.controller.state.activity === 'flood')
 const profileStats = computed(function terrainProfileStats() {
   const sampled = props.controller.state.sampled
   if (!sampled.length) {
@@ -239,6 +261,9 @@ const statusText = computed(function formatStatus() {
     if (props.controller.state.activity === 'sampling-profile') {
       return `正在采样地形 · ${Math.round(props.controller.state.progress * 100)}%`
     }
+    if (props.controller.state.activity === 'drawing-flood') {
+      return '正在绘制淹没范围 · 单击添加折点，双击结束，Esc 取消'
+    }
     return `分析中 · ${Math.round(props.controller.state.progress * 100)}%`
   }
   if (props.controller.state.status === 'complete') {
@@ -246,32 +271,6 @@ const statusText = computed(function formatStatus() {
   }
   return '分析失败'
 })
-
-function parsePositions(minimum = 1): Cartesian3[] | undefined {
-  const positions: Cartesian3[] = []
-  for (const [index, line] of positionsText.value.split(/\r?\n/).entries()) {
-    const tokens = line.split(/[，,\s]+/).filter((value) => value.trim() !== '')
-    const values = tokens.map((value) => Number(value.trim()))
-    if (line.trim() === '') {
-      continue
-    }
-    if (values.length < 2 || values.length > 3 || values.some((value) => !Number.isFinite(value))) {
-      inputError.value = `第 ${index + 1} 行需要经度、纬度和可选高程`
-      return undefined
-    }
-    if (values[0] < -180 || values[0] > 180 || values[1] < -90 || values[1] > 90) {
-      inputError.value = `第 ${index + 1} 行的经纬度超出范围`
-      return undefined
-    }
-    positions.push(Cartesian3.fromDegrees(values[0], values[1], values[2] ?? 0))
-  }
-  if (positions.length < minimum) {
-    inputError.value = `当前分析至少需要 ${minimum} 个有效坐标`
-    return undefined
-  }
-  inputError.value = ''
-  return positions
-}
 
 function applyContour(): void {
   const interval = Number(contourInterval.value)
@@ -281,6 +280,12 @@ function applyContour(): void {
   }
   inputError.value = ''
   props.controller.setContour(interval)
+}
+
+function adjustContourInterval(direction: 1 | -1): void {
+  const current = Number(contourInterval.value)
+  const normalized = Number.isFinite(current) ? current : props.controller.state.contourInterval
+  contourInterval.value = Math.min(Math.max(normalized + direction, 1), 10_000)
 }
 
 function toggleProfile(): void {
@@ -298,10 +303,7 @@ function formatDistance(distanceMeters: number): string {
 }
 
 function runFlood(): void {
-  const positions = parsePositions(3)
-  if (positions) {
-    props.controller.startFlood(positions, waterHeight.value, 3000)
-  }
+  props.controller.startFlood(waterHeight.value, 3000)
 }
 </script>
 
@@ -448,14 +450,54 @@ function runFlood(): void {
 }
 
 .terrain-panel__number-input input {
+  min-width: 0;
   border: 0;
   background: transparent;
   outline: 0;
+  appearance: textfield;
+}
+
+.terrain-panel__number-input input::-webkit-inner-spin-button,
+.terrain-panel__number-input input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
 }
 
 .terrain-panel__number-input span {
   padding-right: 10px;
   color: var(--geo-text-faint, #8da4b8);
+}
+
+.terrain-panel__number-input--stepper {
+  grid-template-columns: minmax(0, 1fr) 30px auto;
+}
+
+.terrain-panel__number-stepper {
+  display: grid;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  border-right: 1px solid var(--geo-line, rgb(117 167 199 / 18%));
+  border-left: 1px solid var(--geo-line, rgb(117 167 199 / 18%));
+}
+
+.terrain-panel__number-stepper button {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  color: var(--geo-text-faint, #8da4b8);
+  background: transparent;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.terrain-panel__number-stepper button + button {
+  border-top: 1px solid var(--geo-line, rgb(117 167 199 / 18%));
+}
+
+.terrain-panel__number-stepper button:hover:not(:disabled),
+.terrain-panel__number-stepper button:focus-visible {
+  color: var(--geo-accent, #55d6ff);
+  background: rgb(85 214 255 / 10%);
 }
 
 .terrain-panel textarea,

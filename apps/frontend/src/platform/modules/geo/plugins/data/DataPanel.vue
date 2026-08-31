@@ -178,19 +178,34 @@
     <section class="data-panel__section">
       <div class="data-panel__heading">
         <div><span>地形</span><small>当前场景表面</small></div>
-        <strong>{{ controller.state.terrain.label }}</strong>
+        <strong class="data-panel__terrain-state">
+          <i v-if="controller.state.terrain.status === 'loading'" aria-hidden="true" />
+          {{
+            controller.state.terrain.status === 'loading'
+              ? '正在切换…'
+              : controller.state.terrain.label
+          }}
+        </strong>
       </div>
       <div class="data-panel__terrain">
         <button
           type="button"
-          :class="{ 'is-active': controller.state.terrain.id === 'ellipsoid' }"
+          :class="{
+            'is-active': controller.state.terrain.id === 'ellipsoid',
+            'is-loading': controller.state.terrain.status === 'loading',
+          }"
+          :disabled="controller.state.terrain.status === 'loading'"
           @click="controller.setTerrain('ellipsoid')"
         >
           椭球体
         </button>
         <button
           type="button"
-          :class="{ 'is-active': controller.state.terrain.id === 'cesium-world-terrain' }"
+          :class="{
+            'is-active': controller.state.terrain.id === 'cesium-world-terrain',
+            'is-loading': controller.state.terrain.status === 'loading',
+          }"
+          :disabled="controller.state.terrain.status === 'loading'"
           @click="controller.setTerrain('cesium-world-terrain')"
         >
           World Terrain
@@ -647,6 +662,19 @@ async function loadTileset(): Promise<void> {
   font-size: 9px;
   font-weight: 700;
 }
+.data-panel__terrain-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.data-panel__terrain-state i {
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid color-mix(in srgb, var(--geo-accent, #45c8ff), transparent 70%);
+  border-top-color: var(--geo-accent, #45c8ff);
+  border-radius: 50%;
+  animation: terrain-loading-spin 0.7s linear infinite;
+}
 .data-panel__search {
   display: grid;
   gap: 5px;
@@ -954,6 +982,24 @@ async function loadTileset(): Promise<void> {
 .data-panel__terrain button:hover,
 .data-panel__terrain button.is-active {
   border-color: var(--geo-accent, #45c8ff);
+}
+.data-panel__terrain button.is-loading {
+  position: relative;
+  color: var(--geo-text-faint, #7890a2);
+}
+.data-panel__terrain button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+@keyframes terrain-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .data-panel__terrain-state i {
+    animation: none;
+  }
 }
 .data-panel__input {
   display: grid;

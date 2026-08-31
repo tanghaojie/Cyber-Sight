@@ -1,8 +1,8 @@
 import { markRaw, reactive, shallowReadonly } from 'vue'
 import {
-  Cartesian3,
   Color,
   EllipsoidTerrainProvider,
+  type Cartesian3,
   type TerrainProvider,
   type Viewer,
 } from 'cesium'
@@ -14,9 +14,10 @@ import {
   type TerrainColorMode,
   type TerrainProfileSample,
 } from '../../tools/terrain/terrain-analysis'
+import { DrawingTool } from '../../tools/drawing/drawing-tool'
 
 export type TerrainStatus = 'idle' | 'running' | 'complete' | 'failed'
-export type TerrainActivity = 'drawing-profile' | 'sampling-profile' | 'flood'
+export type TerrainActivity = 'drawing-profile' | 'sampling-profile' | 'drawing-flood' | 'flood'
 
 const TERRAIN_REQUIRED_MESSAGE = '当前未加载地形，等高线无法使用。请先到数据面板加载地形。'
 
@@ -34,7 +35,8 @@ export interface TerrainState {
 export interface TerrainController extends Disposable {
   readonly state: Readonly<TerrainState>
   startProfile(): void
-  startFlood(positions: readonly Cartesian3[], waterHeight: number, durationMs?: number): void
+  clearProfile(): void
+  startFlood(waterHeight: number, durationMs?: number): void
   setContour(interval?: number): void
   setTerrainColorMode(mode: TerrainColorMode): void
   clearTerrainColorMode(): void
@@ -48,6 +50,7 @@ export function createTerrainController(
   terrainProvider?: TerrainProvider,
 ): TerrainController {
   const tool = markRaw(new TerrainAnalysisTool(viewer, terrainProvider))
+  const floodDrawingTool = markRaw(new DrawingTool(viewer))
   const state = reactive<TerrainState>({
     status: 'idle',
     progress: 0,
@@ -58,6 +61,7 @@ export function createTerrainController(
   let operation: AbortController | undefined
   let floodSession: TerrainAnalysisSession | undefined
   const PROFILE_INTERACTION_ID = 'terrain.profile'
+  const FLOOD_INTERACTION_ID = 'terrain.flood'
 
   function captureTerrainProvider(provider: TerrainProvider): void {
     if (
@@ -163,8 +167,11 @@ export function createTerrainController(
     }
   }
 
-  function startFlood(positions: readonly Cartesian3[], waterHeight: number, durationMs = 0): void {
-    cancel()
+  function runFlood(
+    positions: Parameters<TerrainAnalysisTool['startFlood']>[0],
+    waterHeight: number,
+    durationMs: number,
+  ): void {
     state.status = 'running'
     state.activity = 'flood'
     state.progress = 0
@@ -186,6 +193,46 @@ export function createTerrainController(
       state.status = 'failed'
       state.activity = undefined
       state.error = error instanceof Error ? error.message : 'Flood analysis failed'
+    }
+  }
+
+  function startFlood(waterHeight: number, durationMs = 0): void {
+    cancel()
+    floodDrawingTool.clearAll()
+    state.status = 'running'
+    state.activity = 'drawing-flood'
+    state.progress = 0
+    state.error = undefined
+    try {
+      interactions.activate({
+        id: FLOOD_INTERACTION_ID,
+        cursor: 'crosshair',
+        start(interactionContext) {
+          return floodDrawingTool.startPolygon({
+            signal: interactionContext.signal,
+            color: Color.fromCssColorString('#3a9dff'),
+            onComplete(result) {
+              interactionContext.complete()
+              runFlood(result.positions, waterHeight, durationMs)
+            },
+            onCancel() {
+              if (state.activity === 'drawing-flood') {
+                state.status = 'idle'
+                state.activity = undefined
+              }
+            },
+          })
+        },
+        onError(error) {
+          state.status = 'failed'
+          state.activity = undefined
+          state.error = error instanceof Error ? error.message : 'Flood boundary drawing failed'
+        },
+      })
+    } catch (error) {
+      state.status = 'failed'
+      state.activity = undefined
+      state.error = error instanceof Error ? error.message : 'Flood boundary drawing failed'
     }
   }
 
@@ -219,14 +266,35 @@ export function createTerrainController(
     state.colorMode = undefined
   }
 
-  function cancel(): void {
+  function clearProfile(): void {
     if (interactions.state.activeId === PROFILE_INTERACTION_ID) {
+      interactions.cancel()
+    }
+    if (state.activity === 'sampling-profile') {
+      operation?.abort()
+      operation = undefined
+    }
+    tool.clearProfile()
+    state.sampled = []
+    state.progress = 0
+    if (state.activity === 'drawing-profile' || state.activity === 'sampling-profile') {
+      state.status = 'idle'
+      state.activity = undefined
+    }
+  }
+
+  function cancel(): void {
+    if (
+      interactions.state.activeId === PROFILE_INTERACTION_ID ||
+      interactions.state.activeId === FLOOD_INTERACTION_ID
+    ) {
       interactions.cancel()
     }
     operation?.abort()
     operation = undefined
     floodSession?.stop()
     floodSession = undefined
+    floodDrawingTool.stop()
     tool.stop()
     if (state.status === 'running') {
       state.status = 'idle'
@@ -238,6 +306,7 @@ export function createTerrainController(
   function clear(): void {
     cancel()
     tool.clear()
+    floodDrawingTool.clearAll()
     state.sampled = []
     state.progress = 0
     state.colorMode = undefined
@@ -250,11 +319,13 @@ export function createTerrainController(
     cancel()
     removeTerrainProviderChanged()
     tool.dispose()
+    floodDrawingTool.dispose()
   }
 
   return {
     state: shallowReadonly(state),
     startProfile,
+    clearProfile,
     startFlood,
     setContour,
     setTerrainColorMode,
