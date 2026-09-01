@@ -45,6 +45,19 @@
       </div>
     </dl>
 
+    <label class="geo-flight-panel__visibility">
+      <span>
+        <strong>{{ t('geo.flight.routes') }}</strong>
+        <small>{{ t('geo.flight.routesHint') }}</small>
+      </span>
+      <input
+        type="checkbox"
+        :checked="state.routesVisible"
+        :disabled="!state.enabled"
+        @change="controller.setRoutesVisible(($event.target as HTMLInputElement).checked)"
+      />
+    </label>
+
     <button
       type="button"
       class="geo-flight-panel__refresh"
@@ -230,6 +243,47 @@ const state = props.controller.state
     'Cascadia Code',
     monospace;
   text-align: right;
+}
+
+.geo-flight-panel__visibility {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 13px;
+  border: 1px solid var(--geo-line);
+  border-radius: 11px;
+  background: var(--geo-surface-hover);
+  cursor: pointer;
+}
+
+.geo-flight-panel__visibility span {
+  display: grid;
+  gap: 4px;
+}
+
+.geo-flight-panel__visibility strong {
+  color: var(--geo-text-soft);
+  font-size: 11px;
+}
+
+.geo-flight-panel__visibility small {
+  color: var(--geo-text-faint);
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.geo-flight-panel__visibility input {
+  width: 36px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--geo-accent);
+  cursor: inherit;
+}
+
+.geo-flight-panel__visibility:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .geo-flight-panel__refresh {

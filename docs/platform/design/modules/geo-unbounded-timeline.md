@@ -4,7 +4,7 @@ scope: platform
 repository: Cyber-Sight
 status: active
 owner: project maintainers
-updated: 2026-08-31
+updated: 2026-09-01
 ---
 
 # Geo 无界时间轴与每日循环航线方案
@@ -69,10 +69,10 @@ updated: 2026-08-31
 
 模拟航班使用 UTC 日周期，而非 Time 视窗或 Clock 的 `startTime`/`stopTime`：
 
-- 每条内置航线定义每日起飞秒数、飞行时长、起点和终点；同一 UTC 时刻每天重复相同的航段。
-- 当前时刻落在该航线的当日航段内时，飞机按大圆路线性插值显示；起飞前和降落后不显示飞机。完整起终点大圆线始终显示。
+- 每条内置航线定义每日起飞秒数、飞行时长、起点、终点和模拟巡航高度；同一 UTC 时刻每天重复相同的航段。
+- 当前时刻落在该航线的当日航段内时，飞机按测地线和高度剖面插值显示；起飞前和降落后不显示飞机。完整路线以相同采样位置在三维空间呈现，起降端点自然落地而中途航段不贴地。
 - 到次日相同 UTC 起飞时刻，飞机从起点开始下一次循环。跨任意年份拖动都得到相同的每日航班语义，不需要重建全局 Clock 范围。
-- Flight 工具以确定性的、按 `JulianDate` 求值的位置属性表达循环位置；不得在 `clock.onTick` 中手工写实体位置。Flight 不读取 Time controller 的私有窗口状态。
+- Flight 工具以确定性的、按 `JulianDate` 求值的位置属性表达循环位置；不得在 `clock.onTick` 中手工写实体位置。Flight 不读取 Time controller 的私有窗口状态，只在用户开启 Flight 时通过 Time 的最小播放 capability 启动共享 Clock。
 
 这会取代当前“开启 Flight 时复制 `viewer.clock.startTime/stopTime` 并据此生成一天样本”的耦合方式。实施时应更新相关模拟航班 ADR，使其不再把有限 `SampledPositionProperty` 区间描述为长期契约。
 
@@ -105,7 +105,7 @@ flowchart LR
 
 静态验证沿用格式、TypeScript、lint、架构、生产构建、文档归档检查和 diff 检查。前端自动化与浏览器测试不在仓库范围内。
 
-维护者人工验收至少覆盖：1 分钟、24 小时、1 月和 10 年窗口的刻度可读性；持续向过去/未来平移；缩放锚点稳定；平移不改变昼夜而定位改变昼夜；播放、暂停、倍速和回到现在；每日航班在不同日期同一 UTC 时刻复现、航段外隐藏；以及重复进入/退出后无重复监听器或实体。
+维护者人工验收至少覆盖：1 分钟、24 小时、1 月和 10 年窗口的刻度可读性；持续向过去/未来平移；缩放锚点稳定；平移不改变昼夜而定位改变昼夜；播放、暂停、倍速和回到现在；开启 Flight 后自动播放并框选 30 条航线；飞机与三维航线高度对齐、配色可区分、隐藏航线后只保留飞机；每日航班在不同日期同一 UTC 时刻复现、航段外隐藏；以及重复进入/退出后无重复监听器或实体。
 
 实现已采用 `ClockRange.UNBOUNDED`、独立可见窗口、UTC 自适应刻度和每日循环航段。静态验证通过；时间轴手势、刻度可读性、太阳变化和航班循环仍需维护者按本设计进行浏览器人工验收。
 
@@ -115,3 +115,4 @@ flowchart LR
 - [协作记录](../../archive/ai-logs/2026/08/2026-08-31-geo-unbounded-timeline-and-daily-flight-cycle.md)
 - [当前单一仿真时间 ADR](../../decisions/ADR-20260830-geo-simulation-time-and-solar-lighting.md)
 - [当前模拟航班 ADR](../../decisions/ADR-20260831-geo-simulated-flight-data.md)
+- [航班视图、航线与播放联动实施计划](../../plans/active/2026-09-01-geo-flight-visualization-and-playback.md)

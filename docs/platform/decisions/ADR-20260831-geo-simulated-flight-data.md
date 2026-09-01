@@ -17,8 +17,8 @@ Geo 需要可演示的航空器和航迹，但 OpenSky、adsb.fi 等公开 ADS-B
 
 - 删除 Platform `geo` 后端模块、OpenSky HTTP 契约、服务测试和前端 API 调用；
 - 航班插件只提供内置、明确标注为模拟的航线；
-- 所有位置绑定已有的 `viewer.clock`，使用按 `JulianDate` 求值的 `CallbackPositionProperty`、`VelocityOrientationProperty` 和完整航线图形展示，不创建第二个 Clock，也不手动在每个 tick 写入位置；每条航线定义 UTC 每日起飞秒数与飞行时长，在航段内从起点到终点插值、航段外隐藏，并在次日同一 UTC 时刻重复；完整大圆线始终呈现，活动位置使用透明 Canvas 绘制、按屏幕前进方向旋转的飞机轮廓而非点位；
-- 默认关闭；开启时创建本次会话实体，关闭或销毁时清空 `CustomDataSource`；不保存数据且不访问网络。
+- 所有位置绑定已有的 `viewer.clock`，使用按 `JulianDate` 求值的 `CallbackPositionProperty`、`VelocityOrientationProperty` 和完整三维航线图形展示，不创建第二个 Clock，也不手动在每个 tick 写入位置；每条航线定义 UTC 每日起飞秒数、飞行时长和模拟巡航高度，在航段内沿同一测地线与高度剖面插值、航段外隐藏，并在次日同一 UTC 时刻重复；完整航线以相同高度采样呈现，活动位置使用透明 Canvas 绘制、按屏幕前进方向旋转的飞机轮廓而非点位；
+- 默认关闭；开启时创建本次会话的 30 条多色实体、框选全路线并通过 Time 的公开 capability 启动共享播放；左侧面板可隐藏航线而保持飞机显示。关闭或销毁时清空 `CustomDataSource`；不保存数据且不访问网络。
 
 ## 结果与限制
 

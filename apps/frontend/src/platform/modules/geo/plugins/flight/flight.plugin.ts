@@ -3,6 +3,7 @@ import type { GeoPluginDefinition, GeoPluginContext } from '../../core/geo-plugi
 import { createSimulatedFlightLayer } from '../../tools/flight/simulated-flight-layer'
 import FlightPanel from './FlightPanel.vue'
 import { createGeoFlightController, type GeoFlightController } from './flight.controller'
+import { geoTimePlaybackCapability } from '../time/time.capabilities'
 
 function panelFor(controller: GeoFlightController) {
   return defineComponent({
@@ -16,6 +17,7 @@ function panelFor(controller: GeoFlightController) {
 export const geoFlightPlugin: GeoPluginDefinition = {
   id: 'flight',
   order: 38,
+  requires: ['time'],
   async install(context: GeoPluginContext) {
     const layer = await createSimulatedFlightLayer(context.viewer)
     if (context.signal.aborted) {
@@ -23,7 +25,8 @@ export const geoFlightPlugin: GeoPluginDefinition = {
       throw new DOMException('Geo flight plugin installation was aborted', 'AbortError')
     }
 
-    const controller = createGeoFlightController(layer)
+    const playback = context.capabilities.require(geoTimePlaybackCapability)
+    const controller = createGeoFlightController(layer, playback)
     context.scope.use(controller)
     return {
       contributions: {

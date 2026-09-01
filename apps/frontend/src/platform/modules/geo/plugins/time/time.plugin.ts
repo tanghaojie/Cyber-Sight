@@ -5,6 +5,7 @@ import {
   type GeoSolarLightingCapability,
 } from '../scene/scene.capabilities'
 import TimeDock from './TimeDock.vue'
+import { geoTimePlaybackCapability, type GeoTimePlaybackCapability } from './time.capabilities'
 import { createGeoTimeController, type GeoTimeController } from './time.controller'
 
 function dockFor(controller: GeoTimeController, solarLighting: GeoSolarLightingCapability) {
@@ -42,6 +43,10 @@ export function createGeoTimePlugin(): GeoPluginDefinition {
     install(context: GeoPluginContext) {
       const controller = createGeoTimeController(context.viewer)
       context.scope.use(controller)
+      const playback: GeoTimePlaybackCapability = {
+        setPlaying: controller.setPlaying,
+      }
+      context.capabilities.provide(geoTimePlaybackCapability, playback, context.scope)
       const solarLighting = context.capabilities.require(geoSolarLightingCapability)
       return {
         contributions: {
