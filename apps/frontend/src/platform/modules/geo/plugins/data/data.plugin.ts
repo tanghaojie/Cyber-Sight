@@ -1,4 +1,5 @@
 import { defineComponent, h } from 'vue'
+import { DEFAULT_GEO_CAMERA_VIEW, setGeoCameraView } from '../../tools/view/camera-view'
 import DataPanel from './DataPanel.vue'
 import type { GeoPluginDefinition, GeoPluginContext } from '../../core/geo-plugin'
 import {
@@ -50,6 +51,9 @@ async function loadDefaultTileset(
     return
   }
   await controller.flyToResource(DEFAULT_GEO_TILESET_ID)
+  if (!context.signal.aborted && !context.viewer.isDestroyed()) {
+    setGeoCameraView(context.viewer, DEFAULT_GEO_CAMERA_VIEW)
+  }
 }
 
 export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): GeoPluginDefinition {

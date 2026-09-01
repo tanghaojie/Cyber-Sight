@@ -71,7 +71,7 @@ export function createGeoViewController(viewer: Viewer): GeoViewController {
   function reset(): void {
     guard()
     state.error = undefined
-    state.activeLocation = 'global'
+    state.activeLocation = 'chengdu'
     resetGeoCamera(viewer)
   }
 

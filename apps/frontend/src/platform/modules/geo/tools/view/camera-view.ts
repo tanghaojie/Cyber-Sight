@@ -32,6 +32,24 @@ export interface GeoCameraSnapshot {
   readonly sceneMode: GeoSceneMode
 }
 
+export interface GeoCameraView {
+  readonly longitude: number
+  readonly latitude: number
+  readonly height: number
+  readonly heading: number
+  readonly pitch: number
+  readonly roll: number
+}
+
+export const DEFAULT_GEO_CAMERA_VIEW: GeoCameraView = {
+  longitude: 104.07,
+  latitude: 30.5,
+  height: 1_600,
+  heading: 360,
+  pitch: -20,
+  roll: 0,
+}
+
 export interface GeoCameraLimits {
   readonly minimumZoomDistance: number
   readonly maximumZoomDistance: number
@@ -61,8 +79,16 @@ const LOCATION_DEFINITIONS: readonly GeoViewLocation[] = [
   {
     id: 'chengdu',
     label: '成都',
-    destination: Cartesian3.fromDegrees(103.9774, 30.5482, 183_500),
-    orientation: { heading: 0, pitch: CesiumMath.toRadians(-90), roll: 0 },
+    destination: Cartesian3.fromDegrees(
+      DEFAULT_GEO_CAMERA_VIEW.longitude,
+      DEFAULT_GEO_CAMERA_VIEW.latitude,
+      DEFAULT_GEO_CAMERA_VIEW.height,
+    ),
+    orientation: {
+      heading: CesiumMath.toRadians(DEFAULT_GEO_CAMERA_VIEW.heading),
+      pitch: CesiumMath.toRadians(DEFAULT_GEO_CAMERA_VIEW.pitch),
+      roll: CesiumMath.toRadians(DEFAULT_GEO_CAMERA_VIEW.roll),
+    },
   },
 ]
 
@@ -121,7 +147,7 @@ export function flyToGeoLocation(
 }
 
 export function resetGeoCamera(viewer: Viewer, duration = 1.4): void {
-  flyToGeoLocation(viewer, 'global', { duration })
+  flyToGeoLocation(viewer, 'chengdu', { duration })
 }
 
 export function setGeoSceneMode(viewer: Viewer, mode: GeoSceneMode, duration = 0.8): void {
@@ -151,10 +177,7 @@ export function getGeoCameraSnapshot(viewer: Viewer): GeoCameraSnapshot {
   }
 }
 
-export function setGeoCameraView(
-  viewer: Viewer,
-  view: Pick<GeoCameraSnapshot, 'longitude' | 'latitude' | 'height' | 'heading' | 'pitch' | 'roll'>,
-): void {
+export function setGeoCameraView(viewer: Viewer, view: GeoCameraView): void {
   viewer.camera.setView({
     destination: Cartesian3.fromDegrees(view.longitude, view.latitude, view.height),
     orientation: {

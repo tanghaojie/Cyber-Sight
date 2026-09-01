@@ -17,6 +17,11 @@ import { createGeoViewerAccess, type GeoViewerAccess } from './viewer-access'
 import { createGeoPluginRegistry, type GeoPluginRegistry } from './plugin-registry'
 import type { GeoPluginDefinition } from './geo-plugin'
 import { createGeoRenderPerformanceController } from './render-performance'
+import {
+  DEFAULT_GEO_CAMERA_VIEW,
+  flyToGeoLocation,
+  setGeoCameraView,
+} from '../tools/view/camera-view'
 
 export type GeoRuntimeStatus = 'idle' | 'mounting' | 'ready' | 'failed' | 'disposed'
 export type GeoSceneMode = '2d' | '3d' | 'columbus'
@@ -48,12 +53,6 @@ export interface GeoRuntime {
   dispose(): void
 }
 
-const CHENGDU_VIEW = {
-  longitude: 103.9774,
-  latitude: 30.5482,
-  height: 183_500,
-} as const
-
 const POINTER_PICK_INTERVAL_MS = 50
 const FPS_IDLE_TIMEOUT_MS = 1_500
 
@@ -84,18 +83,7 @@ function configureViewer(viewer: Viewer): void {
   viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(
     ScreenSpaceEventType.LEFT_DOUBLE_CLICK,
   )
-  viewer.camera.setView({
-    destination: Cartesian3.fromDegrees(
-      CHENGDU_VIEW.longitude,
-      CHENGDU_VIEW.latitude,
-      CHENGDU_VIEW.height,
-    ),
-    orientation: {
-      heading: CesiumMath.toRadians(360),
-      pitch: CesiumMath.toRadians(-90),
-      roll: 0,
-    },
-  })
+  setGeoCameraView(viewer, DEFAULT_GEO_CAMERA_VIEW)
 }
 
 function registerRuntimeStatus(
@@ -254,19 +242,7 @@ export function createGeoRuntime(options: GeoRuntimeOptions = {}): GeoRuntime {
 
   function resetCamera(): void {
     const currentViewer = viewerAccessControl.require()
-    currentViewer.camera.flyTo({
-      destination: Cartesian3.fromDegrees(
-        CHENGDU_VIEW.longitude,
-        CHENGDU_VIEW.latitude,
-        CHENGDU_VIEW.height,
-      ),
-      orientation: {
-        heading: CesiumMath.toRadians(360),
-        pitch: CesiumMath.toRadians(-90),
-        roll: 0,
-      },
-      duration: 1.2,
-    })
+    flyToGeoLocation(currentViewer, 'chengdu', { duration: 1.2 })
   }
 
   function orientNorth(): void {

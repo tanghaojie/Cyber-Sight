@@ -72,7 +72,7 @@
           :is="dock.component"
           v-for="dock in bottomDocks"
           :key="dock.id"
-          :collapsed="bottomDockCollapsed[dock.id] ?? false"
+          :collapsed="bottomDockCollapsed[dock.id] ?? true"
           :joined-with-status="!statusBarCollapsed"
           :collapse-label="t('geo.time.collapse')"
           :expand-label="t('geo.time.expand')"
@@ -148,7 +148,7 @@ const workspaceRoot = ref<HTMLElement>()
 const mapContainer = ref<HTMLElement>()
 const activeTaskId = ref<string | undefined>('data')
 const panelOpen = ref(true)
-const statusBarCollapsed = ref(false)
+const statusBarCollapsed = ref(true)
 const bottomDockCollapsed = ref<Record<string, boolean>>({})
 const locationError = ref<string>()
 const runtime = createGeoRuntime({ plugins: geoPlugins })
