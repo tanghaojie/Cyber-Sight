@@ -48,10 +48,10 @@ export interface GeoRuntime {
   dispose(): void
 }
 
-const SHANGHAI_VIEW = {
-  longitude: 121.4737,
-  latitude: 31.2304,
-  height: 1_150_000,
+const CHENGDU_VIEW = {
+  longitude: 103.9774,
+  latitude: 30.5482,
+  height: 183_500,
 } as const
 
 const POINTER_PICK_INTERVAL_MS = 50
@@ -86,13 +86,13 @@ function configureViewer(viewer: Viewer): void {
   )
   viewer.camera.setView({
     destination: Cartesian3.fromDegrees(
-      SHANGHAI_VIEW.longitude,
-      SHANGHAI_VIEW.latitude,
-      SHANGHAI_VIEW.height,
+      CHENGDU_VIEW.longitude,
+      CHENGDU_VIEW.latitude,
+      CHENGDU_VIEW.height,
     ),
     orientation: {
-      heading: 0,
-      pitch: CesiumMath.toRadians(-62),
+      heading: CesiumMath.toRadians(360),
+      pitch: CesiumMath.toRadians(-90),
       roll: 0,
     },
   })
@@ -256,13 +256,13 @@ export function createGeoRuntime(options: GeoRuntimeOptions = {}): GeoRuntime {
     const currentViewer = viewerAccessControl.require()
     currentViewer.camera.flyTo({
       destination: Cartesian3.fromDegrees(
-        SHANGHAI_VIEW.longitude,
-        SHANGHAI_VIEW.latitude,
-        SHANGHAI_VIEW.height,
+        CHENGDU_VIEW.longitude,
+        CHENGDU_VIEW.latitude,
+        CHENGDU_VIEW.height,
       ),
       orientation: {
-        heading: 0,
-        pitch: CesiumMath.toRadians(-62),
+        heading: CesiumMath.toRadians(360),
+        pitch: CesiumMath.toRadians(-90),
         roll: 0,
       },
       duration: 1.2,
