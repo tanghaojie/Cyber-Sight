@@ -55,8 +55,8 @@ const LOCATION_DEFINITIONS: readonly GeoViewLocation[] = [
   {
     id: 'china',
     label: '中国',
-    destination: Cartesian3.fromDegrees(101.4869, 11.5097, 4_279_900),
-    orientation: { heading: 0, pitch: CesiumMath.toRadians(-75), roll: 0 },
+    destination: Cartesian3.fromDegrees(100.6664, 24.4388, 11_358_500),
+    orientation: { heading: CesiumMath.toRadians(360), pitch: CesiumMath.toRadians(-90), roll: 0 },
   },
   {
     id: 'chengdu',
