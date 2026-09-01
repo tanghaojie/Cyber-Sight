@@ -32,11 +32,14 @@ import {
 } from '../../tools/data/imagery-layer-manager'
 import type { GeoImageryLayerEntry } from './data.capabilities'
 
+export type GeoDataLoadingOperation = 'geojson' | 'model' | 'tileset' | 'fly-to' | 'transform'
+
 export interface GeoDataState {
   imagery: readonly GeoImageryLayerSnapshot[]
   resources: readonly GeoDataResourceSnapshot[]
   terrain: GeoTerrainSnapshot
   busy: boolean
+  loadingOperation?: GeoDataLoadingOperation
   loadingImagerySource?: GeoImagerySourceId
   error?: string
 }
@@ -128,10 +131,16 @@ export function createGeoDataController(
   })
   state.terrain = browser.getTerrain()
 
-  async function run<T>(operation: () => Promise<T>): Promise<T | undefined> {
+  async function run<T>(
+    operation: () => Promise<T>,
+    loadingOperation?: GeoDataLoadingOperation,
+  ): Promise<T | undefined> {
     guard()
     pendingOperations += 1
     state.busy = true
+    if (loadingOperation) {
+      state.loadingOperation = loadingOperation
+    }
     state.error = undefined
     try {
       return await operation()
@@ -141,6 +150,9 @@ export function createGeoDataController(
     } finally {
       pendingOperations -= 1
       state.busy = pendingOperations > 0
+      if (state.loadingOperation === loadingOperation) {
+        state.loadingOperation = undefined
+      }
       if (!disposed) {
         refresh()
       }
@@ -212,20 +224,20 @@ export function createGeoDataController(
   async function loadGeoJson(loadOptions: LoadGeoJsonOptions): Promise<void> {
     await run(async function load() {
       await browser.loadGeoJson(loadOptions)
-    })
+    }, 'geojson')
   }
 
   async function loadModel(loadOptions: LoadModelOptions): Promise<void> {
     await run(async function load() {
       const model = await browser.loadModel(loadOptions)
       await browser.flyTo(model.id)
-    })
+    }, 'model')
   }
 
   async function loadTileset(loadOptions: LoadTilesetOptions): Promise<void> {
     await run(async function load() {
       await browser.loadTileset(loadOptions)
-    })
+    }, 'tileset')
   }
 
   function removeResource(id: string): void {
@@ -243,7 +255,7 @@ export function createGeoDataController(
   async function flyToResource(id: string): Promise<void> {
     await run(async function flyTo() {
       await browser.flyTo(id)
-    })
+    }, 'fly-to')
   }
 
   function suggestModelTransform(): GeoModelTransform {
@@ -269,7 +281,7 @@ export function createGeoDataController(
   async function updateModelTransform(id: string, transform: GeoModelTransform): Promise<void> {
     await run(async function update() {
       browser.updateModelTransform(id, transform)
-    })
+    }, 'transform')
   }
 
   async function setTerrain(id: GeoTerrainResourceId, url?: string): Promise<void> {

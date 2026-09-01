@@ -247,9 +247,18 @@
       class="data-panel__section data-panel__tab-panel"
       role="tabpanel"
       aria-labelledby="geo-data-tab-external"
+      :aria-busy="controller.state.loadingOperation === 'model'"
     >
       <div class="data-panel__heading">
         <div><span>外部数据</span><small>浏览器加载</small></div>
+        <strong
+          v-if="controller.state.loadingOperation === 'model'"
+          class="data-panel__loading"
+          role="status"
+          aria-live="polite"
+        >
+          <i aria-hidden="true" />正在加载模型…
+        </strong>
       </div>
       <label class="data-panel__input"
         ><span>GeoJSON URL</span
@@ -307,7 +316,13 @@
         :disabled="!modelUrl || controller.state.busy"
         @click="loadModel"
       >
-        加载 glTF / GLB
+        <span
+          v-if="controller.state.loadingOperation === 'model'"
+          class="data-panel__button-loading"
+        >
+          <i aria-hidden="true" />正在加载…
+        </span>
+        <span v-else>加载 glTF / GLB</span>
       </button>
       <label class="data-panel__input"
         ><span>3D Tiles URL</span
@@ -1094,8 +1109,15 @@ async function loadTileset(): Promise<void> {
     transform: rotate(360deg);
   }
 }
+@keyframes data-panel-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
-  .data-panel__terrain-state i {
+  .data-panel__terrain-state i,
+  .data-panel__loading i,
+  .data-panel__button-loading i {
     animation: none;
   }
 }
@@ -1180,6 +1202,29 @@ async function loadTileset(): Promise<void> {
   cursor: pointer;
   font-size: 10px;
   font-weight: 700;
+}
+.data-panel__loading,
+.data-panel__button-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.data-panel__loading {
+  color: #ffdc8a;
+  font-size: 9px;
+  white-space: nowrap;
+}
+.data-panel__loading i,
+.data-panel__button-loading i {
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: data-panel-loading-spin 0.7s linear infinite;
+}
+.data-panel__button-loading {
+  justify-content: center;
 }
 .data-panel__primary:disabled {
   cursor: not-allowed;

@@ -152,7 +152,7 @@ function modelMatrixFromTransform(transform: GeoModelTransform): Matrix4 {
 
 export function createGeoDataBrowser(
   viewer: Viewer,
-  options: GeoDataBrowserOptions = {},
+  browserOptions: GeoDataBrowserOptions = {},
 ): GeoDataBrowser {
   const resources = new Map<string, ManagedResource>()
   let terrainSnapshot: GeoTerrainSnapshot = {
@@ -173,7 +173,7 @@ export function createGeoDataBrowser(
     if (disposed) {
       throw new Error('Geo data browser has been disposed')
     }
-    if (options.signal?.aborted) {
+    if (browserOptions.signal?.aborted) {
       throw new Error('Geo data loading was cancelled')
     }
     if (viewer.isDestroyed()) {
@@ -189,7 +189,64 @@ export function createGeoDataBrowser(
   }
 
   function notifyActiveTileset(): void {
-    options.onActiveTilesetChange?.(activeTileset())
+    browserOptions.onActiveTilesetChange?.(activeTileset())
+  }
+
+  function waitForModelReady(model: Model): Promise<void> {
+    if (model.ready) {
+      return Promise.resolve()
+    }
+    return new Promise(function wait(resolve, reject) {
+      let settled = false
+
+      function cleanup(): void {
+        model.readyEvent.removeEventListener(onReady)
+        model.errorEvent.removeEventListener(onError)
+        browserOptions.signal?.removeEventListener('abort', onAbort)
+      }
+
+      function finish(error?: Error): void {
+        if (settled) {
+          return
+        }
+        settled = true
+        cleanup()
+        if (error) {
+          reject(error)
+          return
+        }
+        resolve()
+      }
+
+      function onReady(): void {
+        finish()
+      }
+
+      function onError(error: unknown): void {
+        if (error instanceof Error) {
+          finish(error)
+          return
+        }
+        const message =
+          typeof error === 'object' && error !== null && 'message' in error
+            ? String(error.message)
+            : '模型渲染失败'
+        finish(new Error(message))
+      }
+
+      function onAbort(): void {
+        finish(new Error('Geo data loading was cancelled'))
+      }
+
+      model.readyEvent.addEventListener(onReady)
+      model.errorEvent.addEventListener(onError)
+      browserOptions.signal?.addEventListener('abort', onAbort, { once: true })
+      if (model.ready) {
+        onReady()
+        return
+      }
+      requestRender()
+    })
   }
 
   function cleanupDataSource(resource: GeoJsonDataSource): void {
@@ -286,6 +343,9 @@ export function createGeoDataBrowser(
       assertActive()
       viewer.scene.primitives.add(resource)
       added = true
+      requestRender()
+      await waitForModelReady(resource)
+      assertActive()
       const managed: ManagedResource = {
         snapshot: {
           id,
@@ -412,6 +472,8 @@ export function createGeoDataBrowser(
     }
     if (managed.snapshot.kind === 'model') {
       const model = managed.resource as Model
+      await waitForModelReady(model)
+      assertActive()
       const range = Math.max(model.boundingSphere.radius * 2.5, 10)
       return new Promise(function flyToModel(resolve) {
         viewer.camera.flyToBoundingSphere(model.boundingSphere, {
@@ -490,7 +552,7 @@ export function createGeoDataBrowser(
       resources.delete(id)
       managed?.remove()
     })
-    options.onActiveTilesetChange?.(undefined)
+    browserOptions.onActiveTilesetChange?.(undefined)
     requestRender()
   }
 
