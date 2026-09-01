@@ -23,7 +23,8 @@ import {
 } from 'cesium'
 
 const AIRCRAFT_OUTLINE_COLOR = Color.fromCssColorString('#06111c')
-const ROUTE_SAMPLE_COUNT = 48
+const MINIMUM_DAILY_FLIGHT_DURATION_SECONDS = 9 * 60 * 60
+const ROUTE_SAMPLE_COUNT = 192
 
 interface GeoCoordinate {
   readonly longitude: number
@@ -70,7 +71,9 @@ function flight(
     origin,
     destination,
     departureSeconds: departureHour * 60 * 60,
-    durationSeconds: durationHours * 60 * 60,
+    // Flights depart every 45 minutes. Nine-hour daily simulation windows keep
+    // at least ten aircraft in the air while preserving longer route durations.
+    durationSeconds: Math.max(durationHours * 60 * 60, MINIMUM_DAILY_FLIGHT_DURATION_SECONDS),
     cruiseHeightMeters,
     palette: FLIGHT_PALETTES[paletteIndex % FLIGHT_PALETTES.length],
   }
@@ -530,8 +533,9 @@ function createDailyPositionProperty(
       currentDate.getUTCMinutes() * 60 +
       currentDate.getUTCSeconds() +
       currentDate.getUTCMilliseconds() / 1000
-    const elapsedSeconds = secondsSinceMidnight - definition.departureSeconds
-    if (elapsedSeconds < 0 || elapsedSeconds > definition.durationSeconds) {
+    const elapsedSeconds =
+      (secondsSinceMidnight - definition.departureSeconds + 24 * 60 * 60) % (24 * 60 * 60)
+    if (elapsedSeconds > definition.durationSeconds) {
       return undefined
     }
     return positionFor(
@@ -598,7 +602,7 @@ export async function createSimulatedFlightLayer(viewer: Viewer): Promise<Simula
           clampToGround: false,
           material: definition.palette.route.withAlpha(0.88),
           positions: createRoutePositions(definition),
-          width: 1.8,
+          width: 1.2,
         },
       })
       routeEntities.push(route)
