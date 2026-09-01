@@ -19,6 +19,7 @@ Geo 延续维护者开源项目 `vue3-cesium-typescript-start-up-template` 的�
 - 以地图为视觉主体，重新设计工具导航、上下文面板和状态反馈；
 - 所有已接入能力直接提供给进入页面的使用者，不建设管理后台、配置审批或 Geo 专属权限；
 - 通过编译期内置插件隔离不同能力，避免再次形成一个相互穿透的巨大页面和状态树；
+- 在保留 Sight 现有集成方式的同时，通过第二个 HTML 入口支持 Standalone Geo；两者由一次 frontend 构建输出到同一个 `dist`，并共享唯一的 `dist/cesiumStatic/`。
 - 保留 Cyber-Sight 现有 Platform 外壳、主题、本地化和 AI 辅助开发基础设施，但不在 Geo 中新增用户侧 AI 功能。
 
 ## 范围与非目标
@@ -61,7 +62,7 @@ Geo 延续维护者开源项目 `vue3-cesium-typescript-start-up-template` 的�
 apps/frontend/src/platform/modules/geo/
 ```
 
-Geo 拥有模拟航线、Viewer 生命周期、纯 Cesium 工具、工作台页面、内置插件、Geo 运行状态和地图专属组件。Foundation 不得依赖 Geo；其他 Platform 模块不得导入 Geo 页面、Cesium 实例、插件内部状态或内部组件。Geo 不提供后端、HTTP 契约或外部航班数据访问。
+Geo 拥有模拟航线、Viewer 生命周期、纯 Cesium 工具、工作台页面、内置插件、Geo 运行状态和地图专属组件。Foundation 不得依赖 Geo；其他 Platform 模块不得导入 Geo 页面、Cesium 实例、插件内部状态或内部组件。Geo 当前不提供后端、HTTP 契约或外部航班数据访问，但 Standalone 入口不阻止未来在 Platform Geo 模块中增加 API、状态和服务能力。
 
 ### 公共文件
 
@@ -130,6 +131,18 @@ export function registerViews(appViews: ViewRegistrar): void {
 - 图标、名称和排序：由 Forge 菜单管理维护。
 
 登录后，`GET /navigation/menus` 返回该菜单，`dynamicRoutes.ts` 使用组件键从 `viewRegistry` 取得页面并生成 `/geo` 动态路由。Geo 不新增菜单 migration、专属角色、功能权限或数据权限，但沿用 Forge 已有的认证、菜单管理和动态路由能力。
+
+### 双入口单次构建
+
+Sight 继续使用 `index.html` 和上面的 Platform 动态 `/geo` 路由，不改为静态业务路由。新增 `geo.html` 作为 Standalone Geo 的页面入口，由 `src/geo-main.ts` 完成平台配置初始化，再由 `src/geo-start.ts` 挂载现有 `GeoWorkspacePage.vue`。
+
+两个 HTML 入口在同一个 `vite.config.mts` 中声明，由一次 Vite 构建输出到同一个 `apps/frontend/dist`：
+
+- `dist/index.html`：Sight 应用入口；
+- `dist/geo.html`：Standalone Geo 应用入口；
+- `dist/cesiumStatic/`：两个入口共用的 Cesium 静态资源目录。
+
+Standalone Geo 入口复用现有 `runtimeConfig`、Platform 安装、平台本地化资源和全局样式，不重复创建配置文件，也不安装完整 Sight Router、Pinia 或管理壳层。部署 Standalone Geo 时由 Web Server 将站点默认文档指向 `geo.html`，其他资源仍从同一站点根路径提供。Cesium 基础路径继续固定为 `/cesiumStatic/`，不根据入口动态改写，也不复制第二份 Cesium 资源。
 
 工作台使用独立的地图全屏页面，不套用 `AdminLayout`。页面不提供返回 Platform、首页或管理后台的入口，也不渲染常规导航、Header 或 Tags View；离开页面依靠浏览器历史、直接地址或后续由产品外部导航决定。
 
@@ -604,7 +617,7 @@ Viewer 的 `resolutionScale` 由页面级运行时拥有，不交给单个插件
 - 不复制旧项目中硬编码的天地图令牌。天地图令牌只能通过 `VITE_GEO_TIANDITU_TOKEN` 这类公开客户端运行时配置传入，并在界面中明确客户端令牌会暴露给最终用户；没有令牌时对应源显示为不可用，不影响其他底图；
 - 高德源的 GCJ-02 偏移由启动时的自动坐标校正策略转换到 WGS84 瓦片请求；坐标校正策略以可扩展类型保留其他转换实现，第三方公开瓦片仍仅作为可配置候选源，不承诺服务稳定性或商业使用许可；
 - Viewer 自带的后台式控件默认关闭，工作台 Shell 负责相机复位、2D/3D、全屏和状态反馈。
-- Geo 页面被编译为独立懒加载 chunk；当前完整功能构建的 Geo JavaScript chunk 为 `4,319.18 kB`，gzip 为 `1,171.23 kB`，Geo CSS 为 `75.36 kB`，gzip 为 `13.58 kB`。该体积不进入主应用首屏，功能稳定后再评估 `@cesium/engine`/widgets 拆分，不以牺牲 Viewer 契约和可维护性换取过早优化。
+- Sight 中的 Geo 页面继续编译为独立懒加载 chunk；同时一次完整 frontend 构建会输出 `index.html` 和 `geo.html` 两个 HTML 入口，并只生成一个 `dist/cesiumStatic/`。当前完整功能构建的 Geo JavaScript chunk 为 `4,319.18 kB`，gzip 为 `1,171.23 kB`，Geo CSS 为 `75.36 kB`，gzip 为 `13.58 kB`。该体积不进入 Sight 主应用首屏；Standalone Geo 会携带同一个 `dist` 中部分未使用的 Sight 资源，这是保持构建简单和静态资源唯一的明确取舍。功能稳定后再评估 `@cesium/engine`/widgets 拆分，不以牺牲 Viewer 契约和可维护性换取过早优化。
 
 Geo 的数据来源仅包括：
 
@@ -645,7 +658,8 @@ Geo 的数据来源仅包括：
 6. 时间轴在 1 分钟、24 小时、1 月和 10 年窗口下刻度可读；持续平移不改变昼夜，游标定位/播放会改变昼夜，缩放锚点稳定且重复进出无残留监听器；模拟航班默认关闭，开启后应立即播放并取景 30 条航线，飞机与航线应在同一非贴地高度剖面上对齐，飞机标签显示当前模拟高度、机头沿屏幕可见航线前进方向对齐，五种配色在当前地图主题下可区分；隐藏航线后仅保留飞机，并在不同日期同一 UTC 时刻重复、航段外隐藏，关闭和页面离开后无残留实体或网络错误；
 7. 相机、图层、场景、标绘、测量、三维模型、地形分析和分屏能力按阶段验收；外部 glTF/GLB 加载期间有 loading 反馈，成功后无 Model 未加载提示并自动飞到模型，模型卡片再次定位不报 ready 时序错误；
 8. 开发与生产构建的 Cesium Worker、Widget、字体和静态资源路径一致；
-9. 连续进入/退出页面和长时间操作后没有明显资源累积或重复响应。
+9. 连续进入/退出页面和长时间操作后没有明显资源累积或重复响应；
+10. 一次生产构建同时生成 `dist/index.html` 和 `dist/geo.html`，两个入口均能加载对应应用，且只存在一个 `dist/cesiumStatic/`；Standalone Geo 部署将默认文档指向 `geo.html` 后，Cesium Worker、Widget 和 Asset 仍从 `/cesiumStatic/` 正确加载。
 
 前端静态检查不能代替上述视觉、交互和资源生命周期人工验收。
 
@@ -664,6 +678,9 @@ AI 辅助开发继续由 Sight 现有仓库能力承担；Geo 文档和源码无
 - [Geo 默认外部数据与赛博城市渲染协作记录](../../archive/ai-logs/2026/09/2026-09-01-geo-cyber-city-preset.md)
 - [Geo 单一仿真时间与太阳光照](../../decisions/ADR-20260830-geo-simulation-time-and-solar-lighting.md)
 - [Geo 前端模拟航班数据](../../decisions/ADR-20260831-geo-simulated-flight-data.md)
+- [Geo 使用第二个 HTML 构建入口](../../decisions/ADR-20260901-geo-second-build-entry.md)
+- [增加第二个 Geo 构建入口](../../archive/plans/2026-09-01-geo-second-build-entry.md)
+- [增加第二个 Geo 构建入口协作记录](../../archive/ai-logs/2026/09/2026-09-01-geo-second-build-entry.md)
 - [Geo OpenSky 实时航线展示计划](../../archive/plans/2026-08-31-geo-opensky-live-flights.md)
 - [Geo 前端工作台实施计划](../../archive/plans/2026-08-14-geo-frontend-workspace.md)
 - [Geo 底图目录交互与默认加载修复计划](../../archive/plans/2026-08-20-geo-imagery-ui-and-loading.md)

@@ -10,6 +10,7 @@
 
 ## 已完成计划
 
+- [2026-09-01 Geo 第二个构建入口](plans/2026-09-01-geo-second-build-entry.md)：在一次 frontend 多入口构建中同时输出 Sight 和 Standalone Geo，并共享唯一 Cesium 静态目录。
 - [2026-09-01 Geo 默认相机与底部工作台启动状态](plans/2026-09-01-geo-default-camera-and-bottom-dock-state.md)：统一启动成都近景相机预置，并让状态条与时间轴默认收起。
 - [2026-09-01 Geo 赛博城市交付后的 Platform 文档归档审查](plans/2026-09-01-geo-cyber-city-platform-documentation-archive-review.md)：复核上一基线后的 Geo 交付，并将 Platform ledger 推进到 `f1c030b`。
 - [2026-09-01 Geo 默认外部数据与赛博城市渲染](plans/2026-09-01-geo-cyber-city-preset.md)：默认加载成都建筑 3D Tiles，提供程序化科技扫描材质、原始材质切换与 30 km 高空自动隐藏。
@@ -72,6 +73,7 @@
 
 ## AI 协作记录
 
+- [2026-09-01 Geo 第二个构建入口](ai-logs/2026/09/2026-09-01-geo-second-build-entry.md)
 - [2026-09-01 Geo 默认相机与底部工作台启动状态](ai-logs/2026/09/2026-09-01-geo-default-camera-and-bottom-dock-state.md)
 - [2026-09-01 Geo 赛博城市交付后的 Platform 文档归档审查](ai-logs/2026/09/2026-09-01-geo-cyber-city-platform-documentation-archive-review.md)
 - [2026-09-01 Geo 默认外部数据与赛博城市渲染](ai-logs/2026/09/2026-09-01-geo-cyber-city-preset.md)

@@ -13,6 +13,10 @@ const cesiumSourceDirectory = normalizePath(
   resolve(process.cwd(), 'node_modules/cesium/Build/Cesium'),
 )
 const cesiumBaseUrl = '/cesiumStatic/'
+const frontendEntryPoints = {
+  sight: resolve(process.cwd(), 'index.html'),
+  geo: resolve(process.cwd(), 'geo.html'),
+}
 
 function loadLayeredEnvironment(mode: string): Record<string, string> {
   const standardEnvironment = loadEnv(mode, frontendEnvironmentDirectory, '')
@@ -65,6 +69,11 @@ export default defineConfig(function createViteConfig({ mode }) {
     define: {
       ...publicEnvironment(environment),
       CESIUM_BASE_URL: JSON.stringify(cesiumBaseUrl),
+    },
+    build: {
+      rollupOptions: {
+        input: frontendEntryPoints,
+      },
     },
     resolve: {
       alias: {
