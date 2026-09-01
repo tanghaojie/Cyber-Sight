@@ -115,4 +115,4 @@ flowchart LR
 - [协作记录](../../archive/ai-logs/2026/08/2026-08-31-geo-unbounded-timeline-and-daily-flight-cycle.md)
 - [当前单一仿真时间 ADR](../../decisions/ADR-20260830-geo-simulation-time-and-solar-lighting.md)
 - [当前模拟航班 ADR](../../decisions/ADR-20260831-geo-simulated-flight-data.md)
-- [航班视图、航线与播放联动实施计划](../../plans/active/2026-09-01-geo-flight-visualization-and-playback.md)
+- [航班视图、航线与播放联动实施计划](../../archive/plans/2026-09-01-geo-flight-visualization-and-playback.md)

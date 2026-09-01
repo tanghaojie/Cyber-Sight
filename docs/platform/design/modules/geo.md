@@ -663,7 +663,7 @@ AI 辅助开发继续由 Sight 现有仓库能力承担；Geo 文档和源码无
 - [Geo 前端交互完善计划](../../archive/plans/2026-08-20-geo-frontend-interaction-completion.md)
 - [Geo 时间轴与太阳光照实施计划](../../archive/plans/2026-08-30-geo-time-and-solar-lighting.md)
 - [Geo 无界时间轴与每日循环航线实施计划](../../archive/plans/2026-08-31-geo-unbounded-timeline-and-daily-flight-cycle.md)
-- [Geo 航班视图、航线与播放联动实施计划](../../plans/active/2026-09-01-geo-flight-visualization-and-playback.md)
+- [Geo 航班视图、航线与播放联动实施计划](../../archive/plans/2026-09-01-geo-flight-visualization-and-playback.md)
 - [Geo 底部工作台折叠交互实施计划](../../archive/plans/2026-08-31-geo-bottom-workbench.md)
 - [Geo 工作台与地形人工验收问题修复计划](../../archive/plans/2026-08-31-geo-workbench-terrain-acceptance-fixes.md)
 - [Geo 模块设计协作记录](../../archive/ai-logs/2026/08/2026-08-14-geo-platform-design.md)

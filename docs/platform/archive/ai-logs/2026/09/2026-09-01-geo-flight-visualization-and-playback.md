@@ -38,6 +38,6 @@ Time 发布 `time.playback` capability，只暴露 `setPlaying`；Flight 声明�
 ## 相关设计、ADR、计划和提交
 
 - [实施计划](../../../plans/2026-09-01-geo-flight-visualization-and-playback.md)
-- [归档审查计划](../../../../plans/active/2026-09-01-platform-documentation-archive-review.md)
+- [归档审查计划](../../../plans/2026-09-01-platform-documentation-archive-review.md)
 - [Geo 设计](../../../../design/modules/geo.md)
 - [模拟航班 ADR](../../../../decisions/ADR-20260831-geo-simulated-flight-data.md)

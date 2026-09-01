@@ -10,6 +10,7 @@
 
 ## 已完成计划
 
+- [2026-09-01 Geo 航班调整后的 Platform 文档归档审查](plans/2026-09-01-platform-documentation-archive-review.md)：复核航班视图与播放联动交付，并将 Platform ledger 推进到 `4434975`。
 - [2026-09-01 Geo 航班视图、航线与播放联动](plans/2026-09-01-geo-flight-visualization-and-playback.md)：开启航班后自动播放和全航线取景，新增 30 条三维多色模拟航线与仅显示飞机的控制。
 - [2026-08-31 Geo 无界时间轴与每日循环航线](plans/2026-08-31-geo-unbounded-timeline-and-daily-flight-cycle.md)：将时间轴升级为无界 UTC 可见窗口，并让模拟航班按每日 UTC 航段循环。
 - [2026-08-31 Geo 底部工作台折叠交互](plans/2026-08-31-geo-bottom-workbench.md)：将状态条与时间轴合并为连续底部工作台，并让两者可独立收起。
@@ -67,6 +68,7 @@
 
 ## AI 协作记录
 
+- [2026-09-01 Geo 航班调整后的 Platform 文档归档审查](ai-logs/2026/09/2026-09-01-platform-documentation-archive-review.md)
 - [2026-09-01 Geo 航班视图、航线与播放联动](ai-logs/2026/09/2026-09-01-geo-flight-visualization-and-playback.md)
 - [2026-08-31 Geo 底部工作台折叠交互](ai-logs/2026/08/2026-08-31-geo-bottom-workbench.md)
 - [2026-08-31 Geo 飞机显示修复后的 Platform 文档归档审查](ai-logs/2026/08/2026-08-31-platform-documentation-archive-review-7.md)
