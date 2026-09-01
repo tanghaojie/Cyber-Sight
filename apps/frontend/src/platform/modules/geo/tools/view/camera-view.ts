@@ -9,7 +9,7 @@ import {
 } from 'cesium'
 
 export type GeoSceneMode = '3D' | '2D' | 'COLUMBUS_VIEW'
-export type GeoViewLocationId = 'global' | 'china' | 'beijing'
+export type GeoViewLocationId = 'global' | 'china' | 'chengdu'
 
 export interface GeoViewLocation {
   readonly id: GeoViewLocationId
@@ -55,14 +55,14 @@ const LOCATION_DEFINITIONS: readonly GeoViewLocation[] = [
   {
     id: 'china',
     label: '中国',
-    destination: Cartesian3.fromDegrees(104.1954, 35.8617, 4_200_000),
-    orientation: { heading: 0, pitch: CesiumMath.toRadians(-72), roll: 0 },
+    destination: Cartesian3.fromDegrees(101.4869, 11.5097, 4_279_900),
+    orientation: { heading: 0, pitch: CesiumMath.toRadians(-75), roll: 0 },
   },
   {
-    id: 'beijing',
-    label: '北京',
-    destination: Cartesian3.fromDegrees(116.3913, 39.9075, 260_000),
-    orientation: { heading: 0, pitch: CesiumMath.toRadians(-48), roll: 0 },
+    id: 'chengdu',
+    label: '成都',
+    destination: Cartesian3.fromDegrees(103.9774, 30.5482, 183_500),
+    orientation: { heading: 0, pitch: CesiumMath.toRadians(-90), roll: 0 },
   },
 ]
 
