@@ -2,6 +2,7 @@
 
 当前 Platform 决策：
 
+- [Geo 赛博城市 3D Tiles 启动预置](ADR-20260901-geo-cyber-city-tileset-preset.md)：确定启动成都建筑、CustomShader 程序化材质、单一 Clock 扫描、原始材质切换和 30 km 自动隐藏语义。
 - [Geo 前端模拟航班数据](ADR-20260831-geo-simulated-flight-data.md)：确定离线每日循环航线、唯一 `viewer.clock`、Cesium 位置求值和无后端数据边界。
 - [Geo 前端编译期插件架构](ADR-20260814-geo-frontend-plugin-architecture.md)：确定真实 Viewer 命名、纯工具与 Vue UI 分层、编译期插件、互斥交互和资源清理边界。
 - [Geo 单一仿真时间与太阳光照](ADR-20260830-geo-simulation-time-and-solar-lighting.md)：确定唯一 `viewer.clock`、无界自定义底部时间轴、Scene 光照 capability 和太阳阴影边界。

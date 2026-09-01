@@ -12,6 +12,12 @@ import {
   type GeoDataController,
   type GeoDataControllerOptions,
 } from './data.controller'
+import {
+  DEFAULT_GEO_TILESET_ID,
+  DEFAULT_GEO_TILESET_LABEL,
+  DEFAULT_GEO_TILESET_MAX_CAMERA_HEIGHT,
+  DEFAULT_GEO_TILESET_URL,
+} from '../../tools/data/data-presets'
 
 export interface GeoDataPluginInstance {
   readonly id: 'data'
@@ -27,6 +33,23 @@ function panelFor(controller: GeoDataController) {
       return () => h(DataPanel, { controller })
     },
   })
+}
+
+async function loadDefaultTileset(
+  controller: GeoDataController,
+  context: GeoPluginContext,
+): Promise<void> {
+  const loaded = await controller.loadTileset({
+    id: DEFAULT_GEO_TILESET_ID,
+    label: DEFAULT_GEO_TILESET_LABEL,
+    url: DEFAULT_GEO_TILESET_URL,
+    visualStyle: 'cyber-scan',
+    maximumVisibleCameraHeight: DEFAULT_GEO_TILESET_MAX_CAMERA_HEIGHT,
+  })
+  if (!loaded || context.signal.aborted || context.viewer.isDestroyed()) {
+    return
+  }
+  await controller.flyToResource(DEFAULT_GEO_TILESET_ID)
 }
 
 export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): GeoPluginDefinition {
@@ -53,6 +76,9 @@ export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): Geo
       context.scope.use(controller)
       if (!context.signal.aborted && !context.viewer.isDestroyed()) {
         await controller.addImagery('google-hybrid')
+      }
+      if (!context.signal.aborted && !context.viewer.isDestroyed()) {
+        void loadDefaultTileset(controller, context)
       }
       const instance: GeoDataPluginInstance = {
         id: 'data',

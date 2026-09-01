@@ -10,6 +10,7 @@
 
 ## 已完成计划
 
+- [2026-09-01 Geo 默认外部数据与赛博城市渲染](plans/2026-09-01-geo-cyber-city-preset.md)：默认加载成都建筑 3D Tiles，提供程序化科技扫描材质、原始材质切换与 30 km 高空自动隐藏。
 - [2026-09-01 Geo 外部 glTF 加载状态与自动定位修复](plans/2026-09-01-geo-model-loading.md)：增加模型 loading 反馈，等待 Cesium Model ready 后自动定位并保护包围球读取。
 - [2026-09-01 Geo 航班调整后的 Platform 文档归档审查](plans/2026-09-01-platform-documentation-archive-review.md)：复核航班视图与播放联动交付，并将 Platform ledger 推进到 `4434975`。
 - [2026-09-01 Geo 航班视图、航线与播放联动](plans/2026-09-01-geo-flight-visualization-and-playback.md)：开启航班后自动播放和全航线取景，新增 30 条三维多色模拟航线与仅显示飞机的控制。
@@ -69,6 +70,7 @@
 
 ## AI 协作记录
 
+- [2026-09-01 Geo 默认外部数据与赛博城市渲染](ai-logs/2026/09/2026-09-01-geo-cyber-city-preset.md)
 - [2026-09-01 Geo 外部 glTF 加载状态与自动定位修复](ai-logs/2026/09/2026-09-01-geo-model-loading.md)
 - [2026-09-01 Geo 航班调整后的 Platform 文档归档审查](ai-logs/2026/09/2026-09-01-platform-documentation-archive-review.md)
 - [2026-09-01 Geo 航班视图、航线与播放联动](ai-logs/2026/09/2026-09-01-geo-flight-visualization-and-playback.md)

@@ -14,6 +14,7 @@ import {
   type GeoModelTransform,
   type GeoTerrainResourceId,
   type GeoTerrainSnapshot,
+  type GeoTilesetVisualStyle,
   type LoadGeoJsonOptions,
   type LoadModelOptions,
   type LoadTilesetOptions,
@@ -57,9 +58,10 @@ export interface GeoDataController {
   flyToImagery(id: string): void
   loadGeoJson(options: LoadGeoJsonOptions): Promise<void>
   loadModel(options: LoadModelOptions): Promise<void>
-  loadTileset(options: LoadTilesetOptions): Promise<void>
+  loadTileset(options: LoadTilesetOptions): Promise<boolean>
   removeResource(id: string): void
   setResourceVisible(id: string, show: boolean): void
+  setTilesetVisualStyle(id: string, style: GeoTilesetVisualStyle): void
   flyToResource(id: string): Promise<void>
   suggestModelTransform(): GeoModelTransform
   updateModelTransform(id: string, transform: GeoModelTransform): Promise<void>
@@ -83,6 +85,16 @@ export function createGeoDataController(
   const browserOptions: GeoDataBrowserOptions = {
     signal: options.signal,
     onActiveTilesetChange: options.onActiveTilesetChange,
+    onResourcesChange() {
+      if (!disposed) {
+        refresh()
+      }
+    },
+    onResourcesError(message) {
+      if (!disposed) {
+        state.error = message
+      }
+    },
   }
   const browser: GeoDataBrowser = createGeoDataBrowser(viewer, browserOptions)
   const state = reactive<GeoDataState>({
@@ -234,10 +246,11 @@ export function createGeoDataController(
     }, 'model')
   }
 
-  async function loadTileset(loadOptions: LoadTilesetOptions): Promise<void> {
-    await run(async function load() {
-      await browser.loadTileset(loadOptions)
+  async function loadTileset(loadOptions: LoadTilesetOptions): Promise<boolean> {
+    const loaded = await run(async function load() {
+      return browser.loadTileset(loadOptions)
     }, 'tileset')
+    return Boolean(loaded)
   }
 
   function removeResource(id: string): void {
@@ -249,6 +262,12 @@ export function createGeoDataController(
   function setResourceVisible(id: string, show: boolean): void {
     guard()
     browser.setVisible(id, show)
+    refresh()
+  }
+
+  function setTilesetVisualStyle(id: string, style: GeoTilesetVisualStyle): void {
+    guard()
+    browser.setTilesetVisualStyle(id, style)
     refresh()
   }
 
@@ -347,6 +366,7 @@ export function createGeoDataController(
     loadTileset,
     removeResource,
     setResourceVisible,
+    setTilesetVisualStyle,
     flyToResource,
     suggestModelTransform,
     updateModelTransform,

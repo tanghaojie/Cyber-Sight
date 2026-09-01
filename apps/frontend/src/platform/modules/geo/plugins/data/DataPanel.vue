@@ -365,9 +365,22 @@
               ><strong>{{ resource.label }}</strong
               ><small v-if="resource.modelTransform">{{
                 modelTransformSummary(resource.modelTransform)
-              }}</small></span
+              }}</small
+              ><small v-if="resource.autoHidden" class="data-panel__resource-policy-warning"
+                >视角高于 30 km，已暂停绘制</small
+              ><small v-else-if="resource.maximumVisibleCameraHeight">30 km 外自动隐藏</small></span
             ></label
           >
+          <button
+            v-if="resource.visualStyle"
+            class="data-panel__resource-style"
+            type="button"
+            :title="resource.visualStyle === 'cyber-scan' ? '切换为原始材质' : '切换为科技扫描'"
+            @click="toggleTilesetVisualStyle(resource)"
+          >
+            <i :class="{ 'is-active': resource.visualStyle === 'cyber-scan' }" aria-hidden="true" />
+            {{ resource.visualStyle === 'cyber-scan' ? '科技扫描' : '原始材质' }}
+          </button>
           <button
             v-if="resource.modelTransform"
             class="data-panel__resource-adjust"
@@ -455,6 +468,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import type { GeoDataResourceSnapshot, GeoModelTransform } from '../../tools/data/data-browser'
+import { DEFAULT_GEO_MODEL_URL } from '../../tools/data/data-presets'
 import type {
   GeoImageryAvailability,
   GeoImagerySourceDefinition,
@@ -487,7 +501,7 @@ interface ImagerySourceGroup {
 
 const props = defineProps<{ controller: GeoDataController }>()
 const geoJsonUrl = ref('')
-const modelUrl = ref('')
+const modelUrl = ref(DEFAULT_GEO_MODEL_URL)
 const modelPlacement = reactive<GeoModelTransform>(props.controller.suggestModelTransform())
 const modelDrafts = reactive<Record<string, GeoModelTransform>>({})
 const expandedModelId = ref<string>()
@@ -658,6 +672,16 @@ function removeResource(id: string): void {
   if (expandedModelId.value === id) {
     expandedModelId.value = undefined
   }
+}
+
+function toggleTilesetVisualStyle(resource: GeoDataResourceSnapshot): void {
+  if (!resource.visualStyle) {
+    return
+  }
+  props.controller.setTilesetVisualStyle(
+    resource.id,
+    resource.visualStyle === 'cyber-scan' ? 'original' : 'cyber-scan',
+  )
 }
 
 async function loadTileset(): Promise<void> {
@@ -1238,7 +1262,7 @@ async function loadTileset(): Promise<void> {
 }
 .data-panel__resource-summary {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto 24px 24px;
+  grid-template-columns: minmax(0, 1fr) repeat(4, auto);
   align-items: center;
   gap: 5px;
 }
@@ -1251,6 +1275,32 @@ async function loadTileset(): Promise<void> {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.data-panel__resource-name .data-panel__resource-policy-warning {
+  color: #ffc66f;
+}
+.data-panel__resource-summary .data-panel__resource-style {
+  display: inline-flex;
+  width: auto;
+  align-items: center;
+  gap: 5px;
+  padding: 0 7px;
+  border: 1px solid color-mix(in srgb, var(--geo-accent, #45c8ff), transparent 72%);
+  color: var(--geo-text-soft, #aec3d2);
+  font-size: 8px;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--geo-accent, #45c8ff), transparent 94%);
+}
+.data-panel__resource-style i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--geo-text-faint, #7890a2);
+  box-shadow: 0 0 0 transparent;
+}
+.data-panel__resource-style i.is-active {
+  background: #55e7ff;
+  box-shadow: 0 0 8px color-mix(in srgb, #55e7ff, transparent 18%);
 }
 .data-panel__resource-name small {
   margin-top: 2px;

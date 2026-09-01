@@ -16,6 +16,13 @@ import {
   type TerrainProvider,
   type Viewer,
 } from 'cesium'
+import {
+  createCyberCityTilesetVisual,
+  type GeoTilesetVisual,
+  type GeoTilesetVisualStyle,
+} from './tileset-visual-style'
+
+export type { GeoTilesetVisualStyle } from './tileset-visual-style'
 
 export type GeoDataResourceKind = 'geojson' | 'model' | '3d-tiles'
 export type GeoTerrainResourceId = 'ellipsoid' | 'cesium-world-terrain' | 'custom'
@@ -39,6 +46,9 @@ export interface GeoDataResourceSnapshot {
   readonly status: 'ready' | 'loading' | 'failed'
   readonly error?: string
   readonly modelTransform?: GeoModelTransform
+  readonly visualStyle?: GeoTilesetVisualStyle
+  readonly autoHidden?: boolean
+  readonly maximumVisibleCameraHeight?: number
 }
 
 export interface GeoTerrainSnapshot {
@@ -75,6 +85,8 @@ export interface LoadTilesetOptions {
   readonly show?: boolean
   readonly maximumScreenSpaceError?: number
   readonly shadows?: ShadowMode
+  readonly visualStyle?: GeoTilesetVisualStyle
+  readonly maximumVisibleCameraHeight?: number
 }
 
 interface ManagedResource {
@@ -87,6 +99,11 @@ interface ManagedResource {
   }
   readonly resource: GeoJsonDataSource | Model | Cesium3DTilesetType
   readonly remove: () => boolean
+  requestedShow: boolean
+  autoHidden: boolean
+  maximumVisibleCameraHeight?: number
+  visualStyle?: GeoTilesetVisualStyle
+  tilesetVisual?: GeoTilesetVisual
 }
 
 export interface GeoDataBrowser {
@@ -97,6 +114,7 @@ export interface GeoDataBrowser {
   remove(id: string): boolean
   clear(): void
   setVisible(id: string, show: boolean): void
+  setTilesetVisualStyle(id: string, style: GeoTilesetVisualStyle): void
   updateModelTransform(id: string, transform: GeoModelTransform): void
   flyTo(id: string, duration?: number): Promise<boolean>
   setTerrain(id: GeoTerrainResourceId, url?: string): Promise<GeoTerrainSnapshot>
@@ -107,14 +125,12 @@ export interface GeoDataBrowser {
 export interface GeoDataBrowserOptions {
   readonly signal?: AbortSignal
   readonly onActiveTilesetChange?: (tileset: Cesium3DTilesetType | undefined) => void
+  readonly onResourcesChange?: () => void
+  readonly onResourcesError?: (message: string) => void
 }
 
 function normalizeId(kind: GeoDataResourceKind, requestedId?: string): string {
   return requestedId?.trim() || `${kind}-${Date.now().toString(36)}`
-}
-
-function resourceShow(resource: GeoJsonDataSource | Model | Cesium3DTilesetType): boolean {
-  return resource.show
 }
 
 function modelMatrixFromTransform(transform: GeoModelTransform): Matrix4 {
@@ -162,6 +178,8 @@ export function createGeoDataBrowser(
   }
   let disposed = false
   let terrainRequestVersion = 0
+  let scanPhase = 0.34
+  let previousTickTime = performance.now()
 
   function requestRender(): void {
     if (!viewer.isDestroyed()) {
@@ -180,6 +198,68 @@ export function createGeoDataBrowser(
       throw new Error('Geo Viewer has been destroyed')
     }
   }
+
+  function syncResourceVisibility(managed: ManagedResource): boolean {
+    const previousAutoHidden = managed.autoHidden
+    const previousShow = managed.resource.show
+    const maximumHeight = managed.maximumVisibleCameraHeight
+    managed.autoHidden =
+      maximumHeight !== undefined && viewer.camera.positionCartographic.height > maximumHeight
+    managed.resource.show = managed.requestedShow && !managed.autoHidden
+    return previousAutoHidden !== managed.autoHidden || previousShow !== managed.resource.show
+  }
+
+  function syncHeightVisibility(): void {
+    if (disposed || viewer.isDestroyed()) {
+      return
+    }
+    let changed = false
+    resources.forEach(function syncManagedResource(managed) {
+      changed = syncResourceVisibility(managed) || changed
+    })
+    if (changed) {
+      browserOptions.onResourcesChange?.()
+    }
+  }
+
+  function updateScanPhase(): void {
+    const now = performance.now()
+    const elapsed = Math.min(Math.max(now - previousTickTime, 0), 250)
+    previousTickTime = now
+    if (!viewer.clock.shouldAnimate || elapsed === 0) {
+      return
+    }
+    scanPhase = (scanPhase + elapsed / 8_000) % 1
+    resources.forEach(function updateVisual(managed) {
+      managed.tilesetVisual?.setScanPhase(scanPhase)
+    })
+  }
+
+  function fallbackTilesetVisuals(): void {
+    if (disposed || viewer.isDestroyed()) {
+      return
+    }
+    let changed = false
+    resources.forEach(function restoreOriginalMaterial(managed) {
+      if (managed.visualStyle !== 'cyber-scan' || managed.snapshot.kind !== '3d-tiles') {
+        return
+      }
+      ;(managed.resource as Cesium3DTilesetType).customShader = undefined
+      managed.visualStyle = 'original'
+      changed = true
+    })
+    if (!changed) {
+      return
+    }
+    browserOptions.onResourcesError?.('科技扫描渲染失败，已恢复原始材质')
+    browserOptions.onResourcesChange?.()
+    requestRender()
+  }
+
+  const removePreRenderListener = viewer.scene.preRender.addEventListener(syncHeightVisibility)
+  const removeClockTickListener = viewer.clock.onTick.addEventListener(updateScanPhase)
+  const removeRenderErrorListener =
+    viewer.scene.renderError.addEventListener(fallbackTilesetVisuals)
 
   function activeTileset(): Cesium3DTilesetType | undefined {
     const managed = [...resources.values()].reverse().find(function findTileset(item) {
@@ -268,8 +348,11 @@ export function createGeoDataBrowser(
       modelTransform: managed.snapshot.modelTransform
         ? { ...managed.snapshot.modelTransform }
         : undefined,
-      show: resourceShow(managed.resource),
+      show: managed.requestedShow,
       status: 'ready',
+      visualStyle: managed.visualStyle,
+      autoHidden: managed.autoHidden,
+      maximumVisibleCameraHeight: managed.maximumVisibleCameraHeight,
     }
   }
 
@@ -307,8 +390,11 @@ export function createGeoDataBrowser(
           url: options.url,
         },
         resource,
+        requestedShow: options.show ?? true,
+        autoHidden: false,
         remove: () => viewer.dataSources.remove(resource as GeoJsonDataSource, true),
       }
+      syncResourceVisibility(managed)
       viewer.dataSources.add(resource)
       added = true
       resources.set(id, managed)
@@ -355,6 +441,8 @@ export function createGeoDataBrowser(
           modelTransform: options.transform ? { ...options.transform } : undefined,
         },
         resource,
+        requestedShow: options.show ?? true,
+        autoHidden: false,
         remove: () => {
           const removed = viewer.isDestroyed()
             ? false
@@ -363,6 +451,7 @@ export function createGeoDataBrowser(
           return removed
         },
       }
+      syncResourceVisibility(managed)
       resources.set(id, managed)
       requestRender()
       return snapshotFor(managed)
@@ -382,14 +471,18 @@ export function createGeoDataBrowser(
     const id = normalizeId('3d-tiles', options.id)
     assertUnique(id)
     let resource: Cesium3DTilesetType | undefined
+    let visual: GeoTilesetVisual | undefined
     let added = false
     try {
+      visual = options.visualStyle ? createCyberCityTilesetVisual() : undefined
+      visual?.setScanPhase(scanPhase)
       resource = await Cesium3DTileset.fromUrl(options.url, {
         show: options.show ?? true,
         maximumScreenSpaceError: options.maximumScreenSpaceError ?? 16,
         shadows: options.shadows,
       })
       assertActive()
+      resource.customShader = options.visualStyle === 'cyber-scan' ? visual?.shader : undefined
       viewer.scene.primitives.add(resource)
       added = true
       const managed: ManagedResource = {
@@ -400,14 +493,24 @@ export function createGeoDataBrowser(
           url: options.url,
         },
         resource,
+        requestedShow: options.show ?? true,
+        autoHidden: false,
+        maximumVisibleCameraHeight: options.maximumVisibleCameraHeight,
+        visualStyle: options.visualStyle,
+        tilesetVisual: visual,
         remove: () => {
+          if (resource && resource.customShader === visual?.shader) {
+            resource.customShader = undefined
+          }
           const removed = viewer.isDestroyed()
             ? false
             : viewer.scene.primitives.remove(resource as Cesium3DTilesetType)
           cleanupPrimitive(resource as Cesium3DTilesetType)
+          visual?.dispose()
           return removed
         },
       }
+      syncResourceVisibility(managed)
       resources.set(id, managed)
       notifyActiveTileset()
       requestRender()
@@ -419,6 +522,7 @@ export function createGeoDataBrowser(
         }
         cleanupPrimitive(resource)
       }
+      visual?.dispose()
       throw error
     }
   }
@@ -448,7 +552,20 @@ export function createGeoDataBrowser(
     if (!managed) {
       throw new Error(`Geo data resource not found: ${id}`)
     }
-    managed.resource.show = show
+    managed.requestedShow = show
+    syncResourceVisibility(managed)
+    requestRender()
+  }
+
+  function setTilesetVisualStyle(id: string, style: GeoTilesetVisualStyle): void {
+    assertActive()
+    const managed = resources.get(id)
+    if (!managed || managed.snapshot.kind !== '3d-tiles' || !managed.tilesetVisual) {
+      throw new Error(`Geo styled 3D Tiles resource not found: ${id}`)
+    }
+    const tileset = managed.resource as Cesium3DTilesetType
+    managed.visualStyle = style
+    tileset.customShader = style === 'cyber-scan' ? managed.tilesetVisual.shader : undefined
     requestRender()
   }
 
@@ -547,6 +664,9 @@ export function createGeoDataBrowser(
     }
     disposed = true
     terrainRequestVersion += 1
+    removePreRenderListener()
+    removeClockTickListener()
+    removeRenderErrorListener()
     ;[...resources.keys()].forEach(function disposeResource(id) {
       const managed = resources.get(id)
       resources.delete(id)
@@ -564,6 +684,7 @@ export function createGeoDataBrowser(
     remove,
     clear,
     setVisible,
+    setTilesetVisualStyle,
     updateModelTransform,
     flyTo,
     setTerrain,
