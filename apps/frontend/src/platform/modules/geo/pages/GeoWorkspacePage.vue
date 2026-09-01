@@ -266,7 +266,7 @@ const bottomDocks = computed(function registeredBottomDocks() {
 const bottomDocksCollapsed = computed(function allBottomDocksCollapsed() {
   return (
     bottomDocks.value.length > 0 &&
-    bottomDocks.value.every((dock) => bottomDockCollapsed.value[dock.id] === true)
+    bottomDocks.value.every((dock) => bottomDockCollapsed.value[dock.id] ?? true)
   )
 })
 const activeHint = computed(function currentHint() {
