@@ -58,6 +58,23 @@ defineEmits<{
   backdrop-filter: blur(18px) saturate(125%);
   overflow-x: hidden;
   overflow-y: auto;
+  scrollbar-color: color-mix(in srgb, var(--geo-accent), transparent 68%) transparent;
+  scrollbar-width: thin;
+}
+
+.geo-tool-rail::-webkit-scrollbar {
+  width: 4px;
+}
+
+.geo-tool-rail::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.geo-tool-rail::-webkit-scrollbar-thumb {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--geo-accent), transparent 68%);
+  background-clip: padding-box;
 }
 
 .geo-tool-rail__item {
