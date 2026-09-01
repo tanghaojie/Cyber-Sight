@@ -19,13 +19,13 @@ export function createCyberCityTilesetVisual(): GeoTilesetVisual {
       },
     },
     varyings: {
-      v_positionMC: VaryingType.VEC3,
-      v_normalMC: VaryingType.VEC3,
+      v_cyberPositionMC: VaryingType.VEC3,
+      v_cyberNormalMC: VaryingType.VEC3,
     },
     vertexShaderText: `
       void vertexMain(VertexInput vsInput, inout czm_modelVertexOutput vsOutput) {
-        v_positionMC = vsOutput.positionMC;
-        v_normalMC = normalize(vsInput.attributes.normalMC);
+        v_cyberPositionMC = vsOutput.positionMC;
+        v_cyberNormalMC = normalize(vsInput.attributes.normalMC);
       }
     `,
     fragmentShaderText: `
@@ -34,8 +34,7 @@ export function createCyberCityTilesetVisual(): GeoTilesetVisual {
       }
 
       void fragmentMain(FragmentInput fsInput, inout czm_modelMaterial material) {
-        vec3 positionMC = v_positionMC;
-        vec3 normalMC = normalize(v_normalMC);
+        vec3 positionMC = v_cyberPositionMC;
         vec3 normalEC = normalize(fsInput.attributes.normalEC);
         vec3 normalWC = normalize(czm_inverseViewRotation * normalEC);
         vec3 worldUp = normalize(fsInput.attributes.positionWC);
@@ -54,7 +53,7 @@ export function createCyberCityTilesetVisual(): GeoTilesetVisual {
         cyberColor = mix(cyberColor, ultraviolet, towerMix * 0.72);
         cyberColor = mix(cyberColor, vec3(0.08, 0.43, 0.55), roof * 0.42);
 
-        float xFacing = step(abs(normalMC.y), abs(normalMC.x));
+        float xFacing = step(abs(normalWC.y), abs(normalWC.x));
         float facadeAxis = mix(positionMC.x, positionMC.y, xFacing);
         vec2 windowCell = vec2(facadeAxis / 7.5, localHeight / 4.2);
         vec2 windowUv = fract(windowCell);
