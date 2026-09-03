@@ -112,7 +112,7 @@ Cyber-Sight 已通过合并提交 `6c5ea8c` 接入 Forge `70dbfbd`，并采用�
 
 ## 2026-09-03 同步状态
 
-本轮从 `upstream/master` 获取 Forge `8216f9238afcf0c61a89fe3544bb82e7adb6c028`，其中相对下游基线新增 `c1096c9` 和 `8216f92`，在 `sync/forge-2026-09-03` 上以 `--no-ff` 合并。变更集中在 Foundation 文档治理、AI 日志与提交分类、提交标题校验脚本、GitHub 校验工作流和相关测试；没有应用源码、API 契约、数据库迁移或 Geo 业务变更。
+本轮从 `upstream/master` 获取 Forge `8216f9238afcf0c61a89fe3544bb82e7adb6c028`，其中相对下游基线新增 `c1096c9` 和 `8216f92`，在 `sync/forge-2026-09-03` 上以 `--no-ff` 合并，合并提交为 `eeeef0d2324c29d22f0722d3b62f3e27474d37a0`。变更集中在 Foundation 文档治理、AI 日志与提交分类、提交标题校验脚本、GitHub 校验工作流和相关测试；没有应用源码、API 契约、数据库迁移或 Geo 业务变更。
 
 冲突处理遵循下游所有权：继续删除 Forge 专属 `docs/forge/ai-logs/README.md`；Foundation 归档索引合并下游既有同步记录与上游新增分类记录；Foundation 决策索引保留新的提交分类 ADR，但不恢复由 Platform 拥有的品牌 ADR 引用。同步分支未向 `upstream` 推送。
 
