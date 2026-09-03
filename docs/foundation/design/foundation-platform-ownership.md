@@ -40,7 +40,7 @@ Sight 当前没有业务表、业务迁移或需要保留的数据，因此本�
 
 ## 文档边界
 
-`docs/foundation`、`docs/forge`、`docs/platform` 各自保存设计、ADR、计划、AI 日志与归档。Foundation 的现行规范和完整演进证据随上游同步；Forge 专属历史不下发；Platform 历史由业务平台维护。
+`docs/foundation`、`docs/forge`、`docs/platform` 各自保存设计、ADR、计划、AI 日志与归档。AI 日志从 2026-09-03 起按 `chore`、`docs`、`feat`、`fix`、`refactor`、`style`、`test`、`ci`、`build`、`revert` 分类；Foundation 的现行规范、模板和完整演进证据随上游同步，Forge 专属历史不下发，Platform 历史由业务平台维护。
 
 `docs/templates` 是由 Forge 维护并随 Foundation 同步的公共模板目录。模板通过 `scope: foundation | forge | platform` 指示生成文档的目标作用域，三个作用域共用同一套模板，不复制平行版本。
 
@@ -57,7 +57,7 @@ Sight 当前没有业务表、业务迁移或需要保留的数据，因此本�
 - 根配置、锁文件、应用组合入口和 Foundation 数据库迁移属于集成控制文件，生成差异报告并执行专门验证。
 - 未匹配路径默认停止同步，不做静默猜测。
 
-同步工具必须在干净工作区运行，使用 `merge --no-ff --no-commit` 建立共同历史，恢复 Platform 所有文件、移除 Forge 专属文件、重建派生产物，并在验证通过后才允许完成合并提交。
+同步工具必须在干净工作区运行，使用 `merge --no-ff --no-commit` 建立共同历史，恢复 Platform 所有文件、移除 Forge 专属文件、重建派生产物，并在验证通过后才允许完成合并提交。同步合并提交同样必须遵守提交分类，推荐使用 `chore(sync): merge Forge upstream`。
 
 ## 失败模式
 

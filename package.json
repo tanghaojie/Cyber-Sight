@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "pnpm --filter @cyber-ai-forge/api-contract build && pnpm --parallel --filter @cyber-ai-forge/api-contract --filter @cyber-ai-forge/backend --filter @cyber-ai-forge/frontend dev",
     "build": "pnpm -r build",
-    "test": "node --test scripts/forge-sync.test.mjs scripts/docs/archive-audit.test.mjs && pnpm -r test",
+    "test": "node --test scripts/forge-sync.test.mjs scripts/docs/archive-audit.test.mjs scripts/git/commit-message.test.mjs && pnpm -r test",
     "test:watch": "pnpm --filter @cyber-ai-forge/api-contract build && pnpm --filter @cyber-ai-forge/backend test:watch",
     "test:db": "pnpm --filter @cyber-ai-forge/backend db:check",
     "db:generate": "pnpm --filter @cyber-ai-forge/backend db:generate",
@@ -24,6 +24,7 @@
     "docs:archive:test": "node --test scripts/docs/archive-audit.test.mjs",
     "docs:archive:check": "node scripts/docs/archive-audit.mjs",
     "docs:archive:check:ci": "node scripts/docs/archive-audit.mjs --fail-on-due",
+    "commit:check": "node scripts/git/commit-message.mjs --range",
     "lint-staged": "lint-staged",
     "prepare": "simple-git-hooks",
     "preinstall": "npx only-allow pnpm"
@@ -36,7 +37,8 @@
     "*.{json,jsonc,md,yml,yaml,css,scss,html}": "prettier --write --ignore-unknown"
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm lint-staged"
+    "pre-commit": "pnpm lint-staged",
+    "commit-msg": "node scripts/git/commit-message.mjs \"$1\""
   },
   "devDependencies": {
     "eslint": "^10.8.0",

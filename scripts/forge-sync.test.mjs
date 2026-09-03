@@ -5,7 +5,7 @@ import { dirname, join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
-import { parseManifest } from './forge-sync.mjs'
+import { classifyPath, parseManifest } from './forge-sync.mjs'
 
 const syncScript = fileURLToPath(new URL('./forge-sync.mjs', import.meta.url))
 
@@ -16,6 +16,13 @@ test('parses the repository YAML manifest', async () => {
   assert.ok(manifest.platform.includes('.archive-audit.json'))
   assert.ok(manifest.platform.includes('README.md'))
   assert.ok(manifest.forge.includes('forge/'))
+  assert.ok(manifest.integration.includes('scripts/git/'))
+  assert.ok(manifest.integration.includes('.github/workflows/verify-commit-convention.yml'))
+  assert.equal(classifyPath('scripts/git/commit-message.mjs', manifest), 'integration')
+  assert.equal(
+    classifyPath('.github/workflows/verify-commit-convention.yml', manifest),
+    'integration',
+  )
 })
 
 function run(command, args, directory, allowFailure = false) {

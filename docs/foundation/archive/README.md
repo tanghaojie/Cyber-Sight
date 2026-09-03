@@ -44,6 +44,9 @@
 
 ## 完成计划与 AI 协作记录
 
+- 2026-09-03：[AI 日志与 Git 提交分类实施](plans/2026-09-03-ai-log-and-commit-classification.md)及其
+  [AI 协作记录](ai-logs/chore/2026/09/2026-09-03-ai-log-and-commit-classification.md)。
+
 - 2026-08-18：[分域文档归档审计重构](plans/2026-08-18-scope-owned-documentation-archive-audit.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-18-scope-owned-documentation-archive-audit.md)。
 
