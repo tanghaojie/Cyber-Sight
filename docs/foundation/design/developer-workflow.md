@@ -2,7 +2,7 @@
 title: 开发工作流
 status: accepted
 owner: project maintainers
-updated: 2026-07-30
+updated: 2026-09-03
 ---
 
 # 开发工作流
@@ -64,10 +64,15 @@ Prettier 只负责排版，不负责控制流结构。根目录 `eslint.config.m
 
 ## Git 与 AI 门禁
 
-`simple-git-hooks` 安装执行 `pnpm lint-staged` 的 pre-commit hook。`lint-staged` 对本次已暂存
-的 JavaScript、TypeScript 和 Vue 文件先执行 `eslint --fix`，再执行 Prettier；其余受支持
-文件只执行 Prettier。修复结果保留在本次提交中，不会顺带改写未暂存的历史文件，也不能
-替代构建和测试。
+`simple-git-hooks` 安装两个本地门禁：pre-commit 执行 `pnpm lint-staged`，commit-msg 执行
+`node scripts/git/commit-message.mjs "$1"`。`lint-staged` 对本次已暂存的 JavaScript、TypeScript
+和 Vue 文件先执行 `eslint --fix`，再执行 Prettier；其余受支持文件只执行 Prettier。修复结果保留
+在本次提交中，不会顺带改写未暂存的历史文件，也不能替代构建和测试。
+
+2026-09-03 起的新提交必须使用 `chore`、`docs`、`feat`、`fix`、`refactor`、`style`、`test`、`ci`、
+`build` 或 `revert` 作为类型，标题格式为 `<type>(<scope>)?!: <summary>`。本地 hook 仅是快速反馈；
+受保护分支还必须要求 GitHub 的 `Verify commit convention` 通过。可用
+`pnpm commit:check -- <base>..HEAD` 手工验证一段新提交。历史提交不追溯校验。
 
 AI 修改代码时必须遵循根目录 `AGENTS.md`：生成内容直接服从仓库 Prettier 和 ESLint 配置，
 验证阶段执行 `pnpm format`、`pnpm lint` 和 `pnpm format:check`。后端与契约变更运行相称的
@@ -78,7 +83,9 @@ AI 修改代码时必须遵循根目录 `AGENTS.md`：生成内容直接服从�
 ## 失败模式与验证
 
 - hook 未安装：重新执行 `pnpm install` 或 `pnpm prepare`，并确认 `.git/hooks/pre-commit`
-  调用 `pnpm lint-staged`。
+  调用 `pnpm lint-staged`、`.git/hooks/commit-msg` 调用提交标题校验。
+- 提交标题被拒绝：把首行改为允许类型和非空摘要，例如 `fix(auth): reject expired session`；不要用默认
+  `Merge ...` 标题提交 Forge 同步，应使用 `chore(sync): merge Forge upstream`。
 - 编辑器格式与提交结果不同：检查是否安装推荐的 Prettier 扩展，以及是否启用
   `prettier.requireConfig`。
 - `pnpm lint` 报告 `curly`：为对应控制语句补齐花括号，或执行 `pnpm lint:fix` 后复查 diff；

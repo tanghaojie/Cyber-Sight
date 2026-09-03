@@ -65,7 +65,7 @@
 
 1. 在 `docs/<scope>/design/` 新建或更新设计文档。
 2. 在 `docs/<scope>/plans/active/` 创建实施计划，文件名为 `YYYY-MM-DD-<topic>.md`。
-3. 在 `docs/<scope>/ai-logs/YYYY/MM/` 创建或更新 AI 协作记录。
+3. 在 `docs/<scope>/ai-logs/<change-type>/YYYY/MM/` 创建或更新 AI 协作记录；`<change-type>` 必须是 `chore`、`docs`、`feat`、`fix`、`refactor`、`style`、`test`、`ci`、`build` 或 `revert` 之一。
 4. 如果形成新的长期技术决策，在 `docs/<scope>/decisions/` 新增 ADR。
 5. 文档必须声明 `scope: foundation | forge | platform`；三个作用域共用根 `docs/templates/`，不得复制平行模板。
 
@@ -73,12 +73,19 @@
 
 1. 更新设计文档，使其描述最终实现，而不是最初设想。
 2. 补充实际验证结果、偏差、遗留问题和关联提交。
-3. 将完成的计划从对应作用域的 `plans/active/` 移到同作用域的 `archive/plans/`，将 AI 协作记录移到 `archive/ai-logs/YYYY/MM/`，并标记为 `completed`。
+3. 将完成的计划从对应作用域的 `plans/active/` 移到同作用域的 `archive/plans/`，将 AI 协作记录移到 `archive/ai-logs/<change-type>/YYYY/MM/`，并标记为 `completed`。
 4. 若 ADR 被取代或设计被合并/废弃，分别移到同作用域的 `archive/decisions/` 或 `archive/design/`，并在归档索引记录原因和现行替代来源。
 5. 更新相关目录的 `README.md` 索引。
 6. 在所有约定验证通过后提交本轮改动，提交信息应准确概括交付内容，并包含“AI 自动提交的强制标记”规定的 trailer。
 
 除非用户明确要求暂不提交，否则不得把已经验证通过的完整任务留在仅暂存或未暂存状态。验证失败、任务未完成或工作区包含无法确认归属的改动时，不得为了满足提交步骤而勉强提交；应先修复问题或向用户说明阻塞。
+
+### Git 提交分类
+
+1. 2026-09-03 起创建的每一个 Git 提交必须以 `chore`、`docs`、`feat`、`fix`、`refactor`、`style`、`test`、`ci`、`build` 或 `revert` 之一分类，并使用 `<type>(<scope>)?!: <summary>` 格式；`scope` 和 `!` 可选，摘要不能为空。
+2. 历史提交和历史 AI 日志保持原样，不为满足本规则批量改写 Git 历史或移动归档文件。
+3. 本地 `commit-msg` hook 与受保护分支的 `Verify commit convention` 检查共同执行该规则。下游接入同步后必须执行 `pnpm prepare` 或 `pnpm install` 安装 hook，并将该远端检查设为合并门禁。
+4. Forge 同步使用 `--no-commit`；维护者完成同步合并时必须显式使用允许类型，例如 `chore(sync): merge Forge upstream`，不能接受默认 `Merge ...` 标题。
 
 纯拼写、排版、注释或不改变行为的单文件机械修改可以不新建设计和计划，但仍需保持已有文档准确。
 

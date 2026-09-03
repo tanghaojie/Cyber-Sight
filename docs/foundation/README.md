@@ -25,7 +25,7 @@ docs/foundation/
 ├── design/          # 当前系统与模块设计
 ├── decisions/       # 仍有效的 ADR
 ├── plans/active/    # 正在执行的计划
-├── ai-logs/         # 正在执行任务的协作记录
+├── ai-logs/         # 按变更类型分类的正在执行任务协作记录
 ├── guides/          # 人类操作指南，按需阅读
 ├── reference/       # 当前参考表，按需查询
 └── archive/         # 历史证据，默认不读取
@@ -33,12 +33,12 @@ docs/foundation/
 
 ## 生命周期
 
-| 类型   | 当前区             | 进入归档的条件         |
-| ------ | ------------------ | ---------------------- |
-| Design | `design/`          | 被合并、废弃或大幅重写 |
-| ADR    | `decisions/`       | 被后续 ADR 取代        |
-| Plan   | `plans/active/`    | 完成、取消或被取代     |
-| AI Log | `ai-logs/YYYY/MM/` | 对应任务结束           |
+| 类型   | 当前区                           | 进入归档的条件         |
+| ------ | -------------------------------- | ---------------------- |
+| Design | `design/`                        | 被合并、废弃或大幅重写 |
+| ADR    | `decisions/`                     | 被后续 ADR 取代        |
+| Plan   | `plans/active/`                  | 完成、取消或被取代     |
+| AI Log | `ai-logs/<change-type>/YYYY/MM/` | 对应任务结束           |
 
 当前设计始终描述“现在怎样工作”。当前 ADR 只解释仍有效的长期取舍。计划和日志不复制正式结论，任务结束后与历史过程一起归档。详细规则见[分层文档与历史归档](design/documentation-governance.md)。
 
@@ -47,7 +47,8 @@ docs/foundation/
 根目录 [AGENTS.md](../../AGENTS.md) 定义 Git 暂存区门禁、文档门禁、归档步骤和 AI 提交标记。
 
 - 设计：稳定英文小写名称，如 `backend.md`。
-- 计划和日志：`YYYY-MM-DD-<topic>.md`。
+- 计划：`YYYY-MM-DD-<topic>.md`。
+- AI 日志：`<change-type>/YYYY/MM/YYYY-MM-DD-<topic>.md`；`<change-type>` 只能是 `chore`、`docs`、`feat`、`fix`、`refactor`、`style`、`test`、`ci`、`build` 或 `revert`。历史日志保留原来的 `YYYY/MM/` 路径。
 - 新增 ADR：`ADR-YYYYMMDD-<topic>.md`；日期取创建/接受日期，topic 使用小写 kebab-case。既有 `ADR-NNNN-<topic>.md` 文件和引用保持不变。
 - 正文默认中文，代码标识保持原样。
 

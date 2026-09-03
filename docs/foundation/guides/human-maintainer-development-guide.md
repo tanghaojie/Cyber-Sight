@@ -383,7 +383,9 @@ pnpm --filter @cyber-ai-forge/frontend build # 前端类型检查和生产构建
 - `docs/plans/active/`：正在执行的计划。
 - `docs/ai-logs/`：尚未结束任务的人与 AI 结构化协作摘要。
 
-完成后更新实际结果，将计划和 AI 日志分别移动到 `docs/archive/plans/`、`docs/archive/ai-logs/`。历史资料默认不读取，需要复盘时从 `docs/archive/README.md` 定位。所有约定验证通过后必须提交 Git；验证失败或存在归属不明改动时不得勉强提交。
+AI 日志保存到 `docs/<scope>/ai-logs/<change-type>/YYYY/MM/`，完成后移动到对应的 `docs/<scope>/archive/ai-logs/<change-type>/YYYY/MM/`。类型限定为 `chore`、`docs`、`feat`、`fix`、`refactor`、`style`、`test`、`ci`、`build`、`revert`，并且应反映任务主要交付。2026-09-03 前的历史日志不移动。
+
+新提交使用 `<type>(<scope>)?!: <summary>`；scope 和 `!` 可选。首次同步本规则或克隆仓库后运行 `pnpm prepare`，确认本地 `commit-msg` hook 已安装；在受保护分支上还要把 `Verify commit convention` 设为必需检查。Forge 同步的最终提交使用 `chore(sync): merge Forge upstream`，不能保留默认 Merge 标题。历史资料默认不读取，需要复盘时从 `docs/archive/README.md` 定位。所有约定验证通过后必须提交 Git；验证失败或存在归属不明改动时不得勉强提交。
 
 ## 12. 常见问题
 

@@ -2,7 +2,7 @@
 title: Cyber AI Forge 上游同步
 status: accepted
 owner: project maintainers
-updated: 2026-08-14
+updated: 2026-09-03
 ---
 
 # Cyber AI Forge 上游同步
@@ -109,3 +109,11 @@ pnpm docs:archive:check:ci
 ## 2026-08-20 同步状态
 
 Cyber-Sight 已通过合并提交 `6c5ea8c` 接入 Forge `70dbfbd`，并采用所有权分域的归档审计。根 `.archive-audit.json` 固定为 `platform-downstream`：只管理 Platform、继承只读 Foundation、排除 Forge，Integration 归 Foundation。Platform 审查基线由本仓库独立维护，禁止复制 Forge 的 Platform ledger。
+
+## 2026-09-03 同步状态
+
+本轮从 `upstream/master` 获取 Forge `8216f9238afcf0c61a89fe3544bb82e7adb6c028`，其中相对下游基线新增 `c1096c9` 和 `8216f92`，在 `sync/forge-2026-09-03` 上以 `--no-ff` 合并。变更集中在 Foundation 文档治理、AI 日志与提交分类、提交标题校验脚本、GitHub 校验工作流和相关测试；没有应用源码、API 契约、数据库迁移或 Geo 业务变更。
+
+冲突处理遵循下游所有权：继续删除 Forge 专属 `docs/forge/ai-logs/README.md`；Foundation 归档索引合并下游既有同步记录与上游新增分类记录；Foundation 决策索引保留新的提交分类 ADR，但不恢复由 Platform 拥有的品牌 ADR 引用。同步分支未向 `upstream` 推送。
+
+`pnpm format`、`pnpm format:check`、`pnpm lint`、脚本测试、143 个后端测试、API 契约构建、前端生产构建、`pnpm docs:archive:check:ci` 和上游提交标题范围检查均通过；`pnpm prepare` 已安装本地 `commit-msg` hook。构建保留既有 Sass legacy API、VueUse 注释和 Cesium 大 chunk 警告。GitHub 分支保护门禁和前端页面/视觉验收仍由维护者负责。

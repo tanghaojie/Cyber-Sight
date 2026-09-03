@@ -59,8 +59,10 @@ integration:
   - pnpm-lock.yaml
   - pnpm-workspace.yaml
   - scripts/docs/
+  - scripts/git/
   - scripts/forge-sync.mjs
   - scripts/forge-sync.test.mjs
+  - .github/workflows/verify-commit-convention.yml
   - tsconfig.base.json
 
 validate:

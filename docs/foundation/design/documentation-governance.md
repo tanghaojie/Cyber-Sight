@@ -4,7 +4,7 @@ scope: foundation
 repository: Cyber-AI-Forge
 status: accepted
 owner: project maintainers
-updated: 2026-08-18
+updated: 2026-09-03
 ---
 
 # 分层文档与历史归档
@@ -32,7 +32,7 @@ docs/
 ├── design/                # 当前有效的系统和模块设计
 ├── decisions/             # 当前有效的 ADR
 ├── plans/active/          # 正在执行的计划
-├── ai-logs/               # 正在执行任务的结构化协作记录
+├── ai-logs/<change-type>/ # 按变更类型分类的结构化协作记录
 ├── guides/                # 人类操作指南，按需阅读
 ├── reference/             # 当前参考表，按需查询
 ├── templates/             # 新文档模板
@@ -40,7 +40,7 @@ docs/
     ├── design/
     ├── decisions/
     ├── plans/
-    └── ai-logs/
+    └── ai-logs/<change-type>/
 ```
 
 `design/` 回答“现在怎样工作”，`decisions/` 回答“现行长期约束为何成立”。计划和 AI 日志只在任务进行期间留在当前区；完成、取消或被取代后进入 `archive/`。归档不再作为现行规范维护，但必须保留原始状态、替代关系和可追溯路径。
@@ -63,7 +63,8 @@ docs/
 - Design：原地维护当前事实；被合并、废弃或大幅重写的旧版本移入 `archive/design/`。
 - ADR：已接受且仍有效的记录留在 `decisions/`；被取代、被初始版本基线吸收或失去现行解释价值后移入 `archive/decisions/`。既有旧格式编号保持稳定；新增 ADR 使用日期命名。
 - Plan：任务期间位于 `plans/active/`；结束后标记最终状态并移入 `archive/plans/`。
-- AI Log：任务期间位于 `ai-logs/YYYY/MM/`；随任务结束移入 `archive/ai-logs/YYYY/MM/`。
+- AI Log：2026-09-03 起，任务期间位于 `ai-logs/<change-type>/YYYY/MM/`；随任务结束移入 `archive/ai-logs/<change-type>/YYYY/MM/`。`<change-type>` 只能是 `chore`、`docs`、`feat`、`fix`、`refactor`、`style`、`test`、`ci`、`build` 或 `revert`，按任务的主要交付分类，不能因为任务附带文档就一律使用 `docs`。
+- 历史 AI 日志继续保留 `ai-logs/YYYY/MM/` 与 `archive/ai-logs/YYYY/MM/` 路径。不得为分类规则批量移动它们；旧文档链接是历史证据的一部分，且归档区内的相对链接不属于默认断链检查范围。
 - Guide、Reference、Template：只保留当前可用版本；纯历史版本按内容类型进入归档。
 
 归档迁移必须同步更新当前索引和相对链接。当前文档优先链接现行设计或 ADR；历史计划和日志集中从归档索引查找，避免在每份当前模块设计中重复罗列。
@@ -74,7 +75,7 @@ docs/
 - ADR 文件名中的日期必须与 frontmatter 的 `date: YYYY-MM-DD` 对应；日期和 topic 在 ADR 创建后保持不变。
 - 同一天创建多个 ADR 时通过唯一 topic 区分，不分配顺序号，也不通过顺序号解决并发冲突。
 - 既有 `ADR-NNNN-<topic>.md` 文件作为历史兼容格式保留，不批量重命名；既有引用继续保持原样。
-- 新增文档引用新 ADR 时使用其日期命名路径。计划和 AI 日志继续使用各自的日期命名规则。
+- 新增文档引用新 ADR 时使用其日期命名路径。计划继续使用日期命名；AI 日志使用变更类型、日期与主题组成的路径。
 - 归档审计同时识别旧格式和新格式，以免历史 ADR 从治理统计中消失。
 - 本规则由 [ADR-20260811](../decisions/ADR-20260811-adr-filename-convention.md) 正式记录。
 
@@ -91,6 +92,14 @@ docs/
 文档结构调整后至少验证：当前索引无归档项混入、Markdown 相对链接存在、ADR 状态与所在目录一致、`plans/active/` 只含进行中计划，以及默认阅读集的文件数和行数没有反向增长。
 
 2026-08-11 已完成日期命名规则落地：既有 ADR 文件名和引用保持不变，新增 ADR 使用日期命名，归档审计兼容新旧两种格式。`pnpm format`、`pnpm format:check`、`pnpm docs:archive:check` 和 `pnpm docs:archive:check:ci` 均通过；本次没有发现偏差或遗留问题，关联提交为本任务提交。
+
+## AI 日志与提交分类
+
+AI 日志目录和 Git 提交共享同一组变更类型：`chore`、`docs`、`feat`、`fix`、`refactor`、`style`、`test`、`ci`、`build`、`revert`。日志在 frontmatter 中声明 `change_type`，目录名必须与它一致；Git 提交使用 `<type>(<scope>)?!: <summary>`，其中 scope 与破坏性变更标识可选。
+
+提交规则从 2026-09-03 起只约束新提交。`scripts/git/commit-message.mjs` 被本地 `commit-msg` hook 和 GitHub 的 `Verify commit convention` 工作流共用：前者尽早阻止无效标题，后者防止跳过或未安装 hook。分支保护必须把该工作流设为必需检查；否则远端直接推送仍能绕过本地门禁。
+
+业务平台下游同步 Foundation 后接收 Foundation 文档、模板与校验脚本；其 `docs/platform/**` 仍属于下游自身内容，维护者需要在本地将 Platform AI 日志说明改为同一规则。同步不会安装 `.git/hooks`，下游必须执行一次 `pnpm prepare` 或 `pnpm install`。同步合并的提交也必须分类，推荐 `chore(sync): merge Forge upstream`。
 
 ## 初始版本基线
 

@@ -45,6 +45,12 @@
 ## 完成计划与 AI 协作记录
 
 - 2026-08-13：[Forge 架构同步文档归档审查](plans/2026-08-13-documentation-archive-review.md)。
+
+- 2026-09-03：[AI 日志与 Git 提交分类实施](plans/2026-09-03-ai-log-and-commit-classification.md)及其
+  [AI 协作记录](ai-logs/chore/2026/09/2026-09-03-ai-log-and-commit-classification.md)。
+- 2026-09-03：[AI 日志与 Git 提交分类后的 Foundation 归档审查](plans/2026-09-03-ai-log-and-commit-classification-archive-review.md)及其
+  [AI 协作记录](ai-logs/chore/2026/09/2026-09-03-ai-log-and-commit-classification-archive-review.md)。
+
 - 2026-08-18：[分域文档归档审计重构](plans/2026-08-18-scope-owned-documentation-archive-audit.md)及其
   [AI 协作记录](ai-logs/2026/08/2026-08-18-scope-owned-documentation-archive-audit.md)。
 - 2026-08-13：[集中前后端环境文件目录](plans/2026-08-13-env-directory.md)及其
