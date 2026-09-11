@@ -8,6 +8,7 @@ import {
   createImageryLayerCollectionCapability,
   imageryLayerCollectionCapability,
 } from './data.capabilities'
+import { geoModelRenderingCapability } from '../scene/scene.capabilities'
 import {
   createGeoDataController,
   type GeoDataController,
@@ -66,6 +67,7 @@ export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): Geo
   return {
     id: 'data',
     order: 10,
+    requires: ['scene'],
     async install(context: GeoPluginContext) {
       const activeTileset = createActiveTilesetCapability()
       const imageryLayers = createImageryLayerCollectionCapability()
@@ -73,6 +75,7 @@ export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): Geo
       context.capabilities.provide(imageryLayerCollectionCapability, imageryLayers, context.scope)
       const controller = createGeoDataController(context.viewer, {
         ...pluginOptions,
+        modelRendering: context.capabilities.require(geoModelRenderingCapability),
         signal: context.signal,
         onActiveTilesetChange: activeTileset.setCurrent,
         onImageryLayersChange: imageryLayers.setLayers,

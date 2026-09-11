@@ -1,4 +1,5 @@
 import { createGeoCapabilityToken } from '../../core/capability-registry'
+import type { GeoModelRenderingManager } from '../../tools/scene/model-rendering'
 
 export interface GeoSolarLightingState {
   readonly lighting: boolean
@@ -13,3 +14,6 @@ export interface GeoSolarLightingCapability {
 
 export const geoSolarLightingCapability =
   createGeoCapabilityToken<GeoSolarLightingCapability>('scene.solarLighting')
+
+export const geoModelRenderingCapability =
+  createGeoCapabilityToken<GeoModelRenderingManager>('scene.modelRendering')

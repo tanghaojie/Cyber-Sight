@@ -14,6 +14,7 @@
         />
         <i aria-hidden="true" />
       </label>
+      <p class="scene-panel__hint">地球光照只影响底图；外部模型自动跟随时间轴切换昼夜。</p>
     </section>
 
     <section class="scene-panel__section">
@@ -62,7 +63,7 @@ const toggles: readonly { key: keyof GeoSceneSettings; label: string }[] = [
   { key: 'sun', label: '太阳' },
   { key: 'moon', label: '月亮' },
   { key: 'atmosphere', label: '大气层' },
-  { key: 'lighting', label: '太阳光照' },
+  { key: 'lighting', label: '地球光照' },
   { key: 'skyBox', label: '天空盒' },
   { key: 'shadows', label: '太阳阴影' },
   { key: 'depthTestAgainstTerrain', label: '地形深度检测' },
@@ -94,6 +95,12 @@ function setNumber(key: 'sunGlowFactor' | 'shadowDarkness', event: Event): void 
 .scene-panel__section {
   display: grid;
   gap: 10px;
+}
+.scene-panel__hint {
+  margin: 0;
+  color: var(--geo-text-muted, #7890a2);
+  font-size: 10px;
+  line-height: 1.5;
 }
 .scene-panel__heading {
   display: flex;

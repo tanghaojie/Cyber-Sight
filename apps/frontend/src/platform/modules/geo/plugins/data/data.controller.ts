@@ -32,6 +32,7 @@ import {
   type GeoImageryLayerSnapshot,
 } from '../../tools/data/imagery-layer-manager'
 import type { GeoImageryLayerEntry } from './data.capabilities'
+import type { GeoModelRenderingManager } from '../../tools/scene/model-rendering'
 
 export type GeoDataLoadingOperation = 'geojson' | 'model' | 'tileset' | 'fly-to' | 'transform'
 
@@ -75,6 +76,7 @@ export interface GeoDataControllerOptions extends GeoImagerySourceOptions {
   readonly signal?: AbortSignal
   readonly onActiveTilesetChange?: (tileset: Cesium3DTileset | undefined) => void
   readonly onImageryLayersChange?: (layers: readonly GeoImageryLayerEntry[]) => void
+  readonly modelRendering?: GeoModelRenderingManager
 }
 
 export function createGeoDataController(
@@ -84,6 +86,7 @@ export function createGeoDataController(
   const catalog = options.catalog ?? createGeoImageryCatalog()
   const browserOptions: GeoDataBrowserOptions = {
     signal: options.signal,
+    modelRendering: options.modelRendering,
     onActiveTilesetChange: options.onActiveTilesetChange,
     onResourcesChange() {
       if (!disposed) {

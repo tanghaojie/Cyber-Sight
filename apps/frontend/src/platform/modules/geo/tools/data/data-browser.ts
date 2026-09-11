@@ -21,6 +21,10 @@ import {
   type GeoTilesetVisual,
   type GeoTilesetVisualStyle,
 } from './tileset-visual-style'
+import type {
+  GeoModelRenderingManager,
+  GeoModelRenderingRegistration,
+} from '../scene/model-rendering'
 
 export type { GeoTilesetVisualStyle } from './tileset-visual-style'
 
@@ -45,6 +49,7 @@ export interface GeoDataResourceSnapshot {
   readonly show: boolean
   readonly status: 'ready' | 'loading' | 'failed'
   readonly error?: string
+  readonly modelRenderingNotice?: string
   readonly modelTransform?: GeoModelTransform
   readonly visualStyle?: GeoTilesetVisualStyle
   readonly autoHidden?: boolean
@@ -96,9 +101,12 @@ interface ManagedResource {
     kind: GeoDataResourceKind
     url?: string
     modelTransform?: GeoModelTransform
+    modelRenderingNotice?: string
   }
   readonly resource: GeoJsonDataSource | Model | Cesium3DTilesetType
   readonly remove: () => boolean
+  modelRenderingRegistration?: GeoModelRenderingRegistration
+  modelMaterialNotice?: string
   requestedShow: boolean
   autoHidden: boolean
   maximumVisibleCameraHeight?: number
@@ -127,10 +135,94 @@ export interface GeoDataBrowserOptions {
   readonly onActiveTilesetChange?: (tileset: Cesium3DTilesetType | undefined) => void
   readonly onResourcesChange?: () => void
   readonly onResourcesError?: (message: string) => void
+  readonly modelRendering?: GeoModelRenderingManager
 }
 
 function normalizeId(kind: GeoDataResourceKind, requestedId?: string): string {
   return requestedId?.trim() || `${kind}-${Date.now().toString(36)}`
+}
+
+function modelMaterialNotice(gltf: unknown, hasModelRenderingManager: boolean): string | undefined {
+  if (!gltf || typeof gltf !== 'object') {
+    return undefined
+  }
+  const gltfObject = gltf as {
+    materials?: unknown
+    meshes?: unknown
+  }
+  const materials = gltfObject.materials
+  const meshes = gltfObject.meshes
+  if (!Array.isArray(materials) || !Array.isArray(meshes)) {
+    return undefined
+  }
+  const referencedMaterialIndexes = new Set<number>()
+  for (const mesh of meshes) {
+    if (!mesh || typeof mesh !== 'object') {
+      continue
+    }
+    const primitives = (mesh as { primitives?: unknown }).primitives
+    if (!Array.isArray(primitives)) {
+      continue
+    }
+    for (const primitive of primitives) {
+      if (!primitive || typeof primitive !== 'object') {
+        continue
+      }
+      const materialIndex = (primitive as { material?: unknown }).material
+      if (typeof materialIndex === 'number' && Number.isInteger(materialIndex)) {
+        referencedMaterialIndexes.add(materialIndex)
+      }
+    }
+  }
+  let hasEmissive = false
+  let hasUnlit = false
+  for (const materialIndex of referencedMaterialIndexes) {
+    const material = materials[materialIndex]
+    if (!material || typeof material !== 'object') {
+      continue
+    }
+    const materialObject = material as {
+      emissiveFactor?: unknown
+      extensions?: {
+        KHR_materials_unlit?: unknown
+        KHR_materials_emissive_strength?: { emissiveStrength?: unknown }
+      }
+    }
+    const isUnlit = materialObject.extensions?.KHR_materials_unlit !== undefined
+    const emissiveStrength =
+      materialObject.extensions?.KHR_materials_emissive_strength?.emissiveStrength
+    const hasEmissiveStrength =
+      emissiveStrength === undefined ||
+      (typeof emissiveStrength === 'number' && Number.isFinite(emissiveStrength))
+    if (
+      !isUnlit &&
+      Array.isArray(materialObject.emissiveFactor) &&
+      hasEmissiveStrength &&
+      (emissiveStrength === undefined || emissiveStrength !== 0) &&
+      materialObject.emissiveFactor.some(
+        (value) => typeof value === 'number' && Number.isFinite(value) && value > 0,
+      )
+    ) {
+      hasEmissive = true
+    }
+    if (isUnlit) {
+      hasUnlit = true
+    }
+  }
+  if (hasEmissive && hasUnlit) {
+    return hasModelRenderingManager
+      ? '已识别发光与不受光照影响的材质；这部分不会随昼夜变暗。'
+      : '含发光与不受光照影响的材质；保留模型原始渲染。'
+  }
+  if (hasEmissive) {
+    return hasModelRenderingManager
+      ? '已识别发光材质；夜景通道按统一标准处理。'
+      : '含发光材质；保留模型原始渲染。'
+  }
+  if (hasUnlit) {
+    return '含不受光照影响的材质，这部分不会随昼夜变暗。'
+  }
+  return '未检测到发光材质；模型仅随太阳光照变化。'
 }
 
 function modelMatrixFromTransform(transform: GeoModelTransform): Matrix4 {
@@ -180,6 +272,7 @@ export function createGeoDataBrowser(
   let terrainRequestVersion = 0
   let scanPhase = 0.34
   let previousTickTime = performance.now()
+  const pendingModelWaits = new Set<() => void>()
 
   function requestRender(): void {
     if (!viewer.isDestroyed()) {
@@ -239,6 +332,22 @@ export function createGeoDataBrowser(
     if (disposed || viewer.isDestroyed()) {
       return
     }
+    const hasModelResource =
+      pendingModelWaits.size > 0 ||
+      [...resources.values()].some(function hasModel(managed) {
+        return managed.snapshot.kind === 'model'
+      })
+    if (hasModelResource) {
+      const notice = '场景渲染失败，无法确定资源；请移除最近添加的模型后重试'
+      resources.forEach(function markModelFailure(managed) {
+        if (managed.snapshot.kind === 'model') {
+          managed.snapshot.modelRenderingNotice = notice
+        }
+      })
+      browserOptions.onResourcesError?.(notice)
+      browserOptions.onResourcesChange?.()
+      return
+    }
     let changed = false
     resources.forEach(function restoreOriginalMaterial(managed) {
       if (managed.visualStyle !== 'cyber-scan' || managed.snapshot.kind !== '3d-tiles') {
@@ -282,7 +391,9 @@ export function createGeoDataBrowser(
       function cleanup(): void {
         model.readyEvent.removeEventListener(onReady)
         model.errorEvent.removeEventListener(onError)
+        viewer.scene.renderError.removeEventListener(onRenderError)
         browserOptions.signal?.removeEventListener('abort', onAbort)
+        pendingModelWaits.delete(cancel)
       }
 
       function finish(error?: Error): void {
@@ -318,9 +429,19 @@ export function createGeoDataBrowser(
         finish(new Error('Geo data loading was cancelled'))
       }
 
+      function onRenderError(): void {
+        finish(new Error('场景渲染失败，模型尚未完成加载'))
+      }
+
+      function cancel(): void {
+        finish(new Error('Geo data loading was cancelled'))
+      }
+
       model.readyEvent.addEventListener(onReady)
       model.errorEvent.addEventListener(onError)
+      viewer.scene.renderError.addEventListener(onRenderError)
       browserOptions.signal?.addEventListener('abort', onAbort, { once: true })
+      pendingModelWaits.add(cancel)
       if (model.ready) {
         onReady()
         return
@@ -350,6 +471,7 @@ export function createGeoDataBrowser(
         : undefined,
       show: managed.requestedShow,
       status: 'ready',
+      modelRenderingNotice: managed.snapshot.modelRenderingNotice,
       visualStyle: managed.visualStyle,
       autoHidden: managed.autoHidden,
       maximumVisibleCameraHeight: managed.maximumVisibleCameraHeight,
@@ -415,6 +537,8 @@ export function createGeoDataBrowser(
     const id = normalizeId('model', options.id)
     assertUnique(id)
     let resource: Model | undefined
+    let modelRenderingRegistration: GeoModelRenderingRegistration | undefined
+    let modelRenderingNotice: string | undefined
     let added = false
     try {
       resource = await Model.fromGltfAsync({
@@ -425,25 +549,50 @@ export function createGeoDataBrowser(
         show: options.show ?? true,
         minimumPixelSize: options.minimumPixelSize,
         shadows: options.shadows,
+        gltfCallback(gltf: unknown) {
+          modelRenderingNotice = modelMaterialNotice(gltf, Boolean(browserOptions.modelRendering))
+        },
       })
       assertActive()
+      if (!modelRenderingNotice) {
+        modelRenderingNotice = browserOptions.modelRendering
+          ? '材质信息未能确认；已按统一模型渲染兼容路径处理。'
+          : '材质兼容性未知；已保留模型原始渲染。'
+      }
+      const initialModelMaterialNotice = modelRenderingNotice
       viewer.scene.primitives.add(resource)
       added = true
       requestRender()
       await waitForModelReady(resource)
       assertActive()
-      const managed: ManagedResource = {
+      if (browserOptions.modelRendering) {
+        try {
+          modelRenderingRegistration = browserOptions.modelRendering.register(resource)
+        } catch (error) {
+          modelRenderingNotice =
+            error instanceof Error
+              ? `统一模型渲染不可用，已保留模型原始渲染：${error.message}`
+              : '统一模型渲染不可用，已保留模型原始渲染'
+        }
+      }
+      let managed: ManagedResource
+      managed = {
         snapshot: {
           id,
           label: options.label?.trim() || '3D 模型',
           kind: 'model',
           url: options.url,
           modelTransform: options.transform ? { ...options.transform } : undefined,
+          modelRenderingNotice,
         },
         resource,
+        modelMaterialNotice: initialModelMaterialNotice,
+        modelRenderingRegistration,
         requestedShow: options.show ?? true,
         autoHidden: false,
         remove: () => {
+          managed.modelRenderingRegistration?.dispose()
+          managed.modelRenderingRegistration = undefined
           const removed = viewer.isDestroyed()
             ? false
             : viewer.scene.primitives.remove(resource as Model)
@@ -457,6 +606,7 @@ export function createGeoDataBrowser(
       return snapshotFor(managed)
     } catch (error) {
       if (resource) {
+        modelRenderingRegistration?.dispose()
         if (added && !viewer.isDestroyed()) {
           viewer.scene.primitives.remove(resource)
         }
@@ -578,6 +728,19 @@ export function createGeoDataBrowser(
     const model = managed.resource as Model
     model.modelMatrix = modelMatrixFromTransform(transform)
     managed.snapshot.modelTransform = { ...transform }
+    if (managed.modelRenderingRegistration) {
+      managed.modelRenderingRegistration.update()
+    } else if (browserOptions.modelRendering) {
+      try {
+        managed.modelRenderingRegistration = browserOptions.modelRendering.register(model)
+        managed.snapshot.modelRenderingNotice = managed.modelMaterialNotice
+      } catch (error) {
+        managed.snapshot.modelRenderingNotice =
+          error instanceof Error
+            ? `统一模型渲染不可用，已保留模型原始渲染：${error.message}`
+            : '统一模型渲染不可用，已保留模型原始渲染'
+      }
+    }
     requestRender()
   }
 
@@ -664,6 +827,9 @@ export function createGeoDataBrowser(
     }
     disposed = true
     terrainRequestVersion += 1
+    ;[...pendingModelWaits].forEach(function cancelModelWait(cancel) {
+      cancel()
+    })
     removePreRenderListener()
     removeClockTickListener()
     removeRenderErrorListener()

@@ -291,24 +291,30 @@
             ><input v-model.number="modelPlacement.latitude" type="number" step="0.000001"
           /></label>
           <label
-            ><span>高度 m</span
+            ><span>椭球高 m</span
             ><input v-model.number="modelPlacement.height" type="number" step="0.1"
           /></label>
-          <label
-            ><span>缩放</span
-            ><input v-model.number="modelPlacement.scale" type="number" min="0.000001" step="0.1"
-          /></label>
-          <label
-            ><span>航向°</span
-            ><input v-model.number="modelPlacement.heading" type="number" step="1"
-          /></label>
-          <label
-            ><span>俯仰°</span><input v-model.number="modelPlacement.pitch" type="number" step="1"
-          /></label>
-          <label
-            ><span>翻滚°</span><input v-model.number="modelPlacement.roll" type="number" step="1"
-          /></label>
         </div>
+        <details class="data-panel__model-details">
+          <summary>可选的缩放与姿态</summary>
+          <div class="data-panel__transform-grid">
+            <label
+              ><span>缩放</span
+              ><input v-model.number="modelPlacement.scale" type="number" min="0.000001" step="0.1"
+            /></label>
+            <label
+              ><span>航向°</span
+              ><input v-model.number="modelPlacement.heading" type="number" step="1"
+            /></label>
+            <label
+              ><span>俯仰°</span
+              ><input v-model.number="modelPlacement.pitch" type="number" step="1"
+            /></label>
+            <label
+              ><span>翻滚°</span><input v-model.number="modelPlacement.roll" type="number" step="1"
+            /></label>
+          </div>
+        </details>
       </div>
       <button
         class="data-panel__primary"
@@ -366,6 +372,10 @@
               ><small v-if="resource.modelTransform">{{
                 modelTransformSummary(resource.modelTransform)
               }}</small
+              ><small
+                v-if="resource.modelRenderingNotice"
+                class="data-panel__resource-policy-warning"
+                >{{ resource.modelRenderingNotice }}</small
               ><small v-if="resource.autoHidden" class="data-panel__resource-policy-warning"
                 >视角高于 30 km，已暂停绘制</small
               ><small v-else-if="resource.maximumVisibleCameraHeight">30 km 外自动隐藏</small></span
@@ -1159,6 +1169,17 @@ async function loadTileset(): Promise<void> {
   border: 1px solid color-mix(in srgb, var(--geo-accent, #45c8ff), transparent 72%);
   border-radius: 10px;
   background: color-mix(in srgb, var(--geo-accent, #45c8ff), transparent 94%);
+}
+.data-panel__model-details {
+  color: var(--geo-text-faint, #7890a2);
+  font-size: 9px;
+}
+.data-panel__model-details summary {
+  cursor: pointer;
+}
+.data-panel__model-details[open] summary {
+  margin-bottom: 9px;
+  color: var(--geo-text-soft, #b6c5d2);
 }
 .data-panel__model-placement-heading {
   display: flex;

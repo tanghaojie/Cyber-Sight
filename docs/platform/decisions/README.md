@@ -2,6 +2,8 @@
 
 当前 Platform 决策：
 
+- [Geo 外部模型统一渲染](ADR-20260911-geo-external-model-rendering.md)：Scene 统一标准、Data 自动接入、外部资产与渲染分离。
+
 - [Geo 使用第二个 HTML 构建入口](ADR-20260901-geo-second-build-entry.md)：确定一次 Vite 多入口构建，同时输出 Sight 与 Standalone Geo，并共享唯一 Cesium 静态目录。
 - [Geo 赛博城市 3D Tiles 启动预置](ADR-20260901-geo-cyber-city-tileset-preset.md)：确定启动成都建筑、CustomShader 程序化材质、单一 Clock 扫描、原始材质切换和 30 km 自动隐藏语义。
 - [Geo 前端模拟航班数据](ADR-20260831-geo-simulated-flight-data.md)：确定离线每日循环航线、唯一 `viewer.clock`、Cesium 位置求值和无后端数据边界。

@@ -1,5 +1,7 @@
 # Platform 设计索引
 
+- [Geo 外部模型统一渲染标准](modules/geo-model-rendering.md)：只填外部 URL 和定位的自动昼夜、材质约定和资源生命周期。
+
 - [Geo 前端空间可视化工作台](modules/geo.md)：定义 Forge 动态菜单、Viewer 生命周期、纯 Cesium 工具、插件适配、Vue UI 和旧功能迁移边界。
 - [Geo 无界时间轴与每日循环航线方案](modules/geo-unbounded-timeline.md)：定义时间窗口、仿真 Clock、UTC 刻度与每日循环模拟航班的实现语义。
 - [Platform 运行时配置](runtime-configuration.md)：定义前端品牌、后端 API 元数据与 JWT identity 的环境变量边界和失败兜底。
