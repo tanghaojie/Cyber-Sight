@@ -36,7 +36,9 @@ change_type: fix
 
 浏览器时区、夏令时、不同地区太阳位置与 GPU 反射效果需要维护者人工验收；曝光、夜间 IBL、阴影和资产完善不在本轮范围。
 
-代码已在独立任务分支提交，提交后文档 CI 门禁仍为 NOT_DUE。GitHub 集成创建 tree 的请求返回 403（Resource not accessible by integration），无法上传改动及创建草稿 PR；改用本地提交和可应用补丁交付。
+代码已在独立任务分支提交，提交后文档 CI 门禁仍为 NOT_DUE。初次 GitHub 集成创建 tree 的请求返回 403（Resource not accessible by integration），先以本地提交、补丁和 Git bundle 交付。后续检查发现 GitHub 应用安装列表为空；维护者通过 OpenAI 官方 ChatGPT Codex Connector 安装入口补充 Cyber-Sight 仓库授权后，写入权限恢复。普通 Git 传输返回 401，改用 GitHub Git Data API 上传原始 tree / commit 并创建任务分支，远端 SHA 与本地一致。
+
+已创建 [草稿 PR #1](https://github.com/tanghaojie/Cyber-Sight/pull/1)。Vercel 自动触发 Git 来源的预览部署，首轮部署对应 `77cb3a272a297ce45f2d00a6796a57602bb7d2cf`，状态 READY：[预览地址](https://cyber-sight-9nezh2jfv-tanghaojies-projects.vercel.app)。GitHub 提交约定检查通过。生产分支仍为原基线；未手工部署或进行浏览器功能验收。
 
 ## 相关设计、ADR、计划和提交
 

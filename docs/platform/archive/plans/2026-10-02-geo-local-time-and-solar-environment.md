@@ -49,13 +49,15 @@ updated: 2026-10-02
 
 ## 发布与回滚
 
-在任务分支交付本地提交与可应用补丁。尝试创建草稿 PR 时 GitHub 集成返回 403（Resource not accessible by integration），未能上传改动或创建 PR；不合并或部署。需要回滚时可恢复本提交的 Geo 代码和对应设计。
+交付到 GitHub 任务分支 `fix/geo-local-time-solar-environment` 与 [草稿 PR #1](https://github.com/tanghaojie/Cyber-Sight/pull/1)。Vercel Git 集成自动创建预览部署，首轮提交 `77cb3a272a297ce45f2d00a6796a57602bb7d2cf` 已为 READY：[预览地址](https://cyber-sight-9nezh2jfv-tanghaojies-projects.vercel.app)。生产分支仍为原基线。需要回滚时可恢复本提交的 Geo 代码和对应设计。
 
 ## 实际偏差和遗留问题
 
 完成四个 Geo 源文件修改。契约构建、`vue-tsc`、frontend 的 Sight / Standalone Geo 双入口生产构建、lint 和架构检查通过；格式执行通过。归档后的 `pnpm format:check`、`pnpm docs:archive:check:ci` 与 diff 检查通过，文档状态为 NOT_DUE，无断链或所有权冲突。构建包含依赖 Sass 弃用与 bundle 体积提示，未影响产物生成。
 
 静态检查不代替人工验收。浏览器时区/夏令时、暂停拖动、高倍速环境贴图成本与实际 GPU 视觉尚未验收；夜间 IBL 0.2 保留，后续根据实际模型比较调整。
+
+初次上传因 GitHub 应用未安装并授权仓库而返回 403；维护者补充 OpenAI 官方 ChatGPT Codex Connector 对 Cyber-Sight 的授权后，使用 GitHub Git Data API 上传原始提交对象，远端提交 SHA / tree SHA 与本地一致。普通 Git 传输仍返回 401，未采用该传输路径。Vercel 自动预览部署已完成，GitHub 提交约定检查通过；没有执行手工 Vercel 部署或生产发布。
 
 关联代码提交：`231f44fb51286b2948be7f4e8353b850324b0956`（`fix(geo): use browser-local timeline and solar environment lighting`），包含 `Co-Authored-By: -AI- GPT-6 <ai@scaffold-proj.com>`。
 
