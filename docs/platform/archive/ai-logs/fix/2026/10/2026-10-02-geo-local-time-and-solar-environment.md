@@ -36,6 +36,8 @@ change_type: fix
 
 浏览器时区、夏令时、不同地区太阳位置与 GPU 反射效果需要维护者人工验收；曝光、夜间 IBL、阴影和资产完善不在本轮范围。
 
+代码已在独立任务分支提交，提交后文档 CI 门禁仍为 NOT_DUE。GitHub 集成创建 tree 的请求返回 403（Resource not accessible by integration），无法上传改动及创建草稿 PR；改用本地提交和可应用补丁交付。
+
 ## 相关设计、ADR、计划和提交
 
 - [时间轴设计](../../../../../design/modules/geo-unbounded-timeline.md)
@@ -43,4 +45,4 @@ change_type: fix
 - [ADR](../../../../../decisions/ADR-20261002-geo-browser-time-and-solar-environment.md)
 - [实施计划](../../../../plans/2026-10-02-geo-local-time-and-solar-environment.md)
 
-关联提交：`fix(geo): use browser-local timeline and solar environment lighting`，带真实模型 GPT-6 的 AI trailer；具体 SHA 以任务分支 Git 历史和 PR 为准。
+关联代码提交：`231f44fb51286b2948be7f4e8353b850324b0956`（`fix(geo): use browser-local timeline and solar environment lighting`），带真实模型 GPT-6 的 AI trailer。

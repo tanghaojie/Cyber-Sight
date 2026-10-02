@@ -49,7 +49,7 @@ updated: 2026-10-02
 
 ## 发布与回滚
 
-在任务分支交付提交与供维护者审阅的草稿 PR；不合并或部署。需要回滚时可恢复本提交的 Geo 代码和对应设计。
+在任务分支交付本地提交与可应用补丁。尝试创建草稿 PR 时 GitHub 集成返回 403（Resource not accessible by integration），未能上传改动或创建 PR；不合并或部署。需要回滚时可恢复本提交的 Geo 代码和对应设计。
 
 ## 实际偏差和遗留问题
 
@@ -57,7 +57,7 @@ updated: 2026-10-02
 
 静态检查不代替人工验收。浏览器时区/夏令时、暂停拖动、高倍速环境贴图成本与实际 GPU 视觉尚未验收；夜间 IBL 0.2 保留，后续根据实际模型比较调整。
 
-关联提交：`fix(geo): use browser-local timeline and solar environment lighting`，包含 `Co-Authored-By: -AI- GPT-6 <ai@scaffold-proj.com>`。
+关联代码提交：`231f44fb51286b2948be7f4e8353b850324b0956`（`fix(geo): use browser-local timeline and solar environment lighting`），包含 `Co-Authored-By: -AI- GPT-6 <ai@scaffold-proj.com>`。
 
 ## 相关设计、ADR 和 AI 日志
 
