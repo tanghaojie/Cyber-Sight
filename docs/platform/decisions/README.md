@@ -2,6 +2,8 @@
 
 当前 Platform 决策：
 
+- [Geo 三档质量与模型坐标选择](ADR-20261002-geo-render-modes-and-model-placement.md)：最高画质录屏、平衡默认、低配降级和模型定位来源确认，保留默认影像。
+
 - [Geo 浏览器时区显示与太阳驱动环境光](ADR-20261002-geo-browser-time-and-solar-environment.md)：本地日历刻度、绝对时间求值、SUNLIGHT 与环境贴图更新精度。
 
 - [Geo 外部模型统一渲染](ADR-20260911-geo-external-model-rendering.md)：Scene 统一标准、Data 自动接入、外部资产与渲染分离。

@@ -10,6 +10,8 @@
 
 ## 已完成计划
 
+- [2026-10-02 Geo 第一轮显示优化与模型坐标选择](plans/2026-10-02-geo-render-modes-and-model-placement.md)：三档模式、近地昼夜、发光倍率、加载坐标询问与自动构图；保留默认影像。
+
 - [2026-10-02 Geo 浏览器时区时间轴与太阳环境光](plans/2026-10-02-geo-local-time-and-solar-environment.md)：本地日历时间轴、SUNLIGHT 环境光和 300 秒环境贴图更新精度。
 - [2026-10-02 Geo 近期交付后的 Platform 文档归档复核](plans/2026-10-02-geo-platform-documentation-archive-review.md)：复核近期 Geo 与本轮交付，推进 Platform 台账。
 
@@ -78,6 +80,8 @@
 - [2026-08-30 Geo 影像与宽屏交付后的 Platform 文档归档审查](plans/2026-08-30-platform-documentation-archive-review-3.md)：复核影像恢复与宽屏交付并推进 Platform 台账。
 
 ## AI 协作记录
+
+- [2026-10-02 Geo 第一轮显示优化](ai-logs/feat/2026/10/2026-10-02-geo-render-modes-and-model-placement.md)
 
 - [2026-10-02 Geo 浏览器时区时间轴与太阳环境光](ai-logs/fix/2026/10/2026-10-02-geo-local-time-and-solar-environment.md)
 

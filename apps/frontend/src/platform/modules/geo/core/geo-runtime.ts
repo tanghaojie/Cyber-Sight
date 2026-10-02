@@ -16,7 +16,6 @@ import { createGeoInteractionManager, type GeoInteractionManager } from './inter
 import { createGeoViewerAccess, type GeoViewerAccess } from './viewer-access'
 import { createGeoPluginRegistry, type GeoPluginRegistry } from './plugin-registry'
 import type { GeoPluginDefinition } from './geo-plugin'
-import { createGeoRenderPerformanceController } from './render-performance'
 import {
   DEFAULT_GEO_CAMERA_VIEW,
   flyToGeoLocation,
@@ -358,7 +357,6 @@ export function createGeoRuntime(options: GeoRuntimeOptions = {}): GeoRuntime {
         }),
       )
       configureViewer(viewer)
-      runtimeScope.use(createGeoRenderPerformanceController(viewer))
       await plugins.install(viewer)
       if (signal.aborted || disposed) {
         destroyViewer(viewer)

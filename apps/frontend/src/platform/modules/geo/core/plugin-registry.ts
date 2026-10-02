@@ -8,6 +8,7 @@ import type { GeoInteractionManager } from './interaction-manager'
 import type {
   GeoActionTool,
   GeoBottomDockContribution,
+  GeoOverlayContribution,
   GeoContributionKind,
   GeoInspectorContribution,
   GeoPanelContribution,
@@ -153,6 +154,9 @@ function contributionEntries(
   })
   contributions.bottomDocks?.forEach(function addBottomDock(bottomDock: GeoBottomDockContribution) {
     add('bottomDock', bottomDock)
+  })
+  contributions.overlays?.forEach(function addOverlay(overlay: GeoOverlayContribution) {
+    add('overlay', overlay)
   })
   return entries
 }

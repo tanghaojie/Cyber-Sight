@@ -3,17 +3,16 @@ import {
   Cartesian3,
   Cartographic,
   CustomShader,
+  DynamicEnvironmentMapManager,
   Ellipsoid,
   JulianDate,
-  Math as CesiumMath,
-  Matrix3,
   Matrix4,
   Model,
-  Simon1994PlanetaryPositions,
-  Transforms,
   UniformType,
   type Viewer,
 } from 'cesium'
+import type { GeoRenderMode } from '../../core/render-performance'
+import { smoothstep, solarHeightDegrees, sunPositionFixed } from './solar-lighting'
 
 export interface GeoModelRenderingRegistration {
   update(): void
@@ -22,7 +21,34 @@ export interface GeoModelRenderingRegistration {
 
 export interface GeoModelRenderingManager {
   register(model: Model): GeoModelRenderingRegistration
+  registerEnvironment(resource: GeoEnvironmentResource): { dispose(): void }
+  setMode(mode: GeoRenderMode): void
+  getFocusPosition(): Cartesian3 | undefined
   dispose(): void
+}
+
+type GeoEnvironmentResource = Pick<
+  Model,
+  'environmentMapManager' | 'imageBasedLighting' | 'isDestroyed'
+>
+
+interface ManagedEnvironment {
+  readonly resource: GeoEnvironmentResource
+  readonly enabled: boolean
+  readonly secondsDifference: number
+  readonly coefficients: Cartesian3[] | undefined
+  readonly fallbackCoefficients: Cartesian3[]
+}
+
+function setEnvironmentCoefficients(
+  resource: GeoEnvironmentResource,
+  coefficients: Cartesian3[] | undefined,
+): void {
+  // Cesium's public setter accepts undefined to restore automatic IBL; its declaration omits it.
+  const lighting = resource.imageBasedLighting as unknown as {
+    sphericalHarmonicCoefficients: Cartesian3[] | undefined
+  }
+  lighting.sphericalHarmonicCoefficients = coefficients
 }
 
 interface ManagedModel {
@@ -33,6 +59,7 @@ interface ManagedModel {
   baseLightColor: Cartesian3
   readonly usesSceneLight: boolean
   readonly originalIblFactor: Cartesian2
+  readonly environment: { dispose(): void }
   dirty: boolean
   disposed: boolean
   lastNightFactor: number | undefined
@@ -49,17 +76,8 @@ interface SceneLightSnapshot {
 
 const DAYLIGHT_HEIGHT_DEGREES = 2
 const NIGHT_HEIGHT_DEGREES = -6
-const NIGHT_IBL_FACTOR = 0.2
-const solarPositionScratch = new Cartesian3()
-const sunFixedScratch = new Cartesian3()
-const fixedTransformScratch = new Matrix3()
-const surfaceNormalScratch = new Cartesian3()
 const modelCartographicScratch = new Cartographic()
-
-function smoothstep(edge0: number, edge1: number, value: number): number {
-  const t = Math.min(Math.max((value - edge0) / (edge1 - edge0), 0), 1)
-  return t * t * (3 - 2 * t)
-}
+const NIGHT_AMBIENT_COLOR = new Cartesian3(0.02, 0.03, 0.05)
 
 function createModelShader() {
   return new CustomShader({
@@ -67,6 +85,7 @@ function createModelShader() {
       void fragmentMain(FragmentInput fsInput, inout czm_modelMaterial material) {
         #ifdef LIGHTING_PBR
           material.emissive *= u_nightFactor;
+          material.emissive += material.diffuse * u_nightAmbient * u_nightFactor;
         #endif
       }
     `,
@@ -75,28 +94,12 @@ function createModelShader() {
         type: UniformType.FLOAT,
         value: 0.0,
       },
+      u_nightAmbient: {
+        type: UniformType.VEC3,
+        value: new Cartesian3(0.02, 0.03, 0.05),
+      },
     },
   })
-}
-
-function solarHeightDegrees(origin: Cartesian3, sunFixed: Cartesian3): number {
-  const topocentricSun = Cartesian3.subtract(sunFixed, origin, solarPositionScratch)
-  Cartesian3.normalize(topocentricSun, topocentricSun)
-  const surfaceNormal = Ellipsoid.WGS84.geodeticSurfaceNormal(origin, surfaceNormalScratch)
-  const cosine = Math.min(Math.max(Cartesian3.dot(surfaceNormal, topocentricSun), -1), 1)
-  return CesiumMath.toDegrees(Math.asin(cosine))
-}
-
-function sunPositionFixed(time: JulianDate): Cartesian3 | undefined {
-  const transform = Transforms.computeIcrfToCentralBodyFixedMatrix(time, fixedTransformScratch)
-  if (!transform) {
-    return undefined
-  }
-  const sunInertial = Simon1994PlanetaryPositions.computeSunPositionInEarthInertialFrame(
-    time,
-    solarPositionScratch,
-  )
-  return Matrix3.multiplyByVector(transform, sunInertial, sunFixedScratch)
 }
 
 function resolveOrigin(model: Model): Cartesian3 {
@@ -154,8 +157,57 @@ function sceneLightChanged(item: ManagedModel, viewer: Viewer): boolean {
 
 export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderingManager {
   const registrations = new Set<ManagedModel>()
+  const environments = new Set<ManagedEnvironment>()
+  let mode: GeoRenderMode = 'balanced'
   let disposed = false
   let lastTime: JulianDate | undefined
+
+  function applyEnvironment(item: ManagedEnvironment): void {
+    if (item.resource.isDestroyed()) {
+      return
+    }
+    const dynamic = mode !== 'compatible'
+    item.resource.environmentMapManager.enabled = dynamic && item.enabled
+    const timeBudget = mode === 'performance' ? 0.25 : 0.5
+    item.resource.environmentMapManager.maximumSecondsDifference = Math.max(
+      300,
+      viewer.clock.shouldAnimate ? Math.abs(viewer.clock.multiplier) * timeBudget : 300,
+    )
+    const coefficients = dynamic
+      ? item.coefficients
+      : (item.coefficients ?? item.fallbackCoefficients)
+    if (item.resource.imageBasedLighting.sphericalHarmonicCoefficients !== coefficients) {
+      setEnvironmentCoefficients(item.resource, coefficients)
+    }
+  }
+
+  function registerEnvironment(resource: GeoEnvironmentResource): { dispose(): void } {
+    if (disposed) {
+      throw new Error('Geo model rendering manager has been disposed')
+    }
+    const item: ManagedEnvironment = {
+      resource,
+      enabled: resource.environmentMapManager.enabled,
+      secondsDifference: resource.environmentMapManager.maximumSecondsDifference,
+      coefficients: resource.imageBasedLighting.sphericalHarmonicCoefficients,
+      fallbackCoefficients:
+        DynamicEnvironmentMapManager.DEFAULT_SPHERICAL_HARMONIC_COEFFICIENTS.map((coefficient) =>
+          Cartesian3.clone(coefficient),
+        ),
+    }
+    environments.add(item)
+    applyEnvironment(item)
+    return {
+      dispose() {
+        if (!environments.delete(item) || resource.isDestroyed()) {
+          return
+        }
+        resource.environmentMapManager.enabled = item.enabled
+        resource.environmentMapManager.maximumSecondsDifference = item.secondsDifference
+        setEnvironmentCoefficients(resource, item.coefficients)
+      },
+    }
+  }
 
   function applyModel(item: ManagedModel, sunFixed: Cartesian3): boolean {
     if (item.disposed || item.model.isDestroyed()) {
@@ -164,15 +216,16 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
     const origin = resolveOrigin(item.model)
     const altitude = solarHeightDegrees(origin, sunFixed)
     const nightFactor = 1 - smoothstep(NIGHT_HEIGHT_DEGREES, DAYLIGHT_HEIGHT_DEGREES, altitude)
-    const directFactor = smoothstep(0, DAYLIGHT_HEIGHT_DEGREES, altitude)
+    const directFactor = smoothstep(0, 6, altitude)
     if (item.usesSceneLight) {
       item.baseLightColor = sceneBaseLightColor(viewer)
       item.lastSceneLight = sceneLightSnapshot(viewer)
     }
-    const iblFactor = 1 - (1 - NIGHT_IBL_FACTOR) * nightFactor
+    const diffuseFactor = 1 - 0.6 * nightFactor
+    const specularFactor = mode === 'compatible' ? 0 : 1 - 0.4 * nightFactor
     const nextIbl = Cartesian2.fromElements(
-      item.originalIblFactor.x * iblFactor,
-      item.originalIblFactor.y * iblFactor,
+      item.originalIblFactor.x * diffuseFactor,
+      item.originalIblFactor.y * specularFactor,
     )
     const currentIbl = item.model.imageBasedLighting.imageBasedLightingFactor
     const nextLight = Cartesian3.multiplyByScalar(
@@ -180,6 +233,9 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
       directFactor,
       new Cartesian3(),
     )
+    const warmth = 1 - smoothstep(2, 18, altitude)
+    nextLight.y *= 1 - 0.22 * warmth
+    nextLight.z *= 1 - 0.4 * warmth
     const currentLight = (item.model as Model & { lightColor?: Cartesian3 }).lightColor
     const changed =
       item.lastNightFactor !== nightFactor ||
@@ -188,6 +244,10 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
       !currentLight ||
       !Cartesian3.equalsEpsilon(currentLight, nextLight, 1e-7, 1e-7)
     item.shader.setUniform('u_nightFactor', nightFactor)
+    item.shader.setUniform(
+      'u_nightAmbient',
+      mode === 'compatible' ? Cartesian3.ZERO : NIGHT_AMBIENT_COLOR,
+    )
     item.model.imageBasedLighting.imageBasedLightingFactor = nextIbl
     ;(item.model as Model & { lightColor?: Cartesian3 }).lightColor = nextLight
     item.dirty = false
@@ -197,7 +257,11 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
   }
 
   function updateModels(time: JulianDate): void {
-    if (disposed || registrations.size === 0) {
+    if (disposed) {
+      return
+    }
+    environments.forEach(applyEnvironment)
+    if (registrations.size === 0) {
       return
     }
     const timeChanged = !lastTime || !JulianDate.equals(lastTime, time)
@@ -266,6 +330,7 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
         : sceneBaseLightColor(viewer),
       usesSceneLight: !configuredLightColor,
       originalIblFactor: Cartesian2.clone(model.imageBasedLighting.imageBasedLightingFactor),
+      environment: registerEnvironment(model),
       dirty: true,
       disposed: false,
       lastNightFactor: undefined,
@@ -306,6 +371,7 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
                 managed.originalLightColor
             }
           } finally {
+            managed.environment.dispose()
             shader.destroy()
           }
         },
@@ -320,6 +386,7 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
             managed.originalLightColor
         }
       } finally {
+        managed.environment.dispose()
         shader.destroy()
       }
       throw error
@@ -344,6 +411,7 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
       } catch {
         // Continue restoring and destroying the remaining model registrations.
       } finally {
+        item.environment.dispose()
         try {
           item.shader.destroy()
         } catch {
@@ -352,7 +420,45 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
       }
     })
     registrations.clear()
+    environments.forEach(function restoreEnvironment(item) {
+      if (!item.resource.isDestroyed()) {
+        item.resource.environmentMapManager.enabled = item.enabled
+        item.resource.environmentMapManager.maximumSecondsDifference = item.secondsDifference
+        setEnvironmentCoefficients(item.resource, item.coefficients)
+      }
+    })
+    environments.clear()
   }
 
-  return { register, dispose }
+  return {
+    register,
+    registerEnvironment,
+    setMode(nextMode) {
+      if (disposed) {
+        return
+      }
+      mode = nextMode
+      registrations.forEach(function markDirty(item) {
+        item.dirty = true
+      })
+      lastTime = undefined
+      updateModels(viewer.clock.currentTime)
+      viewer.scene.requestRender()
+    },
+    getFocusPosition() {
+      let position: Cartesian3 | undefined
+      for (const item of registrations) {
+        if (item.disposed || !item.model.show || item.model.isDestroyed()) {
+          continue
+        }
+        try {
+          position = resolveOrigin(item.model)
+        } catch {
+          // One invalid placement must not stop the scene's environment updates.
+        }
+      }
+      return position
+    },
+    dispose,
+  }
 }

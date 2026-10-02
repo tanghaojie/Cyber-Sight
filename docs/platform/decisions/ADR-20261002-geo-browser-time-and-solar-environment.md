@@ -22,6 +22,8 @@ date: 2026-10-02
 
 本 ADR 调整 [单时钟 ADR](ADR-20260830-geo-simulation-time-and-solar-lighting.md) 的 UTC 显示要求，并扩展 [外部模型渲染 ADR](ADR-20260911-geo-external-model-rendering.md) 的环境光配置；其余生命周期和模块边界继续有效。
 
+后续[三档质量与模型坐标 ADR](ADR-20261002-geo-render-modes-and-model-placement.md)取代上述固定IBL、阴影默认值和固定300秒参数：300秒作为下限，播放阈值随模式与倍速调整，兼容档关闭动态环境生成。浏览器时区、唯一Clock与太阳绝对时刻语义保持有效。
+
 ## 风险与验证
 
 浏览器本地时间与模型所在地时间可能不同；太阳始终按绝对时刻与模型位置求值。日期偏移在夏令时边界可变化。SUNLIGHT 会影响原生 PBR 模型和 tileset 的环境反射，环境贴图生成存在异步延迟和 GPU 成本；高倍速、暂停拖动及真实资产效果需人工验收。静态检查和构建不能代替视觉验收。

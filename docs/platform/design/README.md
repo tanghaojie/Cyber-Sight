@@ -1,5 +1,7 @@
 # Platform 设计索引
 
+- [Geo 三档显示质量与模型坐标选择](modules/geo-render-quality-and-placement.md)：性能/平衡/兼容、近地光照、模型发光倍率与加载前坐标询问。
+
 - [Geo 外部模型统一渲染标准](modules/geo-model-rendering.md)：只填外部 URL 和定位的自动昼夜、材质约定和资源生命周期。
 
 - [Geo 前端空间可视化工作台](modules/geo.md)：定义 Forge 动态菜单、Viewer 生命周期、纯 Cesium 工具、插件适配、Vue UI 和旧功能迁移边界。
