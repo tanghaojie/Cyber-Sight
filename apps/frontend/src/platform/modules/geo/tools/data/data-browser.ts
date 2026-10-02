@@ -28,6 +28,8 @@ import type {
 
 export type { GeoTilesetVisualStyle } from './tileset-visual-style'
 
+const ENVIRONMENT_MAP_UPDATE_SECONDS = 300
+
 export type GeoDataResourceKind = 'geojson' | 'model' | '3d-tiles'
 export type GeoTerrainResourceId = 'ellipsoid' | 'cesium-world-terrain' | 'custom'
 
@@ -549,6 +551,9 @@ export function createGeoDataBrowser(
         show: options.show ?? true,
         minimumPixelSize: options.minimumPixelSize,
         shadows: options.shadows,
+        environmentMapOptions: {
+          maximumSecondsDifference: ENVIRONMENT_MAP_UPDATE_SECONDS,
+        },
         gltfCallback(gltf: unknown) {
           modelRenderingNotice = modelMaterialNotice(gltf, Boolean(browserOptions.modelRendering))
         },
@@ -630,6 +635,9 @@ export function createGeoDataBrowser(
         show: options.show ?? true,
         maximumScreenSpaceError: options.maximumScreenSpaceError ?? 16,
         shadows: options.shadows,
+        environmentMapOptions: {
+          maximumSecondsDifference: ENVIRONMENT_MAP_UPDATE_SECONDS,
+        },
       })
       assertActive()
       resource.customShader = options.visualStyle === 'cyber-scan' ? visual?.shader : undefined

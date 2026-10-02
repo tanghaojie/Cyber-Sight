@@ -2,6 +2,8 @@
 
 当前 Platform 决策：
 
+- [Geo 浏览器时区显示与太阳驱动环境光](ADR-20261002-geo-browser-time-and-solar-environment.md)：本地日历刻度、绝对时间求值、SUNLIGHT 与环境贴图更新精度。
+
 - [Geo 外部模型统一渲染](ADR-20260911-geo-external-model-rendering.md)：Scene 统一标准、Data 自动接入、外部资产与渲染分离。
 
 - [Geo 使用第二个 HTML 构建入口](ADR-20260901-geo-second-build-entry.md)：确定一次 Vite 多入口构建，同时输出 Sight 与 Standalone Geo，并共享唯一 Cesium 静态目录。

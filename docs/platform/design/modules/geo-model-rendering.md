@@ -4,7 +4,7 @@ scope: platform
 repository: Cyber-Sight
 status: active
 owner: project maintainers
-updated: 2026-09-11
+updated: 2026-10-02
 ---
 
 # Geo 外部模型统一渲染标准
@@ -24,6 +24,8 @@ updated: 2026-09-11
 - 只使用 `viewer.clock.currentTime`。根据太阳位置与每个模型的 WGS84 位置求太阳高度；相同 UTC 的不同地区独立计算，禁止读取电脑本地小时或按相机位置判断建筑昼夜。
 - 高度角大于等于 +2° 为白天，小于等于 -6° 为夜间，中间采用 smoothstep 平滑过渡。每模型环境光贡献从白天原始值平滑降为夜间的 0.2 倍；太阳直射在地平线附近衰减，太阳落到地平线以下后不从地下照亮模型。
 - 场景默认太阳照明开启、阴影关闭。现有地球光照开关明确称为“地球光照”，只控制地球表面；模型昼夜始终跟随仿真时间。太阳图形显隐不代表关闭光源。阴影遵循现有 Scene ShadowMap 开关。
+- Scene 将 `scene.atmosphere.dynamicLighting` 设为 `DynamicAtmosphereLightingType.SUNLIGHT`，使 Cesium 原生环境贴图中的大气光照随太阳方向变化；Scene 释放时恢复原值。Data 创建 Model 和 Cesium3DTileset 时配置 `environmentMapOptions.maximumSecondsDifference: 300`，以仿真秒数提高环境贴图更新精度。由 Cesium 负责生成与释放，不新增计时器或逐帧重置。
+- 夜间 IBL 0.2 与自发光曲线继续保留作为本轮环境光修正的对照基线；环境贴图异步生成和高倍速成本需要人工验收后再校准。
 - 统一按模型变换矩阵的地固坐标原点定位；输入界面标注 WGS84 经纬度和椭球高（米）。无法确定有效地理位置时保留原始渲染并显示说明，不假定成都或地心是有效地点。
 
 ## 职责与公共接口
@@ -59,13 +61,15 @@ URL/定位 → Data 创建 Model 并等待原始模型 ready → Scene 渲染管
 维护者人工验收：
 
 1. 仅填 URL 和定位可加载并自动取景；缩放/姿态为可选调整，界面无 Profile 和夜景参数。
-2. 成都正午/夜间及日落渐变：PBR 明暗和 Emissive 同步；UTC+8 换算正确，时间轴仍明确 UTC。
+2. 成都正午/夜间及日落渐变：PBR 明暗、天空环境反射和 Emissive 同步；时间轴显示浏览器本地时区及对应 UTC 偏移，浏览器时区不同于模型所在地时太阳仍按绝对时刻求值。
 3. 暂停后拖动、播放、倍速、回到现在及修改位置立即生效；不同经度模型显示各自昼夜，跨日和极昼极夜不使用固定小时分支。
 4. 无 Emissive、Unlit、混合材质、透明材质正确显示，提示与实际材质一致。
 5. 显隐、移除、失败、退出重入无重复监听器或资源残留；暂停时空闲渲染不持续增长。
 6. 地球光照、太阳显隐、阴影开关语义清晰；正常 3D Tiles 科技扫描和 Flight 保持原行为。混合模型/瓦片的场景渲染错误不误清除其他资源样式，按提示人工恢复。
 
 ## 关联记录
+
+- [浏览器时区与太阳环境光 ADR](../../decisions/ADR-20261002-geo-browser-time-and-solar-environment.md)
 
 - [决策](../../decisions/ADR-20260911-geo-external-model-rendering.md)
 - [实施计划](../../archive/plans/2026-09-11-geo-external-model-rendering.md)

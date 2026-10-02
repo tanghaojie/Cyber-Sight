@@ -1,4 +1,5 @@
 import { defineComponent, h } from 'vue'
+import { DynamicAtmosphereLightingType } from 'cesium'
 import ScenePanel from './ScenePanel.vue'
 import {
   geoModelRenderingCapability,
@@ -30,6 +31,13 @@ export function createGeoScenePlugin(): GeoPluginDefinition {
     id: 'scene',
     order: 30,
     install(context: GeoPluginContext) {
+      const originalDynamicLighting = context.viewer.scene.atmosphere.dynamicLighting
+      context.viewer.scene.atmosphere.dynamicLighting = DynamicAtmosphereLightingType.SUNLIGHT
+      context.scope.defer(function restoreAtmosphereLighting() {
+        if (!context.viewer.isDestroyed()) {
+          context.viewer.scene.atmosphere.dynamicLighting = originalDynamicLighting
+        }
+      })
       const controller = createGeoSceneController(context.viewer)
       context.scope.use(controller)
       const modelRendering = createGeoModelRenderingManager(context.viewer)
