@@ -4,7 +4,7 @@ scope: platform
 repository: Cyber-Sight
 status: active
 owner: project maintainers
-updated: 2026-10-02
+updated: 2026-10-03
 ---
 
 # Geo 三档显示质量与模型坐标选择
@@ -47,6 +47,8 @@ Data 下载并解析每次加载的独立GLB/JSON副本，不修改远程源资�
 只读取明确WGS84地理metadata，例如根节点extras的longitude_wgs84/latitude_wgs84；验证数值、范围与活动场景。height_m表示模型尺寸，不当海拔。存在有效内置坐标时，在Primitive加入场景前显示两种坐标与取消按钮：使用模型坐标或使用加载输入坐标。模型坐标缺少椭球高时采样当前地形；输入坐标保留显式高度、缩放与姿态。没有坐标不弹窗，继续输入定位。取消、下载失败、地形采样失败、卸载均不得残留模型或未完成的选择。
 
 元数据优先级为glTF全局extras、活动scene extras、活动scene根节点extras；字段为数值型 `longitude_wgs84` / `latitude_wgs84`，可选定位高度为 `ellipsoid_height_m`。这些是资产明确约定，并非glTF统一地理坐标标准；不猜测普通XYZ、尺寸或坐标系。多个根节点位置冲突会报可读错误。GLB校验2.0头与chunk长度；JSON glTF要求2.0。椭球地形使用0米，有availability的真实地形用最高可用精度，其余采样level12；采样失败或等待期间地形变更须重试或选输入坐标，不能静默置零。
+
+新资产按[制作与地理参考标准](geo-model-authoring.md)只在唯一活动根节点保存一份规范字段，采用 WGS84、米制局部锚点及明确椭球高语义。未知高程省略，不能把展示默认高度 0 当实测值。该制作标准中的 CRS、精度、朝向说明、placement.json 和质量版本不新增自动读取能力；当前代码仍只读取上述经纬度与可选椭球高。
 
 坐标决策由Data controller持有Promise与只读请求快照；Vue只展示原生对话框和提交选择，不读取Cesium私有字段。取消不作为错误。模型就绪后按真实范围、视场角和画幅取景；默认成都瓦片加载不得在完成时夺走当前镜头。
 

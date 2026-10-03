@@ -10,6 +10,8 @@
 
 ## 已完成计划
 
+- [2026-10-03 Geo 模型制作与地理参考标准](plans/2026-10-03-geo-model-authoring-standard.md)：区分模型/场景优化，补充 PBR、UV、纹理、表面变化与统一 WGS84 资产契约；记录现有加载边界和人工验收。
+
 - [2026-10-02 Geo 三档质量交付后的 Platform 文档归档复核](plans/2026-10-02-geo-render-quality-documentation-review.md)：复核截至18c7895的Geo交付，推进Platform台账。
 
 - [2026-10-02 Geo 第一轮显示优化与模型坐标选择](plans/2026-10-02-geo-render-modes-and-model-placement.md)：三档模式、近地昼夜、发光倍率、加载坐标询问与自动构图；保留默认影像。
@@ -82,6 +84,8 @@
 - [2026-08-30 Geo 影像与宽屏交付后的 Platform 文档归档审查](plans/2026-08-30-platform-documentation-archive-review-3.md)：复核影像恢复与宽屏交付并推进 Platform 台账。
 
 ## AI 协作记录
+
+- [2026-10-03 Geo 模型制作与地理参考标准](ai-logs/docs/2026/10/2026-10-03-geo-model-authoring-standard.md)
 
 - [2026-10-02 Geo 三档质量交付后的文档复核](ai-logs/docs/2026/10/2026-10-02-geo-render-quality-documentation-review.md)
 

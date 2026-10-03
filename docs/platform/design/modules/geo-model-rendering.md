@@ -4,7 +4,7 @@ scope: platform
 repository: Cyber-Sight
 status: active
 owner: project maintainers
-updated: 2026-10-02
+updated: 2026-10-03
 ---
 
 # Geo 外部模型统一渲染标准
@@ -12,6 +12,8 @@ updated: 2026-10-02
 ## 背景与目标
 
 普通用户提供外部 glTF 2.0/GLB URL 和 WGS84 定位后，模型自动采用系统统一的昼夜渲染。用户可以切换场景级性能、平衡、兼容模式，不需要逐模型 Profile、Shader 或灯光参数。系统只负责标准与渲染，不制作、托管、上传或管理模型资产。
+
+新制作或重导出的建筑遵循[模型制作与地理参考标准](geo-model-authoring.md)：几何、PBR、UV、纹理、表面变化、夜景及地理元数据由资产制作端交付，周边真实环境与反射归场景优化。该标准补充制作要求，不表示现有模型已重制，也不改变本页运行时能力。
 
 ## 范围与非目标
 
@@ -71,6 +73,8 @@ URL/定位 → Data 独立下载解析与发光倍率适配 → 有效坐标时�
 ## 关联记录
 
 - [三档质量与模型坐标决策](../../decisions/ADR-20261002-geo-render-modes-and-model-placement.md)
+
+- [模型制作与地理参考契约](../../decisions/ADR-20261003-geo-model-authoring-and-georeference.md)
 - [浏览器时区与太阳环境光 ADR](../../decisions/ADR-20261002-geo-browser-time-and-solar-environment.md)
 
 - [决策](../../decisions/ADR-20260911-geo-external-model-rendering.md)
