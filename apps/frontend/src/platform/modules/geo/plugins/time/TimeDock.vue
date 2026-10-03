@@ -26,7 +26,9 @@
       >
         {{ t('geo.time.now') }}
       </button>
-      <strong>{{ formatCurrentTime(controller.state.currentTime) }}</strong>
+      <strong :title="browserTimeZone">{{
+        formatCurrentTime(controller.state.currentTime)
+      }}</strong>
       <select
         :value="controller.state.multiplier"
         :aria-label="t('geo.time.speed')"
@@ -65,6 +67,7 @@
           :key="`major:${tick.time}`"
           class="geo-time-dock__tick geo-time-dock__tick--major"
           :style="{ left: `${tick.offset}%` }"
+          :title="formatBoundary(tick.time)"
         >
           <i />
           <em>{{ tick.label }}</em>
@@ -145,23 +148,24 @@ const emit = defineEmits<{
 const { t } = useLocalization()
 const timelineTrack = ref<HTMLElement>()
 const speeds = [1, 10, 60, 600, 3600] as const
+const browserTimeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone
 const currentFormatter = new Intl.DateTimeFormat('zh-CN', {
-  timeZone: 'UTC',
   month: '2-digit',
   day: '2-digit',
   hour: '2-digit',
   minute: '2-digit',
   second: '2-digit',
-  hour12: false,
+  hourCycle: 'h23',
+  timeZoneName: 'shortOffset',
 })
 const boundaryFormatter = new Intl.DateTimeFormat('zh-CN', {
-  timeZone: 'UTC',
   year: 'numeric',
   month: '2-digit',
   day: '2-digit',
   hour: '2-digit',
   minute: '2-digit',
-  hour12: false,
+  hourCycle: 'h23',
+  timeZoneName: 'shortOffset',
 })
 let pointerSession: PointerSession | undefined
 
@@ -220,33 +224,32 @@ const currentTimeVisible = computed(function isCurrentTimeVisible() {
 
 function alignToTick(epochMilliseconds: number, definition: TickDefinition): Date {
   const date = new Date(epochMilliseconds)
-  date.setUTCMilliseconds(0)
+  date.setTime(epochMilliseconds - date.getMilliseconds())
   switch (definition.unit) {
     case 'second':
-      date.setUTCSeconds(Math.floor(date.getUTCSeconds() / definition.step) * definition.step)
+      date.setTime(date.getTime() - (date.getSeconds() % definition.step) * 1000)
       break
     case 'minute':
-      date.setUTCSeconds(0)
-      date.setUTCMinutes(Math.floor(date.getUTCMinutes() / definition.step) * definition.step)
+      date.setTime(
+        date.getTime() - date.getSeconds() * 1000 - (date.getMinutes() % definition.step) * 60_000,
+      )
       break
     case 'hour':
-      date.setUTCSeconds(0, 0)
-      date.setUTCMinutes(0)
-      date.setUTCHours(Math.floor(date.getUTCHours() / definition.step) * definition.step)
+      date.setHours(Math.floor(date.getHours() / definition.step) * definition.step, 0, 0, 0)
       break
     case 'day':
-      date.setUTCHours(0, 0, 0, 0)
+      date.setHours(0, 0, 0, 0)
       break
     case 'month':
-      date.setUTCHours(0, 0, 0, 0)
-      date.setUTCDate(1)
-      date.setUTCMonth(Math.floor(date.getUTCMonth() / definition.step) * definition.step)
+      date.setHours(0, 0, 0, 0)
+      date.setDate(1)
+      date.setMonth(Math.floor(date.getMonth() / definition.step) * definition.step)
       break
     case 'year':
-      date.setUTCHours(0, 0, 0, 0)
-      date.setUTCDate(1)
-      date.setUTCMonth(0)
-      date.setUTCFullYear(Math.floor(date.getUTCFullYear() / definition.step) * definition.step)
+      date.setHours(0, 0, 0, 0)
+      date.setDate(1)
+      date.setMonth(0)
+      date.setFullYear(Math.floor(date.getFullYear() / definition.step) * definition.step)
       break
   }
   return date
@@ -255,33 +258,34 @@ function alignToTick(epochMilliseconds: number, definition: TickDefinition): Dat
 function advanceTick(date: Date, definition: TickDefinition): void {
   switch (definition.unit) {
     case 'second':
-      date.setUTCSeconds(date.getUTCSeconds() + definition.step)
+      // Elapsed-time steps preserve repeated short ticks during a DST rollback.
+      date.setTime(date.getTime() + definition.step * 1000)
       break
     case 'minute':
-      date.setUTCMinutes(date.getUTCMinutes() + definition.step)
+      date.setTime(date.getTime() + definition.step * 60_000)
       break
     case 'hour':
-      date.setUTCHours(date.getUTCHours() + definition.step)
+      date.setHours(date.getHours() + definition.step)
       break
     case 'day':
-      date.setUTCDate(date.getUTCDate() + definition.step)
+      date.setDate(date.getDate() + definition.step)
       break
     case 'month':
-      date.setUTCMonth(date.getUTCMonth() + definition.step)
+      date.setMonth(date.getMonth() + definition.step)
       break
     case 'year':
-      date.setUTCFullYear(date.getUTCFullYear() + definition.step)
+      date.setFullYear(date.getFullYear() + definition.step)
       break
   }
 }
 
 function formatTick(epochMilliseconds: number, definition: TickDefinition): string {
   const date = new Date(epochMilliseconds)
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
-  const day = String(date.getUTCDate()).padStart(2, '0')
-  const hours = String(date.getUTCHours()).padStart(2, '0')
-  const minutes = String(date.getUTCMinutes()).padStart(2, '0')
-  const seconds = String(date.getUTCSeconds()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
   switch (definition.unit) {
     case 'second':
       return `${hours}:${minutes}:${seconds}`
@@ -291,9 +295,9 @@ function formatTick(epochMilliseconds: number, definition: TickDefinition): stri
     case 'day':
       return `${month}/${day}`
     case 'month':
-      return `${date.getUTCFullYear()}-${month}`
+      return `${date.getFullYear()}-${month}`
     case 'year':
-      return String(date.getUTCFullYear())
+      return String(date.getFullYear())
   }
 }
 
@@ -323,11 +327,11 @@ function buildTicks(definition: TickDefinition, includeLabels: boolean): Timelin
 }
 
 function formatCurrentTime(value: number): string {
-  return `${currentFormatter.format(value)} UTC`
+  return currentFormatter.format(value)
 }
 
 function formatBoundary(value: number): string {
-  return `${boundaryFormatter.format(value)} UTC`
+  return boundaryFormatter.format(value)
 }
 
 function timeAtClientX(clientX: number): number | undefined {

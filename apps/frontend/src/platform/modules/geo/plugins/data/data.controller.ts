@@ -33,6 +33,7 @@ import {
 } from '../../tools/data/imagery-layer-manager'
 import type { GeoImageryLayerEntry } from './data.capabilities'
 import type { GeoModelRenderingManager } from '../../tools/scene/model-rendering'
+import type { GeoModelCoordinates, GeoModelCoordinateSource } from '../../tools/data/model-asset'
 
 export type GeoDataLoadingOperation = 'geojson' | 'model' | 'tileset' | 'fly-to' | 'transform'
 
@@ -44,6 +45,10 @@ export interface GeoDataState {
   loadingOperation?: GeoDataLoadingOperation
   loadingImagerySource?: GeoImagerySourceId
   error?: string
+  modelCoordinateRequest?: {
+    readonly coordinates: GeoModelCoordinates
+    readonly input?: GeoModelTransform
+  }
 }
 
 export interface GeoDataController {
@@ -59,6 +64,7 @@ export interface GeoDataController {
   flyToImagery(id: string): void
   loadGeoJson(options: LoadGeoJsonOptions): Promise<void>
   loadModel(options: LoadModelOptions): Promise<void>
+  chooseModelCoordinates(source: GeoModelCoordinateSource): void
   loadTileset(options: LoadTilesetOptions): Promise<boolean>
   removeResource(id: string): void
   setResourceVisible(id: string, show: boolean): void
@@ -110,6 +116,7 @@ export function createGeoDataController(
   let disposed = false
   let pendingOperations = 0
   let terrainRequestVersion = 0
+  let pendingCoordinateChoice: ((source: GeoModelCoordinateSource) => void) | undefined
 
   function guard(): void {
     if (disposed) {
@@ -160,7 +167,9 @@ export function createGeoDataController(
     try {
       return await operation()
     } catch (error) {
-      state.error = error instanceof Error ? error.message : '数据操作失败'
+      if (!disposed && !(error instanceof DOMException && error.name === 'AbortError')) {
+        state.error = error instanceof Error ? error.message : '数据操作失败'
+      }
       return undefined
     } finally {
       pendingOperations -= 1
@@ -244,9 +253,41 @@ export function createGeoDataController(
 
   async function loadModel(loadOptions: LoadModelOptions): Promise<void> {
     await run(async function load() {
-      const model = await browser.loadModel(loadOptions)
+      const model = await browser.loadModel({
+        ...loadOptions,
+        chooseCoordinates:
+          loadOptions.chooseCoordinates ??
+          function requestCoordinates(coordinates) {
+            guard()
+            if (pendingCoordinateChoice) {
+              throw new Error('请先完成当前模型的坐标选择。')
+            }
+            state.modelCoordinateRequest = { coordinates, input: loadOptions.transform }
+            return new Promise<GeoModelCoordinateSource>(function waitForChoice(resolve) {
+              function abort(): void {
+                chooseModelCoordinates('cancel')
+              }
+              pendingCoordinateChoice = function finishChoice(source) {
+                options.signal?.removeEventListener('abort', abort)
+                state.modelCoordinateRequest = undefined
+                resolve(source)
+              }
+              options.signal?.addEventListener('abort', abort, { once: true })
+              if (options.signal?.aborted) {
+                abort()
+              }
+            })
+          },
+      })
+      guard()
       await browser.flyTo(model.id)
     }, 'model')
+  }
+
+  function chooseModelCoordinates(source: GeoModelCoordinateSource): void {
+    const finish = pendingCoordinateChoice
+    pendingCoordinateChoice = undefined
+    finish?.(source)
   }
 
   async function loadTileset(loadOptions: LoadTilesetOptions): Promise<boolean> {
@@ -339,6 +380,7 @@ export function createGeoDataController(
       return
     }
     disposed = true
+    chooseModelCoordinates('cancel')
     options.onImageryLayersChange?.([])
     imagery.dispose()
     browser.dispose()
@@ -366,6 +408,7 @@ export function createGeoDataController(
     flyToImagery,
     loadGeoJson,
     loadModel,
+    chooseModelCoordinates,
     loadTileset,
     removeResource,
     setResourceVisible,

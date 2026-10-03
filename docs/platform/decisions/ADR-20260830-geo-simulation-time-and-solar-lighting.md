@@ -5,6 +5,7 @@ repository: Cyber-Sight
 owner: project maintainers
 status: accepted
 date: 2026-08-30
+updated: 2026-10-02
 ---
 
 # ADR-20260830：Geo 单一仿真时间与太阳光照
@@ -31,7 +32,7 @@ Geo 已隐藏 Cesium 原生 `Animation` 与 `Timeline` 控件，但 Viewer 仍�
 采用方案 3：
 
 - Geo 只使用 Viewer 自带的 `viewer.clock`，关闭 DataSource 自动接管 Clock，并禁止 Time、Scene 或未来 Flight 插件创建第二个 `Clock`；
-- Time 插件使用 `ClockRange.UNBOUNDED`；`startTime`/`stopTime` 不再作为播放或 UI 边界。可见窗口独立于 `currentTime`，可持续平移，单屏范围限制为 1 分钟至 10 年，内部继续使用 Cesium `JulianDate`，界面明确显示 UTC；
+- Time 插件使用 `ClockRange.UNBOUNDED`；`startTime`/`stopTime` 不再作为播放或 UI 边界。可见窗口独立于 `currentTime`，可持续平移，单屏范围限制为 1 分钟至 10 年，内部继续使用 Cesium `JulianDate`；2026-10-02 起按[浏览器时区与太阳环境光 ADR](ADR-20261002-geo-browser-time-and-solar-environment.md)显示浏览器本地时间及 UTC 偏移，初始窗口为本地当天；
 - 时间轴提供播放/暂停、游标定位、空白区域平移、围绕指针缩放、回到当前时刻和倍速控制；时钟停止时不持续请求渲染，平移或缩放窗口不请求场景渲染；
 - 扩展插件契约增加窄范围 `bottomDocks` contribution，工作台 Shell 只按注册表结果渲染常驻底部组件，不直接导入 Time 组件；
 - Scene 插件通过 capability 发布太阳光照端口，Time 插件只消费该端口，不穿透读取 Scene controller；
