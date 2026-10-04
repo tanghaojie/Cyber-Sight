@@ -10,6 +10,7 @@
 
 ## 已完成计划
 
+- [2026-10-04 编辑器调研提交后的 Platform 归档复核](plans/2026-10-04-wechat-research-platform-archive-review.md)：按授权同步两处既有文档并复核独立应用设计提交 `063d503`，推进 Platform 台账。
 - [2026-10-04 桀士排版独立应用设计](plans/2026-10-04-jlab-wechat-editor-design.md)：确认 apps 下纯前端单页、技术栈、裁剪功能和抽屉/分栏方案，尚未开发应用。
 - [2026-10-04 公众号兼容规范调研](plans/2026-10-04-wechat-editor-wechat-compatibility.md)：官方结构/CSS/字体/深色规范、候选输出矩阵和人工验收样本。
 - [2026-10-04 Punk 微排技术调研](plans/2026-10-04-wechat-editor-research.md)：报告已提交；原站证据保留，产品现行方案见桀士排版独立应用设计。
@@ -84,6 +85,7 @@
 
 ## AI 协作记录
 
+- [2026-10-04 编辑器调研提交后的 Platform 归档复核](ai-logs/docs/2026/10/2026-10-04-wechat-research-platform-archive-review.md)
 - [2026-10-04 桀士排版独立应用设计](ai-logs/docs/2026/10/2026-10-04-jlab-wechat-editor-design.md)
 - [2026-10-04 公众号兼容规范调研](ai-logs/docs/2026/10/2026-10-04-wechat-editor-wechat-compatibility.md)
 - [2026-10-04 Punk 微排技术调研报告](ai-logs/docs/2026/10/2026-10-04-wechat-editor-research.md)
