@@ -10,6 +10,8 @@
 
 ## 已完成计划
 
+- [2026-10-04 Geo 交付与 master 合并及发布](plans/2026-10-04-geo-master-merge.md)：合并 PRISM 与 Geo，保留全部源码和历史，统一 Platform 归档基线。
+
 - [2026-10-04 Forge PRISM UI 同步](plans/2026-10-04-forge-prism-ui-sync.md)：接入 86bf968，共享主题/应用壳/管理 UI 与下游首页关于页同步，保留 Geo。
 
 - [2026-10-04 PRISM 同步 Platform 文档归档审查](plans/2026-10-04-platform-archive-review.md)：复核 Geo 外部模型渲染和前次同步，保留有效 ADR 并独立推进 Platform ledger。
@@ -92,6 +94,8 @@
 - [2026-08-30 Geo 影像与宽屏交付后的 Platform 文档归档审查](plans/2026-08-30-platform-documentation-archive-review-3.md)：复核影像恢复与宽屏交付并推进 Platform 台账。
 
 ## AI 协作记录
+
+- [2026-10-04 Geo 交付合并至 master](ai-logs/chore/2026/10/2026-10-04-geo-master-merge.md)
 
 - [2026-10-04 Forge PRISM UI 同步与 Platform 归档复核](ai-logs/chore/2026/10/2026-10-04-forge-prism-ui-sync.md)
 

@@ -3,7 +3,7 @@ title: Geo 交付合并至 master
 scope: platform
 repository: Cyber-Sight
 owner: project maintainers
-status: active
+status: completed
 change_type: chore
 date: 2026-10-04
 ---
@@ -21,3 +21,12 @@ date: 2026-10-04
 ## 实施与验证
 
 四个文档冲突已保留两侧索引；台账暂保留 master 已有基线，合并提交生成后对共同树推进新基线。543 个相关文件哈希核对通过：PRISM/Foundation 与 master 完全一致，Geo 与已交付分支完全一致。冻结锁文件安装、格式、全仓 lint、架构检查及五个 workspace 生产构建通过；合并图形成后继续统一归档复核，最终门禁通过前不发布 master。
+
+## 合并树复核
+
+共同树 dad0830 的父提交为 8081e51 和 b4ea10d，已有代码构建成功，业务源码无手工冲突改写。合并导致两侧独立台账不可直接沿用，复核当前 PRISM/Geo 设计、保留所有归档和索引后，Platform 基线推进到共同树；Foundation 原有同步内容及台账完全保留。最终归档/格式/提交检查通过后执行非强制 master 推送，随后核对 GitHub PR 和 Vercel 正式部署。
+
+关联提交：`chore(geo): integrate landmark delivery with current master`；`docs(geo): finish combined master archive review`。
+
+- [计划](../../../../plans/2026-10-04-geo-master-merge.md)
+- [设计](../../../../../design/modules/geo-landmark-context.md)

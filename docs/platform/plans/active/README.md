@@ -2,6 +2,8 @@
 
 当前无活动实施计划。
 
+最近完成：[Geo 交付与 master 合并](../../archive/plans/2026-10-04-geo-master-merge.md)，保留 PRISM 和 Geo 并统一归档基线。
+
 最近复核：[2026-10-04 Geo 地标周边交付后的文档复核](../../archive/plans/2026-10-04-geo-landmark-documentation-review.md)，Platform 台账推进到 f7a56b0。
 
 最近完成：[2026-10-04 Geo 自动地标周边第一版](../../archive/plans/2026-10-04-geo-landmark-context.md)，生成器、台北街区和 Sight 昼夜/质量接入。
