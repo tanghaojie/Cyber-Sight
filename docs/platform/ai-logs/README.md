@@ -1,8 +1,10 @@
 # Platform 活动 AI 协作记录
 
-本轮完成：[Punk 微排技术调研报告](../archive/ai-logs/docs/2026/10/2026-10-04-wechat-editor-research.md)，交付文档与截图，未实现编辑器。
+当前活动：[编辑器调研提交后的 Platform 归档复核](docs/2026/10/2026-10-04-wechat-research-platform-archive-review.md)：两处授权修订完成，兼容调研与独立应用设计已交付；继续提交树复核。
 
-当前无活动协作记录。最新完成：[Forge PRISM UI 同步与 Platform 归档复核](../archive/ai-logs/chore/2026/10/2026-10-04-forge-prism-ui-sync.md)。最新完成：[Geo 外部模型统一渲染](../archive/ai-logs/feat/2026/09/2026-09-11-geo-external-model-rendering.md)，由 Luna 实现并经主智能体审查验证。
+最新完成：[桀士排版独立应用设计](../archive/ai-logs/docs/2026/10/2026-10-04-jlab-wechat-editor-design.md)与[公众号兼容规范调研](../archive/ai-logs/docs/2026/10/2026-10-04-wechat-editor-wechat-compatibility.md)。应用尚未开发，后续分期见现行设计。
+
+最近完成：[Forge PRISM UI 同步与 Platform 归档复核](../archive/ai-logs/chore/2026/10/2026-10-04-forge-prism-ui-sync.md)、[Geo 外部模型统一渲染](../archive/ai-logs/feat/2026/09/2026-09-11-geo-external-model-rendering.md)。
 
 最近完成：[2026-09-03 Forge 上游同步](../archive/ai-logs/chore/2026/09/2026-09-03-forge-upstream-sync.md)、[Geo 第二个构建入口后的 Platform 文档归档审查](../archive/ai-logs/2026/09/2026-09-01-platform-documentation-archive-review-2.md)、[增加第二个 Geo 构建入口](../archive/ai-logs/2026/09/2026-09-01-geo-second-build-entry.md)、[Geo 默认相机与底部工作台启动状态](../archive/ai-logs/2026/09/2026-09-01-geo-default-camera-and-bottom-dock-state.md)、[Geo 赛博城市交付后的 Platform 文档归档审查](../archive/ai-logs/2026/09/2026-09-01-geo-cyber-city-platform-documentation-archive-review.md)。
 

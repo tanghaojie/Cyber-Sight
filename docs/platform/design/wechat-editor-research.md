@@ -4,18 +4,18 @@ scope: platform
 repository: Cyber-Sight
 status: research
 owner: project maintainers
-updated: 2026-10-04
+updated: 2026-10-05
 ---
 
 # Punk 微排技术架构、功能与 Cyber-Sight 复刻调研报告
 
-本报告记录 2026-10-04 对目标网站、公开部署产物和当前 Cyber-Sight 的核验。报告中的接入方案是待评审建议，不代表已实现的模块或已经批准的长期决定。
+本报告记录 2026-10-04 对目标网站和公开部署产物的核验。原站取证保持不变；产品方案现以[桀士排版独立应用设计](apps/jlab-wechat-editor.md)及其 ADR 为准。应用尚未实现。
 
 ## 1. 结论与证据边界
 
 Punk 微排的核心是一条浏览器排版流水线：**Markdown 原稿 → 结构处理 → HTML → 文章主题 → 预览 → 图片处理与样式内联 → 富文本剪贴板 → 用户粘贴到公众号后台**。价值主要在文章视觉规则和公众号输出适配，而不是原稿输入框本身。[目标网站](https://weipai.iamadrianpunk.com/)及[部署业务脚本](https://weipai.iamadrianpunk.com/_next/static/chunks/page-u6Xrluxd.js)是主要证据。
 
-对 Cyber-Sight，建议首期实现独立 Platform 前端模块，沿用 Vue、动态菜单、认证和 PRISM 应用壳；文章主题、文档模型和公众号输出单独设计。已观察的原站工作流不需要业务服务端参与，因此首期本地版本无需先增加数据库或公众号接口。云草稿、稳定图片托管、团队模板和公众号 API 发布属于后续扩展。
+维护者已确定独立应用“桀士排版 · Markdown 公众号排版助手 / JLab WeChat Editor”，在 `apps/wechat-editor/` 使用 Vue 3、Pinia、Element Plus、Vite、TypeScript，纯前端单页、无路由/后端，不集成 apps/frontend。排除新手教程、文章包和全部 IP 功能；工具栏、抽屉与拖拽双栏按现行独立应用设计实施。
 
 证据分为三类：
 
@@ -23,7 +23,7 @@ Punk 微排的核心是一条浏览器排版流水线：**Markdown 原稿 → �
 | -------- | ---------------------------------------- | -------------------------------------------- |
 | 已核验   | 页面可见，或部署资源中存在明确代码       | 界面、渲染、主题、文件夹导入、存储、复制算法 |
 | 静态推断 | 根据代码状态及调用关系推导，尚未操作验证 | 局部颜色丢失、图片恢复缺口、伪元素复制缺失等 |
-| 接入建议 | 针对 Cyber-Sight 提出的实现方向          | 模块名、文档模型、存储策略、开发阶段         |
+| 产品方案 | 维护者确认的独立应用约束                 | 当前权威设计见桀士排版应用文档               |
 
 本次未找到可确认归属的公开源码仓库、依赖清单或许可证；不能提供作者源码目录和精确依赖版本。部署脚本经过压缩，短函数名仅用于定位。没有登录公众号、上传用户稿件或发布文章，也没有证明所有浏览器与公众号阅读模式兼容。
 
@@ -104,7 +104,7 @@ flowchart TD
   B -.350ms.-> Q[localStorage 原稿]
 ```
 
-主要业务集中在一个较大的 React 页面组件，状态、文件、主题、素材、复制都由该组件编排。它适合解释原站实现；Cyber-Sight 新增模块应把这些规则分成独立职责，避免继续扩大页面组件。
+主要业务集中在一个较大的 React 页面组件，状态、文件、主题、素材、复制都由该组件编排。它适合解释原站实现；桀士排版独立应用按能力组件化，业务规则与工作台组装分开。
 
 ## 5. Markdown 到文章结构的逻辑
 
@@ -200,6 +200,8 @@ Markdown 自动存 localStorage，图片映射和 Blob 只留在组件状态。�
 
 ## 9. 复制到公众号的实现
 
+下文描述原站实现。微信官方规范与 Cyber-Sight 候选导出规则另见[公众号兼容规则与实施准备](wechat-editor-wechat-compatibility.md)，两者不能混同为已验收的公众号支持范围。
+
 ### 9.1 为什么要另做输出转换
 
 文章预览依赖类名、CSS variables、布局与浏览器样式。复制时原站不只取 `innerHTML`，而是把样式计算为内联值，并对文章元素再加工，以减少离开网站后的样式丢失。
@@ -270,96 +272,38 @@ flowchart LR
 | 复制降级与成功提示  | 分支已见                          | 处理权限失败和返回值，提供明确恢复动作                     |
 | 保存配额/损坏       | 部分处理已见                      | 真实状态、统一错误处理、版本校验、恢复/备份                |
 | 公众号图片/链接/CSS | 尚未验收                          | 人工粘贴、保存及阅读验收，不把 DOM 检查当成最终结果        |
-| 未知源码与版本      | 搜索和资源边界                    | 独立实现功能，后续选择依赖并锁定版本；品牌/IP 素材自行准备 |
+| 未知源码与版本      | 搜索和资源边界                    | 独立实现功能，后续选择依赖并锁定版本；产品品牌素材自行准备 |
 
-`Xt` 只剔除成对 script/style/iframe/object、带引号 on* 属性和字面 javascript:，之后注入 HTML。原始 HTML、无引号事件属性、混淆协议等没有完整白名单处理。Marked 官方也明确说明它不负责 HTML 安全清洗。Cyber-Sight 与账户系统同源，安全边界应在正式设计中独立登记。[Marked 官方文档](https://marked.js.org/)
+`Xt` 只剔除成对 script/style/iframe/object、带引号 on* 属性和字面 javascript:，之后注入 HTML。原始 HTML、无引号事件属性、混淆协议等没有完整白名单处理。Marked 官方也明确说明它不负责 HTML 安全清洗。桀士排版需在浏览器预览前主动清洗输入，并建议以独立 origin 部署隔离管理系统状态；具体安全边界见独立应用设计。[Marked 官方文档](https://marked.js.org/)
 
 以上是调研范围内的实现限制，不是本轮对 Cyber-Sight 代码的缺陷结论；本轮未修改业务代码。
 
-## 11. Cyber-Sight 当前架构适配
+## 11. 独立应用决定与仓库现状
 
-本轮仓库基线为 `8081e514b350849a191985aa337c30c2aaf8e8a7`，开始时无既有改动。定位代码先使用 CodeGraph，再读取相关文件。
+维护者已选择 monorepo 中的独立应用，原先注册到 apps/frontend 的 Platform 页面方案未实施，现不采用。正式产品边界与交互以[独立应用设计](apps/jlab-wechat-editor.md)为权威来源，长期决定记录在[应用 ADR](../decisions/ADR-20261004-jlab-wechat-editor-standalone-app.md)。
 
-| 当前事实                                                          | 仓库证据                                                                                                                                                                                                         | 接入含义                                          |
-| ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| 前端已有 Vue 3、Vue Router、Pinia、Element Plus、Vite、TypeScript | [frontend package](../../../apps/frontend/package.json)                                                                                                                                                          | 沿用当前栈，不因原站用 React 而新增一套应用       |
-| Platform 自动发现 registerViews 与语言资源                        | [platform.register.ts](../../../apps/frontend/src/platform/platform.register.ts)                                                                                                                                 | 独立模块懒加载页面，不修改共享菜单实现            |
-| 动态路由按数据库菜单 component key 解析                           | [dynamicRoutes.ts](../../../apps/frontend/src/foundation/router/dynamicRoutes.ts)                                                                                                                                | 登记稳定 key，并显式设置 AdminLayout 或父目录布局 |
-| Geo 是已有页面注册示例                                            | [registerViews.ts](../../../apps/frontend/src/platform/modules/geo/registerViews.ts)                                                                                                                             | 复用注册模式，不耦合 Geo 内部状态                 |
-| PRISM 六主题与双模式                                              | [PRISM UI 接入](prism-ui-integration.md)                                                                                                                                                                         | 应用外壳与文章输出主题分开                        |
-| Platform 后端 module/schema/contracts 当前为空                    | [module](../../../apps/backend/src/platform/platform.module.ts)、[schema](../../../apps/backend/src/platform/database/schema.ts)、[contracts](../../../packages/api-contract/src/platform/platform.contracts.ts) | 首期本地工具无需先造 API、空表或迁移              |
-| Foundation/Platform 模块边界明确                                  | [module-boundaries](../../foundation/design/module-boundaries.md)                                                                                                                                                | 业务归属 Platform，跨模块仅依赖登记公共接口       |
+当前 workspace 的 apps/* 已覆盖独立应用目录；根递归 build 与显式筛选的 dev 启动方式不同。现有 frontend 的动态路由、菜单、认证、PRISM 与 Geo 注册机制只是既有应用事实，不是桀士排版的接入点。新应用的所有权分类及架构检查覆盖仍需在写代码前登记。
 
-前端直接依赖列表没有 Markdown 解析器或富文本编辑器；这只说明直接声明，不能证明整个 monorepo 没有传递相关依赖。后续实现再选定、锁定必要依赖，不在调研阶段安装。
+## 12. 已选方案与职责
 
-## 12. 建议的模块与数据设计
+中文名“桀士排版 · Markdown 公众号排版助手”，英文名“JLab WeChat Editor”。计划在 apps/wechat-editor/ 独立创建，以 Vue 3、Pinia、Element Plus、Vite、TypeScript 实现纯前端单页，无 Router、后端、业务 HTTP 契约或账号依赖。
 
-### 12.1 模块结构
+独立应用内部包含文章、排版、结尾、素材、公众号导出及工作台组件职责。模型、选区映射、稳定素材 id、IndexedDB 保存和输出 profile 详见现行设计，不在研究报告复制第二套接口。
 
-建议模块暂名 `wechat-editor`，路径与菜单 key 都待后续实施确认。
+| 原站能力                              | 桀士排版范围                                   |
+| ------------------------------------- | ---------------------------------------------- |
+| 编辑/预览、配色、章节、阅读参数、复制 | 保留并独立组件化                               |
+| 原站两层顶部栏                        | 合并为单层；正文色、局部字色、章节样式直接显示 |
+| 文字参数、配色实验室、固定结尾        | 平行按钮，左侧向右的非模态抽屉，修改实时预览   |
+| 双栏编辑/预览                         | 保留，分隔线可拖拽修改比例                     |
+| 单文件导入、本地草稿、专注预览        | 保留；不依赖云端或管理系统                     |
+| 教程、文章包、IP/提色/去底            | 不纳入；第 3、6、7、8 节相关内容仍是原站取证   |
 
-```text
-apps/frontend/src/platform/modules/wechat-editor/
-  registerViews.ts                 对外页面注册，懒加载
-  wechat-editor.locales.ts          中英文固定界面文案
-  pages/WechatEditorPage.vue       工作台组装
-  components/                     编辑、主题、预览、素材 UI
-  domain/                         文档、主题、标注、素材类型
-  application/                    导入、渲染、保存、导出编排
-  rendering/                      Markdown 与公众号 HTML 规则
-  adapters/                       存储、剪贴板、Canvas、文件
-```
+## 13. 实施顺序与验收
 
-这是职责示意，不要求建立空目录。页面只编排交互；可测试业务规则不集中在 Vue 组件。首期公共入口可仅为 `registerViews.ts`，其他入口只在真实跨模块需求出现时登记。
+当前只调整文档，没有开发应用代码。分期按现行设计的 P0 接入/兼容准备、P1 独立工作台、P2 排版与恢复、P3 公众号复制闭环执行；不设云端扩展阶段。依赖、许可、部署和规则版本在实施前锁定。
 
-后续云端确有需求时，同名模块再进入 `apps/backend/src/platform/modules/wechat-editor/` 与 `packages/api-contract/src/platform/modules/wechat-editor/`，采用 Zod 4 Schema、运行时输入校验、契约响应和平台既有权限。仅本地编辑不需要 HTTP 契约。
-
-### 12.2 数据模型
-
-| 建议模型        | 关键内容                                                                                            | 目的                         |
-| --------------- | --------------------------------------------------------------------------------------------------- | ---------------------------- |
-| ArticleDocument | schemaVersion、id、markdown、revision、updatedAt、assetRefs、annotations、themeId、format、endingId | 原文、样式与素材可完整恢复   |
-| ThemePreset     | 颜色角色、元素角色、字体、间距、章节样式                                                            | 主题规则可版本化、可复用     |
-| AssetRef        | assetId、原相对路径、mime、Blob/托管地址、尺寸                                                      | 不依赖临时 blob URL 作为身份 |
-| Annotation      | 文档 revision、节点/来源位置、颜色、失效状态                                                        | 编辑后可重定位或提示失效     |
-| ExportProfile   | 允许标签/CSS、图片与链接策略、导出版本                                                              | 公众号转换规则可独立演进     |
-| RenderResult    | previewHtml、exportHtml、diagnostics、sourceMap                                                     | 结构保真和失败原因可解释     |
-
-小配置可放 localStorage，稿件与图片优先 IndexedDB。多账号站内使用时应按用户隔离，明确退出登录后草稿处理。不要使用原站的通用 key，也不要默认把大 data URL 塞入 localStorage。
-
-### 12.3 渲染与输出职责
-
-建议保留源位置信息，以 Marked tokens 或其他正式语法树生成受控文章结构，再按主题渲染。预览与公众号输出共用文档语义和兼容规则，但拥有各自外层。
-
-文章颜色、字体和背景由独立配置持有；Cyber-Sight 切换 PRISM 主题只影响应用壳。文章 CSS 不能污染全局标题、段落和表格。可评估隔离容器/iframe，但具体方案需结合选区改色、样式获取和安全策略决定。
-
-导出只包含文章与明确启用的结尾，不包括导航、工具栏、账号信息或应用壳变量。发布产物需要显式允许的 HTML/CSS/URL，不能把全部 getComputedStyle 属性无条件带出。
-
-建议接口职责为 `importArticle / renderArticle / resolveAssets / saveDraft / exportWechatHtml / copyArticle` 等具名函数；这些是设计建议，本轮未新增公共 API。
-
-## 13. 建议的实施顺序与验收
-
-| 阶段            | 建议范围                                                                           | 完成条件                                         |
-| --------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------ |
-| P0 兼容性验证   | 代表性稿件、主题和公众号转换最小原型                                               | 人工粘贴公众号，确认图片、代码、表格、中文与链接 |
-| P1 本地 MVP     | 模块/菜单、双栏原稿、基础 Markdown、少量主题、阅读参数、复制、单文件导入、本地草稿 | 完成写稿→预览→复制→公众号的闭环                  |
-| P2 原站主要功能 | 文件夹素材、九种章节、IP/提色、结尾、局部标注、完整恢复、专注/窄屏                 | 素材、标注和配置可可靠恢复；长文人工验收         |
-| P3 云端扩展     | 云草稿、版本、模板共享、图片托管、公众号 API 或 AI                                 | 另建设计/契约/后端/迁移与适用自动化验证          |
-
-P3 包含超出原站已证实能力的扩展，应单独确认范围。数学公式、Mermaid、语法高亮和多渠道输出也应作为新增需求评估，不计入本轮已确认功能。
-
-开发工作量通常以 **公众号输出适配、图片生命周期、文档标注模型** 最大；基础输入框和预设主题相对容易。不提供缺乏样本验收和团队投入依据的精确工期。
-
-人工验收样本应覆盖：
-
-- H1–H6、原有中文/数字号、TXT 自动章节、嵌套/任务列表、连续短句与普通段落。
-- 多个代码块、空行、长行、特殊字符、宽表格、每列对齐。
-- 文件夹多篇正文、中文/空格/`../` 路径、同名图片、远程图片失败、刷新恢复。
-- 局部颜色在改稿/换主题/刷新后的保留，IP 复杂背景、固定结尾启停。
-- 长文、中文输入、字体 fallback、存储配额失败、复制权限失败、切换账号。
-- 公众号粘贴、保存草稿、图片接收、手机/电脑阅读和明暗模式。
-
-Cyber-Sight 的前端功能由人类验收。本轮与后续默认不创建/运行前端单元、组件、端到端或浏览器自动化测试。实施阶段 AI 执行适用格式、Lint、架构、类型、生产构建及文档归档检查；这些不替代公众号人工验收。若新增后端/共享契约，按其规则运行真正验证业务行为的测试。
+人工验收覆盖单层顶栏、三类抽屉占位与实时预览、拖拽/键盘比例、局部颜色在改稿和刷新后恢复、单文件/图片与存储失败、代码/表格/外链/字体，以及公众号粘贴、保存和真机明暗。默认不创建或运行前端自动化测试；格式、类型和生产构建不能替代这些验收。
 
 ## 14. 来源与证据定位
 
@@ -403,13 +347,19 @@ S2 可按以下打包短符号定位。偏移是 UTF-8 解码后 JavaScript 字�
 
 ## 15. 本轮交付与未决事项
 
+后续已补充[公众号 HTML/CSS 兼容规则与实施准备](wechat-editor-wechat-compatibility.md)：官方结构、字体、深色模式要求及候选标签/样式矩阵。真实公众号粘贴、保存、图片托管与跨端验收仍未完成。
+
 本轮仅形成报告、截图和文档治理记录，没有实现编辑器、修改运行代码、添加依赖或作产品发布。归档计划和日志见下方链接。
 
-后续实施需明确：模块及菜单名称、首期是否含文章包/IP/局部标注、是否允许原始 HTML、图像保存/托管政策、账号隔离及公众号输出验收样本。依赖精确版本、目标源码许可与实际公众号兼容性仍未核实。本报告不替代正式模块设计或 ADR。
+名称、独立应用边界、技术栈、裁剪功能、工具栏/抽屉/分栏已由维护者确定。后续仍需锁定解析与清洗依赖、许可、静态部署地址、所有权覆盖和人工兼容结果；不增加文章包/IP、账号或后端路线。本报告不替代现行独立应用设计。
 
-交付验证：`pnpm format`、`pnpm format:check`、`git diff --check` 通过；本轮 7 份 Markdown 共 180 条本地链接全部存在；`pnpm docs:archive:check:ci` 返回 `NOT_DUE`（Foundation inherited、Forge excluded）。原站复制证据见第 9.5 节，公众号兼容性保留人工验收边界。
+报告提交前验证：`pnpm format`、`pnpm format:check`、`git diff --check` 通过；当时 7 份 Markdown 共 180 条本地链接全部存在；归档 CI 返回 `NOT_DUE`。报告提交为 `45890e734a3ace5171d3b01aa06ce793dbb499ba`。原站复制证据见第 9.5 节，公众号兼容性保留人工验收边界。
 
-- [本轮调研计划](../archive/plans/2026-10-04-wechat-editor-research.md)
-- [本轮协作记录](../archive/ai-logs/docs/2026/10/2026-10-04-wechat-editor-research.md)
+### 后续设计与归档复核
+
+维护者已授权两处草案：同步流程改为合并后审查再提交；身份 ADR 明确默认视觉与运行时主题关系。旧身份决定继续有效。兼容调研与独立应用设计分别完成文档交付，公众号人工验收仍未执行。归档状态及本轮完成记录从 [Platform 历史索引](../archive/README.md)查阅，避免保留已失效的待授权结论。
+
+- [独立应用设计](apps/jlab-wechat-editor.md)
+- [应用 ADR](../decisions/ADR-20261004-jlab-wechat-editor-standalone-app.md)
+- [公众号兼容规则](wechat-editor-wechat-compatibility.md)
 - [模块边界](../../foundation/design/module-boundaries.md)
-- [PRISM UI 接入](prism-ui-integration.md)

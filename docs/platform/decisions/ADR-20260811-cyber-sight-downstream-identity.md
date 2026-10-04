@@ -1,8 +1,9 @@
 ---
 title: Cyber-Sight 下游身份与上游兼容边界
+scope: platform
 status: accepted
 date: 2026-08-11
-updated: 2026-08-14
+updated: 2026-10-05
 ---
 
 # ADR-20260811：Cyber-Sight 下游身份与上游兼容边界
@@ -31,7 +32,7 @@ Cyber-Sight 基于维护者的开源项目 Cyber AI Forge 建立。GitHub 不允
 
 - 正式产品名为 `Cyber-Sight`，界面短名称为 `CYBER-SIGHT`。
 - 英文产品标签为 `AI-NATIVE BUSINESS APPLICATION`，中文说明为 `AI 原生业务应用`；在业务定位正式确定前不虚构行业能力。
-- 保留现有 C 形 Logo、石墨黑、暖白、薄荷绿与电紫节点视觉；资产文件名可以继续使用 `cyber-*`，文件名不作为产品正式名称。
+- 保留现有 C 形 Logo 以及石墨黑、暖白、薄荷绿与电紫节点的默认品牌表达；运行时颜色以现行[品牌设计](../design/branding.md)与 [PRISM 接入设计](../design/prism-ui-integration.md)为准，结构端点、节点色与背景随主题协调变化。资产文件名可以继续使用 `cyber-*`，文件名不作为产品正式名称。
 - `JTLab / 桀士实验室` 继续作为与产品 Logo 分离的创作者署名。
 - README、前端默认展示、浏览器元信息、Swagger、关于页和公开 URL 改为 Cyber-Sight，并明确 `Built on Cyber AI Forge` / `基于 Cyber AI Forge 构建`。
 - 根包名 `cyber-ai-forge`、workspace 作用域 `@cyber-ai-forge/*`、JWT issuer/audience、浏览器存储键和脚手架系统表不改名。这些是上游兼容或运行时标识，不是当前 UI 品牌。
@@ -63,4 +64,5 @@ Cyber-Sight 基于维护者的开源项目 Cyber AI Forge 建立。GitHub 不允
 ## 相关设计
 
 - [Cyber-Sight 品牌与视觉系统](../design/branding.md)
+- [PRISM UI 接入](../design/prism-ui-integration.md)
 - [Cyber AI Forge 上游同步](../design/upstream-synchronization.md)

@@ -1,8 +1,9 @@
 ---
 title: Cyber AI Forge 上游同步
+scope: platform
 status: accepted
 owner: project maintainers
-updated: 2026-10-04
+updated: 2026-10-05
 ---
 
 # Cyber AI Forge 上游同步
@@ -68,10 +69,12 @@ git switch master
 git pull --ff-only origin master
 git switch -c sync/forge-YYYY-MM-DD
 git log --left-right --cherry-pick --oneline master...upstream/master
-git merge --no-ff upstream/master -m "chore: sync Cyber AI Forge @ <upstream-sha>"
+git merge --no-ff --no-commit upstream/master
 ```
 
 发生冲突时按“文件所有权”处理，并在合并提交中保留 `upstream/master` 作为第二父提交。禁止用 squash、批量 cherry-pick 或对已发布 `master` rebase 来伪造同步；禁止再次使用 `--allow-unrelated-histories`。若 Git 报告历史无关，应停止并检查远端或仓库初始化错误。
+
+合并停在未提交状态；完成逐项审查和约定验证后，再显式创建允许类型的提交，例如 `chore(sync): merge Forge upstream`。AI 提交仍须追加真实模型名称 trailer，不能接受默认 `Merge ...` 标题。
 
 ## 验证与交付
 

@@ -2,6 +2,7 @@
 
 当前 Platform 决策：
 
+- [桀士排版采用独立纯前端应用](ADR-20261004-jlab-wechat-editor-standalone-app.md)：独立 apps 应用、产品名称、技术栈、功能裁剪与工作台交互边界。
 - [Geo 外部模型统一渲染](ADR-20260911-geo-external-model-rendering.md)：Scene 统一标准、Data 自动接入、外部资产与渲染分离。
 
 - [Geo 使用第二个 HTML 构建入口](ADR-20260901-geo-second-build-entry.md)：确定一次 Vite 多入口构建，同时输出 Sight 与 Standalone Geo，并共享唯一 Cesium 静态目录。

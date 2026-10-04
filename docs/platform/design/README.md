@@ -1,6 +1,8 @@
 # Platform 设计索引
 
-- [Punk 微排技术调研与复刻建议](wechat-editor-research.md)：已部署架构、功能、复制逻辑和 Cyber-Sight 接入评估；研究报告，尚未实施或形成长期决定。
+- [桀士排版独立应用](apps/jlab-wechat-editor.md)：JLab WeChat Editor 的产品范围、纯前端边界、单层工具栏、左侧抽屉、可拖拽双栏与实施分期；方案已确认，应用尚未实现。
+- [公众号编辑器 HTML 与 CSS 兼容规则和实施准备](wechat-editor-wechat-compatibility.md)：官方规范、候选导出集合、素材和人工验收边界；研究草案，尚未实施或验收。
+- [Punk 微排技术调研与复刻建议](wechat-editor-research.md)：原站架构、功能与复制证据；产品方案以桀士排版独立应用设计为准。
 - [PRISM UI 接入](prism-ui-integration.md)：主题包、共享 UI、下游品牌与 Geo 兼容边界。
 
 - [Geo 外部模型统一渲染标准](modules/geo-model-rendering.md)：只填外部 URL 和定位的自动昼夜、材质约定和资源生命周期。
