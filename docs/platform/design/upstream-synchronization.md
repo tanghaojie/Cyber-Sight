@@ -125,3 +125,5 @@ Cyber-Sight 已通过合并提交 `6c5ea8c` 接入 Forge `70dbfbd`，并采用�
 Foundation、公共设计令牌及 Integration 按项接入；Platform 首页、关于页和 Logo 移植上游布局/样式，继续使用 Cyber-Sight 文案、配置和通用结构图兜底。README、产品 URL、Geo 源码及双入口不变；Forge 网站、摄影资产、英文 README 和 Pages 工作流继续排除。锁文件保留下游 Cesium/peer 解析并接入设计令牌包；Platform archive ledger 独立复核推进，未复制上游 Platform ledger。
 
 完整验证结果见本轮完成计划和 AI 协作记录；浏览器主题组合、真实 CRUD/权限与 Geo 两入口由维护者人工验收。
+
+实际合并提交为 `24f612cc778c781e18ca612a7375b9f02c03b382`。提交后复核新进入的上游历史，Platform ledger 以该最终合并树作为独立审查基线；归档收尾记录通过 `docs(platform): close PRISM sync archive review` 交付。完整类型/构建、10 项脚本和 143 项后端测试及静态门禁通过。

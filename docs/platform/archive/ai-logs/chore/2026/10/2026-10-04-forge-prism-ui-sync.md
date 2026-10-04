@@ -39,3 +39,7 @@ Platform 审查从 DUE 经 IN_PROGRESS 到 NOT_DUE，复核 2910f7d..71d1d65 的
 
 - [实施计划](../../../../plans/2026-10-04-forge-prism-ui-sync.md)
 - [接入设计](../../../../../design/prism-ui-integration.md)
+
+## 合并后审查收尾
+
+实际合并提交为 `24f612cc778c781e18ca612a7375b9f02c03b382`，第二父提交为 `86bf9688f9c4d2e3690bf6dcd89897e3b2c71277`。提交后审计首次计入新上游历史，报告 architecture change detected。继续同一审查计划，复核最终树与白名单后，将 Platform ledger 从预合并复核 71d1d65 推进到已完成合并 24f612c。Foundation 台账不变，未调整审计门限。最终 CI 恢复 NOT_DUE；用 `docs(platform): close PRISM sync archive review` 提交收尾，无代码变化。

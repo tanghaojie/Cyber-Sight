@@ -53,3 +53,5 @@ README 继续采用下游版本；关于页移植上游布局、原有 about.loc
 - [接入设计](../../design/prism-ui-integration.md)
 - [Platform 审查计划](2026-10-04-platform-archive-review.md)
 - [协作记录](../ai-logs/chore/2026/10/2026-10-04-forge-prism-ui-sync.md)
+
+关联合并提交：`24f612cc778c781e18ca612a7375b9f02c03b382`。提交后上游历史触发架构归档审查，复核最终树后以该合并提交作为 Platform ledger 基线；收尾记录通过独立 docs 提交完成。
