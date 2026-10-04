@@ -4,7 +4,9 @@
 
 此前完成：[Geo 模型制作与地理参考标准](../archive/ai-logs/docs/2026/10/2026-10-03-geo-model-authoring-standard.md)。
 
-最近复核：[Geo 三档质量交付后的文档复核](../archive/ai-logs/docs/2026/10/2026-10-02-geo-render-quality-documentation-review.md)。
+最近复核：[Geo 地标周边交付后的文档复核](../archive/ai-logs/docs/2026/10/2026-10-04-geo-landmark-documentation-review.md)。
+
+此前复核：[Geo 三档质量交付后的文档复核](../archive/ai-logs/docs/2026/10/2026-10-02-geo-render-quality-documentation-review.md)。
 
 当前无活动协作记录。此前完成：[Geo 第一轮显示优化协作记录](../archive/ai-logs/feat/2026/10/2026-10-02-geo-render-modes-and-model-placement.md)、[Geo 浏览器时区时间轴与太阳环境光](../archive/ai-logs/fix/2026/10/2026-10-02-geo-local-time-and-solar-environment.md)，后者包含 Platform 归档复核；[Geo 外部模型统一渲染](../archive/ai-logs/feat/2026/09/2026-09-11-geo-external-model-rendering.md)记录统一渲染基线。
 

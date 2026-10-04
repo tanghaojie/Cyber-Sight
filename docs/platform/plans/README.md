@@ -1,6 +1,8 @@
 # Platform 实施计划
 
-最近完成：[2026-09-03 Forge 上游同步](../archive/plans/2026-09-03-forge-upstream-sync.md)、[Geo 外部 glTF 加载状态与自动定位修复](../archive/plans/2026-09-01-geo-model-loading.md)、[Geo 航班调整后的 Platform 文档归档审查](../archive/plans/2026-09-01-platform-documentation-archive-review.md)、[Geo 航班视图、航线与播放联动](../archive/plans/2026-09-01-geo-flight-visualization-and-playback.md)。
+最近完成：[Geo 自动地标周边第一版](../archive/plans/2026-10-04-geo-landmark-context.md)和[交付后的文档复核](../archive/plans/2026-10-04-geo-landmark-documentation-review.md)。
+
+此前完成：[2026-09-03 Forge 上游同步](../archive/plans/2026-09-03-forge-upstream-sync.md)、[Geo 外部 glTF 加载状态与自动定位修复](../archive/plans/2026-09-01-geo-model-loading.md)、[Geo 航班调整后的 Platform 文档归档审查](../archive/plans/2026-09-01-platform-documentation-archive-review.md)、[Geo 航班视图、航线与播放联动](../archive/plans/2026-09-01-geo-flight-visualization-and-playback.md)。
 
 当前没有活动计划。
 

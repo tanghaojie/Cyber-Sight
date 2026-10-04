@@ -249,7 +249,7 @@ Meshopt/Draco 减少几何传输，KTX2/BasisU 改善纹理传输及 GPU 存储�
 
 本标准不新增后端/公共 API、依赖或运行时 Schema。资料 → 局部建模 → PBR / UV / 纹理 → WGS84 锚点及轴向校准 → 导出验证 → 外部托管 → Data 加载与坐标选择 → Scene 统一昼夜。
 
-读取和定位入口仍为 Geo 的 model-asset.ts、data-browser.ts，渲染由 Scene 和唯一 Clock 管理。说明字段不执行脚本、不自动转换参考系。源资产整改与场景增强后续分别交付。
+读取和定位入口仍为 Geo 的 model-asset.ts、data-browser.ts，渲染由 Scene 和唯一 Clock 管理。说明字段不执行脚本、不自动转换参考系。主体源资产整改独立于已交付的[自动周边街区](geo-landmark-context.md)；生成环境不表示主体 GLB 已重制。
 
 ## 关联与参考
 

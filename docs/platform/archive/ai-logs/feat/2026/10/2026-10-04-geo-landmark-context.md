@@ -32,7 +32,7 @@ Cyber-Sight 起点 f331785，工作区/暂存区为空；归档门禁 NOT_DUE。
 
 七项 Python 生成器回归通过。全部 104 个 GLB 的几何、引用、ENU 变换、包围体和排除验证通过；Khronos 零错误零警告。Sight `pnpm format`、`pnpm format:check`、`pnpm lint`、`pnpm architecture:check`、共享契约构建与 frontend 生产构建通过，包含 vue-tsc；`pnpm docs:archive:check:ci` 为 NOT_DUE，`git diff --check` 通过。构建保留现有 Sass 废弃提示和大包提示；未运行前端/浏览器自动化测试。
 
-素材 master 已发布 `09557564d05b6230544a8ef62375dcb7b43875ee`，Vercel 自动生产部署 `dpl_7JDZtxQpxxSHBCdQxagtEMvuPMzm` 为 READY；场景索引 HTTP 200、JSON 内容有效且 CORS 为 `*`。Sight 改进分支提交后核验预览部署，结果随交付说明提供。关联提交标题：Sight `feat(geo): load generated landmark surroundings`；素材 `feat(geo): generate reusable landmark context and Taipei assets`。不合并现有草稿 PR。
+素材 master 已发布 `09557564d05b6230544a8ef62375dcb7b43875ee`，Vercel 自动生产部署 `dpl_7JDZtxQpxxSHBCdQxagtEMvuPMzm` 为 READY；场景索引 HTTP 200、JSON 内容有效且 CORS 为 `*`。Sight `f7a56b0` 自动预览部署 `dpl_3e9NHouk379KXVRAPJKqVPRjNz6M` 为 READY；135 个线上素材文件与本地逐字节一致且 CORS 正常。预览启用 Vercel 身份验证，GPU 和录屏仍需维护者人工验收。关联提交标题：Sight `feat(geo): load generated landmark surroundings`；素材 `feat(geo): generate reusable landmark context and Taipei assets`。不合并现有草稿 PR。功能提交前门禁为 NOT_DUE；提交后累计三项完成记录触发 DUE，已由[Platform 归档复核](../../../../plans/2026-10-04-geo-landmark-documentation-review.md)接续。
 
 ## 未决事项
 
