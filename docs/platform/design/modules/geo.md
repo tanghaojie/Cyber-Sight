@@ -4,7 +4,7 @@ scope: platform
 repository: Cyber-Sight
 status: active
 owner: project maintainers
-updated: 2026-10-02
+updated: 2026-10-04
 ---
 
 # Geo 前端空间可视化工作台
@@ -29,6 +29,7 @@ Geo 延续维护者开源项目 `vue3-cesium-typescript-start-up-template` 的�
 - 一个仅面向横向宽屏、地图全屏的 `/geo` 前端页面，最低支持与验收基线为 `1280×720` CSS 像素；
 - Cesium Viewer 创建、销毁、相机、场景模式和交互生命周期管理；
 - 影像、地形、模型与 3D Tiles 的前端预置资源管理；
+- 显式地标 scene.json 加载，关联主体与自动生成的周边街区、取消/重试、位置与地形兼容性检查，见[地标与自动周边](geo-landmark-context.md)；
 - 环境效果、标绘、测量、模型/3D Tiles 工具和地形分析；
 - 编译期插件注册、互斥交互工具管理、局部失败隔离和统一清理协议；
 - 对旧项目通用 Geo 能力的分阶段迁移与现代化 UI 重组；

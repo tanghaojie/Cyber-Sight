@@ -1,5 +1,7 @@
 # Platform 设计索引
 
+- [Geo 地标与自动周边街区](modules/geo-landmark-context.md)：外部 Overture/OSM 生成器、台北资产、场景索引与关联、瓦片昼夜及质量预算。
+
 - [Geo 模型制作与地理参考标准](modules/geo-model-authoring.md)：模型/场景优化分类，PBR、UV、纹理与表面变化，统一 WGS84、锚点、高程、轴向及资产交付验收。
 
 - [Geo 三档显示质量与模型坐标选择](modules/geo-render-quality-and-placement.md)：性能/平衡/兼容、近地光照、模型发光倍率与加载前坐标询问。

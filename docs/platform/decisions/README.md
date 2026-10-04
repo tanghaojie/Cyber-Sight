@@ -2,6 +2,8 @@
 
 当前 Platform 决策：
 
+- [Geo 自动地标周边与显式场景索引](ADR-20261004-geo-generated-landmark-context.md)：素材侧生成共享 PBR/两级瓦片，Sight 显式关联模型与街区，保持真实地理布局和唯一时钟。
+
 - [Geo 模型制作与地理参考契约](ADR-20261003-geo-model-authoring-and-georeference.md)：制作端与场景分工、统一局部米制/WGS84 字段，保留现有加载器及渲染边界。
 
 - [Geo 三档质量与模型坐标选择](ADR-20261002-geo-render-modes-and-model-placement.md)：最高画质录屏、平衡默认、低配降级和模型定位来源确认，保留默认影像。

@@ -4,7 +4,7 @@ scope: platform
 repository: Cyber-Sight
 status: active
 owner: project maintainers
-updated: 2026-10-03
+updated: 2026-10-04
 ---
 
 # Geo 模型制作与地理参考标准
@@ -179,7 +179,7 @@ ORM 可合并 R=occlusion、G=roughness、B=metallic，但必须分别绑定 occ
 
 可同时提供 placement.json，顶层采用与 GEO_ROOT.extras 相同的规范字段，再记录 URL 和手工 scale、heading、pitch、roll。未知高度仍省略；文件和 GLB 同版本且一致。UI 经度、纬度、高度映射到 longitude_wgs84、latitude_wgs84、ellipsoid_height_m，输入路径的高度始终为显式定位值，不能假定 sidecar 缺高度也会让输入路径采样。
 
-**当前 Sight 不自动请求/读取 placement.json，也不应用 GLB 中的 heading、推荐缩放、height_source 等说明字段。** GLB 自身嵌入规范坐标，朝向在资产中校准或在 UI 手工输入。未来 sidecar/场景描述另行设计，不把交付文件视为新加载能力。
+**当前 Sight 不自动请求/读取 placement.json，也不应用 GLB 中的 heading、推荐缩放、height_source 等说明字段。** GLB 自身嵌入规范坐标，朝向在资产中校准或在 UI 手工输入。现支持单独显式加载 [scene.json 地标与周边](geo-landmark-context.md)；该入口不会为普通 GLB 猜测或自动请求 sidecar。
 
 | 旧资产                | 重导出要求                                                                                      |
 | --------------------- | ----------------------------------------------------------------------------------------------- |
@@ -215,7 +215,7 @@ ORM 可合并 R=occlusion、G=roughness、B=metallic，但必须分别绑定 occ
 
 Meshopt/Draco 减少几何传输，KTX2/BasisU 改善纹理传输及 GPU 存储；不自动减面或减少批次。低分辨率版本复查扩边和细节，不只是改文件名。
 
-**当前三档 Scene 模式只调整渲染，不自动替换模型 URL 或按距离切换资产版本。** 各版本可分别加载验收，自动选择和 LOD 管理由场景优化另行实施。
+**当前三档 Scene 模式不自动替换主体模型 URL 或切换主体资产版本。** 各主体版本可分别加载验收；生成周边采用 3D Tiles 两级几何并随质量档调整屏幕误差和缓存，见[地标与周边](geo-landmark-context.md)。
 
 ## 8. 交付与验收
 

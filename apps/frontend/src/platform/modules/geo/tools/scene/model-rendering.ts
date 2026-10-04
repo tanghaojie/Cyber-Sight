@@ -8,7 +8,9 @@ import {
   JulianDate,
   Matrix4,
   Model,
+  ShadowMode,
   UniformType,
+  type Cesium3DTileset,
   type Viewer,
 } from 'cesium'
 import type { GeoRenderMode } from '../../core/render-performance'
@@ -21,6 +23,7 @@ export interface GeoModelRenderingRegistration {
 
 export interface GeoModelRenderingManager {
   register(model: Model): GeoModelRenderingRegistration
+  registerTileset(tileset: Cesium3DTileset, position: Cartesian3): GeoModelRenderingRegistration
   registerEnvironment(resource: GeoEnvironmentResource): { dispose(): void }
   setMode(mode: GeoRenderMode): void
   getFocusPosition(): Cartesian3 | undefined
@@ -52,9 +55,17 @@ function setEnvironmentCoefficients(
 }
 
 interface ManagedModel {
-  readonly model: Model
+  readonly model: Model | Cesium3DTileset
+  readonly origin: () => Cartesian3
+  readonly quality?: {
+    readonly tileset: Cesium3DTileset
+    readonly shadows: ShadowMode
+    readonly error: number
+    readonly cache: number
+    readonly overflow: number
+  }
   readonly shader: ReturnType<typeof createModelShader>
-  readonly originalShader: Model['customShader']
+  readonly originalShader: Model['customShader'] | undefined
   readonly originalLightColor: Cartesian3 | undefined
   baseLightColor: Cartesian3
   readonly usesSceneLight: boolean
@@ -213,7 +224,7 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
     if (item.disposed || item.model.isDestroyed()) {
       return false
     }
-    const origin = resolveOrigin(item.model)
+    const origin = item.origin()
     const altitude = solarHeightDegrees(origin, sunFixed)
     const nightFactor = 1 - smoothstep(NIGHT_HEIGHT_DEGREES, DAYLIGHT_HEIGHT_DEGREES, altitude)
     const directFactor = smoothstep(0, 6, altitude)
@@ -300,7 +311,34 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
     updateModels(viewer.clock.currentTime)
   })
 
-  function register(model: Model): GeoModelRenderingRegistration {
+  function applyQuality(item: ManagedModel): void {
+    const tileset = item.quality?.tileset
+    if (!tileset || tileset.isDestroyed()) {
+      return
+    }
+    tileset.maximumScreenSpaceError = mode === 'performance' ? 5 : mode === 'balanced' ? 12 : 28
+    tileset.cacheBytes = (mode === 'performance' ? 256 : mode === 'balanced' ? 128 : 48) * 1024 ** 2
+    tileset.maximumCacheOverflowBytes =
+      (mode === 'performance' ? 64 : mode === 'balanced' ? 32 : 16) * 1024 ** 2
+    tileset.shadows = mode === 'compatible' ? ShadowMode.DISABLED : ShadowMode.ENABLED
+  }
+
+  function restoreQuality(item: ManagedModel): void {
+    const quality = item.quality
+    if (!quality || quality.tileset.isDestroyed()) {
+      return
+    }
+    quality.tileset.maximumScreenSpaceError = quality.error
+    quality.tileset.cacheBytes = quality.cache
+    quality.tileset.maximumCacheOverflowBytes = quality.overflow
+    quality.tileset.shadows = quality.shadows
+  }
+
+  function registerResource(
+    model: Model | Cesium3DTileset,
+    origin: () => Cartesian3,
+    tileset?: Cesium3DTileset,
+  ): GeoModelRenderingRegistration {
     if (disposed) {
       throw new Error('Geo model rendering manager has been disposed')
     }
@@ -310,7 +348,7 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
     if ([...registrations].some((item) => item.model === model && !item.disposed)) {
       throw new Error('模型已经注册统一昼夜渲染')
     }
-    resolveOrigin(model)
+    origin()
     const currentTime = viewer.clock.currentTime
     const sunFixed = sunPositionFixed(currentTime)
     if (!sunFixed) {
@@ -320,6 +358,16 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
     const configuredLightColor = (model as Model & { lightColor?: Cartesian3 }).lightColor
     const managed: ManagedModel = {
       model,
+      origin,
+      quality: tileset
+        ? {
+            tileset,
+            shadows: tileset.shadows,
+            error: tileset.maximumScreenSpaceError,
+            cache: tileset.cacheBytes,
+            overflow: tileset.maximumCacheOverflowBytes,
+          }
+        : undefined,
       shader,
       originalShader: model.customShader,
       originalLightColor: configuredLightColor
@@ -340,6 +388,7 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
     try {
       model.customShader = shader
       registrations.add(managed)
+      applyQuality(managed)
       const changed = applyModel(managed, sunFixed)
       if (changed) {
         viewer.scene.requestRender()
@@ -365,6 +414,7 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
           registrations.delete(managed)
           try {
             if (!model.isDestroyed()) {
+              restoreQuality(managed)
               model.customShader = managed.originalShader
               model.imageBasedLighting.imageBasedLightingFactor = managed.originalIblFactor
               ;(model as unknown as { lightColor: Cartesian3 | undefined }).lightColor =
@@ -380,6 +430,7 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
       registrations.delete(managed)
       try {
         if (!model.isDestroyed()) {
+          restoreQuality(managed)
           model.customShader = managed.originalShader
           model.imageBasedLighting.imageBasedLightingFactor = managed.originalIblFactor
           ;(model as unknown as { lightColor: Cartesian3 | undefined }).lightColor =
@@ -393,6 +444,33 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
     }
   }
 
+  function register(model: Model): GeoModelRenderingRegistration {
+    return registerResource(model, function modelOrigin() {
+      return resolveOrigin(model)
+    })
+  }
+
+  function registerTileset(
+    tileset: Cesium3DTileset,
+    position: Cartesian3,
+  ): GeoModelRenderingRegistration {
+    if (tileset.style || tileset.customShader) {
+      throw new Error('瓦片已有样式，无法同时启用地标街区昼夜材质。')
+    }
+    const origin = Cartesian3.clone(position)
+    const location = Cartographic.fromCartesian(origin)
+    if (!location || !Number.isFinite(location.height)) {
+      throw new Error('街区的 WGS84 锚点无效。')
+    }
+    return registerResource(
+      tileset,
+      function contextOrigin() {
+        return origin
+      },
+      tileset,
+    )
+  }
+
   function dispose(): void {
     if (disposed) {
       return
@@ -403,6 +481,7 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
       item.disposed = true
       try {
         if (!item.model.isDestroyed()) {
+          restoreQuality(item)
           item.model.customShader = item.originalShader
           item.model.imageBasedLighting.imageBasedLightingFactor = item.originalIblFactor
           ;(item.model as unknown as { lightColor: Cartesian3 | undefined }).lightColor =
@@ -432,6 +511,7 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
 
   return {
     register,
+    registerTileset,
     registerEnvironment,
     setMode(nextMode) {
       if (disposed) {
@@ -440,6 +520,7 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
       mode = nextMode
       registrations.forEach(function markDirty(item) {
         item.dirty = true
+        applyQuality(item)
       })
       lastTime = undefined
       updateModels(viewer.clock.currentTime)
@@ -452,7 +533,7 @@ export function createGeoModelRenderingManager(viewer: Viewer): GeoModelRenderin
           continue
         }
         try {
-          position = resolveOrigin(item.model)
+          position = item.origin()
         } catch {
           // One invalid placement must not stop the scene's environment updates.
         }

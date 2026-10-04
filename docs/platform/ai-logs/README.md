@@ -1,6 +1,8 @@
 # Platform 活动 AI 协作记录
 
-最新完成：[Geo 模型制作与地理参考标准](../archive/ai-logs/docs/2026/10/2026-10-03-geo-model-authoring-standard.md)。
+最新完成：[Geo 自动地标周边第一版](../archive/ai-logs/feat/2026/10/2026-10-04-geo-landmark-context.md)。
+
+此前完成：[Geo 模型制作与地理参考标准](../archive/ai-logs/docs/2026/10/2026-10-03-geo-model-authoring-standard.md)。
 
 最近复核：[Geo 三档质量交付后的文档复核](../archive/ai-logs/docs/2026/10/2026-10-02-geo-render-quality-documentation-review.md)。
 

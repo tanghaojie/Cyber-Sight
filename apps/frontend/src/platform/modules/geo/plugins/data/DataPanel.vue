@@ -260,6 +260,61 @@
           <i aria-hidden="true" />正在加载模型…
         </strong>
       </div>
+      <div class="data-panel__landmark">
+        <div class="data-panel__subheading">
+          <span>地标与周边</span>
+          <button type="button" :disabled="controller.state.busy" @click="loadTaipeiScene">
+            台北 101 示例
+          </button>
+        </div>
+        <label class="data-panel__input">
+          <span>场景 URL</span>
+          <input v-model="landmarkSceneUrl" type="url" placeholder="https://…/scene.json" />
+        </label>
+        <button
+          class="data-panel__primary"
+          type="button"
+          :disabled="!landmarkSceneUrl || controller.state.busy"
+          @click="controller.loadLandmarkScene(landmarkSceneUrl)"
+        >
+          加载地标与周边
+        </button>
+        <div
+          v-if="controller.state.landmarkLoading"
+          class="data-panel__scene-progress"
+          role="status"
+        >
+          <span>{{ controller.state.landmarkLoading }}</span>
+          <button type="button" @click="controller.cancelLandmarkLoad()">取消</button>
+        </div>
+        <article
+          v-for="scene in controller.state.landmarkScenes"
+          :key="scene.id"
+          class="data-panel__resource data-panel__scene"
+        >
+          <strong>{{ scene.label }}</strong>
+          <small>{{ landmarkStatusLabels[scene.status] }}</small>
+          <p v-if="scene.notice">{{ scene.notice }}</p>
+          <p v-if="scene.error" class="data-panel__error">{{ scene.error }}</p>
+          <div class="data-panel__scene-actions">
+            <button
+              v-if="scene.status === 'partial' || scene.status === 'incompatible'"
+              type="button"
+              :disabled="controller.state.busy"
+              @click="controller.retryLandmarkScene(scene.id)"
+            >
+              重试周边
+            </button>
+            <button
+              type="button"
+              :disabled="controller.state.busy"
+              @click="controller.removeLandmarkScene(scene.id)"
+            >
+              移除场景
+            </button>
+          </div>
+        </article>
+      </div>
       <label class="data-panel__input"
         ><span>GeoJSON URL</span
         ><input v-model="geoJsonUrl" type="url" placeholder="https://…/data.geojson"
@@ -478,7 +533,10 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import type { GeoDataResourceSnapshot, GeoModelTransform } from '../../tools/data/data-browser'
-import { DEFAULT_GEO_MODEL_URL } from '../../tools/data/data-presets'
+import {
+  DEFAULT_GEO_MODEL_URL,
+  DEFAULT_GEO_LANDMARK_SCENE_URL,
+} from '../../tools/data/data-presets'
 import type {
   GeoImageryAvailability,
   GeoImagerySourceDefinition,
@@ -511,6 +569,18 @@ interface ImagerySourceGroup {
 
 const props = defineProps<{ controller: GeoDataController }>()
 const geoJsonUrl = ref('')
+const landmarkSceneUrl = ref(DEFAULT_GEO_LANDMARK_SCENE_URL)
+const landmarkStatusLabels = {
+  loading: '正在加载',
+  ready: '周边已连接，按视角加载',
+  partial: '主体已保留，周边待连接',
+  incompatible: '主体与周边暂不匹配',
+}
+
+async function loadTaipeiScene(): Promise<void> {
+  landmarkSceneUrl.value = DEFAULT_GEO_LANDMARK_SCENE_URL
+  await props.controller.loadLandmarkScene(landmarkSceneUrl.value)
+}
 const modelUrl = ref(DEFAULT_GEO_MODEL_URL)
 const modelPlacement = reactive<GeoModelTransform>(props.controller.suggestModelTransform())
 const modelDrafts = reactive<Record<string, GeoModelTransform>>({})
@@ -1350,5 +1420,55 @@ async function loadTileset(): Promise<void> {
 .data-panel__resource .data-panel__model-apply:disabled {
   cursor: not-allowed;
   opacity: 0.45;
+}
+.data-panel__landmark {
+  display: grid;
+  gap: 9px;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--geo-line, #263c4e);
+}
+.data-panel__landmark .data-panel__subheading button,
+.data-panel__scene-progress button,
+.data-panel__scene-actions button {
+  min-height: 26px;
+  padding: 3px 8px;
+  border: 1px solid var(--geo-line, #263c4e);
+  border-radius: 5px;
+  color: var(--geo-text, #d5e4ef);
+  background: var(--geo-surface-strong, #0e1c2a);
+  font-size: 10px;
+  cursor: pointer;
+}
+.data-panel__landmark button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.data-panel__scene-progress,
+.data-panel__scene-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--geo-text-faint, #7890a2);
+  font-size: 10px;
+}
+.data-panel__scene {
+  display: grid;
+  gap: 6px;
+}
+.data-panel__scene strong {
+  color: var(--geo-text, #d5e4ef);
+  font-size: 11px;
+}
+.data-panel__scene small,
+.data-panel__scene p {
+  margin: 0;
+  color: var(--geo-text-faint, #7890a2);
+  font-size: 10px;
+  line-height: 1.6;
+}
+.data-panel__scene p.data-panel__error {
+  color: var(--geo-danger, #ff8b91);
 }
 </style>

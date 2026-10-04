@@ -4,7 +4,7 @@ scope: platform
 repository: Cyber-Sight
 status: active
 owner: project maintainers
-updated: 2026-10-03
+updated: 2026-10-04
 ---
 
 # Geo 外部模型统一渲染标准
@@ -45,6 +45,8 @@ updated: 2026-10-03
 URL/定位 → Data 独立下载解析与发光倍率适配 → 有效坐标时询问来源并按需采样地形 → 创建 Model 并等待原始模型 ready → Scene 渲染管理器登记 → 时间和位置求太阳高度 → 更新材质 uniform、环境光及模型直射光 → 按画幅与包围球自动取景。
 
 管理器只建立一套共享时间/场景更新监听，模型数量增长不增加定时器或监听器。首次注册、时间变化（包括暂停拖动）、位置变化均立即求值。相同时间及配置跳过重复计算，不创建额外 Clock、requestAnimationFrame 或空闲重绘循环。Shader 保持实例稳定，只更新 uniform。
+
+自动生成街区通过 `registerTileset(tileset, position)` 显式登记，复用上述太阳高度、PBR 发光、直射和环境策略；任意第三方瓦片继续只登记环境，不强制替换材质。已有 Style/CustomShader 的瓦片不得混入昼夜 Shader。生成街区三档分别使用屏幕误差 5/12/28、缓存 256/128/48 MiB、溢出 64/32/16 MiB，兼容档关闭瓦片阴影；注销恢复原设置。加载、署名和关联状态见[地标与周边](geo-landmark-context.md)。
 
 ## 失败模式与兼容性
 
