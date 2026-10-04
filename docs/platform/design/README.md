@@ -1,5 +1,6 @@
 # Platform 设计索引
 
+- [Punk 微排技术调研与复刻建议](wechat-editor-research.md)：已部署架构、功能、复制逻辑和 Cyber-Sight 接入评估；研究报告，尚未实施或形成长期决定。
 - [PRISM UI 接入](prism-ui-integration.md)：主题包、共享 UI、下游品牌与 Geo 兼容边界。
 
 - [Geo 外部模型统一渲染标准](modules/geo-model-rendering.md)：只填外部 URL 和定位的自动昼夜、材质约定和资源生命周期。

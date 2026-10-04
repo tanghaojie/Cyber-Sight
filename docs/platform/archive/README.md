@@ -10,6 +10,8 @@
 
 ## 已完成计划
 
+- [2026-10-04 Punk 微排技术调研与文档归档](plans/2026-10-04-wechat-editor-research.md)：核对部署架构、功能与公众号复制流程，提出 Cyber-Sight 接入建议；未实现模块。
+
 - [2026-10-04 Forge PRISM UI 同步](plans/2026-10-04-forge-prism-ui-sync.md)：接入 86bf968，共享主题/应用壳/管理 UI 与下游首页关于页同步，保留 Geo。
 
 - [2026-10-04 PRISM 同步 Platform 文档归档审查](plans/2026-10-04-platform-archive-review.md)：复核 Geo 外部模型渲染和前次同步，保留有效 ADR 并独立推进 Platform ledger。
@@ -79,6 +81,8 @@
 - [2026-08-30 Geo 影像与宽屏交付后的 Platform 文档归档审查](plans/2026-08-30-platform-documentation-archive-review-3.md)：复核影像恢复与宽屏交付并推进 Platform 台账。
 
 ## AI 协作记录
+
+- [2026-10-04 Punk 微排技术调研报告](ai-logs/docs/2026/10/2026-10-04-wechat-editor-research.md)
 
 - [2026-10-04 Forge PRISM UI 同步与 Platform 归档复核](ai-logs/chore/2026/10/2026-10-04-forge-prism-ui-sync.md)
 
