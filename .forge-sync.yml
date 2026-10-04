@@ -12,6 +12,7 @@ foundation:
   - scripts/architecture/
 
 platform:
+  - apps/wechat-editor/
   - .archive-audit.json
   - apps/frontend/src/platform/
   - apps/frontend/env/.env.platform.example

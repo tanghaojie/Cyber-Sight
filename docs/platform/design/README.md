@@ -1,6 +1,7 @@
 # Platform 设计索引
 
-- [桀士排版独立应用](apps/jlab-wechat-editor.md)：JLab WeChat Editor 的产品范围、纯前端边界、单层工具栏、左侧抽屉、可拖拽双栏与实施分期；方案已确认，应用尚未实现。
+- [桀士排版独立应用](apps/jlab-wechat-editor.md)：JLab WeChat Editor 的产品范围、纯前端边界、单层工具栏、左侧抽屉、可拖拽双栏与实施状态。
+- [桀士排版内部模块边界](modules/wechat-editor.md)：六个实际模块的公共入口、数据流、失败模式与静态检查覆盖。
 - [公众号编辑器 HTML 与 CSS 兼容规则和实施准备](wechat-editor-wechat-compatibility.md)：官方规范、候选导出集合、素材和人工验收边界；研究草案，尚未实施或验收。
 - [Punk 微排技术调研与复刻建议](wechat-editor-research.md)：原站架构、功能与复制证据；产品方案以桀士排版独立应用设计为准。
 - [PRISM UI 接入](prism-ui-integration.md)：主题包、共享 UI、下游品牌与 Geo 兼容边界。
