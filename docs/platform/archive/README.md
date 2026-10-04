@@ -10,6 +10,8 @@
 
 ## 已完成计划
 
+- [2026-10-05 桀士排版实施后的 Platform 归档复核](plans/2026-10-05-jlab-platform-archive-review.md)：复核实际实现 `5fc0bd1`，推进台账，保留人工验收边界。
+
 - [2026-10-05 桀士排版独立应用实施](plans/2026-10-05-jlab-wechat-editor.md)：横屏纯前端单页、排版/草稿/素材与候选公众号复制；技术验证通过，人工验收待执行。
 
 - [2026-10-04 编辑器调研提交后的 Platform 归档复核](plans/2026-10-04-wechat-research-platform-archive-review.md)：按授权同步两处既有文档并复核独立应用设计提交 `063d503`，推进 Platform 台账。
@@ -86,6 +88,8 @@
 - [2026-08-30 Geo 影像与宽屏交付后的 Platform 文档归档审查](plans/2026-08-30-platform-documentation-archive-review-3.md)：复核影像恢复与宽屏交付并推进 Platform 台账。
 
 ## AI 协作记录
+
+- [2026-10-05 桀士排版实施后的 Platform 归档复核](ai-logs/docs/2026/10/2026-10-05-jlab-platform-archive-review.md)
 
 - [2026-10-05 桀士排版独立应用实施](ai-logs/feat/2026/10/2026-10-05-jlab-wechat-editor.md)
 

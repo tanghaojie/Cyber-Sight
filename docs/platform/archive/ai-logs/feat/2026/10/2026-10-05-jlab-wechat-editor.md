@@ -24,7 +24,7 @@ change_type: feat
 
 TypeScript、ESLint、应用模块边界（24 个源文件/70 个 import）、仓库所有权、独立生产构建、全 monorepo build、pnpm install --frozen-lockfile、归档 CI 通过；本轮提交前执行 pnpm format、format:check 和 diff 检查。应用 build 包含自身边界检查，因此后续根递归 build 也纳入新应用的架构覆盖。没有运行前端或浏览器自动化测试。开发服务 http://127.0.0.1:5174/ 已启动，入口 HTTP 200；已请求在 Codex 侧栏打开，此证据仅表示资源服务，不表示交互通过。
 
-本轮提交按 feat(wechat-editor) 分类，执行模型从本会话 turn_context 核对为 gpt-6.1-sol，提交 trailer 须复查。相关提交为包含本记录的实现提交，可用 git log --all -- apps/wechat-editor 查询。
+实现提交为 `5fc0bd104ddac5e76e5a6dbf9c77625353b82ad3`，按 feat(wechat-editor) 分类；执行模型从本会话 turn_context 核对为 gpt-6.1-sol，git log -1 --format=full 已核对 trailer 正确。提交后归档 CI 因架构变更触发 DUE，由独立复核计划继续处理，不将提交前 NOT_DUE 当作最终结果。
 
 ## 未决问题与下一步
 
