@@ -5,6 +5,7 @@ repository: Cyber-Sight
 owner: project maintainers
 status: accepted
 date: 2026-09-11
+updated: 2026-10-02
 ---
 
 # ADR-20260911：Geo 外部模型统一渲染
@@ -24,6 +25,8 @@ date: 2026-09-11
 以 Geo 内部 `scene.modelRendering` capability 连接 Data 与 Scene。Scene 拥有唯一渲染管理器和默认曲线，Data 拥有 Model/定位，Time 仍唯一控制 Clock。PBR Emissive 作为夜景通道按模型所在地太阳高度渐变；保留 Unlit/透明度等原始语义，无发光通道不生成灯光。按单模型调节 IBL 与太阳直射，避免全局改光影响其他资源。
 
 外部模型默认自动应用标准，不要求用户填写材质参数。现有地球光照开关保持只作用于地球表面，并明确文案；模型随时间自动昼夜，阴影遵循 Scene 开关。此决策扩展 20260830 太阳光照 ADR 的模型渲染范围，其单时钟和低空闲开销决策继续有效。
+
+2026-10-02 的[浏览器时区与太阳环境光 ADR](ADR-20261002-geo-browser-time-and-solar-environment.md)建立 SUNLIGHT 与300仿真秒环境更新基线；随后[三档质量与模型坐标 ADR](ADR-20261002-geo-render-modes-and-model-placement.md)将具体阴影、IBL、环境更新与后期参数扩展为场景级模式。单模型太阳求值、自动接入、Unlit、capability 和资源边界继续有效。
 
 不建设模型资产、目录、持久化、后端、点光源或外部发布流程，不改变已有 3D Tiles 正常科技扫描。混合资源场景的无归属渲染异常只报场景故障，不再据此清除所有 Tileset 样式；没有模型时保留既有回退。
 

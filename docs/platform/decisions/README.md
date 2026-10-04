@@ -2,6 +2,14 @@
 
 当前 Platform 决策：
 
+- [Geo 自动地标周边与显式场景索引](ADR-20261004-geo-generated-landmark-context.md)：素材侧生成共享 PBR/两级瓦片，Sight 显式关联模型与街区，保持真实地理布局和唯一时钟。
+
+- [Geo 模型制作与地理参考契约](ADR-20261003-geo-model-authoring-and-georeference.md)：制作端与场景分工、统一局部米制/WGS84 字段，保留现有加载器及渲染边界。
+
+- [Geo 三档质量与模型坐标选择](ADR-20261002-geo-render-modes-and-model-placement.md)：最高画质录屏、平衡默认、低配降级和模型定位来源确认，保留默认影像。
+
+- [Geo 浏览器时区显示与太阳驱动环境光](ADR-20261002-geo-browser-time-and-solar-environment.md)：本地日历刻度、绝对时间求值、SUNLIGHT 与环境贴图更新精度。
+
 - [Geo 外部模型统一渲染](ADR-20260911-geo-external-model-rendering.md)：Scene 统一标准、Data 自动接入、外部资产与渲染分离。
 
 - [Geo 使用第二个 HTML 构建入口](ADR-20260901-geo-second-build-entry.md)：确定一次 Vite 多入口构建，同时输出 Sight 与 Standalone Geo，并共享唯一 Cesium 静态目录。

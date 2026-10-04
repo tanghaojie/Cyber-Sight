@@ -33,17 +33,30 @@ import {
 } from '../../tools/data/imagery-layer-manager'
 import type { GeoImageryLayerEntry } from './data.capabilities'
 import type { GeoModelRenderingManager } from '../../tools/scene/model-rendering'
+import type { GeoModelCoordinates, GeoModelCoordinateSource } from '../../tools/data/model-asset'
+import {
+  createGeoLandmarkSceneLoader,
+  type GeoLandmarkSceneLoader,
+  type GeoLandmarkSceneSnapshot,
+} from '../../tools/data/landmark-scene-loader'
 
-export type GeoDataLoadingOperation = 'geojson' | 'model' | 'tileset' | 'fly-to' | 'transform'
+export type GeoDataLoadingOperation =
+  'geojson' | 'model' | 'tileset' | 'landmark-scene' | 'fly-to' | 'transform'
 
 export interface GeoDataState {
   imagery: readonly GeoImageryLayerSnapshot[]
   resources: readonly GeoDataResourceSnapshot[]
+  landmarkScenes: readonly GeoLandmarkSceneSnapshot[]
+  landmarkLoading?: string
   terrain: GeoTerrainSnapshot
   busy: boolean
   loadingOperation?: GeoDataLoadingOperation
   loadingImagerySource?: GeoImagerySourceId
   error?: string
+  modelCoordinateRequest?: {
+    readonly coordinates: GeoModelCoordinates
+    readonly input?: GeoModelTransform
+  }
 }
 
 export interface GeoDataController {
@@ -59,6 +72,11 @@ export interface GeoDataController {
   flyToImagery(id: string): void
   loadGeoJson(options: LoadGeoJsonOptions): Promise<void>
   loadModel(options: LoadModelOptions): Promise<void>
+  loadLandmarkScene(url: string): Promise<void>
+  retryLandmarkScene(id: string): Promise<void>
+  cancelLandmarkLoad(): void
+  removeLandmarkScene(id: string): void
+  chooseModelCoordinates(source: GeoModelCoordinateSource): void
   loadTileset(options: LoadTilesetOptions): Promise<boolean>
   removeResource(id: string): void
   setResourceVisible(id: string, show: boolean): void
@@ -103,13 +121,16 @@ export function createGeoDataController(
   const state = reactive<GeoDataState>({
     imagery: [],
     resources: [],
+    landmarkScenes: [],
     terrain: browser.getTerrain(),
     busy: false,
   })
   let imagery: GeoImageryLayerManager
+  let landmarks: GeoLandmarkSceneLoader | undefined
   let disposed = false
   let pendingOperations = 0
   let terrainRequestVersion = 0
+  let pendingCoordinateChoice: ((source: GeoModelCoordinateSource) => void) | undefined
 
   function guard(): void {
     if (disposed) {
@@ -127,6 +148,8 @@ export function createGeoDataController(
   }
 
   function refresh(): void {
+    state.landmarkScenes = landmarks?.sync() ?? []
+    state.landmarkLoading = landmarks?.loading
     const imageryLayers = imagery.list()
     state.imagery = imageryLayers.map(function copyImagery(item) {
       return { ...item }
@@ -160,7 +183,9 @@ export function createGeoDataController(
     try {
       return await operation()
     } catch (error) {
-      state.error = error instanceof Error ? error.message : '数据操作失败'
+      if (!disposed && !(error instanceof DOMException && error.name === 'AbortError')) {
+        state.error = error instanceof Error ? error.message : '数据操作失败'
+      }
       return undefined
     } finally {
       pendingOperations -= 1
@@ -244,9 +269,83 @@ export function createGeoDataController(
 
   async function loadModel(loadOptions: LoadModelOptions): Promise<void> {
     await run(async function load() {
-      const model = await browser.loadModel(loadOptions)
+      const model = await browser.loadModel({
+        ...loadOptions,
+        chooseCoordinates:
+          loadOptions.chooseCoordinates ??
+          function requestCoordinates(coordinates) {
+            return requestModelCoordinates(coordinates, loadOptions.transform, loadOptions.signal)
+          },
+      })
+      guard()
       await browser.flyTo(model.id)
     }, 'model')
+  }
+
+  function requestModelCoordinates(
+    coordinates: GeoModelCoordinates,
+    input: GeoModelTransform | undefined,
+    signal?: AbortSignal,
+  ): Promise<GeoModelCoordinateSource> {
+    guard()
+    if (pendingCoordinateChoice) {
+      throw new Error('请先完成当前模型的坐标选择。')
+    }
+    state.modelCoordinateRequest = { coordinates, input }
+    return new Promise<GeoModelCoordinateSource>(function waitForChoice(resolve) {
+      const signals = new Set(
+        [options.signal, signal].filter((value): value is AbortSignal => Boolean(value)),
+      )
+      function abort(): void {
+        chooseModelCoordinates('cancel')
+      }
+      pendingCoordinateChoice = function finishChoice(source) {
+        signals.forEach((sourceSignal) => sourceSignal.removeEventListener('abort', abort))
+        state.modelCoordinateRequest = undefined
+        resolve(source)
+      }
+      signals.forEach((sourceSignal) =>
+        sourceSignal.addEventListener('abort', abort, { once: true }),
+      )
+      if ([...signals].some((sourceSignal) => sourceSignal.aborted)) {
+        abort()
+      }
+    })
+  }
+
+  function chooseModelCoordinates(source: GeoModelCoordinateSource): void {
+    const finish = pendingCoordinateChoice
+    pendingCoordinateChoice = undefined
+    finish?.(source)
+  }
+
+  landmarks = createGeoLandmarkSceneLoader(viewer, browser, {
+    signal: options.signal,
+    onChange: refresh,
+    chooseCoordinates: requestModelCoordinates,
+  })
+
+  async function loadLandmarkScene(url: string): Promise<void> {
+    await run(async function loadScene() {
+      await landmarks!.load(url)
+    }, 'landmark-scene')
+  }
+
+  async function retryLandmarkScene(id: string): Promise<void> {
+    await run(async function retryScene() {
+      await landmarks!.retry(id)
+    }, 'landmark-scene')
+  }
+
+  function cancelLandmarkLoad(): void {
+    guard()
+    landmarks?.cancel()
+  }
+
+  function removeLandmarkScene(id: string): void {
+    guard()
+    landmarks?.remove(id)
+    refresh()
   }
 
   async function loadTileset(loadOptions: LoadTilesetOptions): Promise<boolean> {
@@ -258,12 +357,15 @@ export function createGeoDataController(
 
   function removeResource(id: string): void {
     guard()
-    browser.remove(id)
+    if (!landmarks?.removeResource(id)) {
+      browser.remove(id)
+    }
     refresh()
   }
 
   function setResourceVisible(id: string, show: boolean): void {
     guard()
+    landmarks?.setResourceVisible(id, show)
     browser.setVisible(id, show)
     refresh()
   }
@@ -339,6 +441,8 @@ export function createGeoDataController(
       return
     }
     disposed = true
+    chooseModelCoordinates('cancel')
+    landmarks?.dispose()
     options.onImageryLayersChange?.([])
     imagery.dispose()
     browser.dispose()
@@ -366,6 +470,11 @@ export function createGeoDataController(
     flyToImagery,
     loadGeoJson,
     loadModel,
+    loadLandmarkScene,
+    retryLandmarkScene,
+    cancelLandmarkLoad,
+    removeLandmarkScene,
+    chooseModelCoordinates,
     loadTileset,
     removeResource,
     setResourceVisible,

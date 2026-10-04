@@ -33,14 +33,17 @@ interface ClockSnapshot {
 }
 
 const DEFAULT_MULTIPLIER = 60
-const DEFAULT_VIEWPORT_DURATION_MS = 24 * 60 * 60 * 1000
 const MIN_VIEWPORT_DURATION_MS = 60 * 1000
 const MAX_VIEWPORT_DURATION_MS = Math.round(365.25 * 10 * 24 * 60 * 60 * 1000)
 const UI_UPDATE_INTERVAL_MS = 100
 
-function utcDayRange(date: Date): { start: number; stop: number } {
-  const start = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
-  return { start, stop: start + DEFAULT_VIEWPORT_DURATION_MS }
+function localDayRange(date: Date): { start: number; stop: number } {
+  const start = new Date(date.getTime())
+  start.setHours(0, 0, 0, 0)
+  const stop = new Date(start.getTime())
+  // Advance the local calendar day so DST days can span 23 or 25 hours.
+  stop.setDate(stop.getDate() + 1)
+  return { start: start.getTime(), stop: stop.getTime() }
 }
 
 function cloneClock(clock: Clock): ClockSnapshot {
@@ -85,7 +88,7 @@ export function createGeoTimeController(viewer: Viewer): GeoTimeController {
   const clock = viewer.clock
   const original = cloneClock(clock)
   const now = new Date()
-  const initialViewport = utcDayRange(now)
+  const initialViewport = localDayRange(now)
 
   clock.startTime = JulianDate.fromDate(new Date(initialViewport.start))
   clock.stopTime = JulianDate.fromDate(new Date(initialViewport.stop))
@@ -225,7 +228,7 @@ export function createGeoTimeController(viewer: Viewer): GeoTimeController {
   function resetToNow(): void {
     guard()
     const currentDate = new Date()
-    const viewport = utcDayRange(currentDate)
+    const viewport = localDayRange(currentDate)
     clock.currentTime = JulianDate.fromDate(currentDate)
     clock.shouldAnimate = false
     state.viewportStart = viewport.start

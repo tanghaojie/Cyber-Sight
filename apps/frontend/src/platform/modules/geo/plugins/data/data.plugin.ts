@@ -1,6 +1,6 @@
 import { defineComponent, h } from 'vue'
-import { DEFAULT_GEO_CAMERA_VIEW, setGeoCameraView } from '../../tools/view/camera-view'
 import DataPanel from './DataPanel.vue'
+import ModelCoordinateDialog from './ModelCoordinateDialog.vue'
 import type { GeoPluginDefinition, GeoPluginContext } from '../../core/geo-plugin'
 import {
   activeTilesetCapability,
@@ -37,24 +37,14 @@ function panelFor(controller: GeoDataController) {
   })
 }
 
-async function loadDefaultTileset(
-  controller: GeoDataController,
-  context: GeoPluginContext,
-): Promise<void> {
-  const loaded = await controller.loadTileset({
+async function loadDefaultTileset(controller: GeoDataController): Promise<void> {
+  await controller.loadTileset({
     id: DEFAULT_GEO_TILESET_ID,
     label: DEFAULT_GEO_TILESET_LABEL,
     url: DEFAULT_GEO_TILESET_URL,
     visualStyle: 'cyber-scan',
     maximumVisibleCameraHeight: DEFAULT_GEO_TILESET_MAX_CAMERA_HEIGHT,
   })
-  if (!loaded || context.signal.aborted || context.viewer.isDestroyed()) {
-    return
-  }
-  await controller.flyToResource(DEFAULT_GEO_TILESET_ID)
-  if (!context.signal.aborted && !context.viewer.isDestroyed()) {
-    setGeoCameraView(context.viewer, DEFAULT_GEO_CAMERA_VIEW)
-  }
 }
 
 export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): GeoPluginDefinition {
@@ -85,7 +75,7 @@ export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): Geo
         await controller.addImagery('google-hybrid')
       }
       if (!context.signal.aborted && !context.viewer.isDestroyed()) {
-        void loadDefaultTileset(controller, context)
+        void loadDefaultTileset(controller)
       }
       const instance: GeoDataPluginInstance = {
         id: 'data',
@@ -95,6 +85,17 @@ export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): Geo
       }
       return {
         contributions: {
+          overlays: [
+            {
+              id: 'model-coordinates',
+              component: defineComponent({
+                name: 'GeoModelCoordinateOverlay',
+                setup() {
+                  return () => h(ModelCoordinateDialog, { controller })
+                },
+              }),
+            },
+          ],
           groups: [{ id: 'data', label: '数据', icon: 'database', order: 10 }],
           tools: [
             {

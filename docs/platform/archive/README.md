@@ -14,6 +14,19 @@
 
 - [2026-10-04 PRISM 同步 Platform 文档归档审查](plans/2026-10-04-platform-archive-review.md)：复核 Geo 外部模型渲染和前次同步，保留有效 ADR 并独立推进 Platform ledger。
 
+- [2026-10-04 Geo 地标周边交付后的文档复核](plans/2026-10-04-geo-landmark-documentation-review.md)：核对当前场景/制作契约及已部署素材，将 Platform 基线推进到 f7a56b0。
+
+- [2026-10-04 Geo 自动地标周边第一版](plans/2026-10-04-geo-landmark-context.md)：可复用 Overture/OSM 生成器、共享 PBR、台北街区、显式场景关联与瓦片昼夜。
+
+- [2026-10-03 Geo 模型制作与地理参考标准](plans/2026-10-03-geo-model-authoring-standard.md)：区分模型/场景优化，补充 PBR、UV、纹理、表面变化与统一 WGS84 资产契约；记录现有加载边界和人工验收。
+
+- [2026-10-02 Geo 三档质量交付后的 Platform 文档归档复核](plans/2026-10-02-geo-render-quality-documentation-review.md)：复核截至18c7895的Geo交付，推进Platform台账。
+
+- [2026-10-02 Geo 第一轮显示优化与模型坐标选择](plans/2026-10-02-geo-render-modes-and-model-placement.md)：三档模式、近地昼夜、发光倍率、加载坐标询问与自动构图；保留默认影像。
+
+- [2026-10-02 Geo 浏览器时区时间轴与太阳环境光](plans/2026-10-02-geo-local-time-and-solar-environment.md)：本地日历时间轴、SUNLIGHT 环境光和 300 秒环境贴图更新精度。
+- [2026-10-02 Geo 近期交付后的 Platform 文档归档复核](plans/2026-10-02-geo-platform-documentation-archive-review.md)：复核近期 Geo 与本轮交付，推进 Platform 台账。
+
 - [2026-09-11 Geo 外部模型统一渲染](plans/2026-09-11-geo-external-model-rendering.md)：URL/定位自动接入统一昼夜标准，静态与生产构建通过，视觉留待人工验收。
 - [2026-09-03 Forge 上游同步](plans/2026-09-03-forge-upstream-sync.md)：接入 Forge `8216f92`，保留 Platform 下游所有权并完成规定验证。
 - [2026-09-01 Geo 第二个构建入口后的 Platform 文档归档审查](plans/2026-09-01-platform-documentation-archive-review-2.md)：复核双入口构建及基线后的 Geo 交付，并将 Platform ledger 推进到 `2910f7d`。
@@ -81,6 +94,18 @@
 ## AI 协作记录
 
 - [2026-10-04 Forge PRISM UI 同步与 Platform 归档复核](ai-logs/chore/2026/10/2026-10-04-forge-prism-ui-sync.md)
+
+- [2026-10-04 Geo 地标周边交付后的文档复核](ai-logs/docs/2026/10/2026-10-04-geo-landmark-documentation-review.md)
+
+- [2026-10-04 Geo 自动地标周边第一版交付](ai-logs/feat/2026/10/2026-10-04-geo-landmark-context.md)
+
+- [2026-10-03 Geo 模型制作与地理参考标准](ai-logs/docs/2026/10/2026-10-03-geo-model-authoring-standard.md)
+
+- [2026-10-02 Geo 三档质量交付后的文档复核](ai-logs/docs/2026/10/2026-10-02-geo-render-quality-documentation-review.md)
+
+- [2026-10-02 Geo 第一轮显示优化](ai-logs/feat/2026/10/2026-10-02-geo-render-modes-and-model-placement.md)
+
+- [2026-10-02 Geo 浏览器时区时间轴与太阳环境光](ai-logs/fix/2026/10/2026-10-02-geo-local-time-and-solar-environment.md)
 
 - [2026-09-11 Geo 外部模型统一渲染](ai-logs/feat/2026/09/2026-09-11-geo-external-model-rendering.md)
 - [2026-09-03 Forge 上游同步](ai-logs/chore/2026/09/2026-09-03-forge-upstream-sync.md)

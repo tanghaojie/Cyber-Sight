@@ -11,6 +11,12 @@ const ADJUSTMENT_COOLDOWN_MS = 1_500
 const SCALE_DOWN_STEP = 0.1
 const SCALE_UP_STEP = 0.05
 
+export type GeoRenderMode = 'performance' | 'balanced' | 'compatible'
+
+export interface GeoRenderPerformanceController extends Disposable {
+  setMode(mode: GeoRenderMode): void
+}
+
 function clampScale(value: number): number {
   return Math.min(1, Math.max(MINIMUM_RESOLUTION_SCALE, value))
 }
@@ -19,14 +25,20 @@ function roundedScale(value: number): number {
   return Math.round(clampScale(value) * 100) / 100
 }
 
-function resolutionScaleLimit(viewer: Viewer): number {
+function resolutionScaleLimit(viewer: Viewer, mode: GeoRenderMode): number {
+  if (mode === 'performance') {
+    return 1
+  }
   const canvas = viewer.scene.canvas
   const cssPixels = Math.max(canvas.clientWidth * canvas.clientHeight, 1)
+  if (mode === 'compatible') {
+    return Math.round(Math.min(0.85, Math.max(0.4, Math.sqrt(900_000 / cssPixels))) * 100) / 100
+  }
   return roundedScale(Math.sqrt(TARGET_RENDER_PIXELS / cssPixels))
 }
 
 function applyResolutionScale(viewer: Viewer, value: number): boolean {
-  const nextScale = roundedScale(value)
+  const nextScale = Math.round(value * 100) / 100
   if (Math.abs(viewer.resolutionScale - nextScale) < 0.001) {
     return false
   }
@@ -36,8 +48,14 @@ function applyResolutionScale(viewer: Viewer, value: number): boolean {
   return true
 }
 
-export function createGeoRenderPerformanceController(viewer: Viewer): Disposable {
-  let scaleLimit = resolutionScaleLimit(viewer)
+export function createGeoRenderPerformanceController(
+  viewer: Viewer,
+): GeoRenderPerformanceController {
+  let mode: GeoRenderMode = 'balanced'
+  const originalScale = viewer.resolutionScale
+  const originalBrowserResolution = viewer.useBrowserRecommendedResolution
+  const originalTargetFrameRate = viewer.targetFrameRate
+  let scaleLimit = resolutionScaleLimit(viewer, mode)
   let lastFrameAt: number | undefined
   let sampleStartedAt: number | undefined
   let sampleFrames = 0
@@ -53,7 +71,7 @@ export function createGeoRenderPerformanceController(viewer: Viewer): Disposable
   }
 
   function handlePostRender(): void {
-    if (disposed || document.hidden) {
+    if (disposed || document.hidden || mode === 'performance') {
       resetSample()
       return
     }
@@ -72,12 +90,17 @@ export function createGeoRenderPerformanceController(viewer: Viewer): Disposable
 
     const elapsed = now - sampleStartedAt
     const framesPerSecond = elapsed > 0 ? (sampleFrames * 1000) / elapsed : HIGH_FRAME_RATE
+    const lowFrameRate = mode === 'compatible' ? 22 : LOW_FRAME_RATE
+    const highFrameRate = mode === 'compatible' ? 28 : HIGH_FRAME_RATE
     if (now - lastAdjustmentAt >= ADJUSTMENT_COOLDOWN_MS) {
-      if (framesPerSecond < LOW_FRAME_RATE) {
-        if (applyResolutionScale(viewer, viewer.resolutionScale - SCALE_DOWN_STEP)) {
+      if (framesPerSecond < lowFrameRate) {
+        const minimum = mode === 'compatible' ? 0.4 : MINIMUM_RESOLUTION_SCALE
+        if (
+          applyResolutionScale(viewer, Math.max(minimum, viewer.resolutionScale - SCALE_DOWN_STEP))
+        ) {
           lastAdjustmentAt = now
         }
-      } else if (framesPerSecond > HIGH_FRAME_RATE && viewer.resolutionScale < scaleLimit) {
+      } else if (framesPerSecond > highFrameRate && viewer.resolutionScale < scaleLimit) {
         if (
           applyResolutionScale(viewer, Math.min(viewer.resolutionScale + SCALE_UP_STEP, scaleLimit))
         ) {
@@ -93,7 +116,7 @@ export function createGeoRenderPerformanceController(viewer: Viewer): Disposable
     if (disposed) {
       return
     }
-    scaleLimit = resolutionScaleLimit(viewer)
+    scaleLimit = resolutionScaleLimit(viewer, mode)
     if (viewer.resolutionScale > scaleLimit) {
       applyResolutionScale(viewer, scaleLimit)
     } else {
@@ -107,6 +130,19 @@ export function createGeoRenderPerformanceController(viewer: Viewer): Disposable
   window.addEventListener('resize', handleResize)
 
   return {
+    setMode(nextMode) {
+      if (disposed) {
+        return
+      }
+      mode = nextMode
+      viewer.useBrowserRecommendedResolution = mode !== 'performance'
+      viewer.targetFrameRate = mode === 'compatible' ? 30 : 60
+      scaleLimit = resolutionScaleLimit(viewer, mode)
+      applyResolutionScale(viewer, scaleLimit)
+      viewer.resize()
+      viewer.scene.requestRender()
+      resetSample()
+    },
     dispose() {
       if (disposed) {
         return
@@ -114,6 +150,12 @@ export function createGeoRenderPerformanceController(viewer: Viewer): Disposable
       disposed = true
       removePostRenderListener()
       window.removeEventListener('resize', handleResize)
+      if (!viewer.isDestroyed()) {
+        viewer.useBrowserRecommendedResolution = originalBrowserResolution
+        viewer.targetFrameRate = originalTargetFrameRate
+        viewer.resolutionScale = originalScale
+        viewer.resize()
+      }
     },
   }
 }

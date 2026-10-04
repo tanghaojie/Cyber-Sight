@@ -94,6 +94,10 @@ export interface GeoBottomDockContribution extends GeoContributionMetadata {
   readonly component: GeoPanelComponent
 }
 
+export interface GeoOverlayContribution extends GeoContributionMetadata {
+  readonly component: GeoPanelComponent
+}
+
 export interface GeoPluginContributions {
   readonly groups?: readonly GeoTaskGroupContribution[]
   readonly tools?: readonly GeoToolContribution[]
@@ -101,10 +105,11 @@ export interface GeoPluginContributions {
   readonly inspectors?: readonly GeoInspectorContribution[]
   readonly statusItems?: readonly GeoStatusItemContribution[]
   readonly bottomDocks?: readonly GeoBottomDockContribution[]
+  readonly overlays?: readonly GeoOverlayContribution[]
 }
 
 export type GeoContributionKind =
-  'group' | 'tool' | 'panel' | 'inspector' | 'statusItem' | 'bottomDock'
+  'group' | 'tool' | 'panel' | 'inspector' | 'statusItem' | 'bottomDock' | 'overlay'
 
 export interface GeoRegisteredContribution {
   readonly id: string
@@ -118,4 +123,5 @@ export interface GeoRegisteredContribution {
     | GeoInspectorContribution
     | GeoStatusItemContribution
     | GeoBottomDockContribution
+    | GeoOverlayContribution
 }
