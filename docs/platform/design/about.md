@@ -1,8 +1,9 @@
 ---
 title: 关于项目模块
+scope: platform
 status: active
 owner: maintainers
-updated: 2026-08-13
+updated: 2026-10-04
 ---
 
 # 关于项目模块
@@ -33,12 +34,12 @@ sys_menus(关于项目)
 
 ## 视觉与交互
 
-- Hero 使用深色 Cyber-Sight 视觉、网格、轨道、节点和渐进式入场动画，突出“工程蓝图”概念。
+- Hero 使用 PRISM 深色结构视觉与共享 PlatformArtwork；未注入品牌图时展示本地通用结构。采用清晰边界、小圆角、低干扰排版，移除旧网格、轨道和连续动画。
 - 通过核心亮点、适用人群、典型场景和“从零搭建 vs 基于基座”的对比表，把 README 的产品价值转译成可扫读的展示面。
 - 通过五层架构流和前端、服务、数据三组技术栈卡片，明确 Vue 3/Vite、共享 Zod 运行时契约、NestJS/Fastify adapter/Drizzle 与 PostgreSQL 的协作关系。
 - 页面不追求复刻 README 全文；详细安装、开发约定和边界仍以仓库 README 与 `docs/` 为准。
-- GitHub CTA 和 Logo 链接均使用新窗口安全属性；卡片和节点仅增强层次，不改变导航语义。
-- `prefers-reduced-motion: reduce` 时关闭连续动画，保留静态结构和可读性。
+- GitHub CTA 和 Logo 链接均使用新窗口安全属性；卡片与结构视觉仅增强层次，不改变导航语义。
+- 遵守 Foundation 全局 `prefers-reduced-motion: reduce` 规则；页面视觉主要为静态结构。
 - 中英文固定文案归属 `about.locales.ts`，数据库菜单名称保持用户可编辑的原始值。
 
 ## 失败模式与验证策略

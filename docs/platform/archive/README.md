@@ -10,6 +10,10 @@
 
 ## 已完成计划
 
+- [2026-10-04 Forge PRISM UI 同步](plans/2026-10-04-forge-prism-ui-sync.md)：接入 86bf968，共享主题/应用壳/管理 UI 与下游首页关于页同步，保留 Geo。
+
+- [2026-10-04 PRISM 同步前 Platform 文档归档审查](plans/2026-10-04-platform-archive-review.md)：复核 Geo 外部模型渲染和前次同步，保留有效 ADR 并独立推进 Platform ledger。
+
 - [2026-09-11 Geo 外部模型统一渲染](plans/2026-09-11-geo-external-model-rendering.md)：URL/定位自动接入统一昼夜标准，静态与生产构建通过，视觉留待人工验收。
 - [2026-09-03 Forge 上游同步](plans/2026-09-03-forge-upstream-sync.md)：接入 Forge `8216f92`，保留 Platform 下游所有权并完成规定验证。
 - [2026-09-01 Geo 第二个构建入口后的 Platform 文档归档审查](plans/2026-09-01-platform-documentation-archive-review-2.md)：复核双入口构建及基线后的 Geo 交付，并将 Platform ledger 推进到 `2910f7d`。
@@ -75,6 +79,8 @@
 - [2026-08-30 Geo 影像与宽屏交付后的 Platform 文档归档审查](plans/2026-08-30-platform-documentation-archive-review-3.md)：复核影像恢复与宽屏交付并推进 Platform 台账。
 
 ## AI 协作记录
+
+- [2026-10-04 Forge PRISM UI 同步与 Platform 归档复核](ai-logs/chore/2026/10/2026-10-04-forge-prism-ui-sync.md)
 
 - [2026-09-11 Geo 外部模型统一渲染](ai-logs/feat/2026/09/2026-09-11-geo-external-model-rendering.md)
 - [2026-09-03 Forge 上游同步](ai-logs/chore/2026/09/2026-09-03-forge-upstream-sync.md)

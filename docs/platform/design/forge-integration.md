@@ -3,7 +3,7 @@ title: Cyber-Sight Forge 集成与下游所有权
 status: accepted
 scope: platform
 owner: project maintainers
-updated: 2026-08-14
+updated: 2026-10-04
 ---
 
 # Cyber-Sight Forge 集成与下游所有权
@@ -33,3 +33,7 @@ Cyber-Sight 以 Cyber AI Forge 的 Foundation 为共享工程基线，在 Platfo
 - 产品入口：已移除下游推广站、英文 README 和 GitHub Pages 工作流；README 不再引用这些资源。
 - 数据库：已连接本地 `cyber-sight` 测试库，PostgreSQL 18.4、17 张应用表、Foundation/Platform 迁移表和 UUIDv7 检查通过。
 - 关联提交：`a23c38240d7d71f1aa5eb36438ffeda59c5f5355`。
+
+## PRISM 更新
+
+2026-10-04 通过保留父提交的同步接入 Forge `86bf968`，新增 Foundation 所有的 `packages/design-tokens/`。frontend workspace 依赖与锁文件同步接入；无 API、后端或数据库迁移变化。首页/关于页保持 Cyber-Sight 文案并采用共享 PRISM 样式，Geo 源码与双入口不变，Forge 网站继续排除。详细边界见 [PRISM 接入](prism-ui-integration.md)。

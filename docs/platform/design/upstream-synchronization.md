@@ -2,7 +2,7 @@
 title: Cyber AI Forge 上游同步
 status: accepted
 owner: project maintainers
-updated: 2026-09-03
+updated: 2026-10-04
 ---
 
 # Cyber AI Forge 上游同步
@@ -117,3 +117,11 @@ Cyber-Sight 已通过合并提交 `6c5ea8c` 接入 Forge `70dbfbd`，并采用�
 冲突处理遵循下游所有权：继续删除 Forge 专属 `docs/forge/ai-logs/README.md`；Foundation 归档索引合并下游既有同步记录与上游新增分类记录；Foundation 决策索引保留新的提交分类 ADR，但不恢复由 Platform 拥有的品牌 ADR 引用。同步分支未向 `upstream` 推送。
 
 `pnpm format`、`pnpm format:check`、`pnpm lint`、脚本测试、143 个后端测试、API 契约构建、前端生产构建、`pnpm docs:archive:check:ci` 和上游提交标题范围检查均通过；`pnpm prepare` 已安装本地 `commit-msg` hook。构建保留既有 Sass legacy API、VueUse 注释和 Cesium 大 chunk 警告。GitHub 分支保护门禁和前端页面/视觉验收仍由维护者负责。
+
+## 2026-10-04 PRISM 同步
+
+从 `71d1d65` 在 `sync/forge-2026-10-04` 合并 Forge `86bf9688f9c4d2e3690bf6dcd89897e3b2c71277`（含 `5c5e829` PRISM UI 与归档收尾）。保留第二父提交，合并提交标题为 `chore(sync): merge Forge PRISM UI 86bf968`。
+
+Foundation、公共设计令牌及 Integration 按项接入；Platform 首页、关于页和 Logo 移植上游布局/样式，继续使用 Cyber-Sight 文案、配置和通用结构图兜底。README、产品 URL、Geo 源码及双入口不变；Forge 网站、摄影资产、英文 README 和 Pages 工作流继续排除。锁文件保留下游 Cesium/peer 解析并接入设计令牌包；Platform archive ledger 独立复核推进，未复制上游 Platform ledger。
+
+完整验证结果见本轮完成计划和 AI 协作记录；浏览器主题组合、真实 CRUD/权限与 Geo 两入口由维护者人工验收。
