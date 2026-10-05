@@ -10,7 +10,7 @@
 
 ## 已完成计划
 
-- [2026-10-05 桀士排版组件注册修复](plans/2026-10-05-jlab-component-registration.md)：补齐 Drawer 和 Radio 注册、样式；技术检查通过，运行时人工验收待执行。
+- [2026-10-05 桀士排版组件注册修复](plans/2026-10-05-jlab-component-registration.md)：补齐 Drawer 与 Radio 样式，并更正 Radio 空安装器为显式组件注册；技术检查通过，运行时人工验收待执行。
 - [2026-10-05 桀士排版布局后的归档复核](plans/2026-10-05-jlab-layout-archive-review.md)：复核 25ff537，推进 Platform 实际基线。
 
 - [2026-10-05 桀士排版工作台交互调整](plans/2026-10-05-jlab-layout-refinement.md)：覆盖抽屉、无占位分隔图标、标题旁操作与插图/下载功能移除；技术检查通过，人工验收待执行。

@@ -22,7 +22,7 @@ updated: 2026-10-05
 
 Vue 公共文件是登记的呈现入口，使用 props/events 接受模型和命令，不读取其他模块的私有 store。App.vue 仅组装 workspace.page.vue，main.ts 注册 Vue/Pinia/Element Plus。workspace.service.ts、工作台子组件和 adapters/indexeddb-storage.ts 均为私有。
 
-Element Plus 在 main.ts 按需显式注册；模板使用 Button、Option、Select、Slider、Switch、Drawer、RadioGroup 和 RadioButton，入口同时导入对应 theme-chalk 样式。增加控件时必须同步入口注册与样式，不能只依赖 vue-tsc 和构建通过判断运行时可用。桌面显示仍由维护者人工验收。
+Element Plus 在 main.ts 按需显式注册；模板使用 Button、Option、Select、Slider、Switch、Drawer、RadioGroup 和 RadioButton，入口同时导入对应 theme-chalk 样式。RadioGroup 和 RadioButton 是 withNoopInstall 子组件，不能用单独的 app.use 注册，必须使用 app.component 显式登记。Option 由 Select 的安装器一并注册。增加控件时必须核对实际安装器行为、入口注册与样式，不能只依赖 vue-tsc、构建或入口存在 .use 调用判断运行时可用。桌面显示仍由维护者人工验收。
 
 数据流：正文/设置事件 → workspace 命令 → 各模块公共领域服务 → 同一快照的预览/输出；完整草稿 → workspace 仓储端口 → IndexedDB 单记录事务（包含 Blob 和偏好）。保存操作排队，成功状态以事务完成为准。临时 DOM Range、抽屉、复制结果和 focus 不入库。预览渲染不持久化生成 HTML。
 
