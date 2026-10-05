@@ -150,6 +150,9 @@ defineExpose({ captureSelection })
     <div class="preview-heading">
       <span>排版预览</span>
       <div class="preview-actions">
+        <label class="frame-toggle"
+          ><input v-model="showFrame" type="checkbox" @change="closeSelection" />阅读外壳</label
+        >
         <el-radio-group
           :model-value="mode"
           size="small"
@@ -170,10 +173,7 @@ defineExpose({ captureSelection })
     </div>
     <div class="preview-scroll" :class="{ framed: showFrame }" @scroll="closeSelection">
       <div class="canvas-controls">
-        <span>{{ measuredWidth }}px 阅读画板</span
-        ><label
-          ><input v-model="showFrame" type="checkbox" @change="closeSelection" />阅读外壳</label
-        >
+        <span>{{ measuredWidth }}px 阅读画板</span>
       </div>
       <div ref="stage" class="frame-stage">
         <div
@@ -258,10 +258,12 @@ defineExpose({ captureSelection })
   background: var(--ui-bg);
 }
 .preview-heading {
-  height: 48px;
-  padding: 0 16px;
+  min-height: 48px;
+  padding: 8px 16px;
   flex-shrink: 0;
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   align-items: center;
   justify-content: space-between;
   background: var(--ui-surface);
@@ -271,6 +273,7 @@ defineExpose({ captureSelection })
 }
 .preview-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }
@@ -293,10 +296,11 @@ defineExpose({ captureSelection })
   font-size: 12px;
   margin-bottom: 16px;
 }
-.canvas-controls label {
+.frame-toggle {
   display: flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
   cursor: pointer;
 }
 .paper {
