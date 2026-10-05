@@ -1,5 +1,7 @@
 # Platform 活动实施计划
 
+[存储实施后 Platform 归档复核](../../archive/plans/2026-10-05-jlab-storage-archive-review.md)已完成，复核 b1a098c..6ee37c 并推进真实提交基线；人工浏览器验收仍待执行。
+
 [桀士排版数据存储与文章版本](../../archive/plans/2026-10-05-jlab-storage-history.md)已完成并归档，配置即时保存、文章版本与迁移人工验收待执行。
 
 [桀士排版最小宽度 800px](../../archive/plans/2026-10-05-jlab-min-width.md)与[Platform 归档复核](../../archive/plans/2026-10-05-jlab-width-archive-review.md)已完成并归档，800px 页面人工验收待执行。

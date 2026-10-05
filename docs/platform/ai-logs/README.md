@@ -1,5 +1,7 @@
 # Platform 活动 AI 协作记录
 
+[存储实施后 Platform 归档复核](../archive/ai-logs/docs/2026/10/2026-10-05-jlab-storage-archive-review.md)已完成，真实审查基线推进到 6ee37c。
+
 [桀士排版数据存储与文章版本](../archive/ai-logs/feat/2026/10/2026-10-05-jlab-storage-history.md)已完成并归档，包含配置/文章分离、主动版本、迁移与实际静态验证。
 
 [桀士排版最小宽度 800px](../archive/ai-logs/style/2026/10/2026-10-05-jlab-min-width.md)已完成并归档，800px 页面人工验收待执行。

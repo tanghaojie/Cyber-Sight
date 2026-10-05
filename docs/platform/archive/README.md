@@ -1,5 +1,7 @@
 # Platform 历史归档
 
+- [2026-10-05 存储实施后 Platform 归档复核](plans/2026-10-05-jlab-storage-archive-review.md)：复核宽度、滚动条和存储历史实现，台账推进到实际 6ee37c；人工验收待执行。
+
 - [2026-10-05 桀士排版数据存储与文章版本](plans/2026-10-05-jlab-storage-history.md)：配置实时 localStorage、文章 current 与主动时间戳版本；静态验证通过，功能人工验收待执行。
 
 - [Platform 归档审查台账](archive-ledger.json)：当前业务平台最近一次完成审查的 Git 基线；下游独立推进。
