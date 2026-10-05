@@ -42,9 +42,7 @@ function remove(timestamp: number): void {
       文章自动保存到当前草稿。只有主动新增版本才会保留历史；版本不包含排版配置和固定结尾。
     </p>
     <div class="history-actions">
-      <el-button type="primary" :disabled="busy || blocked" @click="emit('create')"
-        >新增版本</el-button
-      >
+      <el-button :disabled="busy || blocked" @click="emit('create')">新增版本</el-button>
       <el-button :disabled="busy" @click="emit('refresh')">刷新列表</el-button>
     </div>
     <p v-if="blocked" class="error">当前文章保存已暂停，请备份原稿后刷新页面。</p>
@@ -86,7 +84,7 @@ function remove(timestamp: number): void {
 <style scoped>
 .history-panel {
   padding: 20px;
-  color: #756582;
+  color: var(--ui-text);
 }
 .hint,
 .error {
@@ -95,7 +93,7 @@ function remove(timestamp: number): void {
   margin: 0 0 16px;
 }
 .error {
-  color: #a46836;
+  color: var(--ui-warning);
   overflow-wrap: anywhere;
 }
 .history-actions {
@@ -111,14 +109,14 @@ function remove(timestamp: number): void {
   margin: 0;
 }
 .version-list li {
-  border: 1px solid #e9e3f0;
+  border: 1px solid var(--ui-border);
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 10px;
 }
 .version-list li.selected {
-  border-color: #9972ce;
-  background: #faf7ff;
+  border-color: var(--ui-primary);
+  background: var(--ui-active);
 }
 strong {
   display: block;
@@ -128,9 +126,9 @@ strong {
 time,
 small {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   margin-top: 6px;
-  color: #94869f;
+  color: var(--ui-muted);
 }
 .version-actions {
   display: flex;
@@ -141,7 +139,7 @@ small {
   border: 0;
   background: none;
   padding: 0;
-  color: #7952b5;
+  color: var(--ui-primary);
   cursor: pointer;
 }
 button:disabled {
@@ -158,11 +156,11 @@ textarea {
   min-height: 220px;
   padding: 12px;
   resize: vertical;
-  border: 1px solid #e9e3f0;
+  border: 1px solid var(--ui-border);
   border-radius: 8px;
   font-size: 12px;
   line-height: 1.8;
-  color: #65556f;
-  background: #faf9fc;
+  color: var(--ui-text);
+  background: var(--ui-bg);
 }
 </style>

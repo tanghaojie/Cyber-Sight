@@ -2,6 +2,50 @@ import type { TypesettingConfig, ChapterStyle } from './typesetting.model'
 
 export const presets = [
   {
+    id: 'clear-blue',
+    name: '清透蓝',
+    colors: {
+      body: '#30323d',
+      heading: '#172b4d',
+      accent: '#2563eb',
+      muted: '#475569',
+      background: '#eff6ff',
+    },
+  },
+  {
+    id: 'warm-gold',
+    name: '暖金',
+    colors: {
+      body: '#423b34',
+      heading: '#45352a',
+      accent: '#a16207',
+      muted: '#6b5e50',
+      background: '#fef7e8',
+    },
+  },
+  {
+    id: 'teal',
+    name: '青绿',
+    colors: {
+      body: '#2b403c',
+      heading: '#164e45',
+      accent: '#0f766e',
+      muted: '#526a64',
+      background: '#edf7f4',
+    },
+  },
+  {
+    id: 'ink',
+    name: '墨色',
+    colors: {
+      body: '#30323d',
+      heading: '#1e293b',
+      accent: '#475569',
+      muted: '#64748b',
+      background: '#f1f5f9',
+    },
+  },
+  {
     id: 'punk',
     name: 'Punk',
     colors: {
@@ -49,7 +93,7 @@ export const presets = [
 
 export function defaultTypesetting(): TypesettingConfig {
   return {
-    preset: 'punk',
+    preset: presets[0].id,
     colors: { ...presets[0].colors },
     chapterStyle: 'bar',
     fontSize: 16,
@@ -57,7 +101,7 @@ export function defaultTypesetting(): TypesettingConfig {
     paragraphGap: 20,
     letterSpacing: 0.5,
     font: 'default',
-    backgroundEnabled: false,
+    backgroundEnabled: true,
   }
 }
 
@@ -123,6 +167,14 @@ function decorateChapter(
   }
 }
 
+export function chapterPreview(style: ChapterStyle, config: TypesettingConfig): string {
+  const heading = document.createElement('span')
+  heading.textContent = '章节标题示例'
+  heading.style.cssText = `display:block;color:${config.colors.heading};font-size:15px;line-height:24px;font-weight:bold;padding-bottom:4px;`
+  decorateChapter(heading, style, 1, config)
+  return heading.outerHTML
+}
+
 export function styleArticle(root: HTMLElement, config: TypesettingConfig, numbered = true): void {
   const { colors, fontSize, lineHeight, paragraphGap, letterSpacing } = config
   root.style.cssText = `color:${colors.body};font-size:${fontSize}px;line-height:${fontSize * lineHeight}px;letter-spacing:${letterSpacing}px;word-wrap:break-word;text-align:left;`
@@ -157,7 +209,16 @@ export function styleArticle(root: HTMLElement, config: TypesettingConfig, numbe
         element.style.backgroundColor = colors.background
       }
     } else if (tag === 'pre') {
-      element.style.cssText = `padding:18px;margin:20px 0;background-color:#f4f5f7;color:#30323d;border-radius:8px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:24px;`
+      element.style.cssText = `padding:16px 18px 18px;margin:24px 0;background-color:#f6f8fa;color:#30323d;border:1px solid #e2e8f0;border-radius:8px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:24px;`
+      const chrome = document.createElement('span')
+      chrome.dataset.decoration = 'true'
+      chrome.style.cssText = 'display:block;margin-bottom:12px;line-height:12px;'
+      for (const color of ['#ff5f56', '#ffbd2e', '#27c93f']) {
+        const dot = document.createElement('span')
+        dot.style.cssText = `display:inline-block;width:9px;height:9px;margin-right:6px;border-radius:50%;background-color:${color};`
+        chrome.append(dot)
+      }
+      element.prepend(chrome)
     } else if (tag === 'code') {
       element.style.fontFamily = 'monospace'
       if (element.parentElement?.tagName !== 'PRE') {
@@ -171,6 +232,12 @@ export function styleArticle(root: HTMLElement, config: TypesettingConfig, numbe
       if (tag === 'th') {
         element.style.color = colors.heading
         element.style.fontWeight = 'bold'
+        element.style.backgroundColor = '#f1f5f9'
+      } else if (element.parentElement?.parentElement?.tagName === 'TBODY') {
+        const row = element.parentElement
+        if (row && [...row.parentElement!.children].indexOf(row) % 2 === 1) {
+          element.style.backgroundColor = '#f8fafc'
+        }
       }
     } else if (tag === 'ul' || tag === 'ol') {
       element.style.cssText = 'padding-left:26px;margin:16px 0;'

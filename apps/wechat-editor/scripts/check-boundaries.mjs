@@ -7,14 +7,19 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const modulesRoot = resolve(root, 'src/platform/modules')
 const interfaces = {
   article: ['article.model.ts', 'article.service.ts', 'article-editor.vue', 'article-preview.vue'],
-  typesetting: ['typesetting.model.ts', 'typesetting.service.ts', 'typesetting-panel.vue'],
+  typesetting: [
+    'typesetting.model.ts',
+    'typesetting.service.ts',
+    'typesetting-panel.vue',
+    'typesetting-color-picker.vue',
+  ],
   ending: ['ending.model.ts', 'ending.service.ts', 'ending-panel.vue'],
   assets: ['assets.model.ts', 'assets.service.ts'],
   'wechat-export': ['wechat-export.model.ts', 'wechat-export.service.ts'],
   workspace: ['workspace.store.ts', 'draft-storage.port.ts', 'workspace.page.vue'],
 }
 const dependencies = {
-  article: [],
+  article: ['typesetting'],
   typesetting: [],
   ending: ['article'],
   assets: [],

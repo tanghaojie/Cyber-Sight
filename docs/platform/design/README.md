@@ -1,5 +1,7 @@
 # Platform 设计索引
 
+- [桀士排版工作台 UI 与阅读交互](apps/jlab-wechat-editor-ui.md)：52px顶栏、可视化左抽屉、选区气泡、手机/电脑阅读外壳与稳定反馈。
+
 - [桀士排版存储与文章版本](apps/jlab-wechat-editor-storage.md)：配置/固定结尾即时 localStorage、IndexedDB current 与主动时间戳版本、迁移和并发边界。
 
 - [桀士排版独立应用](apps/jlab-wechat-editor.md)：JLab WeChat Editor 的产品范围、纯前端边界、单层工具栏、覆盖式左抽屉、章节列表、标题区操作、无占位拖拽双栏与实施状态。

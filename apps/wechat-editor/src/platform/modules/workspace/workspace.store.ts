@@ -7,6 +7,7 @@ import {
   articleStatistics,
   migrateAnnotations,
   renderMarkdown,
+  removeAnnotations,
 } from '../article/article.service'
 import { defaultTypesetting, presets } from '../typesetting/typesetting.service'
 import type { TypesettingConfig } from '../typesetting/typesetting.model'
@@ -416,7 +417,7 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
   }
 
   function updateMarkdown(markdown: string): void {
-    if (restoring.value) {
+    if (restoring.value || markdown === article.value.markdown) {
       return
     }
     if (markdown.length > maxMarkdownLength) {
@@ -473,6 +474,30 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
       void historyAction(refreshVersions)
     }
   }
+  function clearSelectionColor(selection: TextSelection | undefined): void {
+    if (!ready.value || restoring.value) {
+      return
+    }
+    if (!selection || selection.revision !== article.value.revision) {
+      message.value = '请重新选择需要清除颜色的正文文字。'
+      return
+    }
+    article.value = {
+      ...article.value,
+      annotations: removeAnnotations(article.value.annotations, selection),
+      updatedAt: Date.now(),
+    }
+  }
+  function clearInvalidAnnotations(): void {
+    if (!ready.value || restoring.value) {
+      return
+    }
+    article.value = {
+      ...article.value,
+      annotations: article.value.annotations.filter((a) => !a.invalid),
+      updatedAt: Date.now(),
+    }
+  }
   async function prepareCopy(): Promise<void> {
     if (copyState.value === 'preparing' || copyState.value === 'copying') {
       return
@@ -491,7 +516,7 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
       diagnostics.value = result.diagnostics
       if (result.diagnostics.some((d) => d.level === 'error')) {
         copyState.value = 'error'
-        message.value = '请处理下方图片或内容问题后再复制。'
+        message.value = '请打开「诊断」处理图片或内容问题后再复制。'
         return
       }
       exportResult.value = result
@@ -567,6 +592,8 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
     setConfig,
     choosePreset,
     colorSelection,
+    clearSelectionColor,
+    clearInvalidAnnotations,
     toggleDrawer,
     prepareCopy,
     copyPrepared,

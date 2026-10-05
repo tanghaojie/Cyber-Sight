@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { TypesettingConfig } from '../typesetting/typesetting.model'
+import ColorPicker from '../typesetting/typesetting-color-picker.vue'
 defineProps<{
   config: TypesettingConfig
   localColor: string
@@ -12,96 +13,90 @@ defineProps<{
 const emit = defineEmits<{
   config: [patch: Partial<TypesettingConfig>]
   localColor: [color: string]
+  capture: []
   drawer: [kind: 'text' | 'colors' | 'ending' | 'chapters' | 'history']
   copy: []
   retry: []
 }>()
+const controls = [
+  ['chapters', '章节样式'],
+  ['text', '文字设置'],
+  ['colors', '配色'],
+  ['ending', '固定结尾'],
+] as const
 </script>
-
 <template>
   <header class="toolbar">
     <div class="brand">
-      <span class="brand-mark">J.</span>
-      <div><strong>桀士排版</strong><small>JLAB WECHAT EDITOR</small></div>
+      <svg
+        class="brand-mark"
+        width="25"
+        height="25"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="m12 3 8 8-8 10-8-10 8-8Zm0 0v10m-4 8h8"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linejoin="round"
+        />
+        <circle cx="12" cy="13" r="2" fill="currentColor" /></svg
+      ><strong>桀士排版</strong><small>EDITOR</small>
     </div>
     <div class="toolbar-divider" />
-    <label class="quick-color"
-      >正文色<input
-        type="color"
-        :value="config.colors.body"
-        aria-label="正文颜色"
-        :disabled="disabled"
-        @input="
-          emit('config', {
-            colors: { ...config.colors, body: ($event.target as HTMLInputElement).value },
-          })
-        "
-    /></label>
-    <label class="quick-color"
-      >局部字色<input
-        type="color"
-        :value="localColor"
-        aria-label="局部文字颜色"
-        :disabled="disabled"
-        @change="emit('localColor', ($event.target as HTMLInputElement).value)"
-    /></label>
-    <button
-      class="tool-button"
-      :class="{ active: drawer === 'chapters' }"
+    <ColorPicker
+      :color="config.colors.body"
+      label="正文色"
       :disabled="disabled"
-      @click="emit('drawer', 'chapters')"
-    >
-      章节样式
-    </button>
+      @change="emit('config', { preset: 'custom', colors: { ...config.colors, body: $event } })"
+    />
+    <ColorPicker
+      :color="localColor"
+      label="局部字色"
+      :disabled="disabled"
+      @open="emit('capture')"
+      @change="emit('localColor', $event)"
+    />
     <div class="toolbar-divider" />
-    <button
-      class="tool-button"
-      :class="{ active: drawer === 'text' }"
-      :disabled="disabled"
-      @click="emit('drawer', 'text')"
-    >
-      文字设置
-    </button>
-    <button
-      class="tool-button"
-      :class="{ active: drawer === 'colors' }"
-      :disabled="disabled"
-      @click="emit('drawer', 'colors')"
-    >
-      配色
-    </button>
-    <button
-      class="tool-button"
-      :class="{ active: drawer === 'ending' }"
-      :disabled="disabled"
-      @click="emit('drawer', 'ending')"
-    >
-      固定结尾
-    </button>
+    <nav aria-label="排版设置" class="toolbar-tools">
+      <button
+        v-for="[kind, label] in controls"
+        :key="kind"
+        class="ui-button"
+        :class="{ active: drawer === kind }"
+        :aria-pressed="drawer === kind"
+        :disabled="disabled"
+        @click="emit('drawer', kind)"
+      >
+        {{ label }}
+      </button>
+    </nav>
     <div class="toolbar-spacer" />
-    <button
-      class="tool-button"
-      :class="{ active: drawer === 'history' }"
-      :disabled="disabled"
-      @click="emit('drawer', 'history')"
-    >
-      历史版本
-    </button>
     <span
       class="save-status"
       :class="{ failed: saveBlocked || saveState.startsWith('保存失败') }"
       :title="saveState"
       role="status"
+      ><i aria-hidden="true" />{{ saveState }}</span
     >
-      <i aria-hidden="true" />自动保存 · {{ saveState }}
-    </span>
     <button
       v-if="saveState.startsWith('保存失败') && !saveBlocked"
-      class="tool-button"
+      class="ui-button"
       :disabled="disabled"
       @click="emit('retry')"
     >
-      重试保存
+      重试
+    </button>
+    <button
+      class="ui-button"
+      :class="{ active: drawer === 'history' }"
+      :aria-pressed="drawer === 'history'"
+      :disabled="disabled"
+      @click="emit('drawer', 'history')"
+    >
+      历史版本
     </button>
     <el-button
       class="copy-button"
@@ -121,16 +116,15 @@ const emit = defineEmits<{
     >
   </header>
 </template>
-
 <style scoped>
 .toolbar {
   display: flex;
   align-items: center;
-  height: 76px;
-  gap: 9px;
-  padding: 0 20px;
-  background: #fff;
-  border-bottom: 1px solid #e6e0ef;
+  height: 52px;
+  gap: 8px;
+  padding: 0 16px;
+  background: var(--ui-surface);
+  border-bottom: 1px solid var(--ui-border);
   flex-shrink: 0;
   white-space: nowrap;
   overflow-x: auto;
@@ -141,108 +135,75 @@ const emit = defineEmits<{
 .brand {
   display: flex;
   align-items: center;
-  gap: 9px;
-  margin-right: 8px;
-}
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 33px;
-  height: 36px;
-  border-radius: 10px;
-  background: #6e45ab;
-  color: #fff;
-  font:
-    italic 700 24px Georgia,
-    serif;
-  box-shadow: 0 3px 10px #6e45ab25;
+  gap: 8px;
+  margin-right: 4px;
+  color: var(--ui-text);
 }
 .brand strong {
-  display: block;
-  font-size: 16px;
-  letter-spacing: 1px;
-  color: #453050;
+  font-size: 14px;
+  letter-spacing: 0.5px;
 }
 .brand small {
-  display: block;
-  font-size: 7px;
+  font-size: 11px;
   letter-spacing: 1px;
-  color: #ad9cbb;
-  margin-top: 5px;
+  padding: 2px 4px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-muted);
 }
 .toolbar-divider {
   width: 1px;
-  height: 24px;
-  background: #eae4f0;
-  margin: 0 3px;
+  height: 22px;
+  background: var(--ui-border);
+  margin: 0 2px;
 }
-.quick-color {
+.toolbar-tools {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: #786b83;
-  cursor: pointer;
-}
-.quick-color input {
-  width: 22px;
-  height: 24px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-}
-.tool-button {
-  border: none;
-  background: transparent;
-  color: #756582;
-  font: inherit;
-  font-size: 11px;
-  padding: 9px 6px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.tool-button:hover {
-  background: #f5f0fa;
-  color: #7348a8;
-}
-.active {
-  background: #f0e8fa;
-  color: #7348a8;
+  gap: 2px;
 }
 .toolbar-spacer {
   flex: 1;
   min-width: 0;
 }
 .copy-button {
-  margin: 0 0 0 3px;
-  font-size: 11px;
-  padding: 8px 12px;
+  margin: 0;
+  font-size: 13px;
+  border-radius: 6px;
+  box-shadow: 0 3px 10px #2563eb20;
+  transition: background-color 0.15s;
 }
 .save-status {
-  max-width: 220px;
+  max-width: 190px;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 11px;
-  color: #84758f;
+  font-size: 12px;
+  color: var(--ui-muted);
 }
 .save-status i {
   display: inline-block;
-  width: 5px;
-  height: 5px;
-  margin-right: 7px;
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
   border-radius: 50%;
-  background: #81ab91;
+  background: var(--ui-success);
   vertical-align: middle;
 }
 .save-status.failed {
-  color: #a46836;
+  color: var(--ui-warning);
 }
 .save-status.failed i {
-  background: #c9804c;
+  background: var(--ui-warning);
 }
-button:disabled {
-  opacity: 0.5;
-  cursor: default;
+@media (max-width: 1200px) {
+  .brand small {
+    display: none;
+  }
+  .toolbar {
+    padding: 0 12px;
+    gap: 6px;
+  }
+  .save-status {
+    max-width: 130px;
+  }
 }
 </style>

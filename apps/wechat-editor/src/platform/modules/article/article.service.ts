@@ -147,6 +147,33 @@ export function addAnnotation(
   }, [])
 }
 
+export function removeAnnotations(
+  annotations: Annotation[],
+  selection: TextSelection,
+): Annotation[] {
+  if (selection.start >= selection.end) {
+    throw new Error('请先选择需要清除颜色的文字。')
+  }
+  const next: Annotation[] = []
+  for (const annotation of annotations) {
+    if (
+      annotation.invalid ||
+      annotation.end <= selection.start ||
+      annotation.start >= selection.end
+    ) {
+      next.push({ ...annotation })
+      continue
+    }
+    if (annotation.start < selection.start) {
+      next.push({ ...annotation, end: selection.start })
+    }
+    if (annotation.end > selection.end) {
+      next.push({ ...annotation, id: crypto.randomUUID(), start: selection.end })
+    }
+  }
+  return next
+}
+
 export function readSelection(root: HTMLElement, revision: number): TextSelection | undefined {
   const selection = window.getSelection()
   if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {

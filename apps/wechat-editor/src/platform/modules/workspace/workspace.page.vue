@@ -3,6 +3,8 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useWorkspaceStore } from './workspace.store'
 import { clampRatio, splitBounds } from './workspace.service'
 import WorkspaceToolbar from './workspace-toolbar.vue'
+import WorkspaceFeedback from './workspace-feedback.vue'
+import './workspace-theme.css'
 import HistoryPanel from './workspace-history-panel.vue'
 import ArticleEditor from '../article/article-editor.vue'
 import ArticlePreview from '../article/article-preview.vue'
@@ -15,10 +17,21 @@ const store = useWorkspaceStore()
 const split = ref<HTMLElement>()
 const fileInput = ref<HTMLInputElement>()
 const selection = ref<TextSelection>()
+const previewComponent = ref<InstanceType<typeof ArticlePreview>>()
+function captureSelection(): void {
+  previewComponent.value?.captureSelection()
+}
 const containerWidth = ref(900)
 const dragging = ref(false)
 let observer: ResizeObserver | undefined
 const displayedRatio = computed(() => clampRatio(store.ratio, containerWidth.value))
+const drawerSize = computed(
+  () => `${Math.min(320, Math.floor(containerWidth.value * displayedRatio.value))}px`,
+)
+function toggleDrawer(kind: NonNullable<typeof store.drawer>): void {
+  store.focus = false
+  store.toggleDrawer(kind)
+}
 const gridStyle = computed(() =>
   store.focus
     ? { gridTemplateColumns: '1fr' }
@@ -150,7 +163,8 @@ onBeforeUnmount(function cleanup() {
       :save-blocked="store.saveBlocked || store.settingsBlocked"
       @config="store.setConfig"
       @local-color="store.colorSelection(selection, $event)"
-      @drawer="store.toggleDrawer"
+      @capture="captureSelection"
+      @drawer="toggleDrawer"
       @copy="copy"
       @retry="store.saveNow"
     />
@@ -165,7 +179,7 @@ onBeforeUnmount(function cleanup() {
       :model-value="Boolean(store.drawer)"
       :title="drawerTitle"
       direction="ltr"
-      size="300px"
+      :size="drawerSize"
       :modal="false"
       :modal-penetrable="true"
       :lock-scroll="false"
@@ -235,48 +249,30 @@ onBeforeUnmount(function cleanup() {
           </svg>
         </div>
         <ArticlePreview
+          ref="previewComponent"
           :html="store.preview.html"
           :revision="store.article.revision"
           :mode="store.previewMode"
           :focus="store.focus"
           :disabled="!store.ready || store.restoring"
+          :accent="store.config.colors.accent"
+          :local-color="store.localColor"
           @mode="store.previewMode = $event"
           @focus="store.focus = !store.focus"
           @selection="selection = $event"
           @error="store.message = $event"
+          @color="store.colorSelection(selection, $event)"
+          @clear="store.clearSelectionColor(selection)"
         />
       </div>
-    </div>
-    <div
-      v-if="
-        store.message ||
-        store.invalidAnnotations ||
-        store.preview.diagnostics.length ||
-        store.diagnostics.length
-      "
-      class="messages"
-      aria-live="polite"
-    >
-      <div v-if="store.message" class="message">
-        <span>{{ store.message }}</span
-        ><button aria-label="关闭提示" @click="store.message = ''">×</button>
-      </div>
-      <div v-if="store.invalidAnnotations" class="message warning">
-        <span>{{ store.invalidAnnotations }} 处局部颜色因改稿失效，请重新选择文字设置。</span
-        ><button
-          :disabled="store.restoring"
-          @click="store.article.annotations = store.article.annotations.filter((a) => !a.invalid)"
-        >
-          清除失效标注
-        </button>
-      </div>
-      <p
-        v-for="(diagnostic, index) in [...store.preview.diagnostics, ...store.diagnostics]"
-        :key="index"
-        :class="{ warning: diagnostic.level === 'error' }"
-      >
-        {{ diagnostic.message }}
-      </p>
+      <WorkspaceFeedback
+        :message="store.message"
+        :invalid="store.invalidAnnotations"
+        :diagnostics="[...store.preview.diagnostics, ...store.diagnostics]"
+        :disabled="!store.ready || store.restoring"
+        @dismiss="store.message = ''"
+        @clear="store.clearInvalidAnnotations"
+      />
     </div>
     <footer class="status-bar">
       <span title="排版文字的非空白字符数，含已启用的固定结尾；阅读时长按 300 字/分钟估算">
@@ -290,33 +286,6 @@ onBeforeUnmount(function cleanup() {
 </template>
 
 <style>
-:root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
-  --el-color-primary: #7952b5;
-  --el-color-primary-light-3: #a88ccf;
-  --el-color-primary-light-5: #c5b2e0;
-  --el-color-primary-light-7: #ded3ed;
-  --el-color-primary-light-9: #f4eefb;
-}
-* {
-  box-sizing: border-box;
-}
-body {
-  margin: 0;
-  background: #f8f6fc;
-  min-width: 800px;
-}
-button,
-input,
-textarea {
-  font-family: inherit;
-}
-button:focus-visible,
-input:focus-visible,
-[tabindex]:focus-visible {
-  outline: 2px solid #9972ce;
-  outline-offset: 2px;
-}
 .workbench {
   display: flex;
   flex-direction: column;
@@ -328,20 +297,21 @@ input:focus-visible,
   display: none;
 }
 .content-row {
+  position: relative;
   display: flex;
   flex: 1;
   min-height: 0;
   overflow: hidden;
 }
 .settings-drawer {
-  top: 76px !important;
-  height: calc(100% - 76px) !important;
+  top: 52px !important;
+  height: calc(100% - 87px) !important;
 }
 .settings-drawer .el-drawer__header {
   margin-bottom: 0;
   padding: 22px;
-  border-bottom: 1px solid #eee9f4;
-  color: #5e426f;
+  border-bottom: 1px solid var(--ui-border);
+  color: var(--ui-text);
 }
 .settings-drawer .el-drawer__body {
   padding: 0;
@@ -358,11 +328,11 @@ input:focus-visible,
 .workbench .editor-pane textarea,
 .workbench .preview-scroll {
   scrollbar-width: thin;
-  scrollbar-color: #a99bbd55 transparent;
+  scrollbar-color: #94a3b855 transparent;
 }
 .workbench .editor-pane textarea:hover,
 .workbench .preview-scroll:hover {
-  scrollbar-color: #a99bbd99 transparent;
+  scrollbar-color: #94a3b899 transparent;
 }
 .workbench .editor-pane textarea::-webkit-scrollbar,
 .workbench .preview-scroll::-webkit-scrollbar {
@@ -376,11 +346,11 @@ input:focus-visible,
 .workbench .editor-pane textarea::-webkit-scrollbar-thumb,
 .workbench .preview-scroll::-webkit-scrollbar-thumb {
   border-radius: 6px;
-  background: #a99bbd55;
+  background: #94a3b855;
 }
 .workbench .editor-pane textarea:hover::-webkit-scrollbar-thumb,
 .workbench .preview-scroll:hover::-webkit-scrollbar-thumb {
-  background: #a99bbd99;
+  background: #94a3b899;
 }
 .separator {
   position: absolute;
@@ -395,43 +365,13 @@ input:focus-visible,
   user-select: none;
   display: grid;
   place-items: center;
-  color: #a697bb;
+  color: var(--ui-muted);
   border-radius: 4px;
 }
 .separator:hover,
 .separator.dragging {
-  color: #7952b5;
-  background: #eee5f9;
-}
-.messages {
-  flex-shrink: 0;
-  max-height: 140px;
-  overflow: auto;
-  padding: 8px 24px;
-  background: #faf7ff;
-  border-top: 1px solid #e5d9f5;
-  font-size: 12px;
-  color: #7b6396;
-}
-.message {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-}
-.messages p {
-  margin: 5px 0;
-  line-height: 1.6;
-}
-.message button {
-  border: 0;
-  background: none;
-  color: #9476b5;
-  cursor: pointer;
-  font-size: 11px;
-}
-.warning {
-  color: #a46836;
+  color: var(--ui-primary);
+  background: var(--ui-active);
 }
 .status-bar {
   height: 35px;
@@ -440,13 +380,13 @@ input:focus-visible,
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #fff;
-  border-top: 1px solid #e9e3f0;
-  font-size: 10px;
-  color: #a393b0;
+  background: var(--ui-surface);
+  border-top: 1px solid var(--ui-border);
+  font-size: 12px;
+  color: var(--ui-muted);
 }
 .status-dot {
   padding: 0 12px;
-  color: #d1c5dc;
+  color: var(--ui-border);
 }
 </style>

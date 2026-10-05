@@ -82,6 +82,9 @@ export function previewArticle(
 
 function readableText(root: HTMLElement): string {
   const clone = root.cloneNode(true) as HTMLElement
+  for (const decoration of clone.querySelectorAll('[data-decoration]')) {
+    decoration.remove()
+  }
   for (const item of clone.querySelectorAll('li')) {
     const parent = item.parentElement
     const position = parent ? [...parent.children].indexOf(item) : 0

@@ -1,10 +1,58 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-defineProps<{ markdown: string; disabled: boolean }>()
+const props = defineProps<{ markdown: string; disabled: boolean }>()
 const emit = defineEmits<{ change: [value: string]; import: [] }>()
 const input = ref<HTMLTextAreaElement>()
+const formats = [
+  ['h1', 'H1', '一级标题'],
+  ['h2', 'H2', '章节标题'],
+  ['bold', 'B', '加粗'],
+  ['italic', 'I', '斜体'],
+  ['quote', '“ ”', '引用'],
+  ['code', '<>', '行内代码'],
+  ['ordered', '1.', '有序列表'],
+  ['unordered', '•', '无序列表'],
+] as const
 let composing = false
+function format(kind: string): void {
+  const area = input.value
+  if (!area || composing || props.disabled) {
+    return
+  }
+  const start = area.selectionStart
+  const end = area.selectionEnd
+  const inline = { bold: '**', italic: '*', code: '`' }[kind as 'bold' | 'italic' | 'code']
+  let from = start
+  let to = end
+  let replacement: string
+  if (inline) {
+    replacement = `${inline}${area.value.slice(start, end) || '文字'}${inline}`
+  } else {
+    from = start === 0 ? 0 : area.value.lastIndexOf('\n', start - 1) + 1
+    to = area.value.indexOf('\n', end)
+    if (to === -1) {
+      to = area.value.length
+    }
+    const prefix = { h1: '# ', h2: '## ', quote: '> ', unordered: '- ' }[
+      kind as 'h1' | 'h2' | 'quote' | 'unordered'
+    ]
+    replacement = area.value
+      .slice(from, to)
+      .split('\n')
+      .map((line, i) => (kind === 'ordered' ? `${i + 1}. ` : prefix || '') + line)
+      .join('\n')
+  }
+  if (area.value.length - (to - from) + replacement.length > 500000) {
+    return
+  }
+  area.focus()
+  area.setSelectionRange(from, to)
+  if (!document.execCommand('insertText', false, replacement)) {
+    area.setRangeText(replacement, from, to, 'end')
+  }
+  emit('change', area.value)
+}
 function update(event: Event): void {
   if (!composing) {
     emit('change', (event.target as HTMLTextAreaElement).value)
@@ -43,6 +91,19 @@ function tab(event: KeyboardEvent): void {
         >导入</el-button
       >
     </div>
+    <div class="format-toolbar" aria-label="Markdown 快捷格式" @pointerdown.prevent>
+      <button
+        v-for="[kind, label, title] in formats"
+        :key="kind"
+        class="ui-button"
+        :title="title"
+        :aria-label="title"
+        :disabled="disabled"
+        @click="format(kind)"
+      >
+        {{ label }}
+      </button>
+    </div>
     <textarea
       ref="input"
       :value="markdown"
@@ -66,24 +127,24 @@ function tab(event: KeyboardEvent): void {
   height: 100%;
   min-height: 0;
   min-width: 0;
-  background: #fcfcfe;
+  background: var(--ui-surface);
 }
 .pane-heading {
   flex-shrink: 0;
-  height: 52px;
+  height: 48px;
   padding: 0 24px;
   display: flex;
   align-items: center;
   gap: 12px;
-  border-bottom: 1px solid #ececf3;
-  color: #878595;
-  font-size: 12px;
+  border-bottom: 1px solid var(--ui-border);
+  color: var(--ui-text);
+  font-size: 13px;
 }
 .pane-label {
   font-size: 11px;
   letter-spacing: 1.6px;
   font-weight: 700;
-  color: #61547e;
+  color: var(--ui-muted);
 }
 textarea {
   flex: 1;
@@ -95,7 +156,7 @@ textarea {
   outline: none;
   padding: 24px 28px;
   background: transparent;
-  color: #4b4957;
+  color: var(--ui-text);
   font:
     14px/1.85 'Cascadia Code',
     Consolas,
@@ -104,6 +165,17 @@ textarea {
   tab-size: 2;
 }
 textarea::placeholder {
-  color: #aaa6b6;
+  color: var(--ui-muted);
+}
+.format-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 6px 20px;
+  border-bottom: 1px solid var(--ui-border);
+}
+.format-toolbar button {
+  min-width: 30px;
+  padding: 3px 6px;
 }
 </style>
