@@ -6,7 +6,7 @@ export const settingsKey = `${storageName}:settings`
 
 export function loadSettings(): WorkspaceSettings | undefined {
   const raw = localStorage.getItem(settingsKey)
-  return raw === null ? undefined : validateSettings(JSON.parse(raw))
+  return raw === null ? undefined : validateSettings(JSON.parse(raw), true)
 }
 
 export function saveSettings(settings: WorkspaceSettings): void {

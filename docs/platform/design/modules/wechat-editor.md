@@ -11,20 +11,20 @@ updated: 2026-10-06
 
 独立交付边界为 apps/wechat-editor。六个实际模块均在 src/platform/modules 内；无 Foundation、后台、契约、路由和空目录。
 
-| 模块          | 职责与数据所有权                                                                 | 登记公共文件                                                                                      | 依赖                                 | 失败模式与人工验证                                                                 |
-| ------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------ | ---------------------------------------------------------------------------------- |
-| article       | Markdown语义、序列化正文标注、快捷格式和阅读UI；不拥有完整草稿                   | article.model.ts、article.service.ts、article-editor.vue、article-preview.vue                     | typesetting公开颜色控件              | 输入法/撤销、跨强调/链接/段落选区；拒绝代码/图片/结尾/装饰；改稿歧义失效           |
-| typesetting   | 颜色角色、六组初始配色及最多九组自定义配色、九种章节、间距字体、对比度和颜色控件 | typesetting.model.ts、typesetting.service.ts、typesetting-panel.vue、typesetting-color-picker.vue | 无其他模块                           | 低对比度、设备字体、最近色存储失败；配置共用于预览和复制                           |
-| ending        | 独立 Markdown 和启用模型；不写正文、不编号                                       | ending.model.ts、ending.service.ts、ending-panel.vue                                              | article                              | 启停、只追加一次、设置保存、刷新恢复                                               |
-| assets        | 浏览器图片准备/尺寸、稳定 id/Blob、临时 URL 生命周期                             | assets.model.ts、assets.service.ts                                                                | 无其他模块                           | 缺图、CORS、解码、格式、大小、过期结果和 URL 释放                                  |
-| wechat-export | 显式只读快照、受控 DOM/内联、候选微信输出、剪贴板                                | wechat-export.model.ts、wechat-export.service.ts                                                  | article、typesetting、ending、assets | 素材失败阻止复制；权限失败保留结果供重试；真实粘贴保存由人类验收                   |
-| workspace     | Pinia 命令编排、配置 localStorage、文章 current/主动版本 IndexedDB；抽屉/分栏 UI | workspace.store.ts、draft-storage.port.ts、workspace.page.vue                                     | 上述五模块                           | 配额/恢复异常显示失败；未知版本不覆盖；多页面冲突暂停；迁移/历史恢复和删除人工验收 |
+| 模块          | 职责与数据所有权                                                                   | 登记公共文件                                                                                      | 依赖                                 | 失败模式与人工验证                                                                 |
+| ------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------ | ---------------------------------------------------------------------------------- |
+| article       | Markdown语义、序列化正文标注、快捷格式和阅读UI；不拥有完整草稿                     | article.model.ts、article.service.ts、article-editor.vue、article-preview.vue                     | typesetting公开颜色控件              | 输入法/撤销、跨强调/链接/段落选区；拒绝代码/图片/结尾/装饰；改稿歧义失效           |
+| typesetting   | 颜色角色、初始化六组、总计1至9组的可编辑配色、九种章节、间距字体、对比度和颜色控件 | typesetting.model.ts、typesetting.service.ts、typesetting-panel.vue、typesetting-color-picker.vue | 无其他模块                           | 低对比度、设备字体、最近色存储失败；配置共用于预览和复制                           |
+| ending        | 独立 Markdown 和启用模型；不写正文、不编号                                         | ending.model.ts、ending.service.ts、ending-panel.vue                                              | article                              | 启停、只追加一次、设置保存、刷新恢复                                               |
+| assets        | 浏览器图片准备/尺寸、稳定 id/Blob、临时 URL 生命周期                               | assets.model.ts、assets.service.ts                                                                | 无其他模块                           | 缺图、CORS、解码、格式、大小、过期结果和 URL 释放                                  |
+| wechat-export | 显式只读快照、受控 DOM/内联、候选微信输出、剪贴板                                  | wechat-export.model.ts、wechat-export.service.ts                                                  | article、typesetting、ending、assets | 素材失败阻止复制；权限失败保留结果供重试；真实粘贴保存由人类验收                   |
+| workspace     | Pinia 命令编排、配置 localStorage、文章 current/主动版本 IndexedDB；抽屉/分栏 UI   | workspace.store.ts、draft-storage.port.ts、workspace.page.vue                                     | 上述五模块                           | 配额/恢复异常显示失败；未知版本不覆盖；多页面冲突暂停；迁移/历史恢复和删除人工验收 |
 
 Vue 公共文件是登记的呈现入口，使用 props/events 接受模型和命令，不读取其他模块的私有 store。App.vue 仅组装 workspace.page.vue，main.ts 注册 Vue/Pinia/Element Plus。workspace.service.ts、工作台子组件和 adapters/indexeddb-storage.ts 均为私有。
 
 2026-10-06 UI改造补充：typesetting公开登记`typesetting-color-picker.vue`，article允许单向依赖此公开颜色控件，不读取其私有配置；typesetting不依赖article。公共`chapterPreview`复用章节装饰规则。`article.service.ts`新增`removeAnnotations`，仅剪除选区内有效颜色标注并保留两侧片段和其他语义。workspace私有`workspace-feedback.vue`和`workspace-theme.css`拥有稳定反馈与应用tokens，均不进入导出。类型、公共文件与单向依赖由应用边界检查同步登记。
 
-初始配色调整为暖金、青绿、墨色、清透蓝、复古潮流、活力橙六组，用户可改名删除并保存最多九组自定义配色，全部配色至少保留一组；旧配置补齐配色列表并保留实际颜色；新草稿默认清透蓝、便签引用底色。颜色控件的最多8个最近色属于可丢弃应用偏好，独立localStorage键，不参加文章版本。Element Plus新增ColorPicker及ColorPickerPanel/Input/Popper样式，入口显式注册ColorPicker；阅读外壳开关与气泡坐标为article临时UI状态。
+初始配色调整为暖金、青绿、墨色、清透蓝、复古潮流、活力橙六组，所有配色均可改名、更新颜色和删除，总计1至9组，可重置为默认六组；旧配置补齐配色列表并保留实际颜色；新草稿默认清透蓝、便签引用底色。颜色控件的最多8个最近色属于可丢弃应用偏好，独立localStorage键，不参加文章版本。Element Plus新增ColorPicker及ColorPickerPanel/Input/Popper样式，入口显式注册ColorPicker；阅读外壳开关与气泡坐标为article临时UI状态。
 
 Element Plus 在 main.ts 按需显式注册；模板使用 Button、Option、Select、Slider、Switch、Drawer、RadioGroup 和 RadioButton，入口同时导入对应 theme-chalk 样式。RadioGroup 和 RadioButton 是 withNoopInstall 子组件，不能用单独的 app.use 注册，必须使用 app.component 显式登记。Option 由 Select 的安装器一并注册。增加控件时必须核对实际安装器行为、入口注册与样式，不能只依赖 vue-tsc、构建或入口存在 .use 调用判断运行时可用。桌面显示仍由维护者人工验收。
 
@@ -45,3 +45,5 @@ Element Plus 在 main.ts 按需显式注册；模板使用 Button、Option、Sel
 article.service.ts 的 articleStatistics 公共函数统计受控 Markdown 渲染文字的非空白字符（含代码文字、标点，不含 Markdown 语法和图片），按 600 字/分钟估算阅读时长。workspace 合并正文与启用结尾后调用，结果仅作 UI 统计，不写入草稿。网格行与两栏内部 flex 使用零最小高度，原稿 textarea、预览容器独立滚动。保存状态仅在顶栏显示，结尾面板仅发出 change；所有持久化继续由 workspace 自动保存命令负责。
 
 人工验收调整交付见[完成计划](../../archive/plans/2026-10-06-jlab-acceptance-fixes.md)。关联实现提交：`40df307ddefd128a6700a90bbe2c569b6b091bd2`；格式、ESLint、TypeScript、生产构建、六模块边界（28文件/94导入）、仓库所有权和归档CI检查通过。构建仍有VueUse PURE注释及509.53kB主包提示。未运行前端自动化或浏览器测试；本轮外壳滚动、125%缩放、配色重载和公众号粘贴需维护者再次人工验收。
+
+配色管理公共服务：maxPalettes、saveColorPreset、deleteColorPreset、updateColorPreset、resetColorPresets，由typesetting统一负责总数边界和配色快照；Vue面板发出patch，workspace编排与持久化。默认库可编辑、删除，重置后恢复六组。读旧列表允许至十五组，新写入严格1至9组，超限不静默丢数据。

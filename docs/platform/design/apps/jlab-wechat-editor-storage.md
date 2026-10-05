@@ -36,4 +36,6 @@ IndexedDB 升级到数据库版本 2；current 数据格式 schemaVersion 2，�
 
 2026-10-05 实现上述存储和历史流程；TypeScript、26 文件/80 导入的模块边界、workspace ESLint、生产构建、格式化、最终仓库 format:check、相对链接和归档 CI 检查通过，Platform 为 NOT_DUE。构建仅有 VueUse PURE 注释清理提示。历史版本仅保留正文引用的旧素材，恢复额外合并当前结尾仍引用的素材；配置不改变文章存储。人工浏览器验收尚未执行。关联提交为本设计所在的 `feat(wechat-editor): persist settings and manage article versions`；[完成计划](../../archive/plans/2026-10-05-jlab-storage-history.md)记录范围和验证。
 
-2026-10-06配置扩展：config新增chapterNumberEnabled和palettes（id、name、colors、custom）；旧记录缺少字段时补齐默认值，保留实际文章颜色。配色名称1至30字符，id唯一，六组初始配色上限、九组自定义配色上限、总数至少一组，五个颜色角色分别校验。损坏的新字段不被默认值覆盖，仍暂停保存。配色库与章节开关随配置同步覆盖，不写文章历史。
+2026-10-06配置扩展：config新增chapterNumberEnabled和palettes（id、name、colors、custom）；旧记录缺少字段时补齐默认值，保留实际文章颜色。配色名称1至30字符，id唯一，所有配色总计1至9组，五个颜色角色分别校验。损坏的新字段不被默认值覆盖，仍暂停保存。配色库与章节开关随配置同步覆盖，不写文章历史。
+
+旧版本超过九组的配色允许完整读入，新增保存仍限制总数最多九组。任何配置写入在超限期间均失败并给出专门提示，用户删减或重置至有效范围后可继续同步保存。重置仅替换配色库，不修改当前文章颜色；新配置不再按custom来源分组或分别限制数量，custom字段仅作旧数据兼容。

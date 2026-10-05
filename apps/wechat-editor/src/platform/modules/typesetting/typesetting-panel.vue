@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { chapterPreview, contrastRatio, defaultTypesetting } from './typesetting.service'
+import {
+  chapterPreview,
+  contrastRatio,
+  defaultTypesetting,
+  maxPalettes,
+  saveColorPreset,
+  deleteColorPreset,
+  updateColorPreset,
+  resetColorPresets,
+} from './typesetting.service'
 import {
   chapterStyles,
   type TypesettingConfig,
@@ -21,8 +30,6 @@ const chapters = computed(() =>
   chapterStyles.map(([id, name]) => ({ id, name, html: chapterPreview(id, props.config) })),
 )
 const paletteName = ref('')
-const builtInPalettes = computed(() => props.config.palettes.filter((p) => !p.custom))
-const customPalettes = computed(() => props.config.palettes.filter((p) => p.custom))
 function renamePalette(preset: ColorPreset, value: string): void {
   const name = value.trim().slice(0, 30) || preset.name
   if (name) {
@@ -32,26 +39,26 @@ function renamePalette(preset: ColorPreset, value: string): void {
   }
 }
 function deletePalette(preset: ColorPreset): void {
-  if (props.config.palettes.length <= 1) {
-    return
+  const patch = deleteColorPreset(props.config, preset.id)
+  if (patch) {
+    emit('change', patch)
   }
-  const palettes = props.config.palettes.filter((p) => p.id !== preset.id)
-  emit('change', { palettes, ...(props.config.preset === preset.id ? { preset: 'custom' } : {}) })
 }
 function savePalette(): void {
-  const name = paletteName.value.trim().slice(0, 30)
-  if (!name || customPalettes.value.length >= 9) {
-    return
+  const patch = saveColorPreset(props.config, paletteName.value)
+  if (patch) {
+    emit('change', patch)
+    paletteName.value = ''
   }
-  const id = 'custom-' + crypto.randomUUID()
-  emit('change', {
-    palettes: [
-      ...props.config.palettes,
-      { id, name, colors: { ...props.config.colors }, custom: true },
-    ],
-    preset: id,
-  })
-  paletteName.value = ''
+}
+function updatePalette(preset: ColorPreset): void {
+  emit('change', updateColorPreset(props.config, preset.id))
+}
+function resetPalettes(): void {
+  if (window.confirm('重置所有配色将移除现有配色，恢复默认六个配色。是否继续？')) {
+    emit('change', resetColorPresets())
+    paletteName.value = ''
+  }
 }
 function changeColor(role: ColorRole, color: string): void {
   emit('change', { preset: 'custom', colors: { ...props.config.colors, [role]: color } })
@@ -180,19 +187,18 @@ function resetText(): void {
     </template>
     <template v-else>
       <p class="settings-intro">看看标题、正文与引用如何相处。</p>
-      <section
-        v-for="group in [
-          { label: '默认配色', items: builtInPalettes },
-          { label: '用户自定义配色', items: customPalettes },
-        ]"
-        :key="group.label"
-      >
-        <h3 class="palette-heading">
-          {{ group.label }}
-          <small v-if="group.label === '用户自定义配色'">{{ customPalettes.length }}/9</small>
-        </h3>
+      <section>
+        <div class="palette-header">
+          <h3 class="palette-heading">
+            配色 <small>{{ config.palettes.length }}/{{ maxPalettes }}</small>
+          </h3>
+          <button class="ui-button bordered" @click="resetPalettes">重置所有配色</button>
+        </div>
+        <p v-if="config.palettes.length > maxPalettes" class="settings-note">
+          旧版保存了超过九个配色，已完整保留。请删除至九个以内或重置所有配色后保存。
+        </p>
         <div class="preset-grid">
-          <div v-for="preset in group.items" :key="preset.id" class="palette-entry">
+          <div v-for="preset in config.palettes" :key="preset.id" class="palette-entry">
             <button
               class="preset-card"
               :class="{ active: config.preset === preset.id }"
@@ -217,6 +223,13 @@ function resetText(): void {
               >
             </button>
             <div class="palette-actions">
+              <button
+                class="ui-button"
+                :aria-label="'用当前颜色更新配色：' + preset.name"
+                @click="updatePalette(preset)"
+              >
+                更新颜色
+              </button>
               <input
                 :value="preset.name"
                 maxlength="30"
@@ -244,13 +257,15 @@ function resetText(): void {
         />
         <button
           class="ui-button bordered"
-          :disabled="!paletteName.trim() || customPalettes.length >= 9"
+          :disabled="!paletteName.trim() || config.palettes.length >= maxPalettes"
           @click="savePalette"
         >
           保存当前配色
         </button>
       </div>
-      <p class="settings-note">至少保留一个配色。调整下方颜色后可保存为自定义配色，最多九个。</p>
+      <p class="settings-note">
+        全部配色合计最多九个、至少一个。默认配色也可改名、更新颜色或删除。
+      </p>
       <div class="role-list">
         <div v-for="[role, label] in roles" :key="role" class="color-row">
           <span>{{ label }}</span
@@ -427,6 +442,19 @@ function resetText(): void {
 }
 .palette-entry .preset-card {
   width: 100%;
+}
+.palette-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.palette-actions {
+  flex-wrap: wrap;
+}
+.palette-actions input {
+  order: -1;
+  flex-basis: 100%;
 }
 .palette-actions,
 .palette-save {

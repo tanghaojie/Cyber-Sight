@@ -1,5 +1,7 @@
 # Platform 历史归档
 
+- [2026-10-06 桀士排版统一配色数量与重置](plans/2026-10-06-jlab-palette-limit.md)：总计1至9组，默认配色可修改删除，重置为六组；[协作记录](ai-logs/fix/2026/10/2026-10-06-jlab-palette-limit.md)。
+
 - [2026-10-06 桀士排版验收修改后 Platform 归档复核](plans/2026-10-06-jlab-acceptance-archive-review.md)：核对6ee37c..40df307并推进真实基线；[协作记录](ai-logs/docs/2026/10/2026-10-06-jlab-acceptance-archive-review.md)。
 
 - [2026-10-06 桀士排版人工验收调整](plans/2026-10-06-jlab-acceptance-fixes.md)：章节独立序号、配色管理、宽抽屉、完整阅读外壳和600字/分钟；[协作记录](ai-logs/fix/2026/10/2026-10-06-jlab-acceptance-fixes.md)。

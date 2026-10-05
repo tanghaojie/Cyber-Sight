@@ -1,5 +1,7 @@
 # Platform 活动 AI 协作记录
 
+[统一配色数量与重置](../archive/ai-logs/fix/2026/10/2026-10-06-jlab-palette-limit.md)已完成并归档，记录总数规则、重置与旧数据保护。
+
 [验收修改后 Platform 归档复核](../archive/ai-logs/docs/2026/10/2026-10-06-jlab-acceptance-archive-review.md)已完成，核对实际提交与设计后推进Platform台账。
 
 [桀士排版人工验收调整](../archive/ai-logs/fix/2026/10/2026-10-06-jlab-acceptance-fixes.md)已完成并归档，记录六项反馈与配置兼容、实际验证边界。

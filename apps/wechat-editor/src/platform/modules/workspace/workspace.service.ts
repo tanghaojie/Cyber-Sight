@@ -5,7 +5,7 @@ import type {
   ArticleVersion,
 } from './draft-storage.port'
 import { isColor } from '../article/article.service'
-import { normalizeTypesetting } from '../typesetting/typesetting.service'
+import { normalizeTypesetting, maxPalettes } from '../typesetting/typesetting.service'
 import { chapterStyles } from '../typesetting/typesetting.model'
 import { maxMarkdownLength } from '../../app.config'
 
@@ -49,7 +49,7 @@ function validArticle(value: unknown): boolean {
   return Boolean(valid)
 }
 
-export function validateSettings(value: unknown): WorkspaceSettings {
+export function validateSettings(value: unknown, allowLegacyPalettes = false): WorkspaceSettings {
   const draft = value as WorkspaceSettings | undefined
   const valid =
     draft &&
@@ -65,9 +65,7 @@ export function validateSettings(value: unknown): WorkspaceSettings {
     (draft.config.palettes === undefined ||
       (Array.isArray(draft.config.palettes) &&
         draft.config.palettes.length >= 1 &&
-        draft.config.palettes.length <= 15 &&
-        draft.config.palettes.filter((p) => p?.custom).length <= 9 &&
-        draft.config.palettes.filter((p) => !p?.custom).length <= 6 &&
+        draft.config.palettes.length <= (allowLegacyPalettes ? 15 : maxPalettes) &&
         new Set(draft.config.palettes.map((p) => p?.id)).size === draft.config.palettes.length &&
         draft.config.palettes.every(
           (p) =>
@@ -108,6 +106,13 @@ export function validateSettings(value: unknown): WorkspaceSettings {
     draft.ratio < 1 &&
     ['phone', 'desktop'].includes(draft.previewMode)
   if (!valid) {
+    if (
+      Array.isArray(draft?.config?.palettes) &&
+      draft.config.palettes.length > maxPalettes &&
+      !allowLegacyPalettes
+    ) {
+      throw new Error('配色最多九个，请删除多余配色或重置所有配色后保存。')
+    }
     throw new Error('本地配置版本或数据异常，已暂停配置保存，原记录保留。请备份后处理。')
   }
   return { ...draft, config: normalizeTypesetting(draft.config) }

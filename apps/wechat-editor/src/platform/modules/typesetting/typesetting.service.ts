@@ -84,6 +84,52 @@ export function defaultPalettes(): ColorPreset[] {
   return presets.map((preset) => ({ ...preset, colors: { ...preset.colors } }))
 }
 
+export const maxPalettes = 9
+
+export function saveColorPreset(
+  config: TypesettingConfig,
+  value: string,
+): Partial<TypesettingConfig> | undefined {
+  const name = value.trim().slice(0, 30)
+  if (!name || config.palettes.length >= maxPalettes) {
+    return
+  }
+  const id = 'custom-' + crypto.randomUUID()
+  return {
+    palettes: [...config.palettes, { id, name, colors: { ...config.colors }, custom: true }],
+    preset: id,
+  }
+}
+
+export function deleteColorPreset(
+  config: TypesettingConfig,
+  id: string,
+): Partial<TypesettingConfig> | undefined {
+  if (config.palettes.length <= 1 || !config.palettes.some((preset) => preset.id === id)) {
+    return
+  }
+  return {
+    palettes: config.palettes.filter((preset) => preset.id !== id),
+    ...(config.preset === id ? { preset: 'custom' } : {}),
+  }
+}
+
+export function updateColorPreset(
+  config: TypesettingConfig,
+  id: string,
+): Partial<TypesettingConfig> {
+  return {
+    palettes: config.palettes.map((preset) =>
+      preset.id === id ? { ...preset, colors: { ...config.colors } } : preset,
+    ),
+    preset: id,
+  }
+}
+
+export function resetColorPresets(): Partial<TypesettingConfig> {
+  return { palettes: defaultPalettes(), preset: 'custom' }
+}
+
 export function normalizeTypesetting(config: TypesettingConfig): TypesettingConfig {
   return {
     ...config,

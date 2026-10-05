@@ -9,7 +9,11 @@ import {
   renderMarkdown,
   removeAnnotations,
 } from '../article/article.service'
-import { defaultTypesetting, normalizeTypesetting } from '../typesetting/typesetting.service'
+import {
+  defaultTypesetting,
+  normalizeTypesetting,
+  maxPalettes,
+} from '../typesetting/typesetting.service'
 import type { TypesettingConfig } from '../typesetting/typesetting.model'
 import { defaultEnding } from '../ending/ending.service'
 import type { PreparedAsset } from '../assets/assets.model'
@@ -203,7 +207,10 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
       settingsDirty.value = false
       settingsError.value = ''
     } catch {
-      settingsError.value = '保存失败：配置未保存，请检查浏览器存储空间或权限后重试'
+      settingsError.value =
+        config.value.palettes.length > maxPalettes
+          ? '保存失败：配色最多九个，请删除多余配色或重置所有配色'
+          : '保存失败：配置未保存，请检查浏览器存储空间或权限后重试'
     }
   }
 
