@@ -1,5 +1,7 @@
 # Platform 活动 AI 协作记录
 
+[桀士排版人工验收调整](../archive/ai-logs/fix/2026/10/2026-10-06-jlab-acceptance-fixes.md)已完成并归档，记录六项反馈与配置兼容、实际验证边界。
+
 [桀士排版完整 UI 与交互改造](../archive/ai-logs/feat/2026/10/2026-10-05-jlab-ui-redesign.md)于2026-10-06完成并归档，实现提交`87f1f9e`，包括电脑阅读外壳。
 
 [存储实施后 Platform 归档复核](../archive/ai-logs/docs/2026/10/2026-10-05-jlab-storage-archive-review.md)已完成，真实审查基线推进到 6ee37c。

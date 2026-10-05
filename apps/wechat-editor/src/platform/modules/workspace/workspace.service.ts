@@ -5,6 +5,7 @@ import type {
   ArticleVersion,
 } from './draft-storage.port'
 import { isColor } from '../article/article.service'
+import { normalizeTypesetting } from '../typesetting/typesetting.service'
 import { chapterStyles } from '../typesetting/typesetting.model'
 import { maxMarkdownLength } from '../../app.config'
 
@@ -59,6 +60,28 @@ export function validateSettings(value: unknown): WorkspaceSettings {
     ['body', 'heading', 'accent', 'muted', 'background'].every((role) =>
       isColor(draft.config.colors?.[role as keyof typeof draft.config.colors]),
     ) &&
+    (draft.config.chapterNumberEnabled === undefined ||
+      typeof draft.config.chapterNumberEnabled === 'boolean') &&
+    (draft.config.palettes === undefined ||
+      (Array.isArray(draft.config.palettes) &&
+        draft.config.palettes.length >= 1 &&
+        draft.config.palettes.length <= 15 &&
+        draft.config.palettes.filter((p) => p?.custom).length <= 9 &&
+        draft.config.palettes.filter((p) => !p?.custom).length <= 6 &&
+        new Set(draft.config.palettes.map((p) => p?.id)).size === draft.config.palettes.length &&
+        draft.config.palettes.every(
+          (p) =>
+            p &&
+            typeof p.id === 'string' &&
+            p.id.length > 0 &&
+            typeof p.name === 'string' &&
+            p.name.trim().length > 0 &&
+            p.name.length <= 30 &&
+            typeof p.custom === 'boolean' &&
+            ['body', 'heading', 'accent', 'muted', 'background'].every((role) =>
+              isColor(p.colors?.[role as keyof typeof p.colors]),
+            ),
+        ))) &&
     chapterStyles.some(([id]) => id === draft.config.chapterStyle) &&
     [
       draft.config.fontSize,
@@ -87,7 +110,7 @@ export function validateSettings(value: unknown): WorkspaceSettings {
   if (!valid) {
     throw new Error('本地配置版本或数据异常，已暂停配置保存，原记录保留。请备份后处理。')
   }
-  return draft
+  return { ...draft, config: normalizeTypesetting(draft.config) }
 }
 
 export function validateDraft(value: unknown): WorkspaceDraft {

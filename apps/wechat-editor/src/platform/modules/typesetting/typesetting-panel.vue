@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { chapterPreview, contrastRatio, defaultTypesetting, presets } from './typesetting.service'
-import { chapterStyles, type TypesettingConfig, type ColorRole } from './typesetting.model'
+import { computed, ref } from 'vue'
+import { chapterPreview, contrastRatio, defaultTypesetting } from './typesetting.service'
+import {
+  chapterStyles,
+  type TypesettingConfig,
+  type ColorPreset,
+  type ColorRole,
+} from './typesetting.model'
 import ColorPicker from './typesetting-color-picker.vue'
 const props = defineProps<{ kind: 'text' | 'colors' | 'chapters'; config: TypesettingConfig }>()
 const emit = defineEmits<{ change: [patch: Partial<TypesettingConfig>]; preset: [id: string] }>()
@@ -15,6 +20,39 @@ const roles: [ColorRole, string][] = [
 const chapters = computed(() =>
   chapterStyles.map(([id, name]) => ({ id, name, html: chapterPreview(id, props.config) })),
 )
+const paletteName = ref('')
+const builtInPalettes = computed(() => props.config.palettes.filter((p) => !p.custom))
+const customPalettes = computed(() => props.config.palettes.filter((p) => p.custom))
+function renamePalette(preset: ColorPreset, value: string): void {
+  const name = value.trim().slice(0, 30) || preset.name
+  if (name) {
+    emit('change', {
+      palettes: props.config.palettes.map((p) => (p.id === preset.id ? { ...p, name } : p)),
+    })
+  }
+}
+function deletePalette(preset: ColorPreset): void {
+  if (props.config.palettes.length <= 1) {
+    return
+  }
+  const palettes = props.config.palettes.filter((p) => p.id !== preset.id)
+  emit('change', { palettes, ...(props.config.preset === preset.id ? { preset: 'custom' } : {}) })
+}
+function savePalette(): void {
+  const name = paletteName.value.trim().slice(0, 30)
+  if (!name || customPalettes.value.length >= 9) {
+    return
+  }
+  const id = 'custom-' + crypto.randomUUID()
+  emit('change', {
+    palettes: [
+      ...props.config.palettes,
+      { id, name, colors: { ...props.config.colors }, custom: true },
+    ],
+    preset: id,
+  })
+  paletteName.value = ''
+}
 function changeColor(role: ColorRole, color: string): void {
   emit('change', { preset: 'custom', colors: { ...props.config.colors, [role]: color } })
 }
@@ -116,7 +154,14 @@ function resetText(): void {
       <button class="ui-button bordered" @click="resetText">恢复默认文字设置</button>
     </template>
     <template v-else-if="kind === 'chapters'">
-      <p class="settings-intro">直接看样式，选适合文章的一种。</p>
+      <label class="setting-label chapter-number">
+        启用章节序号
+        <el-switch
+          :model-value="config.chapterNumberEnabled"
+          @update:model-value="emit('change', { chapterNumberEnabled: Boolean($event) })"
+        />
+      </label>
+      <p class="settings-intro">序号按正文章节顺序自动添加；下方样式只控制标题装饰。</p>
       <div class="chapter-list" role="group" aria-label="章节样式">
         <button
           v-for="item in chapters"
@@ -135,32 +180,77 @@ function resetText(): void {
     </template>
     <template v-else>
       <p class="settings-intro">看看标题、正文与引用如何相处。</p>
-      <div class="preset-grid">
+      <section
+        v-for="group in [
+          { label: '默认配色', items: builtInPalettes },
+          { label: '用户自定义配色', items: customPalettes },
+        ]"
+        :key="group.label"
+      >
+        <h3 class="palette-heading">
+          {{ group.label }}
+          <small v-if="group.label === '用户自定义配色'">{{ customPalettes.length }}/9</small>
+        </h3>
+        <div class="preset-grid">
+          <div v-for="preset in group.items" :key="preset.id" class="palette-entry">
+            <button
+              class="preset-card"
+              :class="{ active: config.preset === preset.id }"
+              :aria-pressed="config.preset === preset.id"
+              @click="emit('preset', preset.id)"
+            >
+              <span class="mini-article" :style="{ color: preset.colors.body }"
+                ><strong
+                  :style="{ color: preset.colors.heading, borderColor: preset.colors.accent }"
+                  >阅读的节奏</strong
+                ><span class="mini-line" /><span class="mini-line short" /><span
+                  class="mini-quote"
+                  :style="{
+                    color: preset.colors.muted,
+                    background: preset.colors.background,
+                    borderColor: preset.colors.accent,
+                  }"
+                  >给观点一点留白</span
+                ></span
+              ><span class="preset-name"
+                >{{ preset.name }}<span v-if="config.preset === preset.id"> ✓</span></span
+              >
+            </button>
+            <div class="palette-actions">
+              <input
+                :value="preset.name"
+                maxlength="30"
+                :aria-label="'配色名称：' + preset.name"
+                @change="renamePalette(preset, ($event.target as HTMLInputElement).value)"
+              />
+              <button
+                class="ui-button"
+                :disabled="config.palettes.length <= 1"
+                :aria-label="'删除配色：' + preset.name"
+                @click="deletePalette(preset)"
+              >
+                删除
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div class="palette-save">
+        <input
+          v-model="paletteName"
+          maxlength="30"
+          placeholder="输入配色名"
+          aria-label="新配色名称"
+        />
         <button
-          v-for="preset in presets"
-          :key="preset.id"
-          class="preset-card"
-          :class="{ active: config.preset === preset.id }"
-          :aria-pressed="config.preset === preset.id"
-          @click="emit('preset', preset.id)"
+          class="ui-button bordered"
+          :disabled="!paletteName.trim() || customPalettes.length >= 9"
+          @click="savePalette"
         >
-          <span class="mini-article" :style="{ color: preset.colors.body }"
-            ><strong :style="{ color: preset.colors.heading, borderColor: preset.colors.accent }"
-              >阅读的节奏</strong
-            ><span class="mini-line" /><span class="mini-line short" /><span
-              class="mini-quote"
-              :style="{
-                color: preset.colors.muted,
-                background: preset.colors.background,
-                borderColor: preset.colors.accent,
-              }"
-              >给观点一点留白</span
-            ></span
-          ><span class="preset-name"
-            >{{ preset.name }}<span v-if="config.preset === preset.id"> ✓</span></span
-          >
+          保存当前配色
         </button>
       </div>
+      <p class="settings-note">至少保留一个配色。调整下方颜色后可保存为自定义配色，最多九个。</p>
       <div class="role-list">
         <div v-for="[role, label] in roles" :key="role" class="color-row">
           <span>{{ label }}</span
@@ -319,5 +409,44 @@ function resetText(): void {
   border-bottom: 1px solid var(--ui-border);
   padding: 12px 0;
   font-size: 13px;
+}
+
+.chapter-number {
+  margin: 0 0 12px;
+}
+.palette-heading {
+  font-size: 13px;
+  margin: 20px 0 12px;
+}
+.palette-heading small {
+  color: var(--ui-muted);
+  font-weight: normal;
+}
+.palette-entry {
+  min-width: 0;
+}
+.palette-entry .preset-card {
+  width: 100%;
+}
+.palette-actions,
+.palette-save {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: 8px;
+}
+.palette-actions input,
+.palette-save input {
+  min-width: 0;
+  width: 100%;
+  border: 1px solid var(--ui-border);
+  border-radius: 4px;
+  padding: 6px 8px;
+  color: var(--ui-text);
+  background: var(--ui-surface);
+  font-size: 12px;
+}
+.palette-save {
+  margin-top: 20px;
 }
 </style>

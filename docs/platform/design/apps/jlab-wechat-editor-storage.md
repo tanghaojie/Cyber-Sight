@@ -2,7 +2,7 @@
 title: 桀士排版数据存储与文章版本
 scope: platform
 status: accepted
-updated: 2026-10-05
+updated: 2026-10-06
 ---
 
 # 桀士排版数据存储与文章版本
@@ -35,3 +35,5 @@ IndexedDB 升级到数据库版本 2；current 数据格式 schemaVersion 2，�
 执行应用模块边界、TypeScript、生产构建、ESLint、仓库格式与归档 CI 检查。依仓库规则不新增或运行前端自动化/浏览器测试。维护者手工验证：配置即时持久化、正文 current 覆盖、主动版本与同毫秒冲突、查看/恢复/删除、刷新、旧草稿迁移、存储权限/配额/损坏、两页面冲突及恢复时选区失效。实际检查结果记录在实施计划和 AI 日志。
 
 2026-10-05 实现上述存储和历史流程；TypeScript、26 文件/80 导入的模块边界、workspace ESLint、生产构建、格式化、最终仓库 format:check、相对链接和归档 CI 检查通过，Platform 为 NOT_DUE。构建仅有 VueUse PURE 注释清理提示。历史版本仅保留正文引用的旧素材，恢复额外合并当前结尾仍引用的素材；配置不改变文章存储。人工浏览器验收尚未执行。关联提交为本设计所在的 `feat(wechat-editor): persist settings and manage article versions`；[完成计划](../../archive/plans/2026-10-05-jlab-storage-history.md)记录范围和验证。
+
+2026-10-06配置扩展：config新增chapterNumberEnabled和palettes（id、name、colors、custom）；旧记录缺少字段时补齐默认值，保留实际文章颜色。配色名称1至30字符，id唯一，六组初始配色上限、九组自定义配色上限、总数至少一组，五个颜色角色分别校验。损坏的新字段不被默认值覆盖，仍暂停保存。配色库与章节开关随配置同步覆盖，不写文章历史。

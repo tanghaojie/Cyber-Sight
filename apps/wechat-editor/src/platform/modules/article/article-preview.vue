@@ -23,6 +23,13 @@ const emit = defineEmits<{
 const root = ref<HTMLElement>()
 const pane = ref<HTMLElement>()
 const paper = ref<HTMLElement>()
+const stage = ref<HTMLElement>()
+const frameScale = ref(1)
+const readerTitle = computed(() => {
+  const content = document.createElement('div')
+  content.innerHTML = props.html
+  return content.querySelector('h1')?.textContent || '微信文章'
+})
 const bubble = ref<HTMLElement>()
 const showFrame = ref(true)
 const bubbleOpen = ref(false)
@@ -115,6 +122,9 @@ onMounted(function listen() {
   document.addEventListener('pointerdown', outsidePointer)
   document.addEventListener('keydown', keydown)
   observer = new ResizeObserver(function measure() {
+    if (stage.value) {
+      frameScale.value = Math.min(1, stage.value.clientWidth / 440, stage.value.clientHeight / 956)
+    }
     if (paper.value) {
       measuredWidth.value = Math.round(paper.value.clientWidth)
     }
@@ -122,6 +132,9 @@ onMounted(function listen() {
   })
   if (paper.value) {
     observer.observe(paper.value)
+  }
+  if (stage.value) {
+    observer.observe(stage.value)
   }
 })
 onBeforeUnmount(function unlisten() {
@@ -155,35 +168,51 @@ defineExpose({ captureSelection })
         </button>
       </div>
     </div>
-    <div class="preview-scroll" @scroll="closeSelection">
+    <div class="preview-scroll" :class="{ framed: showFrame }" @scroll="closeSelection">
       <div class="canvas-controls">
         <span>{{ measuredWidth }}px 阅读画板</span
         ><label
           ><input v-model="showFrame" type="checkbox" @change="closeSelection" />阅读外壳</label
         >
       </div>
-      <div ref="paper" class="paper" :class="[mode, { 'without-frame': !showFrame }]">
-        <template v-if="showFrame">
-          <div v-if="mode === 'phone'" class="phone-status" aria-hidden="true">
-            <span>9:41</span><i class="island" /><span>5G ▰</span>
+      <div ref="stage" class="frame-stage">
+        <div
+          ref="paper"
+          class="paper"
+          :class="[mode, { 'without-frame': !showFrame }]"
+          :style="showFrame && mode === 'phone' ? { zoom: frameScale } : undefined"
+        >
+          <template v-if="showFrame">
+            <div v-if="mode === 'phone'" class="phone-status" aria-hidden="true">
+              <span>9:41</span><i class="island" /><span>5G ▰</span>
+            </div>
+            <div v-if="mode === 'phone'" class="reader-nav" aria-hidden="true">
+              <span>‹</span><span>微信文章</span><span>···</span>
+            </div>
+            <div v-else class="desktop-toolbar" aria-hidden="true">
+              <span class="browser-controls">‹　›　⟳</span>
+              <span class="browser-tab">{{ readerTitle }} <span>×</span></span>
+              <span class="browser-search">⌕</span>
+              <span class="window-controls">···　−　□　×</span>
+            </div>
+          </template>
+          <div class="reader-content" @scroll="closeSelection">
+            <div v-if="showFrame" class="reader-meta">
+              <span class="original">原创</span><span class="account">公众号名称</span
+              ><small>模拟阅读信息</small>
+            </div>
+            <article
+              ref="root"
+              title="选中文字可局部改色"
+              @pointerup="selectionFinished"
+              @keyup="selectionFinished"
+              v-html="html"
+            />
           </div>
-          <div class="reader-nav" aria-hidden="true">
-            <span>{{ mode === 'phone' ? '‹' : '←' }}</span
-            ><span>{{ mode === 'phone' ? '微信文章' : '微信 · 电脑阅读' }}</span
-            ><span>···</span>
+          <div v-if="showFrame && mode === 'phone'" class="phone-home" aria-hidden="true">
+            <i />
           </div>
-          <div class="reader-meta">
-            <span class="original">原创</span><span class="account">公众号名称</span
-            ><small>模拟阅读信息</small>
-          </div>
-        </template>
-        <article
-          ref="root"
-          title="选中文字可局部改色"
-          @pointerup="selectionFinished"
-          @keyup="selectionFinished"
-          v-html="html"
-        />
+        </div>
       </div>
       <p class="paper-note">阅读外壳不进入复制内容 · 实际效果以公众号保存后为准</p>
     </div>
@@ -278,12 +307,12 @@ defineExpose({ captureSelection })
   overflow: hidden;
 }
 .paper.phone {
-  width: 375px;
+  width: 440px;
   max-width: 100%;
   border-radius: 24px;
 }
 .paper.desktop {
-  width: 760px;
+  width: 1100px;
   max-width: 100%;
   border-radius: var(--ui-radius-lg);
 }
@@ -418,5 +447,133 @@ article :deep(::selection) {
       transform: translateY(0);
     }
   }
+}
+
+.preview-scroll.framed {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.framed .canvas-controls,
+.framed .paper-note {
+  flex-shrink: 0;
+}
+.frame-stage {
+  min-height: 0;
+}
+.framed .frame-stage {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 0;
+}
+.framed .paper {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  min-height: 0;
+  flex-shrink: 0;
+}
+.framed .paper.phone {
+  width: 440px;
+  max-width: none;
+  height: 956px;
+  border: 8px solid #292b30;
+  outline: 2px solid #8b8d93;
+  outline-offset: -2px;
+  border-radius: 58px;
+}
+.framed .paper.desktop {
+  height: 100%;
+  max-height: 100%;
+  width: 100%;
+  max-width: 1100px;
+  border: 1px solid #bfc5ce;
+  border-radius: 10px;
+}
+.framed .phone-status {
+  height: 58px;
+  flex-shrink: 0;
+  padding: 0 28px;
+  font-weight: 600;
+}
+.framed .island {
+  width: 126px;
+  height: 34px;
+  background: #080808;
+}
+.framed .reader-nav {
+  flex-shrink: 0;
+}
+.framed .reader-content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.reader-content {
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b855 transparent;
+}
+.desktop-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  background: #ededf0;
+  border-bottom: 1px solid #e1e3e8;
+  color: #51545b;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.browser-controls {
+  white-space: nowrap;
+  color: #9b9ca1;
+}
+.browser-tab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  padding: 7px 12px;
+  border: 1px solid #e1e3e8;
+  border-radius: 5px;
+  background: white;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.browser-search {
+  padding: 5px 8px;
+  border: 1px solid #dcdfe4;
+  border-radius: 5px;
+}
+.window-controls {
+  margin-left: auto;
+  white-space: nowrap;
+}
+.phone-home {
+  height: 28px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: white;
+}
+.phone-home i {
+  width: 140px;
+  height: 5px;
+  border-radius: 8px;
+  background: #141414;
+}
+.desktop .reader-content {
+  padding: 0 clamp(0px, 6%, 80px);
+}
+.paper.phone.without-frame {
+  width: 440px;
+}
+.paper.desktop.without-frame {
+  width: 1100px;
 }
 </style>

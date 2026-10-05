@@ -1,5 +1,7 @@
 # Platform 活动实施计划
 
+[桀士排版人工验收调整](../../archive/plans/2026-10-06-jlab-acceptance-fixes.md)已完成并归档；六项修改与技术验证完成，本轮视觉及公众号效果待再次人工验收。
+
 [桀士排版完整 UI 与交互改造](../../archive/plans/2026-10-05-jlab-ui-redesign.md)已完成并归档，实现提交`87f1f9e`；人工交互与公众号验收待维护者。
 
 [存储实施后 Platform 归档复核](../../archive/plans/2026-10-05-jlab-storage-archive-review.md)已完成，复核 b1a098c..6ee37c 并推进真实提交基线；人工浏览器验收仍待执行。

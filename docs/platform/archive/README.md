@@ -1,5 +1,7 @@
 # Platform 历史归档
 
+- [2026-10-06 桀士排版人工验收调整](plans/2026-10-06-jlab-acceptance-fixes.md)：章节独立序号、配色管理、宽抽屉、完整阅读外壳和600字/分钟；[协作记录](ai-logs/fix/2026/10/2026-10-06-jlab-acceptance-fixes.md)。
+
 - [2026-10-06 桀士排版完整 UI 与交互改造](plans/2026-10-05-jlab-ui-redesign.md)：52px顶栏、可视化抽屉、来源映射气泡、手机/电脑阅读外壳、稳定反馈与输出升级；实现`87f1f9e`，技术验证通过、人工验收待执行。[协作记录](ai-logs/feat/2026/10/2026-10-05-jlab-ui-redesign.md)。
 
 - [2026-10-05 存储实施后 Platform 归档复核](plans/2026-10-05-jlab-storage-archive-review.md)：复核宽度、滚动条和存储历史实现，台账推进到实际 6ee37c；人工验收待执行。

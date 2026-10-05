@@ -11,10 +11,18 @@ export const chapterStyles = [
 ] as const
 export type ChapterStyle = (typeof chapterStyles)[number][0]
 export type ColorRole = 'body' | 'heading' | 'accent' | 'muted' | 'background'
+export interface ColorPreset {
+  id: string
+  name: string
+  colors: Record<ColorRole, string>
+  custom: boolean
+}
 export interface TypesettingConfig {
   preset: string
   colors: Record<ColorRole, string>
   chapterStyle: ChapterStyle
+  chapterNumberEnabled: boolean
+  palettes: ColorPreset[]
   fontSize: number
   lineHeight: number
   paragraphGap: number

@@ -7,8 +7,7 @@ const snippets = [
   { name: '关注提示', markdown: '---\n\n如果这篇文章对你有帮助，欢迎关注、点赞或分享。' },
   {
     name: '往期精选',
-    markdown:
-      '---\n\n**往期精选**\n\n- [文章标题](https://mp.weixin.qq.com/)\n- [另一篇文章](https://mp.weixin.qq.com/)',
+    markdown: '---\n\n**往期精选**\n\n- 精选介绍 【手动去公众号编辑往期链接】',
   },
 ]
 function appendSnippet(markdown: string): void {
@@ -49,7 +48,7 @@ function appendSnippet(markdown: string): void {
       <el-button size="small" @click="emit('change', { markdown: '' })">清空</el-button>
     </div>
     <p class="note">
-      片段追加到现有结尾，不会自动启用。请替换示例名称和链接。修改即预览，结尾设置即时保存到当前浏览器。
+      片段追加到现有结尾，不会自动启用。请替换示例名称；往期链接请在公众号编辑器内手动添加。修改即预览，结尾设置即时保存到当前浏览器。
     </p>
   </div>
 </template>

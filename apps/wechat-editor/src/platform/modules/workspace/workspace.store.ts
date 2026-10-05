@@ -9,7 +9,7 @@ import {
   renderMarkdown,
   removeAnnotations,
 } from '../article/article.service'
-import { defaultTypesetting, presets } from '../typesetting/typesetting.service'
+import { defaultTypesetting, normalizeTypesetting } from '../typesetting/typesetting.service'
 import type { TypesettingConfig } from '../typesetting/typesetting.model'
 import { defaultEnding } from '../ending/ending.service'
 import type { PreparedAsset } from '../assets/assets.model'
@@ -188,7 +188,7 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
     }
   }
   function applySettings(settings: WorkspaceSettings): void {
-    config.value = settings.config
+    config.value = normalizeTypesetting(settings.config)
     ending.value = settings.ending
     ratio.value = settings.ratio
     previewMode.value = settings.previewMode
@@ -448,7 +448,7 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
     config.value = { ...config.value, ...patch }
   }
   function choosePreset(id: string): void {
-    const preset = presets.find((p) => p.id === id)
+    const preset = config.value.palettes.find((p) => p.id === id)
     if (preset) {
       setConfig({ preset: preset.id, colors: { ...preset.colors } })
     }

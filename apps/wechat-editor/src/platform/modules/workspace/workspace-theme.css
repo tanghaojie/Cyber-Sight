@@ -95,3 +95,22 @@ textarea:focus-visible,
   font-size: 12px;
   margin-bottom: 8px;
 }
+
+.jlab-color-palette .el-color-predefine {
+  display: block;
+}
+.jlab-color-palette .el-color-predefine__colors {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.jlab-color-palette .el-color-predefine__color-selector {
+  margin: 0;
+}
+.jlab-color-palette .el-color-dropdown__value input:focus-visible {
+  outline: none;
+}
+.jlab-color-palette .el-color-dropdown__value .el-input__wrapper.is-focus {
+  box-shadow: 0 0 0 1px var(--ui-primary) inset;
+}

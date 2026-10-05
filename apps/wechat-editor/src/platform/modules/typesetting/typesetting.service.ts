@@ -1,6 +1,6 @@
-import type { TypesettingConfig, ChapterStyle } from './typesetting.model'
+import type { TypesettingConfig, ChapterStyle, ColorPreset } from './typesetting.model'
 
-export const presets = [
+const originalPresets = [
   {
     id: 'clear-blue',
     name: '清透蓝',
@@ -45,17 +45,7 @@ export const presets = [
       background: '#f1f5f9',
     },
   },
-  {
-    id: 'punk',
-    name: 'Punk',
-    colors: {
-      body: '#30323d',
-      heading: '#5b3acb',
-      accent: '#c44b77',
-      muted: '#707080',
-      background: '#f4f0ff',
-    },
-  },
+
   {
     id: 'retro',
     name: '复古潮流',
@@ -67,17 +57,7 @@ export const presets = [
       background: '#f7f2e8',
     },
   },
-  {
-    id: 'red-blue',
-    name: '红蓝 CP',
-    colors: {
-      body: '#303849',
-      heading: '#245aa5',
-      accent: '#c84045',
-      muted: '#687386',
-      background: '#eef4fc',
-    },
-  },
+
   {
     id: 'orange',
     name: '活力橙',
@@ -91,11 +71,34 @@ export const presets = [
   },
 ]
 
+export const presets: ColorPreset[] = [
+  'warm-gold',
+  'teal',
+  'ink',
+  'clear-blue',
+  'retro',
+  'orange',
+].map((id) => ({ ...originalPresets.find((preset) => preset.id === id)!, custom: false }))
+
+export function defaultPalettes(): ColorPreset[] {
+  return presets.map((preset) => ({ ...preset, colors: { ...preset.colors } }))
+}
+
+export function normalizeTypesetting(config: TypesettingConfig): TypesettingConfig {
+  return {
+    ...config,
+    chapterNumberEnabled: config.chapterNumberEnabled ?? false,
+    palettes: config.palettes ?? defaultPalettes(),
+  }
+}
+
 export function defaultTypesetting(): TypesettingConfig {
   return {
-    preset: presets[0].id,
-    colors: { ...presets[0].colors },
+    preset: 'clear-blue',
+    colors: { ...presets.find((preset) => preset.id === 'clear-blue')!.colors },
     chapterStyle: 'bar',
+    chapterNumberEnabled: false,
+    palettes: defaultPalettes(),
     fontSize: 16,
     lineHeight: 1.9,
     paragraphGap: 20,
@@ -128,7 +131,7 @@ function decorateChapter(
   const decoration = document.createElement('span')
   decoration.dataset.decoration = 'true'
   decoration.style.cssText = `color:${accent};font-size:14px;line-height:24px;font-weight:bold;`
-  const label = String(number).padStart(2, '0')
+  const label = config.chapterNumberEnabled ? String(number).padStart(2, '0') + '  ' : ''
   switch (style) {
     case 'underline':
       heading.style.borderBottom = `2px solid ${accent}`
@@ -142,25 +145,32 @@ function decorateChapter(
       heading.style.padding = '12px'
       break
     case 'slash':
-      decoration.textContent = `// ${label}  `
+      decoration.textContent = '//  '
       break
     case 'bracket':
-      decoration.textContent = `[ ${label} ]  `
+      decoration.textContent = '[ ]  '
       break
     case 'circles':
-      decoration.textContent = `◎ ${label} ◎  `
+      decoration.textContent = '◎ ◎  '
       break
     case 'dots':
-      decoration.textContent = `● ● ●  ${label}  `
+      decoration.textContent = '● ● ●  '
       break
     case 'overline':
-      decoration.textContent = label
+      decoration.textContent = '—'
       decoration.style.display = 'block'
       break
     case 'quote':
       decoration.textContent = '“  '
       decoration.style.color = color
       break
+  }
+  if (label) {
+    const sequence = document.createElement('span')
+    sequence.dataset.decoration = 'true'
+    sequence.textContent = label
+    sequence.style.color = accent
+    heading.prepend(sequence)
   }
   if (decoration.textContent) {
     heading.prepend(decoration)

@@ -26,7 +26,8 @@ const dragging = ref(false)
 let observer: ResizeObserver | undefined
 const displayedRatio = computed(() => clampRatio(store.ratio, containerWidth.value))
 const drawerSize = computed(
-  () => `${Math.min(320, Math.floor(containerWidth.value * displayedRatio.value))}px`,
+  () =>
+    `${Math.min(store.drawer === 'colors' || store.drawer === 'ending' ? 520 : 320, store.drawer === 'colors' || store.drawer === 'ending' ? containerWidth.value - 40 : Math.floor(containerWidth.value * displayedRatio.value))}px`,
 )
 function toggleDrawer(kind: NonNullable<typeof store.drawer>): void {
   store.focus = false
@@ -275,7 +276,7 @@ onBeforeUnmount(function cleanup() {
       />
     </div>
     <footer class="status-bar">
-      <span title="排版文字的非空白字符数，含已启用的固定结尾；阅读时长按 300 字/分钟估算">
+      <span title="排版文字的非空白字符数，含已启用的固定结尾；阅读时长按 600 字/分钟估算">
         {{ store.statistics.characters.toLocaleString() }} 字
         <span class="status-dot">/</span>
         预计阅读 {{ store.statistics.readingMinutes }} 分钟
