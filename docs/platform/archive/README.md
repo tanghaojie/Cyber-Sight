@@ -10,6 +10,9 @@
 
 ## 已完成计划
 
+- [2026-10-05 桀士排版最小宽度 800px](plans/2026-10-05-jlab-min-width.md)：页面宽度与单层顶栏内部横向滚动；人工验收待执行。
+- [2026-10-05 桀士排版宽度调整前 Platform 归档复核](plans/2026-10-05-jlab-width-archive-review.md)：核对注册及滚动/保存修复，台账推进到实际 b1a098c。
+
 - [2026-10-05 桀士排版组件注册修复](plans/2026-10-05-jlab-component-registration.md)：补齐 Drawer 与 Radio 样式，并更正 Radio 空安装器为显式组件注册；技术检查通过，运行时人工验收待执行。
 - [2026-10-05 桀士排版布局后的归档复核](plans/2026-10-05-jlab-layout-archive-review.md)：复核 25ff537，推进 Platform 实际基线。
 
@@ -93,6 +96,8 @@
 - [2026-08-30 Geo 影像与宽屏交付后的 Platform 文档归档审查](plans/2026-08-30-platform-documentation-archive-review-3.md)：复核影像恢复与宽屏交付并推进 Platform 台账。
 
 ## AI 协作记录
+
+- [2026-10-05 桀士排版最小宽度 800px](ai-logs/style/2026/10/2026-10-05-jlab-min-width.md)
 
 - [2026-10-05 桀士排版滚动与自动保存布局](ai-logs/fix/2026/10/2026-10-05-jlab-scroll-autosave.md)：双栏滚动、底部统计与顶栏自动保存；[实施计划](plans/2026-10-05-jlab-scroll-autosave.md)。静态验证通过，人工验收待执行。
 

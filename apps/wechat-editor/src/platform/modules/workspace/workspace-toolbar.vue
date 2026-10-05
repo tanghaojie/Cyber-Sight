@@ -115,6 +115,10 @@ const emit = defineEmits<{
   border-bottom: 1px solid #e6e0ef;
   flex-shrink: 0;
   white-space: nowrap;
+  overflow-x: auto;
+}
+.toolbar > * {
+  flex-shrink: 0;
 }
 .brand {
   display: flex;

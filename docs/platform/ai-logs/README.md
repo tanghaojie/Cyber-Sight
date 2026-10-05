@@ -1,5 +1,7 @@
 # Platform 活动 AI 协作记录
 
+[桀士排版最小宽度 800px](../archive/ai-logs/style/2026/10/2026-10-05-jlab-min-width.md)已完成并归档，800px 页面人工验收待执行。
+
 [桀士排版滚动与自动保存布局](../archive/ai-logs/fix/2026/10/2026-10-05-jlab-scroll-autosave.md)已完成并归档，浏览器人工验收待执行。
 
 当前无活动 AI 协作记录。[组件注册修复](../archive/ai-logs/fix/2026/10/2026-10-05-jlab-component-registration.md)已完成并归档。

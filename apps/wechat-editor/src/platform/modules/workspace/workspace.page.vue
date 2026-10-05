@@ -283,7 +283,7 @@ onBeforeUnmount(function cleanup() {
 body {
   margin: 0;
   background: #f8f6fc;
-  min-width: 1280px;
+  min-width: 800px;
 }
 button,
 input,
@@ -299,7 +299,7 @@ input:focus-visible,
 .workbench {
   display: flex;
   flex-direction: column;
-  min-width: 1280px;
+  min-width: 800px;
   height: 100vh;
   min-height: 650px;
 }
