@@ -334,6 +334,33 @@ input:focus-visible,
   grid-template-rows: minmax(0, 1fr);
   overflow: hidden;
 }
+.workbench .editor-pane textarea,
+.workbench .preview-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #a99bbd55 transparent;
+}
+.workbench .editor-pane textarea:hover,
+.workbench .preview-scroll:hover {
+  scrollbar-color: #a99bbd99 transparent;
+}
+.workbench .editor-pane textarea::-webkit-scrollbar,
+.workbench .preview-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.workbench .editor-pane textarea::-webkit-scrollbar-track,
+.workbench .preview-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.workbench .editor-pane textarea::-webkit-scrollbar-thumb,
+.workbench .preview-scroll::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  background: #a99bbd55;
+}
+.workbench .editor-pane textarea:hover::-webkit-scrollbar-thumb,
+.workbench .preview-scroll:hover::-webkit-scrollbar-thumb {
+  background: #a99bbd99;
+}
 .separator {
   position: absolute;
   left: v-bind('displayedRatio * 100 + "%"');
