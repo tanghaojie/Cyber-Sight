@@ -26,8 +26,10 @@ Vue 公共文件是登记的呈现入口，使用 props/events 接受模型和�
 
 标注采用正文可着色文本的渲染偏移。每个 Markdown 文本 token 的 span 登记起止位置；选区转换为跨 token 的文本区间。纯样式修改不改变偏移；正文变更计算公共前后缀，仅迁移确定的区间，重复锚点或改动区间失效。源码不嵌入颜色标签，重叠后写优先、相邻同色合并。未采用模糊匹配或纯 DOM 包裹。
 
-图片通过 asset:id 进入 Markdown；数据库保存 Blob，预览临时 object URL。HTTPS 图片可预览，导出 fetch/CORS 失败阻止复制。PNG/JPEG/WebP 大图等比缩到 1440×2400；WebP 转 PNG，保留透明；GIF 保持动画，大 GIF 超尺寸阻止导出。相对路径不扫描文件夹。原始 HTML 禁用，作为文本显示；所有预览/复制 HTML 来自受控解析和代码生成样式，经 DOMPurify 清洗。站外链接复制成可见网址。
+新增本地插图和 Markdown 下载命令已移除。旧草稿图片通过 asset:id 恢复；数据库保存 Blob，预览临时 object URL。HTTPS 图片可预览，导出 fetch/CORS 失败阻止复制。PNG/JPEG/WebP 大图等比缩到 1440×2400；WebP 转 PNG，保留透明；GIF 保持动画，大 GIF 超尺寸阻止导出。相对路径不扫描文件夹。原始 HTML 禁用，作为文本显示；所有预览/复制 HTML 来自受控解析和代码生成样式，经 DOMPurify 清洗。站外链接复制成可见网址。
 
 应用内 scripts/check-boundaries.mjs 用 TypeScript AST 检查源文件依赖、公开文件、注册模块和依赖方向，覆盖 .ts/.vue 及字面量动态导入。仓库旧 architecture:check 不覆盖新应用；新应用 build 自动执行应用边界检查，因此根递归 build 也会覆盖它，或单独运行应用 architecture:check。共享检查器继续由 Forge 拥有。本轮不引入前端自动化测试。
 
 手工验证清单见 [应用说明](../../../../apps/wechat-editor/README.md)。产品和范围见 [独立应用设计](../apps/jlab-wechat-editor.md)。
+
+工作台使用四类 Element Plus 覆盖左抽屉（章节、文字、配色、结尾），不影响主栏宽度。章节列表点击即时更新排版配置；导入由 article-editor 事件交给 workspace 执行；article-preview 通过 mode/focus 事件通知 workspace 更新宽度与专注状态，不读取私有 store。分隔图标绝对定位在两栏边界，无占位列。失败备份提示统一指导手动复制原稿。技术验证见本次交互调整归档计划；功能仍由维护者人工验收。

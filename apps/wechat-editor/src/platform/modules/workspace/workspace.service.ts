@@ -67,33 +67,18 @@ export function validateDraft(value: unknown): WorkspaceDraft {
     ['phone', 'desktop'].includes(draft.previewMode)
   if (!valid) {
     throw new Error(
-      '本地草稿版本或数据异常，原数据已保留。请先下载当前内容，再决定是否覆盖本地草稿。',
+      '本地草稿版本或数据异常，原数据已保留。请先复制原稿到本地文件，再决定是否覆盖本地草稿。',
     )
   }
   return draft
 }
 
 export function splitBounds(width: number): { min: number; max: number } {
-  const available = Math.max(600, width - 12)
+  const available = Math.max(600, width)
   return { min: 280 / available, max: 1 - 320 / available }
 }
 
 export function clampRatio(ratio: number, width: number): number {
   const { min, max } = splitBounds(width)
   return Math.max(min, Math.min(max, ratio))
-}
-
-export function downloadText(
-  text: string,
-  name: string,
-  mime = 'text/markdown;charset=utf-8',
-): void {
-  const url = URL.createObjectURL(new Blob([text], { type: mime }))
-  const anchor = document.createElement('a')
-  anchor.href = url
-  anchor.download = name
-  anchor.click()
-  setTimeout(function release() {
-    URL.revokeObjectURL(url)
-  }, 1000)
 }

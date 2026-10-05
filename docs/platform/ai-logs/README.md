@@ -1,6 +1,8 @@
 # Platform 活动 AI 协作记录
 
-当前无活动 AI 协作记录。最新复核：[桀士排版实施后的 Platform 归档复核](../archive/ai-logs/docs/2026/10/2026-10-05-jlab-platform-archive-review.md)，已核对实际实现提交并推进台账。
+当前无活动 AI 协作记录。[桀士排版工作台交互调整](../archive/ai-logs/feat/2026/10/2026-10-05-jlab-layout-refinement.md)已完成并归档。
+
+最新复核：[桀士排版实施后的 Platform 归档复核](../archive/ai-logs/docs/2026/10/2026-10-05-jlab-platform-archive-review.md)，已核对实际实现提交并推进台账。
 
 最新完成：[桀士排版独立应用实施](../archive/ai-logs/feat/2026/10/2026-10-05-jlab-wechat-editor.md)，代码与技术验证完成，人工验收待执行。
 

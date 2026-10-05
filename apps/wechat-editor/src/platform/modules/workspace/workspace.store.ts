@@ -7,7 +7,7 @@ import { defaultTypesetting, presets } from '../typesetting/typesetting.service'
 import type { TypesettingConfig } from '../typesetting/typesetting.model'
 import { defaultEnding } from '../ending/ending.service'
 import type { PreparedAsset } from '../assets/assets.model'
-import { prepareAsset, createAssetUrls, releaseAssetUrls } from '../assets/assets.service'
+import { createAssetUrls, releaseAssetUrls } from '../assets/assets.service'
 import { previewArticle, exportArticle, copyRichText } from '../wechat-export/wechat-export.service'
 import type { ExportResult, ExportSnapshot, Diagnostic } from '../wechat-export/wechat-export.model'
 import type { WorkspaceDraft } from './draft-storage.port'
@@ -28,7 +28,7 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
   const assets = ref<PreparedAsset[]>([])
   const ratio = ref(0.5)
   const previewMode = ref<'phone' | 'desktop'>('phone')
-  const drawer = ref<'text' | 'colors' | 'ending' | undefined>()
+  const drawer = ref<'text' | 'colors' | 'ending' | 'chapters' | undefined>()
   const focus = ref(false)
   const ready = ref(false)
   const dirty = ref(false)
@@ -51,7 +51,7 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
   if (channel) {
     channel.onmessage = function externalSave() {
       saveBlocked.value = true
-      saveState.value = '另一页面更新了草稿，请下载当前内容后刷新页面。'
+      saveState.value = '另一页面更新了草稿，请复制原稿到本地文件后刷新页面。'
     }
   }
 
@@ -152,7 +152,7 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
         }
         channel?.postMessage({ saved: true })
       } catch {
-        saveState.value = '保存失败，请下载 Markdown 备份并重试'
+        saveState.value = '保存失败，请复制原稿到本地文件备份并重试'
       }
     })
     await saveQueue
@@ -204,31 +204,9 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
       updatedAt: Date.now(),
     }
   }
-  function toggleDrawer(kind: 'text' | 'colors' | 'ending'): void {
+  function toggleDrawer(kind: 'text' | 'colors' | 'ending' | 'chapters'): void {
     drawer.value = drawer.value === kind ? undefined : kind
   }
-  async function insertImage(file: File, start: number, end: number): Promise<void> {
-    const revision = article.value.revision
-    const asset = await prepareAsset(file)
-    if (revision !== article.value.revision) {
-      throw new Error('处理图片期间文章已修改，请重新插入图片。')
-    }
-    if (assets.value.length >= 100) {
-      throw new Error('当前草稿最多保存 100 张图片。')
-    }
-    const alt = file.name.replace(/[\[\]\\\r\n]/g, '')
-    const next =
-      article.value.markdown.slice(0, start) +
-      `\n\n![${alt}](asset:${asset.id})\n\n` +
-      article.value.markdown.slice(end)
-    if (next.length > maxMarkdownLength) {
-      throw new Error('文章过长，请拆分后插入图片。')
-    }
-    assets.value = [...assets.value, asset]
-    rebuildUrls()
-    updateMarkdown(next)
-  }
-
   async function prepareCopy(): Promise<void> {
     if (copyState.value === 'preparing' || copyState.value === 'copying') {
       return
@@ -309,7 +287,6 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
     choosePreset,
     colorSelection,
     toggleDrawer,
-    insertImage,
     prepareCopy,
     copyPrepared,
     dispose,

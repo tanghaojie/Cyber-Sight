@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { contrastRatio, presets } from './typesetting.service'
-import type { TypesettingConfig, ColorRole } from './typesetting.model'
-const props = defineProps<{ kind: 'text' | 'colors'; config: TypesettingConfig }>()
+import { chapterStyles, type TypesettingConfig, type ColorRole } from './typesetting.model'
+const props = defineProps<{ kind: 'text' | 'colors' | 'chapters'; config: TypesettingConfig }>()
 const emit = defineEmits<{ change: [patch: Partial<TypesettingConfig>]; preset: [id: string] }>()
 const roles: [ColorRole, string][] = [
   ['body', '正文'],
@@ -71,6 +71,22 @@ function changeColor(role: ColorRole, event: Event): void {
       </el-select>
       <p class="settings-note">自定义字体取决于设备是否安装。默认选项在复制时沿用公众号字体。</p>
     </template>
+    <template v-else-if="kind === 'chapters'">
+      <p class="settings-intro">点击选择章节样式，实时查看文章效果。</p>
+      <div class="chapter-list" role="group" aria-label="章节样式">
+        <button
+          v-for="[id, name] in chapterStyles"
+          :key="id"
+          class="chapter-option"
+          :class="{ active: config.chapterStyle === id }"
+          :aria-pressed="config.chapterStyle === id"
+          @click="emit('change', { chapterStyle: id })"
+        >
+          <span>{{ name }}</span
+          ><span v-if="config.chapterStyle === id" aria-hidden="true">✓</span>
+        </button>
+      </div>
+    </template>
     <template v-else>
       <p class="settings-intro">选一组配色，再给它一点自己的风格。</p>
       <div class="preset-grid">
@@ -115,6 +131,26 @@ function changeColor(role: ColorRole, event: Event): void {
 </template>
 
 <style scoped>
+.chapter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.chapter-option {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  border: 1px solid #e7e2ef;
+  border-radius: 8px;
+  background: #fff;
+  color: #746582;
+  cursor: pointer;
+  text-align: left;
+}
+.chapter-option.active {
+  border-color: #8061c6;
+  background: #f7f3ff;
+}
 .settings-body {
   padding: 22px;
 }

@@ -1,22 +1,15 @@
 <script setup lang="ts">
-import { chapterStyles, type TypesettingConfig } from '../typesetting/typesetting.model'
+import type { TypesettingConfig } from '../typesetting/typesetting.model'
 defineProps<{
   config: TypesettingConfig
   drawer?: string
-  focus: boolean
-  mode: string
   copyState: string
   disabled: boolean
 }>()
 const emit = defineEmits<{
   config: [patch: Partial<TypesettingConfig>]
   localColor: [color: string]
-  drawer: [kind: 'text' | 'colors' | 'ending']
-  import: []
-  image: []
-  download: []
-  focus: []
-  mode: []
+  drawer: [kind: 'text' | 'colors' | 'ending' | 'chapters']
   copy: []
 }>()
 </script>
@@ -48,19 +41,14 @@ const emit = defineEmits<{
         :disabled="disabled"
         @change="emit('localColor', ($event.target as HTMLInputElement).value)"
     /></label>
-    <label class="chapter-control"
-      ><span>章节样式</span
-      ><el-select
-        :model-value="config.chapterStyle"
-        size="small"
-        :disabled="disabled"
-        @update:model-value="emit('config', { chapterStyle: $event })"
-        ><el-option
-          v-for="[id, name] in chapterStyles"
-          :key="id"
-          :value="id"
-          :label="name" /></el-select
-    ></label>
+    <button
+      class="tool-button"
+      :class="{ active: drawer === 'chapters' }"
+      :disabled="disabled"
+      @click="emit('drawer', 'chapters')"
+    >
+      章节样式
+    </button>
     <div class="toolbar-divider" />
     <button
       class="tool-button"
@@ -76,7 +64,7 @@ const emit = defineEmits<{
       :disabled="disabled"
       @click="emit('drawer', 'colors')"
     >
-      配色实验室
+      配色
     </button>
     <button
       class="tool-button"
@@ -87,41 +75,6 @@ const emit = defineEmits<{
       固定结尾
     </button>
     <div class="toolbar-spacer" />
-    <button
-      class="icon-button"
-      title="导入单个 Markdown / TXT"
-      :disabled="disabled"
-      @click="emit('import')"
-    >
-      导入
-    </button>
-    <button
-      class="icon-button"
-      title="插入单张本地图片"
-      :disabled="disabled"
-      @click="emit('image')"
-    >
-      插图
-    </button>
-    <button
-      class="icon-button"
-      title="下载当前 Markdown 原稿"
-      :disabled="disabled"
-      @click="emit('download')"
-    >
-      下载
-    </button>
-    <button class="icon-button" :disabled="disabled" @click="emit('mode')">
-      {{ mode === 'phone' ? '手机宽度' : '电脑宽度' }}
-    </button>
-    <button
-      class="icon-button"
-      :class="{ active: focus }"
-      :disabled="disabled"
-      @click="emit('focus')"
-    >
-      {{ focus ? '返回编辑' : '专注预览' }}
-    </button>
     <el-button
       class="copy-button"
       type="primary"
@@ -207,18 +160,7 @@ const emit = defineEmits<{
   background: transparent;
   cursor: pointer;
 }
-.chapter-control {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: #786b83;
-}
-.chapter-control .el-select {
-  width: 80px;
-}
-.tool-button,
-.icon-button {
+.tool-button {
   border: none;
   background: transparent;
   color: #756582;
@@ -228,8 +170,7 @@ const emit = defineEmits<{
   border-radius: 6px;
   cursor: pointer;
 }
-.tool-button:hover,
-.icon-button:hover {
+.tool-button:hover {
   background: #f5f0fa;
   color: #7348a8;
 }

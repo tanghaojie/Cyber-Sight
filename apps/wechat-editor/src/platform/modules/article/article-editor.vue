@@ -2,23 +2,17 @@
 import { ref } from 'vue'
 
 defineProps<{ markdown: string; disabled: boolean }>()
-const emit = defineEmits<{ change: [value: string]; cursor: [start: number, end: number] }>()
+const emit = defineEmits<{ change: [value: string]; import: [] }>()
 const input = ref<HTMLTextAreaElement>()
 let composing = false
 function update(event: Event): void {
   if (!composing) {
     emit('change', (event.target as HTMLTextAreaElement).value)
-    cursor()
   }
 }
 function compositionEnd(event: CompositionEvent): void {
   composing = false
   update(event)
-}
-function cursor(): void {
-  if (input.value) {
-    emit('cursor', input.value.selectionStart, input.value.selectionEnd)
-  }
 }
 function tab(event: KeyboardEvent): void {
   if (event.key !== 'Tab' || !input.value || composing) {
@@ -33,13 +27,22 @@ function tab(event: KeyboardEvent): void {
   }
   input.value.setRangeText('  ', input.value.selectionStart, input.value.selectionEnd, 'end')
   emit('change', input.value.value)
-  cursor()
 }
 </script>
 
 <template>
   <section class="editor-pane">
-    <div class="pane-heading"><span class="pane-label">MARKDOWN</span><span>原稿</span></div>
+    <div class="pane-heading">
+      <span class="pane-label">MARKDOWN</span><span>原稿</span
+      ><el-button
+        size="small"
+        text
+        :disabled="disabled"
+        title="导入单个 Markdown / TXT"
+        @click="emit('import')"
+        >导入</el-button
+      >
+    </div>
     <textarea
       ref="input"
       :value="markdown"
@@ -51,9 +54,6 @@ function tab(event: KeyboardEvent): void {
       @input="update"
       @compositionstart="composing = true"
       @compositionend="compositionEnd"
-      @select="cursor"
-      @click="cursor"
-      @keyup="cursor"
       @keydown="tab"
     />
     <div class="editor-footer">

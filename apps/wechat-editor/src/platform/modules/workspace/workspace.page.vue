@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useWorkspaceStore } from './workspace.store'
-import { clampRatio, downloadText, splitBounds } from './workspace.service'
+import { clampRatio, splitBounds } from './workspace.service'
 import WorkspaceToolbar from './workspace-toolbar.vue'
 import ArticleEditor from '../article/article-editor.vue'
 import ArticlePreview from '../article/article-preview.vue'
@@ -13,10 +13,8 @@ import { maxMarkdownLength } from '../../app.config'
 const store = useWorkspaceStore()
 const split = ref<HTMLElement>()
 const fileInput = ref<HTMLInputElement>()
-const imageInput = ref<HTMLInputElement>()
 const selection = ref<TextSelection>()
 const containerWidth = ref(900)
-const cursor = ref({ start: 0, end: 0 })
 const dragging = ref(false)
 let observer: ResizeObserver | undefined
 const displayedRatio = computed(() => clampRatio(store.ratio, containerWidth.value))
@@ -24,18 +22,21 @@ const gridStyle = computed(() =>
   store.focus
     ? { gridTemplateColumns: '1fr' }
     : {
-        gridTemplateColumns: `minmax(280px, ${displayedRatio.value}fr) 12px minmax(320px, ${1 - displayedRatio.value}fr)`,
+        gridTemplateColumns: `minmax(280px, ${displayedRatio.value}fr) minmax(320px, ${1 - displayedRatio.value}fr)`,
       },
 )
 const drawerTitle = computed(
-  () => ({ text: '文字设置', colors: '配色实验室', ending: '固定结尾' })[store.drawer || 'text'],
+  () =>
+    ({ text: '文字设置', colors: '配色', ending: '固定结尾', chapters: '章节样式' })[
+      store.drawer || 'text'
+    ],
 )
 function updatePointer(event: PointerEvent): void {
   if (!split.value || !dragging.value) {
     return
   }
   const rect = split.value.getBoundingClientRect()
-  store.ratio = clampRatio((event.clientX - rect.left) / (rect.width - 12), rect.width)
+  store.ratio = clampRatio((event.clientX - rect.left) / rect.width, rect.width)
 }
 function startDrag(event: PointerEvent): void {
   dragging.value = true
@@ -72,7 +73,7 @@ async function importFile(event: Event): Promise<void> {
     if (!/\.(md|txt)$/i.test(file.name) || file.size > 2 * 1024 * 1024) {
       throw new Error('请选择不超过 2 MB 的单个 .md 或 .txt 文件。')
     }
-    if (!window.confirm('导入将替换当前正文。需要保留时，请先下载 Markdown。')) {
+    if (!window.confirm('导入将替换当前正文。需要保留时，请先复制原稿到本地文件。')) {
       return
     }
     const revision = store.article.revision
@@ -87,23 +88,9 @@ async function importFile(event: Event): Promise<void> {
     }
     store.updateMarkdown(markdown)
     selection.value = undefined
-    cursor.value = { start: 0, end: 0 }
     store.message = `已导入 ${file.name}`
   } catch (error) {
     store.message = error instanceof Error ? error.message : '文件无法读取，请使用 UTF-8 编码。'
-  }
-}
-async function importImage(event: Event): Promise<void> {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
-  input.value = ''
-  if (!file) {
-    return
-  }
-  try {
-    await store.insertImage(file, cursor.value.start, cursor.value.end)
-  } catch (error) {
-    store.message = error instanceof Error ? error.message : '图片无法处理。'
   }
 }
 function copy(): void {
@@ -151,18 +138,11 @@ onBeforeUnmount(function cleanup() {
     <WorkspaceToolbar
       :config="store.config"
       :drawer="store.drawer"
-      :focus="store.focus"
-      :mode="store.previewMode"
       :copy-state="store.copyState"
       :disabled="!store.ready"
       @config="store.setConfig"
       @local-color="store.colorSelection(selection, $event)"
       @drawer="store.toggleDrawer"
-      @import="fileInput?.click()"
-      @image="imageInput?.click()"
-      @download="downloadText(store.article.markdown, '桀士排版.md')"
-      @focus="store.focus = !store.focus"
-      @mode="store.previewMode = store.previewMode === 'phone' ? 'desktop' : 'phone'"
       @copy="copy"
     />
     <input
@@ -172,44 +152,40 @@ onBeforeUnmount(function cleanup() {
       accept=".md,.txt"
       @change="importFile"
     />
-    <input
-      ref="imageInput"
-      class="hidden-input"
-      type="file"
-      accept="image/png,image/jpeg,image/gif,image/webp"
-      @change="importImage"
-    />
+    <el-drawer
+      :model-value="Boolean(store.drawer)"
+      :title="drawerTitle"
+      direction="ltr"
+      size="300px"
+      :modal="false"
+      :modal-penetrable="true"
+      :lock-scroll="false"
+      class="settings-drawer"
+      @update:model-value="!$event && (store.drawer = undefined)"
+    >
+      <TypesettingPanel
+        v-if="store.drawer && store.drawer !== 'ending'"
+        :kind="store.drawer"
+        :config="store.config"
+        @change="store.setConfig"
+        @preset="store.choosePreset"
+      />
+      <EndingPanel
+        v-else-if="store.drawer === 'ending'"
+        :ending="store.ending"
+        :save-state="store.saveState"
+        @change="store.ending = { ...store.ending, ...$event }"
+        @save="store.saveNow"
+      />
+    </el-drawer>
     <div class="content-row">
-      <aside v-if="store.drawer" class="drawer" aria-label="排版设置">
-        <div class="drawer-heading">
-          <div>
-            <small>TYPE & STYLE</small>
-            <h2>{{ drawerTitle }}</h2>
-          </div>
-          <button aria-label="关闭设置" @click="store.drawer = undefined">×</button>
-        </div>
-        <TypesettingPanel
-          v-if="store.drawer !== 'ending'"
-          :kind="store.drawer"
-          :config="store.config"
-          @change="store.setConfig"
-          @preset="store.choosePreset"
-        />
-        <EndingPanel
-          v-else
-          :ending="store.ending"
-          :save-state="store.saveState"
-          @change="store.ending = { ...store.ending, ...$event }"
-          @save="store.saveNow"
-        />
-      </aside>
       <div ref="split" class="split-workspace" :style="gridStyle">
         <ArticleEditor
           v-if="!store.focus"
           :markdown="store.article.markdown"
           :disabled="!store.ready"
           @change="store.updateMarkdown"
-          @cursor="(start, end) => (cursor = { start, end })"
+          @import="fileInput?.click()"
         />
         <div
           v-if="!store.focus"
@@ -229,12 +205,23 @@ onBeforeUnmount(function cleanup() {
           @lostpointercapture="stopDrag"
           @keydown="keyRatio"
         >
-          <span />
+          <svg width="12" height="20" viewBox="0 0 12 20" aria-hidden="true">
+            <path
+              d="M4 5v10M8 5v10"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
         </div>
         <ArticlePreview
           :html="store.preview.html"
           :revision="store.article.revision"
           :mode="store.previewMode"
+          :focus="store.focus"
+          :disabled="!store.ready"
+          @mode="store.previewMode = $event"
+          @focus="store.focus = !store.focus"
           @selection="selection = $event"
           @error="store.message = $event"
         />
@@ -327,75 +314,45 @@ input:focus-visible,
   min-height: 0;
   overflow: hidden;
 }
-.drawer {
-  flex: 0 0 300px;
-  background: #fff;
-  border-right: 1px solid #e7dfef;
-  overflow: auto;
-  animation: reveal 160ms ease-out;
+.settings-drawer {
+  top: 76px !important;
+  height: calc(100% - 76px) !important;
 }
-@keyframes reveal {
-  from {
-    opacity: 0;
-    transform: translateX(-14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-.drawer-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.settings-drawer .el-drawer__header {
+  margin-bottom: 0;
   padding: 22px;
   border-bottom: 1px solid #eee9f4;
-}
-.drawer-heading small {
-  color: #baa8cd;
-  font-size: 9px;
-  letter-spacing: 1.8px;
-}
-.drawer-heading h2 {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 7px 0 0;
   color: #5e426f;
 }
-.drawer-heading button {
-  border: none;
-  background: #f5f1fa;
-  border-radius: 50%;
-  width: 26px;
-  height: 26px;
-  cursor: pointer;
-  color: #9d85b2;
-  font-size: 18px;
+.settings-drawer .el-drawer__body {
+  padding: 0;
 }
 .split-workspace {
+  position: relative;
   flex: 1;
-  min-width: 612px;
+  min-width: 600px;
   display: grid;
   overflow: hidden;
 }
 .separator {
+  position: absolute;
+  left: v-bind('displayedRatio * 100 + "%"');
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  width: 12px;
+  height: 32px;
   cursor: col-resize;
   touch-action: none;
   user-select: none;
   display: grid;
   place-items: center;
-  background: #f9f7fc;
-  border-left: 1px solid #e8e3ef;
-  border-right: 1px solid #e8e3ef;
-}
-.separator span {
-  height: 36px;
-  width: 3px;
-  border-radius: 2px;
-  background: #c6bbd5;
+  color: #a697bb;
+  border-radius: 4px;
 }
 .separator:hover,
 .separator.dragging {
+  color: #7952b5;
   background: #eee5f9;
 }
 .messages {
