@@ -56,9 +56,6 @@ function tab(event: KeyboardEvent): void {
       @compositionend="compositionEnd"
       @keydown="tab"
     />
-    <div class="editor-footer">
-      <span>{{ markdown.length.toLocaleString() }} 字符</span><span>Markdown / TXT · 本地写作</span>
-    </div>
   </section>
 </template>
 
@@ -67,10 +64,12 @@ function tab(event: KeyboardEvent): void {
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
   min-width: 0;
   background: #fcfcfe;
 }
 .pane-heading {
+  flex-shrink: 0;
   height: 52px;
   padding: 0 24px;
   display: flex;
@@ -88,6 +87,8 @@ function tab(event: KeyboardEvent): void {
 }
 textarea {
   flex: 1;
+  min-height: 0;
+  overflow: auto;
   width: 100%;
   resize: none;
   border: 0;
@@ -104,13 +105,5 @@ textarea {
 }
 textarea::placeholder {
   color: #aaa6b6;
-}
-.editor-footer {
-  display: flex;
-  justify-content: space-between;
-  padding: 11px 24px;
-  border-top: 1px solid #ececf3;
-  font-size: 11px;
-  color: #94909f;
 }
 </style>

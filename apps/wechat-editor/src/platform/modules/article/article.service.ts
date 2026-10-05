@@ -53,6 +53,16 @@ export function renderMarkdown(markdown: string, annotations: Annotation[] = [])
   return { html: md.render(markdown), text }
 }
 
+export function articleStatistics(markdown: string): {
+  characters: number
+  readingMinutes: number
+} {
+  const root = document.createElement('div')
+  root.innerHTML = renderMarkdown(markdown).html
+  const characters = Array.from((root.textContent || '').replace(/\s/g, '')).length
+  return { characters, readingMinutes: Math.ceil(characters / 300) }
+}
+
 export function migrateAnnotations(
   before: string,
   after: string,

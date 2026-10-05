@@ -5,6 +5,8 @@ defineProps<{
   drawer?: string
   copyState: string
   disabled: boolean
+  saveState: string
+  saveBlocked: boolean
 }>()
 const emit = defineEmits<{
   config: [patch: Partial<TypesettingConfig>]
@@ -75,6 +77,14 @@ const emit = defineEmits<{
       固定结尾
     </button>
     <div class="toolbar-spacer" />
+    <span
+      class="save-status"
+      :class="{ failed: saveBlocked || saveState.startsWith('保存失败') }"
+      :title="saveState"
+      role="status"
+    >
+      <i aria-hidden="true" />自动保存 · {{ saveState }}
+    </span>
     <el-button
       class="copy-button"
       type="primary"
@@ -186,6 +196,28 @@ const emit = defineEmits<{
   margin: 0 0 0 3px;
   font-size: 11px;
   padding: 8px 12px;
+}
+.save-status {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 11px;
+  color: #84758f;
+}
+.save-status i {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: #81ab91;
+  vertical-align: middle;
+}
+.save-status.failed {
+  color: #a46836;
+}
+.save-status.failed i {
+  background: #c9804c;
 }
 button:disabled {
   opacity: 0.5;

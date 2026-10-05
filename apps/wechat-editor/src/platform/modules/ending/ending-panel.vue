@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FixedEnding } from './ending.model'
-defineProps<{ ending: FixedEnding; saveState: string }>()
-const emit = defineEmits<{ change: [patch: Partial<FixedEnding>]; save: [] }>()
+defineProps<{ ending: FixedEnding }>()
+const emit = defineEmits<{ change: [patch: Partial<FixedEnding>] }>()
 </script>
 
 <template>
@@ -20,11 +20,9 @@ const emit = defineEmits<{ change: [patch: Partial<FixedEnding>]; save: [] }>()
       @input="emit('change', { markdown: ($event.target as HTMLTextAreaElement).value })"
     />
     <div class="ending-actions">
-      <el-button size="small" @click="emit('change', { markdown: '' })">清空</el-button
-      ><el-button size="small" type="primary" plain @click="emit('save')">保存到本机</el-button>
+      <el-button size="small" @click="emit('change', { markdown: '' })">清空</el-button>
     </div>
     <p class="note">启用后追加在文章末尾，不改正文原稿。修改即预览，并随草稿自动保存。</p>
-    <p class="save-state">{{ saveState }}</p>
   </div>
 </template>
 
@@ -33,8 +31,7 @@ const emit = defineEmits<{ change: [patch: Partial<FixedEnding>]; save: [] }>()
   padding: 22px;
 }
 .intro,
-.note,
-.save-state {
+.note {
   font-size: 11px;
   line-height: 1.9;
   color: #998ca8;

@@ -140,6 +140,8 @@ onBeforeUnmount(function cleanup() {
       :drawer="store.drawer"
       :copy-state="store.copyState"
       :disabled="!store.ready"
+      :save-state="store.saveState"
+      :save-blocked="store.saveBlocked"
       @config="store.setConfig"
       @local-color="store.colorSelection(selection, $event)"
       @drawer="store.toggleDrawer"
@@ -173,9 +175,7 @@ onBeforeUnmount(function cleanup() {
       <EndingPanel
         v-else-if="store.drawer === 'ending'"
         :ending="store.ending"
-        :save-state="store.saveState"
         @change="store.ending = { ...store.ending, ...$event }"
-        @save="store.saveNow"
       />
     </el-drawer>
     <div class="content-row">
@@ -258,14 +258,12 @@ onBeforeUnmount(function cleanup() {
       </p>
     </div>
     <footer class="status-bar">
-      <span
-        ><i :class="{ failed: store.saveBlocked || store.saveState.startsWith('保存失败') }" />{{
-          store.saveState
-        }}
-        <button v-if="!store.saveBlocked && store.ready" @click="store.saveNow">
-          立即保存
-        </button></span
-      ><span>本地草稿 · 横屏工作台 <span class="status-dot">/</span> JLab WeChat Editor</span>
+      <span title="排版文字的非空白字符数，含已启用的固定结尾；阅读时长按 300 字/分钟估算">
+        {{ store.statistics.characters.toLocaleString() }} 字
+        <span class="status-dot">/</span>
+        预计阅读 {{ store.statistics.readingMinutes }} 分钟
+      </span>
+      <span>数据仅保存在当前浏览器 <span class="status-dot">/</span> JLab WeChat Editor</span>
     </footer>
   </main>
 </template>
@@ -332,6 +330,8 @@ input:focus-visible,
   flex: 1;
   min-width: 600px;
   display: grid;
+  min-height: 0;
+  grid-template-rows: minmax(0, 1fr);
   overflow: hidden;
 }
 .separator {
@@ -396,26 +396,6 @@ input:focus-visible,
   border-top: 1px solid #e9e3f0;
   font-size: 10px;
   color: #a393b0;
-}
-.status-bar i {
-  display: inline-block;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #81ab91;
-  margin-right: 7px;
-  vertical-align: middle;
-}
-.status-bar i.failed {
-  background: #c9804c;
-}
-.status-bar button {
-  color: #9177aa;
-  border: 0;
-  background: none;
-  margin-left: 9px;
-  cursor: pointer;
-  font-size: 10px;
 }
 .status-dot {
   padding: 0 12px;

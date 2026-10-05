@@ -2,7 +2,12 @@ import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { exampleMarkdown, maxMarkdownLength } from '../../app.config'
 import type { ArticleDocument, TextSelection } from '../article/article.model'
-import { addAnnotation, migrateAnnotations, renderMarkdown } from '../article/article.service'
+import {
+  addAnnotation,
+  articleStatistics,
+  migrateAnnotations,
+  renderMarkdown,
+} from '../article/article.service'
 import { defaultTypesetting, presets } from '../typesetting/typesetting.service'
 import type { TypesettingConfig } from '../typesetting/typesetting.model'
 import { defaultEnding } from '../ending/ending.service'
@@ -69,6 +74,11 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
   const invalidAnnotations = computed(
     () => article.value.annotations.filter((a) => a.invalid).length,
   )
+  const statistics = computed(function measureArticle() {
+    return articleStatistics(
+      article.value.markdown + (ending.value.enabled ? '\n\n' + ending.value.markdown : ''),
+    )
+  })
 
   function rebuildUrls(): void {
     releaseAssetUrls(urls.value)
@@ -279,6 +289,7 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
     exportResult,
     preview,
     invalidAnnotations,
+    statistics,
     snapshot,
     initialize,
     saveNow,

@@ -94,6 +94,8 @@
 
 ## AI 协作记录
 
+- [2026-10-05 桀士排版滚动与自动保存布局](ai-logs/fix/2026/10/2026-10-05-jlab-scroll-autosave.md)：双栏滚动、底部统计与顶栏自动保存；[实施计划](plans/2026-10-05-jlab-scroll-autosave.md)。静态验证通过，人工验收待执行。
+
 - [2026-10-05 桀士排版组件注册修复](ai-logs/fix/2026/10/2026-10-05-jlab-component-registration.md)
 
 - [2026-10-05 桀士排版工作台交互调整](ai-logs/feat/2026/10/2026-10-05-jlab-layout-refinement.md)

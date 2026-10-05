@@ -35,3 +35,5 @@ Element Plus 在 main.ts 按需显式注册；模板使用 Button、Option、Sel
 手工验证清单见 [应用说明](../../../../apps/wechat-editor/README.md)。产品和范围见 [独立应用设计](../apps/jlab-wechat-editor.md)。
 
 工作台使用四类 Element Plus 覆盖左抽屉（章节、文字、配色、结尾），不影响主栏宽度。章节列表点击即时更新排版配置；导入由 article-editor 事件交给 workspace 执行；article-preview 通过 mode/focus 事件通知 workspace 更新宽度与专注状态，不读取私有 store。分隔图标绝对定位在两栏边界，无占位列。失败备份提示统一指导手动复制原稿。技术验证见本次交互调整归档计划；功能仍由维护者人工验收。
+
+article.service.ts 的 articleStatistics 公共函数统计受控 Markdown 渲染文字的非空白字符（含代码文字、标点，不含 Markdown 语法和图片），按 300 字/分钟估算阅读时长。workspace 合并正文与启用结尾后调用，结果仅作 UI 统计，不写入草稿。网格行与两栏内部 flex 使用零最小高度，原稿 textarea、预览容器独立滚动。保存状态仅在顶栏显示，结尾面板仅发出 change；所有持久化继续由 workspace 自动保存命令负责。

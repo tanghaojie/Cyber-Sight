@@ -81,6 +81,7 @@ onBeforeUnmount(function unlisten() {
   flex-direction: column;
   min-width: 0;
   height: 100%;
+  min-height: 0;
   background: #f1f0f5;
 }
 .preview-heading {
@@ -105,6 +106,7 @@ onBeforeUnmount(function unlisten() {
 }
 .preview-scroll {
   flex: 1;
+  min-height: 0;
   overflow: auto;
   padding: 30px 18px 16px;
 }
