@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useWorkspaceStore } from './workspace.store'
 import { clampRatio, splitBounds } from './workspace.service'
 import WorkspaceToolbar from './workspace-toolbar.vue'
+import HistoryPanel from './workspace-history-panel.vue'
 import ArticleEditor from '../article/article-editor.vue'
 import ArticlePreview from '../article/article-preview.vue'
 import TypesettingPanel from '../typesetting/typesetting-panel.vue'
@@ -27,9 +28,13 @@ const gridStyle = computed(() =>
 )
 const drawerTitle = computed(
   () =>
-    ({ text: '文字设置', colors: '配色', ending: '固定结尾', chapters: '章节样式' })[
-      store.drawer || 'text'
-    ],
+    ({
+      text: '文字设置',
+      colors: '配色',
+      ending: '固定结尾',
+      chapters: '章节样式',
+      history: '历史版本',
+    })[store.drawer || 'text'],
 )
 function updatePointer(event: PointerEvent): void {
   if (!split.value || !dragging.value) {
@@ -73,7 +78,7 @@ async function importFile(event: Event): Promise<void> {
     if (!/\.(md|txt)$/i.test(file.name) || file.size > 2 * 1024 * 1024) {
       throw new Error('请选择不超过 2 MB 的单个 .md 或 .txt 文件。')
     }
-    if (!window.confirm('导入将替换当前正文。需要保留时，请先复制原稿到本地文件。')) {
+    if (!window.confirm('导入将替换当前正文。需要保留时，请先在「历史版本」新增版本。')) {
       return
     }
     const revision = store.article.revision
@@ -137,15 +142,17 @@ onBeforeUnmount(function cleanup() {
   <main class="workbench">
     <WorkspaceToolbar
       :config="store.config"
+      :local-color="store.localColor"
       :drawer="store.drawer"
       :copy-state="store.copyState"
-      :disabled="!store.ready"
+      :disabled="!store.ready || store.restoring"
       :save-state="store.saveState"
-      :save-blocked="store.saveBlocked"
+      :save-blocked="store.saveBlocked || store.settingsBlocked"
       @config="store.setConfig"
       @local-color="store.colorSelection(selection, $event)"
       @drawer="store.toggleDrawer"
       @copy="copy"
+      @retry="store.saveNow"
     />
     <input
       ref="fileInput"
@@ -166,7 +173,7 @@ onBeforeUnmount(function cleanup() {
       @update:model-value="!$event && (store.drawer = undefined)"
     >
       <TypesettingPanel
-        v-if="store.drawer && store.drawer !== 'ending'"
+        v-if="store.drawer && store.drawer !== 'ending' && store.drawer !== 'history'"
         :kind="store.drawer"
         :config="store.config"
         @change="store.setConfig"
@@ -177,13 +184,26 @@ onBeforeUnmount(function cleanup() {
         :ending="store.ending"
         @change="store.ending = { ...store.ending, ...$event }"
       />
+      <HistoryPanel
+        v-else-if="store.drawer === 'history'"
+        :versions="store.versions"
+        :selected="store.selectedVersion"
+        :busy="store.historyBusy"
+        :blocked="store.saveBlocked"
+        :error="store.historyError"
+        @create="store.createVersion"
+        @refresh="store.refreshHistory"
+        @view="store.viewVersion"
+        @restore="store.restoreVersion"
+        @delete="store.deleteVersion"
+      />
     </el-drawer>
     <div class="content-row">
       <div ref="split" class="split-workspace" :style="gridStyle">
         <ArticleEditor
           v-if="!store.focus"
           :markdown="store.article.markdown"
-          :disabled="!store.ready"
+          :disabled="!store.ready || store.restoring"
           @change="store.updateMarkdown"
           @import="fileInput?.click()"
         />
@@ -219,7 +239,7 @@ onBeforeUnmount(function cleanup() {
           :revision="store.article.revision"
           :mode="store.previewMode"
           :focus="store.focus"
-          :disabled="!store.ready"
+          :disabled="!store.ready || store.restoring"
           @mode="store.previewMode = $event"
           @focus="store.focus = !store.focus"
           @selection="selection = $event"
@@ -244,6 +264,7 @@ onBeforeUnmount(function cleanup() {
       <div v-if="store.invalidAnnotations" class="message warning">
         <span>{{ store.invalidAnnotations }} 处局部颜色因改稿失效，请重新选择文字设置。</span
         ><button
+          :disabled="store.restoring"
           @click="store.article.annotations = store.article.annotations.filter((a) => !a.invalid)"
         >
           清除失效标注

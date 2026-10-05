@@ -51,6 +51,8 @@ date: 2026-10-04
 
 ## 相关设计
 
+- [配置即时保存与主动文章版本 ADR](ADR-20261005-jlab-local-storage-history.md)：2026-10-05 确认的数据存储规则。
+
 - [独立应用设计](../design/apps/jlab-wechat-editor.md)
 - [公众号兼容规则](../design/wechat-editor-wechat-compatibility.md)
 - [原站研究](../design/wechat-editor-research.md)

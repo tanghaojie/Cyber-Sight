@@ -15,9 +15,20 @@ import type { PreparedAsset } from '../assets/assets.model'
 import { createAssetUrls, releaseAssetUrls } from '../assets/assets.service'
 import { previewArticle, exportArticle, copyRichText } from '../wechat-export/wechat-export.service'
 import type { ExportResult, ExportSnapshot, Diagnostic } from '../wechat-export/wechat-export.model'
-import type { WorkspaceDraft } from './draft-storage.port'
-import { createDraftStorage } from './adapters/indexeddb-storage'
-import { validateDraft } from './workspace.service'
+import type {
+  WorkspaceDraft,
+  WorkspaceSettings,
+  VersionSummary,
+  ArticleVersion,
+} from './draft-storage.port'
+import { createDraftStorage, DraftConflictError } from './adapters/indexeddb-storage'
+import { loadSettings, saveSettings, settingsKey } from './adapters/local-settings-storage'
+import {
+  validateDraft,
+  validateLegacyDraft,
+  validateVersion,
+  draftWriteId,
+} from './workspace.service'
 
 export const useWorkspaceStore = defineStore('jlab-workspace', function workspaceStore() {
   const article = ref<ArticleDocument>({
@@ -33,12 +44,23 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
   const assets = ref<PreparedAsset[]>([])
   const ratio = ref(0.5)
   const previewMode = ref<'phone' | 'desktop'>('phone')
-  const drawer = ref<'text' | 'colors' | 'ending' | 'chapters' | undefined>()
+  const localColor = ref('#c44b77')
+  const drawer = ref<'text' | 'colors' | 'ending' | 'chapters' | 'history' | undefined>()
   const focus = ref(false)
   const ready = ref(false)
-  const dirty = ref(false)
-  const saveState = ref('正在读取草稿…')
+  const articleDirty = ref(false)
+  const settingsDirty = ref(false)
+  const dirty = computed(() => articleDirty.value || settingsDirty.value)
+  const articleSaveState = ref('正在读取草稿…')
+  const settingsError = ref('')
+  const settingsBlocked = ref(false)
+  const saveState = computed(() => settingsError.value || articleSaveState.value)
   const saveBlocked = ref(false)
+  const versions = ref<VersionSummary[]>([])
+  const selectedVersion = ref<ArticleVersion>()
+  const historyBusy = ref(false)
+  const historyError = ref('')
+  const restoring = ref(false)
   const copyState = ref<'idle' | 'preparing' | 'ready' | 'copying' | 'success' | 'error'>('idle')
   const message = ref('')
   const diagnostics = ref<Diagnostic[]>([])
@@ -48,17 +70,32 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
   let timer: ReturnType<typeof setTimeout> | undefined
   let saveQueue = Promise.resolve()
   let generation = 0
+  let articleGeneration = 0
+  let expectedWriteId: string | undefined
+  let applying = false
   let exportGeneration = 0
   const channel =
     typeof BroadcastChannel === 'undefined'
       ? undefined
       : new BroadcastChannel('jlab-wechat-editor-draft')
   if (channel) {
-    channel.onmessage = function externalSave() {
-      saveBlocked.value = true
-      saveState.value = '另一页面更新了草稿，请复制原稿到本地文件后刷新页面。'
+    channel.onmessage = function externalSave(event) {
+      if (event.data?.saved) {
+        saveBlocked.value = true
+        articleSaveState.value = '另一页面更新了草稿，请复制原稿到本地文件后刷新页面。'
+      }
+      if (drawer.value === 'history') {
+        void historyAction(refreshVersions)
+      }
     }
   }
+  function externalSettings(event: StorageEvent): void {
+    if (event.storageArea === localStorage && (event.key === settingsKey || event.key === null)) {
+      settingsBlocked.value = true
+      settingsError.value = '另一页面更新了配置，配置保存已暂停，请刷新页面。'
+    }
+  }
+  window.addEventListener('storage', externalSettings)
 
   function snapshot(): ExportSnapshot {
     return {
@@ -86,22 +123,52 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
   }
 
   async function initialize(): Promise<void> {
+    let settings: WorkspaceSettings | undefined
+    try {
+      settings = loadSettings()
+      if (settings) {
+        applySettings(settings)
+      }
+    } catch (error) {
+      settingsBlocked.value = true
+      settingsError.value = '配置读取失败，配置保存已暂停'
+      message.value = error instanceof Error ? error.message : '无法读取本地配置。'
+    }
     try {
       const stored = await storage.load()
       if (stored !== undefined) {
-        const draft = validateDraft(stored)
+        expectedWriteId = draftWriteId(stored)
+        const legacy = expectedWriteId === 'legacy' ? validateLegacyDraft(stored) : undefined
+        const draft = legacy
+          ? { schemaVersion: 2 as const, article: legacy.article, assets: legacy.assets }
+          : validateDraft(stored)
         article.value = draft.article
-        config.value = draft.config
-        ending.value = draft.ending
         assets.value = draft.assets
-        ratio.value = draft.ratio
-        previewMode.value = draft.previewMode
         rebuildUrls()
+        if (legacy) {
+          if (settingsBlocked.value) {
+            throw new Error('配置不可读取，旧草稿已恢复到内存，迁移和文章保存暂停，原记录保留。')
+          }
+          if (!settings) {
+            applySettings({
+              schemaVersion: 1,
+              config: legacy.config,
+              ending: legacy.ending,
+              ratio: legacy.ratio,
+              previewMode: legacy.previewMode,
+              localColor: localColor.value,
+            })
+            saveSettings(settingsSnapshot())
+          }
+          const result = await storage.save(draft, expectedWriteId)
+          expectedWriteId = result.writeId
+          channel?.postMessage({ saved: true })
+        }
       }
-      saveState.value = stored ? '已恢复本地草稿' : '修改后自动保存到本机'
+      articleSaveState.value = stored ? '已恢复本地文章' : '修改后自动保存到本机'
     } catch (error) {
       saveBlocked.value = true
-      saveState.value = '草稿读取失败，自动保存已暂停'
+      articleSaveState.value = '文章读取或迁移失败，文章保存已暂停'
       message.value =
         error instanceof Error ? error.message : '无法读取草稿，请检查浏览器存储权限。'
     } finally {
@@ -109,66 +176,249 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
     }
   }
 
+  function settingsSnapshot(): WorkspaceSettings {
+    return {
+      schemaVersion: 1,
+      config: JSON.parse(JSON.stringify(config.value)),
+      ending: { ...ending.value },
+      ratio: ratio.value,
+      previewMode: previewMode.value,
+      localColor: localColor.value,
+    }
+  }
+  function applySettings(settings: WorkspaceSettings): void {
+    config.value = settings.config
+    ending.value = settings.ending
+    ratio.value = settings.ratio
+    previewMode.value = settings.previewMode
+    localColor.value = settings.localColor
+  }
+  function persistSettings(): void {
+    if (!ready.value || settingsBlocked.value) {
+      return
+    }
+    try {
+      saveSettings(settingsSnapshot())
+      settingsDirty.value = false
+      settingsError.value = ''
+    } catch {
+      settingsError.value = '保存失败：配置未保存，请检查浏览器存储空间或权限后重试'
+    }
+  }
+
   function changed(): void {
     generation++
-    dirty.value = true
     exportResult.value = undefined
     copyState.value = 'idle'
     diagnostics.value = []
+  }
+  function articleChanged(): void {
+    changed()
+    articleGeneration++
+    articleDirty.value = true
     if (timer) {
       clearTimeout(timer)
     }
     if (!saveBlocked.value) {
-      saveState.value = '有修改，等待保存…'
+      articleSaveState.value = '有修改，等待保存…'
       timer = setTimeout(function autosave() {
         void saveNow()
       }, 450)
     }
   }
   watch(
-    [article, config, ending, assets, ratio, previewMode],
+    [article, assets],
     function draftChanged() {
-      if (ready.value) {
+      if (ready.value && !applying) {
+        articleChanged()
+      }
+    },
+    { deep: true, flush: 'sync' },
+  )
+  watch(
+    [config, ending, ratio, previewMode, localColor],
+    function settingsChanged() {
+      if (ready.value && !applying) {
         changed()
+        settingsDirty.value = true
+        persistSettings()
       }
     },
     { deep: true, flush: 'sync' },
   )
 
+  function articleSnapshot(): WorkspaceDraft {
+    const current = snapshot()
+    return { schemaVersion: 2, article: current.article, assets: current.assets }
+  }
+  async function writeArticle(
+    draft: WorkspaceDraft,
+    version: number,
+    history = false,
+  ): Promise<number | undefined> {
+    if (saveBlocked.value) {
+      throw new Error('文章保存已暂停，请备份后刷新页面。')
+    }
+    articleSaveState.value = '保存中…'
+    try {
+      const result = await storage.save(draft, expectedWriteId, history)
+      expectedWriteId = result.writeId
+      if (version === articleGeneration) {
+        articleSaveState.value = '已保存到本机'
+        articleDirty.value = false
+      }
+      channel?.postMessage({ saved: true })
+      return result.timestamp
+    } catch (error) {
+      if (error instanceof DraftConflictError) {
+        saveBlocked.value = true
+      }
+      articleSaveState.value = '保存失败，请复制原稿到本地文件备份并重试'
+      throw error
+    }
+  }
+
+  function enqueue<T>(action: () => Promise<T>): Promise<T> {
+    const task = saveQueue.then(action)
+    saveQueue = task.then(
+      () => undefined,
+      () => undefined,
+    )
+    return task
+  }
+
   async function saveNow(): Promise<void> {
     if (timer) {
       clearTimeout(timer)
     }
-    if (!ready.value || saveBlocked.value) {
+    if (!ready.value || restoring.value) {
       return
     }
-    const version = generation
-    const draft: WorkspaceDraft = {
-      schemaVersion: 1,
-      ...snapshot(),
-      ratio: ratio.value,
-      previewMode: previewMode.value,
+    if (settingsDirty.value) {
+      persistSettings()
     }
-    saveState.value = '保存中…'
-    saveQueue = saveQueue.then(async function persist() {
-      if (saveBlocked.value) {
-        return
+    if (!articleDirty.value || saveBlocked.value) {
+      return
+    }
+    const version = articleGeneration
+    const draft = articleSnapshot()
+    try {
+      await enqueue(() => writeArticle(draft, version))
+    } catch (error) {
+      message.value = error instanceof Error ? error.message : '保存失败，请重试。'
+    }
+  }
+
+  async function refreshVersions(): Promise<void> {
+    try {
+      versions.value = await storage.listVersions()
+      historyError.value = ''
+      if (
+        selectedVersion.value &&
+        !versions.value.some((v) => v.timestamp === selectedVersion.value?.timestamp)
+      ) {
+        selectedVersion.value = undefined
       }
-      try {
-        await storage.save(draft)
-        if (version === generation) {
-          saveState.value = '已保存到本机'
-          dirty.value = false
-        }
-        channel?.postMessage({ saved: true })
-      } catch {
-        saveState.value = '保存失败，请复制原稿到本地文件备份并重试'
-      }
+    } catch (error) {
+      historyError.value = error instanceof Error ? error.message : '读取历史版本失败，请重试。'
+    }
+  }
+  async function historyAction(action: () => Promise<void>): Promise<void> {
+    if (!ready.value || historyBusy.value) {
+      return
+    }
+    historyBusy.value = true
+    historyError.value = ''
+    try {
+      await enqueue(action)
+    } catch (error) {
+      historyError.value = error instanceof Error ? error.message : '历史操作失败，请重试。'
+    } finally {
+      historyBusy.value = false
+    }
+  }
+  async function refreshHistory(): Promise<void> {
+    await historyAction(refreshVersions)
+  }
+  async function createVersion(): Promise<void> {
+    if (saveBlocked.value || historyBusy.value) {
+      return
+    }
+    const draft = articleSnapshot()
+    const version = articleGeneration
+    if (timer) {
+      clearTimeout(timer)
+    }
+    await historyAction(async function appendVersion() {
+      await writeArticle(draft, version, true)
+      message.value = '已新增文章版本。'
+      await refreshVersions()
     })
-    await saveQueue
+  }
+  async function viewVersion(timestamp: number): Promise<void> {
+    await historyAction(async function view() {
+      selectedVersion.value = undefined
+      selectedVersion.value = validateVersion(await storage.loadVersion(timestamp), timestamp)
+    })
+  }
+  async function restoreVersion(timestamp: number): Promise<void> {
+    if (saveBlocked.value || historyBusy.value) {
+      return
+    }
+    restoring.value = true
+    if (timer) {
+      clearTimeout(timer)
+    }
+    await historyAction(async function restore() {
+      const record = validateVersion(await storage.loadVersion(timestamp), timestamp)
+      const draft = record.draft
+      const revision = Math.max(article.value.revision, draft.article.revision) + 1
+      draft.article = {
+        ...draft.article,
+        revision,
+        updatedAt: Date.now(),
+        annotations: draft.article.annotations.map((a) => ({ ...a, revision })),
+      }
+      const endingAssets = assets.value.filter(
+        (asset) =>
+          ending.value.markdown.includes(`asset:${asset.id}`) &&
+          !draft.assets.some((item) => item.id === asset.id),
+      )
+      draft.assets = [...draft.assets, ...endingAssets]
+      await writeArticle(draft, articleGeneration)
+      applying = true
+      try {
+        article.value = draft.article
+        assets.value = draft.assets
+        rebuildUrls()
+      } finally {
+        applying = false
+      }
+      articleGeneration++
+      changed()
+      message.value = '已恢复到当前文章，排版设置与固定结尾保持当前配置。'
+    })
+    restoring.value = false
+    if (articleDirty.value && !saveBlocked.value) {
+      void saveNow()
+    }
+  }
+  async function deleteVersion(timestamp: number): Promise<void> {
+    await historyAction(async function remove() {
+      await storage.deleteVersion(timestamp)
+      if (selectedVersion.value?.timestamp === timestamp) {
+        selectedVersion.value = undefined
+      }
+      await refreshVersions()
+      channel?.postMessage({ history: true })
+      message.value = '已删除历史版本，当前文章保留。'
+    })
   }
 
   function updateMarkdown(markdown: string): void {
+    if (restoring.value) {
+      return
+    }
     if (markdown.length > maxMarkdownLength) {
       message.value = '文章超过 50 万字符，请拆分后再导入。'
       return
@@ -193,7 +443,6 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
       rebuildUrls()
     }
   }
-  watch(ending, pruneAssets, { deep: true })
   function setConfig(patch: Partial<TypesettingConfig>): void {
     config.value = { ...config.value, ...patch }
   }
@@ -204,6 +453,10 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
     }
   }
   function colorSelection(selection: TextSelection | undefined, color: string): void {
+    localColor.value = color
+    if (restoring.value) {
+      return
+    }
     if (!selection || selection.revision !== article.value.revision) {
       message.value = '请重新选中右侧预览中的正文文字，再设置颜色。'
       return
@@ -214,8 +467,11 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
       updatedAt: Date.now(),
     }
   }
-  function toggleDrawer(kind: 'text' | 'colors' | 'ending' | 'chapters'): void {
+  function toggleDrawer(kind: 'text' | 'colors' | 'ending' | 'chapters' | 'history'): void {
     drawer.value = drawer.value === kind ? undefined : kind
+    if (drawer.value === 'history') {
+      void historyAction(refreshVersions)
+    }
   }
   async function prepareCopy(): Promise<void> {
     if (copyState.value === 'preparing' || copyState.value === 'copying') {
@@ -268,6 +524,8 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
     }
     releaseAssetUrls(urls.value)
     channel?.close()
+    window.removeEventListener('storage', externalSettings)
+    void saveQueue.finally(() => storage.close())
   }
 
   return {
@@ -277,12 +535,19 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
     assets,
     ratio,
     previewMode,
+    localColor,
     drawer,
     focus,
     ready,
     dirty,
     saveState,
     saveBlocked,
+    settingsBlocked,
+    versions,
+    selectedVersion,
+    historyBusy,
+    historyError,
+    restoring,
     copyState,
     message,
     diagnostics,
@@ -293,6 +558,11 @@ export const useWorkspaceStore = defineStore('jlab-workspace', function workspac
     snapshot,
     initialize,
     saveNow,
+    refreshHistory,
+    createVersion,
+    viewVersion,
+    restoreVersion,
+    deleteVersion,
     updateMarkdown,
     setConfig,
     choosePreset,

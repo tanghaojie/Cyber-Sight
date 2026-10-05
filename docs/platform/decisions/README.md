@@ -2,6 +2,8 @@
 
 当前 Platform 决策：
 
+- [桀士排版配置即时保存与主动文章版本](ADR-20261005-jlab-local-storage-history.md)：配置无历史，文章默认 current，主动时间戳版本。
+
 - [桀士排版采用独立纯前端应用](ADR-20261004-jlab-wechat-editor-standalone-app.md)：独立 apps 应用、产品名称、技术栈、功能裁剪与工作台交互边界。
 - [Geo 外部模型统一渲染](ADR-20260911-geo-external-model-rendering.md)：Scene 统一标准、Data 自动接入、外部资产与渲染分离。
 

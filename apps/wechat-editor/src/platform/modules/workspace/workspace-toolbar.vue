@@ -2,6 +2,7 @@
 import type { TypesettingConfig } from '../typesetting/typesetting.model'
 defineProps<{
   config: TypesettingConfig
+  localColor: string
   drawer?: string
   copyState: string
   disabled: boolean
@@ -11,8 +12,9 @@ defineProps<{
 const emit = defineEmits<{
   config: [patch: Partial<TypesettingConfig>]
   localColor: [color: string]
-  drawer: [kind: 'text' | 'colors' | 'ending' | 'chapters']
+  drawer: [kind: 'text' | 'colors' | 'ending' | 'chapters' | 'history']
   copy: []
+  retry: []
 }>()
 </script>
 
@@ -38,7 +40,7 @@ const emit = defineEmits<{
     <label class="quick-color"
       >局部字色<input
         type="color"
-        value="#c44b77"
+        :value="localColor"
         aria-label="局部文字颜色"
         :disabled="disabled"
         @change="emit('localColor', ($event.target as HTMLInputElement).value)"
@@ -77,6 +79,14 @@ const emit = defineEmits<{
       固定结尾
     </button>
     <div class="toolbar-spacer" />
+    <button
+      class="tool-button"
+      :class="{ active: drawer === 'history' }"
+      :disabled="disabled"
+      @click="emit('drawer', 'history')"
+    >
+      历史版本
+    </button>
     <span
       class="save-status"
       :class="{ failed: saveBlocked || saveState.startsWith('保存失败') }"
@@ -85,6 +95,14 @@ const emit = defineEmits<{
     >
       <i aria-hidden="true" />自动保存 · {{ saveState }}
     </span>
+    <button
+      v-if="saveState.startsWith('保存失败') && !saveBlocked"
+      class="tool-button"
+      :disabled="disabled"
+      @click="emit('retry')"
+    >
+      重试保存
+    </button>
     <el-button
       class="copy-button"
       type="primary"

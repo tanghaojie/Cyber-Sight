@@ -11,20 +11,20 @@ updated: 2026-10-05
 
 独立交付边界为 apps/wechat-editor。六个实际模块均在 src/platform/modules 内；无 Foundation、后台、契约、路由和空目录。
 
-| 模块          | 职责与数据所有权                                            | 登记公共文件                                                                  | 依赖                                 | 失败模式与人工验证                                                              |
-| ------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------- |
-| article       | Markdown 语义、可序列化正文标注；不拥有完整草稿             | article.model.ts、article.service.ts、article-editor.vue、article-preview.vue | 无其他模块                           | 输入法、跨强调/链接/段落选区；拒绝代码/图片/结尾/装饰；改稿歧义标为失效         |
-| typesetting   | 颜色角色、四类预设、九种章节、间距字体和对比度              | typesetting.model.ts、typesetting.service.ts、typesetting-panel.vue           | 无其他模块                           | 低对比度提示、设备字体差异；配置应用于预览和复制                                |
-| ending        | 独立 Markdown 和启用模型；不写正文、不编号                  | ending.model.ts、ending.service.ts、ending-panel.vue                          | article                              | 启停、只追加一次、设置保存、刷新恢复                                            |
-| assets        | 浏览器图片准备/尺寸、稳定 id/Blob、临时 URL 生命周期        | assets.model.ts、assets.service.ts                                            | 无其他模块                           | 缺图、CORS、解码、格式、大小、过期结果和 URL 释放                               |
-| wechat-export | 显式只读快照、受控 DOM/内联、候选微信输出、剪贴板           | wechat-export.model.ts、wechat-export.service.ts                              | article、typesetting、ending、assets | 素材失败阻止复制；权限失败保留结果供重试；真实粘贴保存由人类验收                |
-| workspace     | Pinia 命令编排、完整草稿与 IndexedDB 一致写入；抽屉/分栏 UI | workspace.store.ts、draft-storage.port.ts、workspace.page.vue                 | 上述五模块                           | 配额/恢复异常显示失败；未知版本不覆盖；多页面冲突提示暂停保存；关闭前未保存提示 |
+| 模块          | 职责与数据所有权                                                                 | 登记公共文件                                                                  | 依赖                                 | 失败模式与人工验证                                                                 |
+| ------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------ | ---------------------------------------------------------------------------------- |
+| article       | Markdown 语义、可序列化正文标注；不拥有完整草稿                                  | article.model.ts、article.service.ts、article-editor.vue、article-preview.vue | 无其他模块                           | 输入法、跨强调/链接/段落选区；拒绝代码/图片/结尾/装饰；改稿歧义标为失效            |
+| typesetting   | 颜色角色、四类预设、九种章节、间距字体和对比度                                   | typesetting.model.ts、typesetting.service.ts、typesetting-panel.vue           | 无其他模块                           | 低对比度提示、设备字体差异；配置应用于预览和复制                                   |
+| ending        | 独立 Markdown 和启用模型；不写正文、不编号                                       | ending.model.ts、ending.service.ts、ending-panel.vue                          | article                              | 启停、只追加一次、设置保存、刷新恢复                                               |
+| assets        | 浏览器图片准备/尺寸、稳定 id/Blob、临时 URL 生命周期                             | assets.model.ts、assets.service.ts                                            | 无其他模块                           | 缺图、CORS、解码、格式、大小、过期结果和 URL 释放                                  |
+| wechat-export | 显式只读快照、受控 DOM/内联、候选微信输出、剪贴板                                | wechat-export.model.ts、wechat-export.service.ts                              | article、typesetting、ending、assets | 素材失败阻止复制；权限失败保留结果供重试；真实粘贴保存由人类验收                   |
+| workspace     | Pinia 命令编排、配置 localStorage、文章 current/主动版本 IndexedDB；抽屉/分栏 UI | workspace.store.ts、draft-storage.port.ts、workspace.page.vue                 | 上述五模块                           | 配额/恢复异常显示失败；未知版本不覆盖；多页面冲突暂停；迁移/历史恢复和删除人工验收 |
 
 Vue 公共文件是登记的呈现入口，使用 props/events 接受模型和命令，不读取其他模块的私有 store。App.vue 仅组装 workspace.page.vue，main.ts 注册 Vue/Pinia/Element Plus。workspace.service.ts、工作台子组件和 adapters/indexeddb-storage.ts 均为私有。
 
 Element Plus 在 main.ts 按需显式注册；模板使用 Button、Option、Select、Slider、Switch、Drawer、RadioGroup 和 RadioButton，入口同时导入对应 theme-chalk 样式。RadioGroup 和 RadioButton 是 withNoopInstall 子组件，不能用单独的 app.use 注册，必须使用 app.component 显式登记。Option 由 Select 的安装器一并注册。增加控件时必须核对实际安装器行为、入口注册与样式，不能只依赖 vue-tsc、构建或入口存在 .use 调用判断运行时可用。桌面显示仍由维护者人工验收。
 
-数据流：正文/设置事件 → workspace 命令 → 各模块公共领域服务 → 同一快照的预览/输出；完整草稿 → workspace 仓储端口 → IndexedDB 单记录事务（包含 Blob 和偏好）。保存操作排队，成功状态以事务完成为准。临时 DOM Range、抽屉、复制结果和 focus 不入库。预览渲染不持久化生成 HTML。
+数据流：正文/设置事件 → workspace 命令 → 各模块公共领域服务 → 同一快照的预览/输出。配置/固定结尾/偏好 → 私有 local-settings-storage 适配 → localStorage 同步覆盖；文章/标注/必要 Blob → draft-storage.port → IndexedDB current，主动新增版本才写 versions。文章操作排队、事务内检查 writeId；历史恢复只替换文章，配置不回滚。设置事件不写文章，结尾修改不触发素材清理。临时 DOM Range、抽屉、复制结果和 focus 不入库。预览渲染不持久化生成 HTML。完整模型和旧格式迁移见[存储设计](../apps/jlab-wechat-editor-storage.md)。
 
 标注采用正文可着色文本的渲染偏移。每个 Markdown 文本 token 的 span 登记起止位置；选区转换为跨 token 的文本区间。纯样式修改不改变偏移；正文变更计算公共前后缀，仅迁移确定的区间，重复锚点或改动区间失效。源码不嵌入颜色标签，重叠后写优先、相邻同色合并。未采用模糊匹配或纯 DOM 包裹。
 
@@ -34,6 +34,6 @@ Element Plus 在 main.ts 按需显式注册；模板使用 Button、Option、Sel
 
 手工验证清单见 [应用说明](../../../../apps/wechat-editor/README.md)。产品和范围见 [独立应用设计](../apps/jlab-wechat-editor.md)。
 
-工作台使用四类 Element Plus 覆盖左抽屉（章节、文字、配色、结尾），不影响主栏宽度。章节列表点击即时更新排版配置；导入由 article-editor 事件交给 workspace 执行；article-preview 通过 mode/focus 事件通知 workspace 更新宽度与专注状态，不读取私有 store。分隔图标绝对定位在两栏边界，无占位列。失败备份提示统一指导手动复制原稿。技术验证见本次交互调整归档计划；功能仍由维护者人工验收。
+工作台使用 Element Plus 覆盖左抽屉（章节、文字、配色、结尾、历史），不影响主栏宽度。章节列表点击即时更新排版配置；导入由 article-editor 事件交给 workspace 执行；article-preview 通过 mode/focus 事件通知 workspace 更新宽度与专注状态，不读取私有 store。分隔图标绝对定位在两栏边界，无占位列。失败备份提示统一指导手动复制原稿。历史面板为 workspace 私有组件，使用 props/events，不直接访问仓储。技术验证见本次实施计划；功能仍由维护者人工验收。
 
 article.service.ts 的 articleStatistics 公共函数统计受控 Markdown 渲染文字的非空白字符（含代码文字、标点，不含 Markdown 语法和图片），按 300 字/分钟估算阅读时长。workspace 合并正文与启用结尾后调用，结果仅作 UI 统计，不写入草稿。网格行与两栏内部 flex 使用零最小高度，原稿 textarea、预览容器独立滚动。保存状态仅在顶栏显示，结尾面板仅发出 change；所有持久化继续由 workspace 自动保存命令负责。

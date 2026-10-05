@@ -1,5 +1,7 @@
 # Platform 活动实施计划
 
+[桀士排版数据存储与文章版本](../../archive/plans/2026-10-05-jlab-storage-history.md)已完成并归档，配置即时保存、文章版本与迁移人工验收待执行。
+
 [桀士排版最小宽度 800px](../../archive/plans/2026-10-05-jlab-min-width.md)与[Platform 归档复核](../../archive/plans/2026-10-05-jlab-width-archive-review.md)已完成并归档，800px 页面人工验收待执行。
 
 [桀士排版滚动与自动保存布局](../../archive/plans/2026-10-05-jlab-scroll-autosave.md)已完成并归档，浏览器人工验收待执行。
