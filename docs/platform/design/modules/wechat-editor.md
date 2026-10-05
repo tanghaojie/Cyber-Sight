@@ -44,4 +44,4 @@ Element Plus 在 main.ts 按需显式注册；模板使用 Button、Option、Sel
 
 article.service.ts 的 articleStatistics 公共函数统计受控 Markdown 渲染文字的非空白字符（含代码文字、标点，不含 Markdown 语法和图片），按 600 字/分钟估算阅读时长。workspace 合并正文与启用结尾后调用，结果仅作 UI 统计，不写入草稿。网格行与两栏内部 flex 使用零最小高度，原稿 textarea、预览容器独立滚动。保存状态仅在顶栏显示，结尾面板仅发出 change；所有持久化继续由 workspace 自动保存命令负责。
 
-人工验收调整交付见[完成计划](../../archive/plans/2026-10-06-jlab-acceptance-fixes.md)。关联提交：`fix(wechat-editor): address manual acceptance feedback`（计划所在提交）；格式、ESLint、TypeScript、生产构建、六模块边界（28文件/94导入）、仓库所有权和归档CI检查通过。构建仍有VueUse PURE注释及509.53kB主包提示。未运行前端自动化或浏览器测试；本轮外壳滚动、125%缩放、配色重载和公众号粘贴需维护者再次人工验收。
+人工验收调整交付见[完成计划](../../archive/plans/2026-10-06-jlab-acceptance-fixes.md)。关联实现提交：`40df307ddefd128a6700a90bbe2c569b6b091bd2`；格式、ESLint、TypeScript、生产构建、六模块边界（28文件/94导入）、仓库所有权和归档CI检查通过。构建仍有VueUse PURE注释及509.53kB主包提示。未运行前端自动化或浏览器测试；本轮外壳滚动、125%缩放、配色重载和公众号粘贴需维护者再次人工验收。

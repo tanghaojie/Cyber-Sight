@@ -1,5 +1,7 @@
 # Platform 活动实施计划
 
+[验收修改后 Platform 归档复核](../../archive/plans/2026-10-06-jlab-acceptance-archive-review.md)已完成，台账推进到真实40df307。
+
 [桀士排版人工验收调整](../../archive/plans/2026-10-06-jlab-acceptance-fixes.md)已完成并归档；六项修改与技术验证完成，本轮视觉及公众号效果待再次人工验收。
 
 [桀士排版完整 UI 与交互改造](../../archive/plans/2026-10-05-jlab-ui-redesign.md)已完成并归档，实现提交`87f1f9e`；人工交互与公众号验收待维护者。

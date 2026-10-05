@@ -45,4 +45,4 @@ Markdown原稿保留textarea、IME保护和Tab行为，增加标题、加粗、�
 
 实施记录见[UI改造计划](../../archive/plans/2026-10-05-jlab-ui-redesign.md)。实际实现提交`87f1f9ebf7463c432da20d3747e0128fd70438bb`。代码已实现，格式、Lint、类型、生产构建、模块/所有权和归档检查已通过；人工交互与公众号粘贴仍待维护者。构建有第三方PURE注释及504.72kB主包提示，不影响构建成功。
 
-人工验收调整交付见[完成计划](../../archive/plans/2026-10-06-jlab-acceptance-fixes.md)。关联提交：`fix(wechat-editor): address manual acceptance feedback`（计划所在提交）；格式、ESLint、TypeScript、生产构建、六模块边界（28文件/94导入）、仓库所有权和归档CI检查通过。构建仍有VueUse PURE注释及509.53kB主包提示。未运行前端自动化或浏览器测试；本轮外壳滚动、125%缩放、配色重载和公众号粘贴需维护者再次人工验收。
+人工验收调整交付见[完成计划](../../archive/plans/2026-10-06-jlab-acceptance-fixes.md)。关联实现提交：`40df307ddefd128a6700a90bbe2c569b6b091bd2`；格式、ESLint、TypeScript、生产构建、六模块边界（28文件/94导入）、仓库所有权和归档CI检查通过。构建仍有VueUse PURE注释及509.53kB主包提示。未运行前端自动化或浏览器测试；本轮外壳滚动、125%缩放、配色重载和公众号粘贴需维护者再次人工验收。
