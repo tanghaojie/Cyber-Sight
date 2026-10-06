@@ -34,7 +34,6 @@ const bubble = ref<HTMLElement>()
 const showFrame = ref(true)
 const bubbleOpen = ref(false)
 const bubblePosition = ref({ left: '0px', top: '0px' })
-const measuredWidth = ref(375)
 const quickColors = computed(() => [
   ...new Set([props.accent, '#b7791f', '#c2410c', '#0f766e', '#30323d']),
 ])
@@ -125,9 +124,6 @@ onMounted(function listen() {
     if (stage.value) {
       frameScale.value = Math.min(1, stage.value.clientWidth / 440, stage.value.clientHeight / 956)
     }
-    if (paper.value) {
-      measuredWidth.value = Math.round(paper.value.clientWidth)
-    }
     closeSelection()
   })
   if (paper.value) {
@@ -148,7 +144,23 @@ defineExpose({ captureSelection })
 <template>
   <section ref="pane" class="preview-pane">
     <div class="preview-heading">
-      <span>排版预览</span>
+      <span class="preview-title">
+        <svg
+          class="action-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+        公众号预览
+      </span>
       <div class="preview-actions">
         <label class="frame-toggle"
           ><input v-model="showFrame" type="checkbox" @change="closeSelection" />阅读外壳</label
@@ -210,9 +222,6 @@ defineExpose({ captureSelection })
       </div>
     </div>
     <div class="preview-scroll" :class="{ framed: showFrame }" @scroll="closeSelection">
-      <div class="canvas-controls">
-        <span>{{ measuredWidth }}px 阅读画板</span>
-      </div>
       <div ref="stage" class="frame-stage">
         <div
           ref="paper"
@@ -252,7 +261,6 @@ defineExpose({ captureSelection })
           </div>
         </div>
       </div>
-      <p class="paper-note">阅读外壳不进入复制内容 · 实际效果以公众号保存后为准</p>
     </div>
     <div
       v-if="bubbleOpen"
@@ -329,6 +337,11 @@ defineExpose({ captureSelection })
   align-items: center;
   gap: 8px;
 }
+.preview-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 .preview-actions :deep(.el-radio-button__inner) {
   padding: 6px 10px;
 }
@@ -337,16 +350,6 @@ defineExpose({ captureSelection })
   min-height: 0;
   overflow: auto;
   padding: 20px 18px 16px;
-}
-.canvas-controls {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 18px;
-  color: var(--ui-muted);
-  font-size: 12px;
-  margin-bottom: 16px;
 }
 .frame-toggle {
   display: flex;
@@ -441,13 +444,6 @@ article {
 .desktop.without-frame article {
   padding-top: 24px;
 }
-.paper-note {
-  text-align: center;
-  color: var(--ui-muted);
-  font-size: 12px;
-  line-height: 1.8;
-  margin: 18px 0 6px;
-}
 .selection-bubble {
   position: absolute;
   z-index: 4;
@@ -509,10 +505,6 @@ article :deep(::selection) {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-}
-.framed .canvas-controls,
-.framed .paper-note {
-  flex-shrink: 0;
 }
 .frame-stage {
   min-height: 0;

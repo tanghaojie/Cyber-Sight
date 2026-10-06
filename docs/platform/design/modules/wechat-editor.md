@@ -4,7 +4,7 @@ scope: platform
 repository: Cyber-Sight
 status: accepted
 owner: project maintainers
-updated: 2026-10-06
+updated: 2026-10-07
 ---
 
 # 桀士排版内部模块边界
@@ -24,7 +24,7 @@ Vue 公共文件是登记的呈现入口，使用 props/events 接受模型和�
 
 2026-10-06 UI改造补充：typesetting公开登记`typesetting-color-picker.vue`，article允许单向依赖此公开颜色控件，不读取其私有配置；typesetting不依赖article。公共`chapterPreview`复用章节装饰规则。`article.service.ts`新增`removeAnnotations`，仅剪除选区内有效颜色标注并保留两侧片段和其他语义。workspace私有`workspace-feedback.vue`和`workspace-theme.css`拥有稳定反馈与应用tokens，均不进入导出。类型、公共文件与单向依赖由应用边界检查同步登记。
 
-初始配色调整为暖金、青绿、墨色、清透蓝、复古潮流、活力橙六组，所有配色均可改名、更新颜色和删除，总计1至9组，可重置为默认六组；旧配置补齐配色列表并保留实际颜色；新草稿默认清透蓝、便签引用底色。颜色控件的最多8个最近色属于可丢弃应用偏好，独立localStorage键，不参加文章版本。Element Plus新增ColorPicker及ColorPickerPanel/Input/Popper样式，入口显式注册ColorPicker；阅读外壳开关与气泡坐标为article临时UI状态。
+初始配色调整为暖金、青绿、墨色、清透蓝、复古潮流、活力橙六组，所有配色均可改名、更新颜色和删除，总计1至9组，可重置为默认六组；旧配置补齐配色列表并保留实际颜色；新草稿默认清透蓝、便签引用底色。颜色控件的最多8个最近色属于可丢弃应用偏好，独立localStorage键，不参加文章版本。Element Plus新增ColorPicker及ColorPickerPanel/Input/Popper样式；配色改名使用ElMessageBox.prompt及显式MessageBox样式，通过既有change事件保存配置，入口显式注册ColorPicker；阅读外壳开关与气泡坐标为article临时UI状态。
 
 Element Plus 在 main.ts 按需显式注册；模板使用 Button、Option、Select、Slider、Switch、Drawer、RadioGroup 和 RadioButton，入口同时导入对应 theme-chalk 样式。RadioGroup 和 RadioButton 是 withNoopInstall 子组件，不能用单独的 app.use 注册，必须使用 app.component 显式登记。Option 由 Select 的安装器一并注册。增加控件时必须核对实际安装器行为、入口注册与样式，不能只依赖 vue-tsc、构建或入口存在 .use 调用判断运行时可用。桌面显示仍由维护者人工验收。
 
@@ -40,7 +40,7 @@ Element Plus 在 main.ts 按需显式注册；模板使用 Button、Option、Sel
 
 工作台使用 Element Plus 覆盖左抽屉（章节、文字、配色、结尾、历史），不影响主栏宽度。章节列表点击即时更新排版配置；导入由 article-editor 事件交给 workspace 执行；article-preview 通过 mode/focus 事件通知 workspace 更新宽度与专注状态，不读取私有 store。分隔图标绝对定位在两栏边界，无占位列。失败备份提示统一指导手动复制原稿。历史面板为 workspace 私有组件，使用 props/events，不直接访问仓储。技术验证见本次实施计划；功能仍由维护者人工验收。
 
-现行UI详见[工作台UI与阅读交互](../apps/jlab-wechat-editor-ui.md)。顶栏52px，配色和结尾抽屉最大520px并可覆盖部分预览；其他抽屉最大320px并钳制到编辑栏宽度，打开设置退出专注并恢复原分栏偏好。预览手机/电脑外壳和模拟信息位于文章根外，未进入标注或输出。选区捕获保留revision锚点，气泡只发送颜色/清除命令；重渲染、滚动、尺寸变化或Escape清除临时锚点。保存异常仍保留顶栏状态，Toast隐藏不消除可查看的诊断。输出终端装饰/便签/表格均通过既有受控清洗；终端装饰和章节装饰不进入纯文本剪贴板。结尾片段显式追加，不自动启用、不替换既有内容。
+现行UI详见[工作台UI与阅读交互](../apps/jlab-wechat-editor-ui.md)。顶栏52px，配色、结尾、章节样式和历史版本抽屉最大520px并可覆盖部分预览；文字设置抽屉最大320px并钳制到编辑栏宽度，打开设置退出专注并恢复原分栏偏好。预览手机/电脑外壳和模拟信息位于文章根外，未进入标注或输出。选区捕获保留revision锚点，气泡只发送颜色/清除命令；重渲染、滚动、尺寸变化或Escape清除临时锚点。保存异常仍保留顶栏状态，Toast隐藏不消除可查看的诊断。输出终端装饰/便签/表格均通过既有受控清洗；终端装饰和章节装饰不进入纯文本剪贴板。结尾片段显式追加，不自动启用、不替换既有内容。
 
 article.service.ts 的 articleStatistics 公共函数统计受控 Markdown 渲染文字的非空白字符（含代码文字、标点，不含 Markdown 语法和图片），按 600 字/分钟估算阅读时长。workspace 合并正文与启用结尾后调用，结果仅作 UI 统计，不写入草稿。网格行与两栏内部 flex 使用零最小高度，原稿 textarea、预览容器独立滚动。保存状态仅在顶栏显示，结尾面板仅发出 change；所有持久化继续由 workspace 自动保存命令负责。
 

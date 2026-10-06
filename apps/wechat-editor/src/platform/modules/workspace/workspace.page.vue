@@ -25,10 +25,13 @@ const containerWidth = ref(900)
 const dragging = ref(false)
 let observer: ResizeObserver | undefined
 const displayedRatio = computed(() => clampRatio(store.ratio, containerWidth.value))
-const drawerSize = computed(
-  () =>
-    `${Math.min(store.drawer === 'colors' || store.drawer === 'ending' ? 520 : 320, store.drawer === 'colors' || store.drawer === 'ending' ? containerWidth.value - 40 : Math.floor(containerWidth.value * displayedRatio.value))}px`,
-)
+const drawerSize = computed(() => {
+  const wide = store.drawer !== 'text'
+  const available = wide
+    ? containerWidth.value - 40
+    : Math.floor(containerWidth.value * displayedRatio.value)
+  return `${Math.min(wide ? 520 : 320, available)}px`
+})
 function toggleDrawer(kind: NonNullable<typeof store.drawer>): void {
   store.focus = false
   store.toggleDrawer(kind)

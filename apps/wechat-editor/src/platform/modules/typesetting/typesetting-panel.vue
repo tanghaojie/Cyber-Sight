@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { ElMessageBox } from 'element-plus'
 import {
   chapterPreview,
   contrastRatio,
@@ -30,12 +31,22 @@ const chapters = computed(() =>
   chapterStyles.map(([id, name]) => ({ id, name, html: chapterPreview(id, props.config) })),
 )
 const paletteName = ref('')
-function renamePalette(preset: ColorPreset, value: string): void {
-  const name = value.trim().slice(0, 30) || preset.name
-  if (name) {
+async function renamePalette(preset: ColorPreset): Promise<void> {
+  try {
+    const { value } = await ElMessageBox.prompt('输入新的配色名称', '修改配色名称', {
+      inputValue: preset.name,
+      inputValidator: (value: string) =>
+        (value.trim().length > 0 && value.trim().length <= 30) || '请输入1至30个字符的名称',
+      confirmButtonText: '保存',
+      cancelButtonText: '取消',
+      closeOnClickModal: false,
+    })
+    const name = value.trim()
     emit('change', {
       palettes: props.config.palettes.map((p) => (p.id === preset.id ? { ...p, name } : p)),
     })
+  } catch {
+    // 取消或关闭弹窗保留现有配色名称。
   }
 }
 function deletePalette(preset: ColorPreset): void {
@@ -271,12 +282,26 @@ function resetText(): void {
                 </svg>
                 更新颜色
               </button>
-              <input
-                :value="preset.name"
-                maxlength="30"
-                :aria-label="'配色名称：' + preset.name"
-                @change="renamePalette(preset, ($event.target as HTMLInputElement).value)"
-              />
+              <button
+                class="ui-button"
+                :aria-label="'修改配色名称：' + preset.name"
+                @click="renamePalette(preset)"
+              >
+                <svg
+                  class="action-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="m15 4 5 5M4 20l4-1L20 7a2 2 0 0 0-4-4L4 15ZM4 20h16" />
+                </svg>
+                修改名称
+              </button>
               <button
                 class="ui-button"
                 :disabled="config.palettes.length <= 1"
@@ -517,10 +542,13 @@ function resetText(): void {
 }
 .palette-actions {
   flex-wrap: wrap;
+  opacity: 0;
+  pointer-events: none;
 }
-.palette-actions input {
-  order: -1;
-  flex-basis: 100%;
+.palette-entry:hover .palette-actions,
+.palette-entry:focus-within .palette-actions {
+  opacity: 1;
+  pointer-events: auto;
 }
 .palette-actions,
 .palette-save {
@@ -529,7 +557,6 @@ function resetText(): void {
   align-items: center;
   margin-top: 8px;
 }
-.palette-actions input,
 .palette-save input {
   min-width: 0;
   width: 100%;

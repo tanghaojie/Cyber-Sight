@@ -59,3 +59,5 @@ date: 2026-10-04
 - [独立应用设计](../design/apps/jlab-wechat-editor.md)
 - [公众号兼容规则](../design/wechat-editor-wechat-compatibility.md)
 - [原站研究](../design/wechat-editor-research.md)
+
+2026-10-07人工验收继续调整：章节样式和历史版本抽屉同配色/结尾加宽到最大520px，文字设置保留320px。配色动作悬停显示、弹窗改名、方括号内编号和公众号预览标题按现行UI设计实施；独立应用与存储/导出边界保持现行约定。

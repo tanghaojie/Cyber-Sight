@@ -83,6 +83,7 @@ function tab(event: KeyboardEvent): void {
     <div class="pane-heading">
       <span class="pane-label">MARKDOWN</span><span>原稿</span
       ><el-button
+        class="import-button"
         size="small"
         text
         :disabled="disabled"
@@ -157,6 +158,9 @@ function tab(event: KeyboardEvent): void {
   letter-spacing: 1.6px;
   font-weight: 700;
   color: var(--ui-muted);
+}
+.import-button {
+  margin-left: auto;
 }
 textarea {
   flex: 1;

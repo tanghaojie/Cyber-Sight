@@ -1,5 +1,7 @@
 # Platform 活动实施计划
 
+[第二轮人工验收调整](../../archive/plans/2026-10-07-jlab-ui-acceptance.md)与[近期交付归档复核](../../archive/plans/2026-10-07-jlab-ui-archive-review.md)已完成并归档；六项反馈完成，人工交互与公众号效果待复验。
+
 [统一配色数量与重置](../../archive/plans/2026-10-06-jlab-palette-limit.md)已完成并归档，全部配色总计1至9组，重置恢复默认六组。
 
 [验收修改后 Platform 归档复核](../../archive/plans/2026-10-06-jlab-acceptance-archive-review.md)已完成，台账推进到真实40df307。

@@ -194,7 +194,7 @@ function decorateChapter(
       decoration.textContent = '//  '
       break
     case 'bracket':
-      decoration.textContent = '[ ]  '
+      decoration.textContent = label ? `[${label.trim()}]  ` : '[ ]  '
       break
     case 'circles':
       decoration.textContent = '◎ ◎  '
@@ -211,7 +211,7 @@ function decorateChapter(
       decoration.style.color = color
       break
   }
-  if (label) {
+  if (label && style !== 'bracket') {
     const sequence = document.createElement('span')
     sequence.dataset.decoration = 'true'
     sequence.textContent = label

@@ -1,5 +1,8 @@
 # Platform 历史归档
 
+- [2026-10-07 桀士排版第二轮人工验收调整](plans/2026-10-07-jlab-ui-acceptance.md)：悬停配色操作与弹窗改名、导入对齐、公众号预览、宽章节/历史抽屉、方括号内编号和提示移除；[协作记录](ai-logs/fix/2026/10/2026-10-07-jlab-ui-acceptance.md)。
+- [2026-10-07 桀士排版近期交付文档归档复核](plans/2026-10-07-jlab-ui-archive-review.md)：核对40df307..9ccc7d9，保留有效设计和ADR、推进真实基线；[协作记录](ai-logs/docs/2026/10/2026-10-07-jlab-ui-archive-review.md)。
+
 - [2026-10-06 桀士排版品牌与按钮视觉调整](plans/2026-10-06-jlab-brand-icons.md)：中文标题和副标题、操作图标及浅灰手机边框；[协作记录](ai-logs/style/2026/10/2026-10-06-jlab-brand-icons.md)。
 
 - [2026-10-06 桀士排版统一配色数量与重置](plans/2026-10-06-jlab-palette-limit.md)：总计1至9组，默认配色可修改删除，重置为六组；[协作记录](ai-logs/fix/2026/10/2026-10-06-jlab-palette-limit.md)。
