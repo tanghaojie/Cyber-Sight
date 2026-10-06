@@ -114,3 +114,14 @@ textarea:focus-visible,
 .jlab-color-palette .el-color-dropdown__value .el-input__wrapper.is-focus {
   box-shadow: 0 0 0 1px var(--ui-primary) inset;
 }
+
+.action-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  vertical-align: -3px;
+}
+.el-button .action-icon,
+.el-radio-button .action-icon {
+  margin-right: 6px;
+}

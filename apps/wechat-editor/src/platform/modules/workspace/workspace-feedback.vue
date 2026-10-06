@@ -41,7 +41,19 @@ onBeforeUnmount(function cleanup() {
       :aria-expanded="opened"
       @click="opened = !opened"
     >
-      诊断 {{ count }}<span v-if="invalid"> · {{ invalid }} 处颜色失效</span>
+      <svg
+        class="action-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M12 3 2 21h20ZM12 9v5M12 17h.01" /></svg
+      >诊断 {{ count }}<span v-if="invalid"> · {{ invalid }} 处颜色失效</span>
     </button>
     <section v-if="opened && count" class="diagnostic-panel" aria-label="排版诊断">
       <div class="diagnostic-heading">
@@ -49,11 +61,39 @@ onBeforeUnmount(function cleanup() {
         ><button class="ui-button" aria-label="关闭诊断" @click="opened = false">×</button>
       </div>
       <p v-if="message">
-        {{ message }} <button class="ui-button" @click="emit('dismiss')">移除提示</button>
+        {{ message }}
+        <button class="ui-button" @click="emit('dismiss')">
+          <svg
+            class="action-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="m9 4 11 11-6 6H8l-6-6ZM7 10l11 11M14 21h8" /></svg
+          >移除提示
+        </button>
       </p>
       <div v-if="invalid" class="invalid-warning">
         <p>{{ invalid }} 处局部颜色因改稿失效，请重新选择文字。</p>
         <button class="ui-button bordered" :disabled="disabled" @click="emit('clear')">
+          <svg
+            class="action-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="m9 4 11 11-6 6H8l-6-6ZM7 10l11 11M14 21h8" />
+          </svg>
           清除失效标注
         </button>
       </div>

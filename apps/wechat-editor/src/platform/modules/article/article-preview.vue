@@ -159,15 +159,53 @@ defineExpose({ captureSelection })
           :disabled="disabled"
           aria-label="预览宽度"
           @update:model-value="emit('mode', $event as 'phone' | 'desktop')"
-          ><el-radio-button value="phone">手机</el-radio-button
-          ><el-radio-button value="desktop">电脑</el-radio-button></el-radio-group
+          ><el-radio-button value="phone"
+            ><svg
+              class="action-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M7 2h10v20H7ZM10 18h4" /></svg
+            >手机</el-radio-button
+          ><el-radio-button value="desktop"
+            ><svg
+              class="action-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M3 4h18v13H3ZM12 17v4M8 21h8" /></svg
+            >电脑</el-radio-button
+          ></el-radio-group
         ><button
           class="ui-button"
           :disabled="disabled"
           :aria-pressed="focus"
           @click="emit('focus')"
         >
-          {{ focus ? '返回编辑' : '专注预览' }}
+          <svg
+            class="action-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5" /></svg
+          >{{ focus ? '返回编辑' : '专注预览' }}
         </button>
       </div>
     </div>
@@ -242,7 +280,21 @@ defineExpose({ captureSelection })
         :disabled="disabled"
         @change="applyColor"
       />
-      <button class="ui-button" :disabled="disabled" @click="clearColor">清除</button>
+      <button class="ui-button" :disabled="disabled" @click="clearColor">
+        <svg
+          class="action-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="m9 4 11 11-6 6H8l-6-6ZM7 10l11 11M14 21h8" /></svg
+        >清除
+      </button>
     </div>
   </section>
 </template>
@@ -483,9 +535,10 @@ article :deep(::selection) {
   width: 440px;
   max-width: none;
   height: 956px;
-  border: 8px solid #292b30;
-  outline: 2px solid #8b8d93;
-  outline-offset: -2px;
+  border: 3px solid #cbd2da;
+  box-shadow:
+    0 0 0 1px #e2e8f0,
+    0 8px 24px #0f172a0a;
   border-radius: 58px;
 }
 .framed .paper.desktop {

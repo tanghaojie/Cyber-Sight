@@ -19,10 +19,14 @@ const emit = defineEmits<{
   retry: []
 }>()
 const controls = [
-  ['chapters', '章节样式'],
-  ['text', '文字设置'],
-  ['colors', '配色'],
-  ['ending', '固定结尾'],
+  ['chapters', '章节样式', 'M4 5h16M4 12h16M4 19h10'],
+  ['text', '文字设置', 'M4 5h16M12 5v14M8 19h8'],
+  [
+    'colors',
+    '配色',
+    'M12 3a9 9 0 1 0 0 18h1a2 2 0 0 0 1-4 2 2 0 0 1 1-4h3a3 3 0 0 0 3-3 9 9 0 0 0-9-7ZM7 8h.01M12 6h.01M17 8h.01M6 13h.01',
+  ],
+  ['ending', '固定结尾', 'M5 3h10l4 4v14H5ZM9 12h6M9 16h6M15 3v4h4'],
 ] as const
 </script>
 <template>
@@ -43,7 +47,7 @@ const controls = [
           stroke-linejoin="round"
         />
         <circle cx="12" cy="13" r="2" fill="currentColor" /></svg
-      ><strong>桀士排版</strong><small>EDITOR</small>
+      ><strong>桀士排版</strong><small>公众号助手</small>
     </div>
     <div class="toolbar-divider" />
     <ColorPicker
@@ -62,7 +66,7 @@ const controls = [
     <div class="toolbar-divider" />
     <nav aria-label="排版设置" class="toolbar-tools">
       <button
-        v-for="[kind, label] in controls"
+        v-for="[kind, label, iconPath] in controls"
         :key="kind"
         class="ui-button"
         :class="{ active: drawer === kind }"
@@ -70,7 +74,19 @@ const controls = [
         :disabled="disabled"
         @click="emit('drawer', kind)"
       >
-        {{ label }}
+        <svg
+          class="action-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path :d="iconPath" /></svg
+        >{{ label }}
       </button>
     </nav>
     <div class="toolbar-spacer" />
@@ -87,6 +103,19 @@ const controls = [
       :disabled="disabled"
       @click="emit('retry')"
     >
+      <svg
+        class="action-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M20 7a8 8 0 1 0 0 10M20 3v5h-5" />
+      </svg>
       重试
     </button>
     <button
@@ -96,6 +125,19 @@ const controls = [
       :disabled="disabled"
       @click="emit('drawer', 'history')"
     >
+      <svg
+        class="action-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M3 11a9 9 0 1 1 2 7M3 4v7h7M12 7v5l3 2" />
+      </svg>
       历史版本
     </button>
     <el-button
@@ -104,6 +146,18 @@ const controls = [
       :disabled="disabled"
       :loading="copyState === 'preparing' || copyState === 'copying'"
       @click="emit('copy')"
+      ><svg
+        class="action-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M9 9h12v12H9ZM15 5V3H3v12h2" /></svg
       >{{
         copyState === 'preparing'
           ? '准备图文'
@@ -195,9 +249,6 @@ const controls = [
   background: var(--ui-warning);
 }
 @media (max-width: 1200px) {
-  .brand small {
-    display: none;
-  }
   .toolbar {
     padding: 0 12px;
     gap: 6px;

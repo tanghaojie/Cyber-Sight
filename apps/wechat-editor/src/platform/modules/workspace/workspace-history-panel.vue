@@ -42,8 +42,36 @@ function remove(timestamp: number): void {
       文章自动保存到当前草稿。只有主动新增版本才会保留历史；版本不包含排版配置和固定结尾。
     </p>
     <div class="history-actions">
-      <el-button :disabled="busy || blocked" @click="emit('create')">新增版本</el-button>
-      <el-button :disabled="busy" @click="emit('refresh')">刷新列表</el-button>
+      <el-button :disabled="busy || blocked" @click="emit('create')"
+        ><svg
+          class="action-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M12 4v16M4 12h16" /></svg
+        >新增版本</el-button
+      >
+      <el-button :disabled="busy" @click="emit('refresh')"
+        ><svg
+          class="action-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M20 7a8 8 0 1 0 0 10M20 3v5h-5" /></svg
+        >刷新列表</el-button
+      >
     </div>
     <p v-if="blocked" class="error">当前文章保存已暂停，请备份原稿后刷新页面。</p>
     <p v-if="error" class="error" role="alert">{{ error }}</p>
@@ -63,9 +91,53 @@ function remove(timestamp: number): void {
         }}</time>
         <small>{{ version.characters.toLocaleString() }} 个 Markdown 字符</small>
         <div class="version-actions">
-          <button :disabled="busy" @click="emit('view', version.timestamp)">查看</button>
-          <button :disabled="busy || blocked" @click="restore(version.timestamp)">恢复</button>
-          <button :disabled="busy" @click="remove(version.timestamp)">删除</button>
+          <button :disabled="busy" @click="emit('view', version.timestamp)">
+            <svg
+              class="action-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12ZM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6"
+              /></svg
+            >查看
+          </button>
+          <button :disabled="busy || blocked" @click="restore(version.timestamp)">
+            <svg
+              class="action-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M3 11a9 9 0 1 1 2 7M3 4v7h7M12 7v5l3 2" /></svg
+            >恢复
+          </button>
+          <button :disabled="busy" @click="remove(version.timestamp)">
+            <svg
+              class="action-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" /></svg
+            >删除
+          </button>
         </div>
       </li>
     </ol>

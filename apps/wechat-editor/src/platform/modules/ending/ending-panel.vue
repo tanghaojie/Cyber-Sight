@@ -35,7 +35,18 @@ function appendSnippet(markdown: string): void {
         :disabled="ending.markdown.length + snippet.markdown.length + 2 > 500000"
         @click="appendSnippet(snippet.markdown)"
       >
-        ＋ {{ snippet.name }}
+        <svg
+          class="action-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M12 4v16M4 12h16" /></svg
+        >{{ snippet.name }}
       </button>
     </div>
     <textarea
@@ -45,7 +56,21 @@ function appendSnippet(markdown: string): void {
       @input="emit('change', { markdown: ($event.target as HTMLTextAreaElement).value })"
     />
     <div class="ending-actions">
-      <el-button size="small" @click="emit('change', { markdown: '' })">清空</el-button>
+      <el-button size="small" @click="emit('change', { markdown: '' })"
+        ><svg
+          class="action-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" /></svg
+        >清空</el-button
+      >
     </div>
     <p class="note">
       片段追加到现有结尾，不会自动启用。请替换示例名称；往期链接请在公众号编辑器内手动添加。修改即预览，结尾设置即时保存到当前浏览器。

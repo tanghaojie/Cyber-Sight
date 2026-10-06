@@ -88,6 +88,18 @@ function tab(event: KeyboardEvent): void {
         :disabled="disabled"
         title="导入单个 Markdown / TXT"
         @click="emit('import')"
+        ><svg
+          class="action-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M12 3v12m-4-4 4 4 4-4M4 15v6h16v-6" /></svg
         >导入</el-button
       >
     </div>

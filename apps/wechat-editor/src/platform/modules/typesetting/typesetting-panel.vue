@@ -158,7 +158,21 @@ function resetText(): void {
           value="sans" /><el-option label="宋体 / 衬线" value="serif"
       /></el-select>
       <p class="settings-note">自定义字体取决于设备。默认选项在复制时沿用公众号字体。</p>
-      <button class="ui-button bordered" @click="resetText">恢复默认文字设置</button>
+      <button class="ui-button bordered" @click="resetText">
+        <svg
+          class="action-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M20 7a8 8 0 1 0 0 10M20 3v5h-5" /></svg
+        >恢复默认文字设置
+      </button>
     </template>
     <template v-else-if="kind === 'chapters'">
       <label class="setting-label chapter-number">
@@ -192,7 +206,21 @@ function resetText(): void {
           <h3 class="palette-heading">
             配色 <small>{{ config.palettes.length }}/{{ maxPalettes }}</small>
           </h3>
-          <button class="ui-button bordered" @click="resetPalettes">重置所有配色</button>
+          <button class="ui-button bordered" @click="resetPalettes">
+            <svg
+              class="action-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M20 7a8 8 0 1 0 0 10M20 3v5h-5" /></svg
+            >重置所有配色
+          </button>
         </div>
         <p v-if="config.palettes.length > maxPalettes" class="settings-note">
           旧版保存了超过九个配色，已完整保留。请删除至九个以内或重置所有配色后保存。
@@ -228,6 +256,19 @@ function resetText(): void {
                 :aria-label="'用当前颜色更新配色：' + preset.name"
                 @click="updatePalette(preset)"
               >
+                <svg
+                  class="action-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M4 3h14l3 3v15H3V3ZM7 3v6h10V3M7 21v-8h10v8" />
+                </svg>
                 更新颜色
               </button>
               <input
@@ -242,6 +283,19 @@ function resetText(): void {
                 :aria-label="'删除配色：' + preset.name"
                 @click="deletePalette(preset)"
               >
+                <svg
+                  class="action-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" />
+                </svg>
                 删除
               </button>
             </div>
@@ -260,7 +314,19 @@ function resetText(): void {
           :disabled="!paletteName.trim() || config.palettes.length >= maxPalettes"
           @click="savePalette"
         >
-          保存当前配色
+          <svg
+            class="action-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M4 3h14l3 3v15H3V3ZM7 3v6h10V3M7 21v-8h10v8" /></svg
+          >保存当前配色
         </button>
       </div>
       <p class="settings-note">
