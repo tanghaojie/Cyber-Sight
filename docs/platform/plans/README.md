@@ -1,5 +1,7 @@
 # Platform 实施计划
 
+最近完成：[CoAIForge P1 来源交接](../archive/plans/2026-10-07-coaiforge-handoff.md)和[交接后的 Platform 归档复核](../archive/plans/2026-10-07-coaiforge-platform-archive-review.md)。整体 P1 仍由 CoAIForge 跟踪前端人工验收。
+
 最近完成：[master 冲突处理与共同合并树归档复核](../archive/plans/2026-10-07-master-conflict-resolution.md)，保留双方历史并统一真实审查基线。
 
 最近完成：[Geo 自动地标周边第一版](../archive/plans/2026-10-04-geo-landmark-context.md)和[交付后的文档复核](../archive/plans/2026-10-04-geo-landmark-documentation-review.md)。
