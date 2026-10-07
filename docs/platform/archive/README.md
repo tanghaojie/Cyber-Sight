@@ -1,5 +1,6 @@
 # Platform 历史归档
 
+- [2026-10-07 CoAIForge P1 实施接续](plans/2026-10-07-coaiforge-handoff.md)：目标三种工程与治理已实现并推送，Windows/Linux CI 全部通过，前端验收待维护者；[协作记录](ai-logs/docs/2026/10/2026-10-07-coaiforge-handoff.md)。
 - [2026-10-07 CoAIForge 实施前选择确认](plans/2026-10-07-coaiforge-decisions.md)：确认已建仓库、公共基础与片段组合、原归档阈值、CLI 只初始化 Git 和 MIT；[协作记录](ai-logs/docs/2026/10/2026-10-07-coaiforge-decisions.md)。P1 仍未实施。
 
 - [2026-10-07 master 冲突处理与共同合并树归档复核](plans/2026-10-07-master-conflict-resolution.md)：保留桀士排版/P0 与 Geo 双方历史，4 个文档冲突已处理，台账推进到共同提交 `7d17cf6`；[协作记录](ai-logs/chore/2026/10/2026-10-07-master-conflict-resolution.md)。

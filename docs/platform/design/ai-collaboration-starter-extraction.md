@@ -3,7 +3,7 @@ title: 独立 AI 协作启动模板来源提取清单
 scope: platform
 repository: Cyber-Sight
 status: accepted
-implementation_status: not_started
+implementation_status: applied_in_coaiforge
 owner: project maintainers
 updated: 2026-10-07
 ---
@@ -12,9 +12,9 @@ updated: 2026-10-07
 
 ## 基线与使用方式
 
-来源为 Cyber-Sight 提交 `19646b40de73e114bf5447cfc14166af2c84bb47`。本表记录静态提取范围，不表示文件已复制或模板已验证。P1 开始时重查来源差异，保护之后的人类修改，并更新清单；不得整仓复制后以“清理”为由扩大迁移范围。
+来源为 Cyber-Sight 提交 `19646b40de73e114bf5447cfc14166af2c84bb47`，确认选择提交为 `68d655d`。本表记录提取处理依据；2026-10-07 已按边界在 CoAIForge 独立实现，目标技术提交 `6ae8374`、首基线提交 `bb67bd9`。保留 MIT LICENSE 和格式配置，协作规范、治理脚本与最小工程按目标改写；没有整仓复制或迁移来源业务。三种 Windows 工程技术验证通过，已推送 master，Windows/Linux CI 全部通过；前端人类验收尚待执行。
 
-目标原则见[正式设计](ai-collaboration-starter.md)。下列源路径均相对于来源仓库；目标路径属于尚未创建的新项目。源码事实已通过 CodeGraph 和针对性读取核对，未检查远端 Forge。
+目标原则见[正式设计](ai-collaboration-starter.md)。下列源路径均相对于来源仓库；目标路径属于 CoAIForge 的组合输出。源码事实已通过 CodeGraph 和针对性读取核对，未检查远端 Forge。
 
 ## 保留思想、按目标改写的内容
 

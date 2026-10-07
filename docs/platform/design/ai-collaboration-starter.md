@@ -3,7 +3,7 @@ title: 独立 AI 协作启动模板
 scope: platform
 repository: Cyber-Sight
 status: accepted
-implementation_status: not_started
+implementation_status: implemented_in_coaiforge_pending_acceptance
 owner: project maintainers
 updated: 2026-10-07
 ---
@@ -14,7 +14,7 @@ updated: 2026-10-07
 
 维护者已确认目标：提炼 Cyber-Sight 的人与 AI 协作经验，形成独立项目模板。核心交付是 AGENTS.md、现行设计和文档治理体系；代码只提供最小启动环境。P0 交付设计与清单，P1 制作可运行模板，后续阶段才实现并发布 CLI，最后迁移 Geo 和桀士排版。
 
-本文是已接受的目标设计，模板代码尚未实施。文件位于来源仓库，按当前规则声明 `scope: platform`；新模板自身的代码、文档、审计配置均不采用 Forge/Foundation/Platform scope，不继承上游只读身份，也不使用 Forge 合并同步协议。该决定不修改 Cyber-Sight 现行架构或治理。
+本文是已接受的目标设计。2026-10-07 已在 CoAIForge 完成 P1 技术实现与三种工程的 Windows 独立验证，目标提交为 `6ae8374`、`bb67bd9`；经维护者授权已推送 master，[Windows/Linux CI](https://github.com/tanghaojie/CoAIForge/actions/runs/37642662208) 的 7 个任务全部通过，前端人类验收尚待执行。文件位于来源仓库，按当前规则声明 `scope: platform`；新模板自身的代码、文档、审计配置均不采用 Forge/Foundation/Platform scope，不继承上游只读身份，也不使用 Forge 合并同步协议。该决定不修改 Cyber-Sight 现行架构或治理。
 
 ## CoAIForge 仓库与模板源组织
 
@@ -135,7 +135,7 @@ project/
 | 复制旧历史、身份或验收结论                  | 新项目从自己的真实基线起步，只带适用的现行规范                     |
 | 模板间规范漂移                              | P1 确定规范单一来源和组合清单；公共标准不能维护成三份独立副本      |
 
-Node/pnpm 和依赖具体版本待 P1 兼容验证后固定；本机 pnpm 11.13.1 只是来源环境记录，不是已经验证的模板版本。CoAIForge 仓库、组合模式、阈值、Git 初始化策略和 MIT 已确认。CLI 安装命令、npm 包名、发布渠道和更新机制不在本轮决定。
+P1 在 CoAIForge 固定并验证 Node 24.18.0、pnpm 11.13.1，以及 Vue 3/Vite 5/Nest 11/Fastify 5/TypeScript 5/Zod 4 的精确依赖和三套锁文件。契约同源生成 ESM/CommonJS 产物，前端生产构建与后端实际导入均通过。三种工程的适用检查分别在 Windows 本地与 Windows/Linux CI 通过，前端人工验收保留未执行状态。CoAIForge 仓库、组合模式、阈值、Git 初始化策略和 MIT 已确认。CLI 安装命令、npm 包名、发布渠道和更新机制不在本轮决定。
 
 ## 关联与交付边界
 
@@ -143,4 +143,4 @@ Node/pnpm 和依赖具体版本待 P1 兼容验证后固定；本机 pnpm 11.13.
 - [长期决策](../decisions/ADR-20261007-independent-ai-collaboration-starter.md)
 - [P1 实施计划](../plans/active/2026-10-07-ai-collaboration-starter-p1.md)
 
-P0 的交付为文档，不包含模板运行证据；P1 未启动。P0 实际检查与关联提交从 Platform 归档索引追溯。
+P0 的交付仍为文档；P1 技术实现及实际证据由 [CoAIForge](https://github.com/tanghaojie/CoAIForge) 独立维护，提交 `6ae8374`、`bb67bd9` 已推送 master，Windows/Linux CI 全部通过。P1 接续入口记录待验收边界，不在 Cyber-Sight 重复执行模板代码。P0 及本次来源同步从 Platform 归档索引追溯。

@@ -3,8 +3,8 @@ title: 独立 AI 协作启动模板 P1 实施计划
 scope: platform
 repository: Cyber-Sight
 owner: project maintainers
-status: draft
-implementation_status: not_started
+status: pending_human_acceptance
+implementation_status: implemented_in_coaiforge
 created: 2026-10-07
 updated: 2026-10-07
 ---
@@ -13,7 +13,7 @@ updated: 2026-10-07
 
 ## 状态与目标
 
-方案范围及实施前选择已由维护者确认，P1 尚未开始。目标为已创建的 CoAIForge；本轮只同步选择，不实施模板代码。计划暂存于来源仓库活动区，标记 draft/not_started；获得启动指令后，在目标仓库按无 scope 规则建立实施记录并同步此处的接续状态，避免两处重复执行。
+维护者已授权并在 CoAIForge 完成 P1 技术实施。本文件保留为来源接续入口；实际实施、技术验证与剩余验收只在目标 `docs/plans/active/2026-10-07-starter-p1.md` 跟踪，不在两个仓库重复执行。CoAIForge 当前状态 pending_human_acceptance，技术提交为 `6ae8374`、真实基线记录为 `bb67bd9`；Windows/Linux CI 已通过，前端人类验收尚待执行。以下工作包是确认的原实施范围，复选框的最终状态以目标计划为准，不代表仍需在来源再次编码。
 
 交付以 AGENTS.md 和 docs 为核心的三种独立启动工程。选择前端/后端为空启动，全栈只有 health + Zod 契约 + 前端状态展示。
 
@@ -109,4 +109,6 @@ P1 不发布 npm、不修改线上入口、不删除来源应用。模板尚未�
 
 ## 当前实际结果与遗留问题
 
-P1 全部实施任务未执行，没有安装/构建/运行/人工验收结果，也没有新仓库提交。当前交付为本计划、P0 设计及已确认选择。获得启动指令后在 CoAIForge 接续；无需重新讨论已确认事项。
+CoAIForge 已完成规范单一来源、组合清单、三种独立工程、health/Zod 全链路、模块/文档/提交/单项目归档检查和 CI。Node 24.18.0/pnpm 11.13.1 固定；三种输出分别在干净目录冻结安装、格式、Lint、类型、模块、文档、构建和适用测试通过；根治理与组合测试 22/22，后端和契约真实产物/HTTP 测试通过。无前端自动化测试。目标工作区干净，首提交后真实登记基线，正常归档 CI NOT_DUE。
+
+经维护者授权，6ae8374、bb67bd9 已推送到 CoAIForge 的 master。[远端 CI](https://github.com/tanghaojie/CoAIForge/actions/runs/37642662208) 对 bb67bd9 的治理及 Windows/Linux × 三种预设共 7 个任务全部通过。前端空启动、health 加载/成功/失败及刷新由维护者验收，整体 P1 尚不标 completed。CLI/npm 发布和 Geo/公众号编辑器迁移未开始。
