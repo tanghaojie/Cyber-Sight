@@ -1,6 +1,6 @@
 # Platform 活动 AI 协作记录
 
-- [master 冲突处理与推送](chore/2026/10/2026-10-07-master-conflict-resolution.md)：处理现有合并、验证并复核共同树后推送。
+- [master 冲突处理与推送](../archive/ai-logs/chore/2026/10/2026-10-07-master-conflict-resolution.md)：冲突处理和共同树 `7d17cf6` 归档复核完成，静态验证通过；发布证据在最终交付反馈核对。
 
 独立 AI 协作启动模板 P0 协作记录已完成并归档，从[历史归档索引](../archive/README.md)追溯；未启动 P1 代码。
 

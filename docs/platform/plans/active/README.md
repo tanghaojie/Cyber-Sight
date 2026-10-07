@@ -1,6 +1,6 @@
 # Platform 活动实施计划
 
-- [master 冲突处理与共同合并树归档复核](2026-10-07-master-conflict-resolution.md)：本次合并与推送进行中，维护者已授权处理现有暂存内容和冲突。
+[master 冲突处理与共同合并树归档复核](../../archive/plans/2026-10-07-master-conflict-resolution.md)已完成归档，合并提交为 `7d17cf6`；发布证据在最终交付反馈核对。
 
 - [独立 AI 协作启动模板 P1](2026-10-07-ai-collaboration-starter-p1.md)：范围已确认，计划状态 draft、实施 not_started；独立仓库与启动前选择尚待确认，不是正在执行的代码任务。
 

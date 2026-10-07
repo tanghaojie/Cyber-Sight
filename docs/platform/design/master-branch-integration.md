@@ -31,8 +31,8 @@ Platform 的设计、决策和归档索引合并双方新增条目。两条历�
 
 - [Geo 地标周边设计](modules/geo-landmark-context.md)
 - [桀士排版设计](apps/jlab-wechat-editor.md)
-- [实施与归档审查计划](../plans/active/2026-10-07-master-conflict-resolution.md)
-- [协作记录](../ai-logs/chore/2026/10/2026-10-07-master-conflict-resolution.md)
+- [实施与归档审查计划](../archive/plans/2026-10-07-master-conflict-resolution.md)
+- [协作记录](../archive/ai-logs/chore/2026/10/2026-10-07-master-conflict-resolution.md)
 
 ## 合并前验证结果
 
@@ -40,4 +40,10 @@ Platform 的设计、决策和归档索引合并双方新增条目。两条历�
 
 724 个文件的 Git blob 核对通过：406 个前后端/共享包文件保留远端实现；318 个桀士排版、锁文件、仓库配置、工作流与 Foundation 文档文件保留本地实现。没有业务源码的手工改写或未解决的冲突。保留已有 Sass legacy API、Rollup PURE 注释和大 chunk 警告，人工交互及视觉验收仍待维护者。
 
-共同合并树的实际提交与最终归档结果在任务完成时补充。
+## 共同合并树复核结果
+
+合并提交为 `7d17cf6719de85e9c00a89ef714117928ce0a16d`，父提交分别为 `b9b74c6` 和 `6262b51`。提交 hook 执行后再次核对业务源码、依赖锁文件与继承文档，仍与对应父提交一致。
+
+共同树审查覆盖新增四项 Geo ADR、九份已完成计划以及本地桀士排版/P0 文档；它们保持各自有效设计、接口和人工验收边界。文档链接无缺失、没有仍需移动的失效 ADR 或替代设计，双方已有归档证据完整保留。Platform 台账推进到实际合并提交 `7d17cf6`，Foundation 台账保持本地原值。
+
+实施计划与协作记录完成归档，最终格式与提交规范检查通过，归档 CI 返回 NOT_DUE。普通推送的实际远端 SHA 在提交后核对并随最终交付反馈。

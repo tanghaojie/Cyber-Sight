@@ -1,5 +1,7 @@
 # Platform 历史归档
 
+- [2026-10-07 master 冲突处理与共同合并树归档复核](plans/2026-10-07-master-conflict-resolution.md)：保留桀士排版/P0 与 Geo 双方历史，4 个文档冲突已处理，台账推进到共同提交 `7d17cf6`；[协作记录](ai-logs/chore/2026/10/2026-10-07-master-conflict-resolution.md)。
+
 - [2026-10-07 启动模板 P0 交付后归档复核](plans/2026-10-07-starter-p0-archive-review.md)：复核 `9ccc7d9..66b264c` 的桀士排版 UI 与模板文档，推进 Platform 真实审查基线，保留未启动 P1；[协作记录](ai-logs/docs/2026/10/2026-10-07-starter-p0-archive-review.md)。
 
 - [2026-10-07 独立 AI 协作启动模板 P0](plans/2026-10-07-ai-collaboration-starter-p0.md)：将已确认的无业务预设、三种工程和单项目治理方案整理为设计、提取清单、ADR 与未启动 P1 计划；[协作记录](ai-logs/docs/2026/10/2026-10-07-ai-collaboration-starter-p0.md)。仅完成文档，不包含模板代码或 CLI。
