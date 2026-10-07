@@ -1,5 +1,7 @@
 # Platform 历史归档
 
+- [2026-10-07 CoAIForge 实施前选择确认](plans/2026-10-07-coaiforge-decisions.md)：确认已建仓库、公共基础与片段组合、原归档阈值、CLI 只初始化 Git 和 MIT；[协作记录](ai-logs/docs/2026/10/2026-10-07-coaiforge-decisions.md)。P1 仍未实施。
+
 - [2026-10-07 master 冲突处理与共同合并树归档复核](plans/2026-10-07-master-conflict-resolution.md)：保留桀士排版/P0 与 Geo 双方历史，4 个文档冲突已处理，台账推进到共同提交 `7d17cf6`；[协作记录](ai-logs/chore/2026/10/2026-10-07-master-conflict-resolution.md)。
 
 - [2026-10-07 启动模板 P0 交付后归档复核](plans/2026-10-07-starter-p0-archive-review.md)：复核 `9ccc7d9..66b264c` 的桀士排版 UI 与模板文档，推进 Platform 真实审查基线，保留未启动 P1；[协作记录](ai-logs/docs/2026/10/2026-10-07-starter-p0-archive-review.md)。

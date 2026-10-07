@@ -2,7 +2,7 @@
 
 [master 冲突处理与共同合并树归档复核](../../archive/plans/2026-10-07-master-conflict-resolution.md)已完成归档，合并提交为 `7d17cf6`；发布证据在最终交付反馈核对。
 
-- [独立 AI 协作启动模板 P1](2026-10-07-ai-collaboration-starter-p1.md)：范围已确认，计划状态 draft、实施 not_started；独立仓库与启动前选择尚待确认，不是正在执行的代码任务。
+- [独立 AI 协作启动模板 P1](2026-10-07-ai-collaboration-starter-p1.md)：CoAIForge 仓库与组合模式、归档阈值、Git 初始化和 MIT 已确认；计划仍为 draft/not_started，尚未实施代码。
 
 独立启动模板 P0 文档整理已完成，记录从[历史归档索引](../../archive/README.md)追溯；上面的 P1 保持未实施。
 

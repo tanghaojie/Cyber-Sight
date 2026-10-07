@@ -27,7 +27,7 @@ updated: 2026-10-07
 | `docs/foundation/design/testing-strategy.md`、`developer-workflow.md`                                                   | 按需提炼       | 三种工程适用的开发命令、前端人工验收与后端/契约/脚本自动化验证边界                                                                   |
 | `docs/templates/design-template.md`、`adr-template.md`、`implementation-plan-template.md`、`ai-session-log-template.md` | 改写           | 目标 docs/templates 单一来源；移除 scope、上游字段，保留状态、日期、分类和必要内容                                                   |
 | `scripts/docs/archive-audit.mjs`、`scripts/docs/archive-audit.test.mjs`                                                 | 重构并验证     | 单项目 policy/ledger，取消 forge-sync 导入、所有权分组、inherited 状态和上游操作要求                                                 |
-| `docs/foundation/archive/archive-policy.json`                                                                           | 提炼协议       | 即时触发证据和阈值外置；默认值在 P1 确认，目标路径为 docs/archive/archive-policy.json                                                |
+| `docs/foundation/archive/archive-policy.json`                                                                           | 提炼协议       | 即时触发证据和阈值外置；已确认沿用 20/3/3/30 天，目标路径为 docs/archive/archive-policy.json                                         |
 | `scripts/architecture/check-ownership.mjs`                                                                              | 改写职责       | 模块目录、公共入口、依赖方向与循环检查，不机械删除旧 scope 字符串后沿用                                                              |
 | `scripts/git/commit-message.mjs`、`scripts/git/commit-message.test.mjs`                                                 | 核对后复用     | 提交类型协议及脚本测试；另核对 AI trailer 的校验覆盖，不能假设现有 hook 已验证全部 AGENTS 规则                                       |
 | `.github/workflows/verify-commit-convention.yml`                                                                        | 参数化复用     | 新项目提交检查；新增适用工程与文档 CI，保留前端自动化边界                                                                            |
@@ -60,7 +60,7 @@ updated: 2026-10-07
 
 ## 来源、许可和参数化
 
-来源根 LICENSE 为 MIT，版权声明为 2026 JTLab。复制实质性源码/文档时保留适用版权与许可说明；新项目许可证和 npm 包发布信息仍待维护者选择，本次不重授权第三方材料。P1 逐项核对实际纳入依赖/资源的许可，避免把品牌图片和第三方示例素材当作通用资源。
+来源根 LICENSE 为 MIT，版权声明为 2026 JTLab。CoAIForge 已确认采用 MIT；复制实质性源码/文档时保留适用版权与许可说明，本次不重授权第三方材料。npm 包发布信息留待后续阶段。P1 逐项核对实际纳入依赖/资源的许可，避免把品牌图片和第三方示例素材当作通用资源。
 
 项目名、包作用域、仓库地址及 README 元信息应参数化；不得删除必要来源署名来实现“去品牌”。模板不携带运行密钥或默认生产账号。
 
