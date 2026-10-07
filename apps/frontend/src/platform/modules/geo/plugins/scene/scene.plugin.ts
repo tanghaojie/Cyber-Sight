@@ -30,11 +30,10 @@ export function createGeoScenePlugin(): GeoPluginDefinition {
     id: 'scene',
     order: 30,
     install(context: GeoPluginContext) {
-      const controller = createGeoSceneController(context.viewer)
-      context.scope.use(controller)
       const modelRendering = createGeoModelRenderingManager(context.viewer)
       context.scope.use(modelRendering)
-      controller.set({ sun: true, lighting: true, shadows: false })
+      const controller = createGeoSceneController(context.viewer, modelRendering)
+      context.scope.use(controller)
       const solarLighting: GeoSolarLightingCapability = {
         state: controller.state,
         setLighting(enabled: boolean) {

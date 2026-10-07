@@ -67,6 +67,8 @@
 
       <GeoPluginErrors :title="t('geo.plugins.errors')" :errors="runtime.plugins.state.errors" />
 
+      <component :is="overlay.component" v-for="overlay in overlays" :key="overlay.id" />
+
       <div v-if="bottomDocks.length" class="geo-bottom-docks">
         <component
           :is="dock.component"
@@ -131,6 +133,7 @@ import GeoToolRail, { type GeoTaskRailItem } from '../components/shell/GeoToolRa
 import { provideGeoRuntime } from '../core/geo-context'
 import type {
   GeoBottomDockContribution,
+  GeoOverlayContribution,
   GeoInspectorContribution,
   GeoPanelContribution,
   GeoTaskGroupContribution,
@@ -262,6 +265,11 @@ const bottomDocks = computed(function registeredBottomDocks() {
     .sort(function compareBottomDocks(left, right) {
       return left.order - right.order || left.id.localeCompare(right.id)
     })
+})
+const overlays = computed(function registeredOverlays() {
+  return runtime.plugins.getContributions('overlay').map(function toOverlay(entry) {
+    return { id: entry.id, component: (entry.contribution as GeoOverlayContribution).component }
+  })
 })
 const bottomDocksCollapsed = computed(function allBottomDocksCollapsed() {
   return (

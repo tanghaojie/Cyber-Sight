@@ -1,5 +1,8 @@
 import { reactive, readonly, type DeepReadonly } from 'vue'
 import type { Viewer } from 'cesium'
+import type { GeoRenderMode } from '../../core/render-performance'
+import type { GeoModelRenderingManager } from '../../tools/scene/model-rendering'
+import { createGeoRenderQuality } from '../../tools/scene/render-quality'
 import {
   getGeoSceneSettings,
   setGeoSceneSettings,
@@ -8,15 +11,23 @@ import {
 } from '../../tools/scene/scene-settings'
 
 export interface GeoSceneController {
-  readonly state: DeepReadonly<GeoSceneSettings>
+  readonly state: DeepReadonly<GeoSceneSettings & { renderMode: GeoRenderMode }>
+  setRenderMode(mode: GeoRenderMode): void
   set(patch: GeoSceneSettingsPatch): void
   toggle(key: keyof GeoSceneSettings): void
   refresh(): void
   dispose(): void
 }
 
-export function createGeoSceneController(viewer: Viewer): GeoSceneController {
-  const state = reactive<GeoSceneSettings>(getGeoSceneSettings(viewer))
+export function createGeoSceneController(
+  viewer: Viewer,
+  models: GeoModelRenderingManager,
+): GeoSceneController {
+  const quality = createGeoRenderQuality(viewer, models)
+  const state = reactive<GeoSceneSettings & { renderMode: GeoRenderMode }>({
+    ...getGeoSceneSettings(viewer),
+    renderMode: 'balanced',
+  })
   let disposed = false
 
   function guard(): void {
@@ -47,8 +58,24 @@ export function createGeoSceneController(viewer: Viewer): GeoSceneController {
   }
 
   function dispose(): void {
+    if (disposed) {
+      return
+    }
     disposed = true
+    quality.dispose()
   }
 
-  return { state: readonly(state), set, toggle, refresh, dispose }
+  return {
+    state: readonly(state),
+    setRenderMode(mode) {
+      guard()
+      quality.setMode(mode)
+      state.renderMode = mode
+      refresh()
+    },
+    set,
+    toggle,
+    refresh,
+    dispose,
+  }
 }

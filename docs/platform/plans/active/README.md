@@ -1,5 +1,7 @@
 # Platform 活动实施计划
 
+- [master 冲突处理与共同合并树归档复核](2026-10-07-master-conflict-resolution.md)：本次合并与推送进行中，维护者已授权处理现有暂存内容和冲突。
+
 - [独立 AI 协作启动模板 P1](2026-10-07-ai-collaboration-starter-p1.md)：范围已确认，计划状态 draft、实施 not_started；独立仓库与启动前选择尚待确认，不是正在执行的代码任务。
 
 独立启动模板 P0 文档整理已完成，记录从[历史归档索引](../../archive/README.md)追溯；上面的 P1 保持未实施。
@@ -31,5 +33,13 @@ P0 提交后的 Platform 归档复核已完成，真实审查基线推进到 `66
 [桀士排版实施后的 Platform 归档复核](../../archive/plans/2026-10-05-jlab-platform-archive-review.md)已完成，台账推进到实际实现提交。
 
 [桀士排版代码实施](../../archive/plans/2026-10-05-jlab-wechat-editor.md)已完成，人工交互与公众号粘贴验收待维护者执行。
+
+最近完成：[Geo 交付与 master 合并](../../archive/plans/2026-10-04-geo-master-merge.md)，保留 PRISM 和 Geo 并统一归档基线。
+
+最近复核：[2026-10-04 Geo 地标周边交付后的文档复核](../../archive/plans/2026-10-04-geo-landmark-documentation-review.md)，Platform 台账推进到 f7a56b0。
+
+最近完成：[2026-10-04 Geo 自动地标周边第一版](../../archive/plans/2026-10-04-geo-landmark-context.md)，生成器、台北街区和 Sight 昼夜/质量接入。
+
+此前完成：[2026-10-03 Geo 模型制作与地理参考标准](../../archive/plans/2026-10-03-geo-model-authoring-standard.md)，包含模型/场景分类、材质和 UV/纹理、统一 WGS84、交付验收。
 
 已完成记录见 [Platform 历史归档](../../archive/README.md)。

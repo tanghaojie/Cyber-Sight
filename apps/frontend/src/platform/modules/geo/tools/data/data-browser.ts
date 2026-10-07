@@ -1,21 +1,30 @@
 import {
   Cartesian3,
+  Cartographic,
   Cesium3DTileset,
   CesiumTerrainProvider,
   createWorldTerrainAsync,
   EllipsoidTerrainProvider,
   GeoJsonDataSource,
-  HeadingPitchRange,
   HeadingPitchRoll,
   Math as CesiumMath,
   Matrix4,
   Model,
   ShadowMode,
+  sampleTerrain,
+  sampleTerrainMostDetailed,
   Transforms,
   type Cesium3DTileset as Cesium3DTilesetType,
   type TerrainProvider,
   type Viewer,
 } from 'cesium'
+import {
+  prepareGeoModelAsset,
+  type GeoModelCoordinates,
+  type GeoModelCoordinateSource,
+  type PreparedGeoModelAsset,
+} from './model-asset'
+import { modelCameraOffset } from '../view/model-camera'
 import {
   createCyberCityTilesetVisual,
   type GeoTilesetVisual,
@@ -27,6 +36,8 @@ import type {
 } from '../scene/model-rendering'
 
 export type { GeoTilesetVisualStyle } from './tileset-visual-style'
+
+const ENVIRONMENT_MAP_UPDATE_SECONDS = 300
 
 export type GeoDataResourceKind = 'geojson' | 'model' | '3d-tiles'
 export type GeoTerrainResourceId = 'ellipsoid' | 'cesium-world-terrain' | 'custom'
@@ -73,6 +84,7 @@ export interface LoadGeoJsonOptions {
 }
 
 export interface LoadModelOptions {
+  readonly signal?: AbortSignal
   readonly id?: string
   readonly label?: string
   readonly url: string
@@ -81,9 +93,13 @@ export interface LoadModelOptions {
   readonly show?: boolean
   readonly minimumPixelSize?: number
   readonly shadows?: ShadowMode
+  readonly chooseCoordinates?: (
+    coordinates: GeoModelCoordinates,
+  ) => Promise<GeoModelCoordinateSource>
 }
 
 export interface LoadTilesetOptions {
+  readonly signal?: AbortSignal
   readonly id?: string
   readonly label?: string
   readonly url: string
@@ -92,6 +108,7 @@ export interface LoadTilesetOptions {
   readonly shadows?: ShadowMode
   readonly visualStyle?: GeoTilesetVisualStyle
   readonly maximumVisibleCameraHeight?: number
+  readonly dayNightPosition?: Cartesian3
 }
 
 interface ManagedResource {
@@ -106,7 +123,9 @@ interface ManagedResource {
   readonly resource: GeoJsonDataSource | Model | Cesium3DTilesetType
   readonly remove: () => boolean
   modelRenderingRegistration?: GeoModelRenderingRegistration
+  environmentRegistration?: { dispose(): void }
   modelMaterialNotice?: string
+  tilesetError?: string
   requestedShow: boolean
   autoHidden: boolean
   maximumVisibleCameraHeight?: number
@@ -273,6 +292,81 @@ export function createGeoDataBrowser(
   let scanPhase = 0.34
   let previousTickTime = performance.now()
   const pendingModelWaits = new Set<() => void>()
+  const pendingLoads = new Set<AbortController>()
+
+  function loadScope(signal?: AbortSignal): { signal: AbortSignal; dispose(): void } {
+    const controller = new AbortController()
+    const signals = [browserOptions.signal, signal].filter(
+      (value): value is AbortSignal => value !== undefined,
+    )
+    function abort(): void {
+      controller.abort()
+    }
+    signals.forEach(function listen(source) {
+      source.addEventListener('abort', abort, { once: true })
+      if (source.aborted) {
+        abort()
+      }
+    })
+    pendingLoads.add(controller)
+    return {
+      signal: controller.signal,
+      dispose() {
+        signals.forEach((source) => source.removeEventListener('abort', abort))
+        pendingLoads.delete(controller)
+      },
+    }
+  }
+
+  function checkLoad(signal: AbortSignal): void {
+    assertActive()
+    if (signal.aborted) {
+      throw new DOMException('数据加载已取消', 'AbortError')
+    }
+  }
+
+  function awaitLoad<T>(
+    promise: Promise<T>,
+    signal: AbortSignal,
+    disposeLate?: (value: T) => void,
+  ): Promise<T> {
+    return new Promise(function waitForLoad(resolve, reject) {
+      let settled = false
+      function abort(): void {
+        if (!settled) {
+          settled = true
+          signal.removeEventListener('abort', abort)
+          reject(new DOMException('数据加载已取消', 'AbortError'))
+        }
+      }
+      signal.addEventListener('abort', abort, { once: true })
+      promise.then(
+        function complete(value) {
+          if (settled) {
+            try {
+              disposeLate?.(value)
+            } catch {
+              // An abandoned asynchronous resource must not interrupt the viewer.
+            }
+            return
+          }
+          settled = true
+          signal.removeEventListener('abort', abort)
+          resolve(value)
+        },
+        function fail(error) {
+          if (!settled) {
+            settled = true
+            signal.removeEventListener('abort', abort)
+            reject(error)
+          }
+        },
+      )
+      if (signal.aborted) {
+        abort()
+      }
+    })
+  }
 
   function requestRender(): void {
     if (!viewer.isDestroyed()) {
@@ -381,7 +475,10 @@ export function createGeoDataBrowser(
     browserOptions.onActiveTilesetChange?.(activeTileset())
   }
 
-  function waitForModelReady(model: Model): Promise<void> {
+  function waitForModelReady(
+    model: Model,
+    signal: AbortSignal = browserOptions.signal ?? new AbortController().signal,
+  ): Promise<void> {
     if (model.ready) {
       return Promise.resolve()
     }
@@ -392,7 +489,7 @@ export function createGeoDataBrowser(
         model.readyEvent.removeEventListener(onReady)
         model.errorEvent.removeEventListener(onError)
         viewer.scene.renderError.removeEventListener(onRenderError)
-        browserOptions.signal?.removeEventListener('abort', onAbort)
+        signal.removeEventListener('abort', onAbort)
         pendingModelWaits.delete(cancel)
       }
 
@@ -426,7 +523,7 @@ export function createGeoDataBrowser(
       }
 
       function onAbort(): void {
-        finish(new Error('Geo data loading was cancelled'))
+        finish(new DOMException('数据加载已取消', 'AbortError'))
       }
 
       function onRenderError(): void {
@@ -440,8 +537,12 @@ export function createGeoDataBrowser(
       model.readyEvent.addEventListener(onReady)
       model.errorEvent.addEventListener(onError)
       viewer.scene.renderError.addEventListener(onRenderError)
-      browserOptions.signal?.addEventListener('abort', onAbort, { once: true })
+      signal.addEventListener('abort', onAbort, { once: true })
       pendingModelWaits.add(cancel)
+      if (signal.aborted) {
+        onAbort()
+        return
+      }
       if (model.ready) {
         onReady()
         return
@@ -470,7 +571,8 @@ export function createGeoDataBrowser(
         ? { ...managed.snapshot.modelTransform }
         : undefined,
       show: managed.requestedShow,
-      status: 'ready',
+      status: managed.tilesetError ? 'failed' : 'ready',
+      error: managed.tilesetError,
       modelRenderingNotice: managed.snapshot.modelRenderingNotice,
       visualStyle: managed.visualStyle,
       autoHidden: managed.autoHidden,
@@ -536,35 +638,94 @@ export function createGeoDataBrowser(
     assertActive()
     const id = normalizeId('model', options.id)
     assertUnique(id)
+    const load = loadScope(options.signal)
     let resource: Model | undefined
     let modelRenderingRegistration: GeoModelRenderingRegistration | undefined
     let modelRenderingNotice: string | undefined
     let added = false
+    let prepared: PreparedGeoModelAsset | undefined
+    let transform = options.transform ? { ...options.transform } : undefined
     try {
-      resource = await Model.fromGltfAsync({
-        url: options.url,
-        modelMatrix: options.transform
-          ? modelMatrixFromTransform(options.transform)
-          : options.modelMatrix,
-        show: options.show ?? true,
-        minimumPixelSize: options.minimumPixelSize,
-        shadows: options.shadows,
-        gltfCallback(gltf: unknown) {
-          modelRenderingNotice = modelMaterialNotice(gltf, Boolean(browserOptions.modelRendering))
-        },
-      })
-      assertActive()
+      checkLoad(load.signal)
+      prepared = await prepareGeoModelAsset(options.url, load.signal)
+      checkLoad(load.signal)
+      if (prepared.coordinates && options.chooseCoordinates) {
+        const source = await awaitLoad(options.chooseCoordinates(prepared.coordinates), load.signal)
+        checkLoad(load.signal)
+        if (source === 'cancel') {
+          throw new DOMException('模型加载已取消', 'AbortError')
+        }
+        if (source === 'model') {
+          const coordinates = prepared.coordinates
+          let height = coordinates.height
+          if (height === undefined) {
+            const provider = viewer.terrainProvider
+            if (provider instanceof EllipsoidTerrainProvider) {
+              height = 0
+            } else {
+              const positions = [
+                Cartographic.fromDegrees(coordinates.longitude, coordinates.latitude),
+              ]
+              const sampled = await awaitLoad(
+                provider.availability
+                  ? sampleTerrainMostDetailed(provider, positions, true)
+                  : sampleTerrain(provider, 12, positions, true),
+                load.signal,
+              )
+              checkLoad(load.signal)
+              if (viewer.terrainProvider !== provider) {
+                throw new Error('地形已变化，请重新加载模型以确定定位高度。')
+              }
+              height = sampled[0]?.height
+              if (height === undefined || !Number.isFinite(height)) {
+                throw new Error('无法获取模型位置的地形高度；请使用输入坐标并设置定位高度。')
+              }
+            }
+          }
+          transform = {
+            scale: 1,
+            heading: 0,
+            pitch: 0,
+            roll: 0,
+            ...transform,
+            longitude: coordinates.longitude,
+            latitude: coordinates.latitude,
+            height,
+          }
+        }
+      }
+      resource = await awaitLoad(
+        Model.fromGltfAsync({
+          url: prepared.url,
+          modelMatrix: transform ? modelMatrixFromTransform(transform) : options.modelMatrix,
+          show: options.show ?? true,
+          minimumPixelSize: options.minimumPixelSize,
+          shadows: options.shadows,
+          environmentMapOptions: {
+            maximumSecondsDifference: ENVIRONMENT_MAP_UPDATE_SECONDS,
+          },
+          gltfCallback(gltf: unknown) {
+            modelRenderingNotice = modelMaterialNotice(gltf, Boolean(browserOptions.modelRendering))
+          },
+        }),
+        load.signal,
+        cleanupPrimitive,
+      )
+      checkLoad(load.signal)
       if (!modelRenderingNotice) {
         modelRenderingNotice = browserOptions.modelRendering
           ? '材质信息未能确认；已按统一模型渲染兼容路径处理。'
           : '材质兼容性未知；已保留模型原始渲染。'
       }
+      if (prepared.emissiveMaterials > 0) {
+        modelRenderingNotice += ` 已适配 ${prepared.emissiveMaterials} 组发光倍率。`
+      }
       const initialModelMaterialNotice = modelRenderingNotice
       viewer.scene.primitives.add(resource)
       added = true
       requestRender()
-      await waitForModelReady(resource)
-      assertActive()
+      await waitForModelReady(resource, load.signal)
+      checkLoad(load.signal)
       if (browserOptions.modelRendering) {
         try {
           modelRenderingRegistration = browserOptions.modelRendering.register(resource)
@@ -582,7 +743,7 @@ export function createGeoDataBrowser(
           label: options.label?.trim() || '3D 模型',
           kind: 'model',
           url: options.url,
-          modelTransform: options.transform ? { ...options.transform } : undefined,
+          modelTransform: transform,
           modelRenderingNotice,
         },
         resource,
@@ -591,13 +752,17 @@ export function createGeoDataBrowser(
         requestedShow: options.show ?? true,
         autoHidden: false,
         remove: () => {
-          managed.modelRenderingRegistration?.dispose()
-          managed.modelRenderingRegistration = undefined
-          const removed = viewer.isDestroyed()
-            ? false
-            : viewer.scene.primitives.remove(resource as Model)
-          cleanupPrimitive(resource as Model)
-          return removed
+          try {
+            managed.modelRenderingRegistration?.dispose()
+            managed.modelRenderingRegistration = undefined
+            const removed = viewer.isDestroyed()
+              ? false
+              : viewer.scene.primitives.remove(resource as Model)
+            cleanupPrimitive(resource as Model)
+            return removed
+          } finally {
+            prepared?.dispose()
+          }
         },
       }
       syncResourceVisibility(managed)
@@ -605,14 +770,20 @@ export function createGeoDataBrowser(
       requestRender()
       return snapshotFor(managed)
     } catch (error) {
-      if (resource) {
-        modelRenderingRegistration?.dispose()
-        if (added && !viewer.isDestroyed()) {
-          viewer.scene.primitives.remove(resource)
+      try {
+        if (resource) {
+          modelRenderingRegistration?.dispose()
+          if (added && !viewer.isDestroyed()) {
+            viewer.scene.primitives.remove(resource)
+          }
+          cleanupPrimitive(resource)
         }
-        cleanupPrimitive(resource)
+      } finally {
+        prepared?.dispose()
       }
       throw error
+    } finally {
+      load.dispose()
     }
   }
 
@@ -620,19 +791,45 @@ export function createGeoDataBrowser(
     assertActive()
     const id = normalizeId('3d-tiles', options.id)
     assertUnique(id)
+    const load = loadScope(options.signal)
     let resource: Cesium3DTilesetType | undefined
     let visual: GeoTilesetVisual | undefined
+    let environmentRegistration: { dispose(): void } | undefined
+    let renderingRegistration: GeoModelRenderingRegistration | undefined
+    let removeTileFailureListener: (() => void) | undefined
     let added = false
     try {
+      checkLoad(load.signal)
+      if (options.dayNightPosition && options.visualStyle === 'cyber-scan') {
+        throw new Error('街区昼夜材质不能与科技扫描样式同时启用。')
+      }
       visual = options.visualStyle ? createCyberCityTilesetVisual() : undefined
       visual?.setScanPhase(scanPhase)
-      resource = await Cesium3DTileset.fromUrl(options.url, {
-        show: options.show ?? true,
-        maximumScreenSpaceError: options.maximumScreenSpaceError ?? 16,
-        shadows: options.shadows,
-      })
-      assertActive()
+      resource = await awaitLoad(
+        Cesium3DTileset.fromUrl(options.url, {
+          show: options.show ?? true,
+          maximumScreenSpaceError: options.maximumScreenSpaceError ?? 16,
+          shadows: options.shadows,
+          environmentMapOptions: {
+            maximumSecondsDifference: ENVIRONMENT_MAP_UPDATE_SECONDS,
+          },
+        }),
+        load.signal,
+        cleanupPrimitive,
+      )
+      checkLoad(load.signal)
       resource.customShader = options.visualStyle === 'cyber-scan' ? visual?.shader : undefined
+      if (options.dayNightPosition) {
+        if (!browserOptions.modelRendering) {
+          throw new Error('当前场景缺少街区昼夜渲染能力。')
+        }
+        renderingRegistration = browserOptions.modelRendering.registerTileset(
+          resource,
+          options.dayNightPosition,
+        )
+      } else {
+        environmentRegistration = browserOptions.modelRendering?.registerEnvironment(resource)
+      }
       viewer.scene.primitives.add(resource)
       added = true
       const managed: ManagedResource = {
@@ -643,12 +840,17 @@ export function createGeoDataBrowser(
           url: options.url,
         },
         resource,
+        environmentRegistration,
+        modelRenderingRegistration: renderingRegistration,
         requestedShow: options.show ?? true,
         autoHidden: false,
         maximumVisibleCameraHeight: options.maximumVisibleCameraHeight,
         visualStyle: options.visualStyle,
         tilesetVisual: visual,
         remove: () => {
+          removeTileFailureListener?.()
+          renderingRegistration?.dispose()
+          environmentRegistration?.dispose()
           if (resource && resource.customShader === visual?.shader) {
             resource.customShader = undefined
           }
@@ -662,10 +864,22 @@ export function createGeoDataBrowser(
       }
       syncResourceVisibility(managed)
       resources.set(id, managed)
+      if (options.dayNightPosition) {
+        removeTileFailureListener = resource.tileFailed.addEventListener(function tileFailed() {
+          if (!disposed && resources.has(id)) {
+            managed.tilesetError = '周边瓦片加载失败，请检查资源地址并重试。'
+            browserOptions.onResourcesError?.(managed.tilesetError)
+            browserOptions.onResourcesChange?.()
+          }
+        })
+      }
       notifyActiveTileset()
       requestRender()
       return snapshotFor(managed)
     } catch (error) {
+      removeTileFailureListener?.()
+      renderingRegistration?.dispose()
+      environmentRegistration?.dispose()
       if (resource) {
         if (added && !viewer.isDestroyed()) {
           viewer.scene.primitives.remove(resource)
@@ -674,6 +888,8 @@ export function createGeoDataBrowser(
       }
       visual?.dispose()
       throw error
+    } finally {
+      load.dispose()
     }
   }
 
@@ -754,11 +970,10 @@ export function createGeoDataBrowser(
       const model = managed.resource as Model
       await waitForModelReady(model)
       assertActive()
-      const range = Math.max(model.boundingSphere.radius * 2.5, 10)
       return new Promise(function flyToModel(resolve) {
         viewer.camera.flyToBoundingSphere(model.boundingSphere, {
           duration,
-          offset: new HeadingPitchRange(0, CesiumMath.toRadians(-25), range),
+          offset: modelCameraOffset(viewer, model.boundingSphere),
           complete() {
             requestRender()
             resolve(true)
@@ -826,6 +1041,8 @@ export function createGeoDataBrowser(
       return
     }
     disposed = true
+    pendingLoads.forEach((controller) => controller.abort())
+    pendingLoads.clear()
     terrainRequestVersion += 1
     ;[...pendingModelWaits].forEach(function cancelModelWait(cancel) {
       cancel()

@@ -1,6 +1,23 @@
 <template>
   <div class="geo-scene-panel">
     <section class="scene-panel__section">
+      <div class="scene-panel__heading"><span>显示模式</span></div>
+      <div class="scene-panel__modes" role="group" aria-label="显示模式">
+        <button
+          v-for="mode in renderModes"
+          :key="mode.id"
+          type="button"
+          :aria-pressed="controller.state.renderMode === mode.id"
+          @click="controller.setRenderMode(mode.id)"
+        >
+          {{ mode.label }}
+        </button>
+      </div>
+      <p class="scene-panel__hint">
+        {{ renderModes.find((mode) => mode.id === controller.state.renderMode)?.description }}
+      </p>
+    </section>
+    <section class="scene-panel__section">
       <div class="scene-panel__heading">
         <span>环境效果</span>
         <button type="button" title="刷新场景状态" @click="controller.refresh">↻</button>
@@ -56,8 +73,27 @@
 <script setup lang="ts">
 import type { GeoSceneController } from './scene.controller'
 import type { GeoSceneSettings } from '../../tools/scene/scene-settings'
+import type { GeoRenderMode } from '../../core/render-performance'
 
 const props = defineProps<{ controller: GeoSceneController }>()
+
+const renderModes: readonly { id: GeoRenderMode; label: string; description: string }[] = [
+  {
+    id: 'performance',
+    label: '性能',
+    description: '最高画质，锁定原生分辨率；适合录屏，硬件负载较高。',
+  },
+  {
+    id: 'balanced',
+    label: '平衡',
+    description: '保留昼夜与柔和阴影，自动调整清晰度以兼顾流畅度。',
+  },
+  {
+    id: 'compatible',
+    label: '兼容',
+    description: '关闭阴影、大气和多数特效，降低分辨率；适合低配硬件。',
+  },
+]
 
 const toggles: readonly { key: keyof GeoSceneSettings; label: string }[] = [
   { key: 'sun', label: '太阳' },
@@ -95,6 +131,28 @@ function setNumber(key: 'sunGlowFactor' | 'shadowDarkness', event: Event): void 
 .scene-panel__section {
   display: grid;
   gap: 10px;
+}
+.scene-panel__modes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.scene-panel__modes button {
+  min-height: 32px;
+  border: 1px solid var(--geo-line, #263c4e);
+  border-radius: 8px;
+  color: var(--geo-text-soft, #b6c5d2);
+  background: transparent;
+  cursor: pointer;
+}
+.scene-panel__modes button[aria-pressed='true'] {
+  color: var(--geo-accent, #45c8ff);
+  border-color: var(--geo-accent, #45c8ff);
+  background: var(--geo-surface-hover, #1b2a38);
+}
+.scene-panel__modes button:focus-visible {
+  outline: 2px solid var(--geo-accent, #45c8ff);
+  outline-offset: 2px;
 }
 .scene-panel__hint {
   margin: 0;
