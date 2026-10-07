@@ -12,7 +12,7 @@ updated: 2026-10-07
 
 ## 基线与使用方式
 
-来源为 Cyber-Sight 提交 `19646b40de73e114bf5447cfc14166af2c84bb47`，确认选择提交为 `68d655d`。本表记录提取处理依据；2026-10-07 已按边界在 CoAIForge 独立实现，目标技术提交 `6ae8374`、首基线提交 `bb67bd9`。保留 MIT LICENSE 和格式配置，协作规范、治理脚本与最小工程按目标改写；没有整仓复制或迁移来源业务。三种 Windows 工程技术验证通过，已推送 master，Windows/Linux CI 全部通过；前端人类验收尚待执行。
+来源为 Cyber-Sight 提交 `19646b40de73e114bf5447cfc14166af2c84bb47`，确认选择提交为 `68d655d`。本表记录提取处理依据；2026-10-07 已按边界在 CoAIForge 独立实现，目标技术提交 `6ae8374`、首基线提交 `bb67bd9`。保留 MIT LICENSE 和格式配置，协作规范、治理脚本与最小工程按目标改写；没有整仓复制或迁移来源业务。三种 Windows 工程技术验证通过，已推送 master，Windows/Linux CI 全部通过；维护者已确认前端人工验收通过，P1 已完成。
 
 目标原则见[正式设计](ai-collaboration-starter.md)。下列源路径均相对于来源仓库；目标路径属于 CoAIForge 的组合输出。源码事实已通过 CodeGraph 和针对性读取核对，未检查远端 Forge。
 
@@ -72,4 +72,4 @@ updated: 2026-10-07
 - 来源路径变更对照、目标无旧 scope/上游协议和产品业务残留检查；许可和来源说明不作为错误残留移除。
 - Windows/Linux 上适用技术检查及前端人工验收状态；未经执行不得写成通过。
 
-关联：[P1 实施计划](../plans/active/2026-10-07-ai-collaboration-starter-p1.md)。
+关联：[P1 实施计划](../archive/plans/2026-10-07-ai-collaboration-starter-p1.md)。

@@ -2,7 +2,7 @@
 
 - [master 分支集成](master-branch-integration.md)：保留本地桀士排版与远端 Geo 交付，合并 Platform 索引并复核共同合并树。
 
-- [独立 AI 协作启动模板](ai-collaboration-starter.md)：CoAIForge P1 技术实现与 Windows/Linux CI 已通过，前端人工验收待维护者；三种最小工程及单项目协作规范由目标仓库维护。
+- [独立 AI 协作启动模板](ai-collaboration-starter.md)：CoAIForge P1 技术实现与 Windows/Linux CI 已通过，前端人工验收已由维护者确认通过；三种最小工程及单项目协作规范由目标仓库维护。
 - [独立启动模板提取清单](ai-collaboration-starter-extraction.md)：来源基线、保留/改写/排除项、隐式依赖与待验证证据。
 
 - [桀士排版工作台 UI 与阅读交互](apps/jlab-wechat-editor-ui.md)：52px顶栏、悬停配色操作与弹窗改名、520px章节/历史抽屉、方括号内编号、公众号预览与阅读外壳。

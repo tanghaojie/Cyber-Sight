@@ -46,5 +46,5 @@ P1 保持 draft/not_started，未执行模板安装、启动、构建、后端/�
 - [正式设计](../../design/ai-collaboration-starter.md)
 - [提取清单](../../design/ai-collaboration-starter-extraction.md)
 - [长期决策](../../decisions/ADR-20261007-independent-ai-collaboration-starter.md)
-- [P1 实施计划](../../plans/active/2026-10-07-ai-collaboration-starter-p1.md)
+- [P1 实施计划](../../archive/plans/2026-10-07-ai-collaboration-starter-p1.md)
 - [AI 协作记录](../ai-logs/docs/2026/10/2026-10-07-ai-collaboration-starter-p0.md)

@@ -3,8 +3,8 @@ title: 独立 AI 协作启动模板 P1 实施计划
 scope: platform
 repository: Cyber-Sight
 owner: project maintainers
-status: pending_human_acceptance
-implementation_status: implemented_in_coaiforge
+status: completed
+implementation_status: completed_in_coaiforge
 created: 2026-10-07
 updated: 2026-10-07
 ---
@@ -13,7 +13,7 @@ updated: 2026-10-07
 
 ## 状态与目标
 
-维护者已授权并在 CoAIForge 完成 P1 技术实施。本文件保留为来源接续入口；实际实施、技术验证与剩余验收只在目标 `docs/plans/active/2026-10-07-starter-p1.md` 跟踪，不在两个仓库重复执行。CoAIForge 当前状态 pending_human_acceptance，技术提交为 `6ae8374`、真实基线记录为 `bb67bd9`；Windows/Linux CI 已通过，前端人类验收尚待执行。以下工作包是确认的原实施范围，复选框的最终状态以目标计划为准，不代表仍需在来源再次编码。
+维护者已授权并在 CoAIForge 完成 P1 技术实施。本文件保留为来源接续入口；实际实施、技术验证与剩余验收只在目标 `docs/archive/plans/2026-10-07-starter-p1.md` 跟踪，不在两个仓库重复执行。CoAIForge 当前状态 completed，技术提交为 `6ae8374`、真实基线记录为 `bb67bd9`；Windows/Linux CI 已通过，维护者已确认前端人工验收通过。以下工作包是确认的原实施范围，复选框的最终状态以目标计划为准，不代表仍需在来源再次编码。
 
 交付以 AGENTS.md 和 docs 为核心的三种独立启动工程。选择前端/后端为空启动，全栈只有 health + Zod 契约 + 前端状态展示。
 
@@ -48,44 +48,44 @@ npm 包名、CLI 安装与发布、升级机制属于后续 CLI 阶段，不阻�
 
 ### P1.1 目标工程与规范基线
 
-- [ ] 在已确认 CoAIForge 位置执行暂存区门禁，重查并保护既有文件，登记具体布局。
-- [ ] 建立公共基础、前端/后端片段和全栈 health 补充的单一规范来源、组合与参数清单；只包含已选择应用。
-- [ ] 编写无 scope 的 AGENTS.md、docs 入口、模块/开发/验证/文档治理设计。
-- [ ] 提供 design、ADR、plan、AI log 模板；状态和日期规则与脚本保持一致。
-- [ ] 为工具缺失、无 CodeGraph 索引提供标准命令路径。
+- [x] 在已确认 CoAIForge 位置执行暂存区门禁，重查并保护既有文件，登记具体布局。
+- [x] 建立公共基础、前端/后端片段和全栈 health 补充的单一规范来源、组合与参数清单；只包含已选择应用。
+- [x] 编写无 scope 的 AGENTS.md、docs 入口、模块/开发/验证/文档治理设计。
+- [x] 提供 design、ADR、plan、AI log 模板；状态和日期规则与脚本保持一致。
+- [x] 为工具缺失、无 CodeGraph 索引提供标准命令路径。
 
 ### P1.2 两种单选空工程
 
-- [ ] 前端最小 Vue/Vite/TypeScript 页面，删除原管理 UI、Cesium、Pinia/Router 等未用依赖。
-- [ ] 后端最小 Nest/Fastify 启动与关闭，不预置 root/health 业务接口、数据库或鉴权。
-- [ ] 配置各自的类型、Lint、开发、构建和启动命令；不引用缺选 workspace。
-- [ ] 固定经验证的运行环境、pnpm 和锁文件，记录环境变量及失败诊断。
+- [x] 前端最小 Vue/Vite/TypeScript 页面，删除原管理 UI、Cesium、Pinia/Router 等未用依赖。
+- [x] 后端最小 Nest/Fastify 启动与关闭，不预置 root/health 业务接口、数据库或鉴权。
+- [x] 配置各自的类型、Lint、开发、构建和启动命令；不引用缺选 workspace。
+- [x] 固定经验证的运行环境、pnpm 和锁文件，记录环境变量及失败诊断。
 
 ### P1.3 全栈 health 示例
 
-- [ ] 先建立最小共享 Zod 契约，登记包导出与构建顺序。
-- [ ] 新建 health 模块设计，登记公共文件、依赖、数据流和验证边界。
-- [ ] 后端只提供 GET /health 进程存活接口；消除 Public/auth/runtime/database 隐式依赖。
-- [ ] 前端请求并校验响应，展示加载/成功/失败；不可达、超时和非法响应不显示成功。
-- [ ] 后端和契约自动化验证实际响应、时间格式、错误结构及产物入口；测试不启动原应用或外部数据库。
-- [ ] 记录开发代理/生产 API 地址的配置方式，人工核对实际前后端调用。
+- [x] 先建立最小共享 Zod 契约，登记包导出与构建顺序。
+- [x] 新建 health 模块设计，登记公共文件、依赖、数据流和验证边界。
+- [x] 后端只提供 GET /health 进程存活接口；消除 Public/auth/runtime/database 隐式依赖。
+- [x] 前端请求并校验响应，展示加载/成功/失败；不可达、超时和非法响应不显示成功。
+- [x] 后端和契约自动化验证实际响应、时间格式、错误结构及产物入口；测试不启动原应用或外部数据库。
+- [x] 记录开发代理/生产 API 地址的配置方式，人工核对实际前后端调用。
 
 ### P1.4 治理脚本与 CI
 
-- [ ] 模块检查改为无 scope 的 modules 目录及公共边界，覆盖合法与非法依赖样例。
-- [ ] 提交类型、AI trailer 的规则与实际校验覆盖一致；安装 hooks 并提供 CI 检查。
-- [ ] 单项目审计解除 forge-sync、所有权 profile、来源 ledger 的依赖。
-- [ ] 验证 NOT_DUE/DUE/IN_PROGRESS/BLOCKED，以及无 Git、无首提交、首基线和损坏配置；最终 CI 不放行未完成审查。
-- [ ] 当前文档链接、状态、ADR 命名、AI 日志分类及归档索引检查与设计一致。
-- [ ] CI 按三种组合执行适用检查，不加入前端单元/组件/E2E/浏览器自动化。
+- [x] 模块检查改为无 scope 的 modules 目录及公共边界，覆盖合法与非法依赖样例。
+- [x] 提交类型、AI trailer 的规则与实际校验覆盖一致；安装 hooks 并提供 CI 检查。
+- [x] 单项目审计解除 forge-sync、所有权 profile、来源 ledger 的依赖。
+- [x] 验证 NOT_DUE/DUE/IN_PROGRESS/BLOCKED，以及无 Git、无首提交、首基线和损坏配置；最终 CI 不放行未完成审查。
+- [x] 当前文档链接、状态、ADR 命名、AI 日志分类及归档索引检查与设计一致。
+- [x] CI 按三种组合执行适用检查，不加入前端单元/组件/E2E/浏览器自动化。
 
 ### P1.5 独立验证与收尾
 
-- [ ] 三种输出各自在脱离来源仓库的干净目录安装与验证，固定锁文件可复现。
-- [ ] Windows 与 Linux 验证适用命令，记录成功、失败和未执行项；不以本机结果推断跨平台通过。
-- [ ] 检查无旧 scope、上游同步依赖、产品功能、个人路径和实际环境凭据；保留必要来源署名。
-- [ ] 人类验收前端空启动与全栈状态展示；未完成时明确保留待验收状态。
-- [ ] 更新设计、依赖/许可清单和实际结果；完成计划/日志归档、索引和适用审计后提交。
+- [x] 三种输出各自在脱离来源仓库的干净目录安装与验证，固定锁文件可复现。
+- [x] Windows 与 Linux 验证适用命令，记录成功、失败和未执行项；不以本机结果推断跨平台通过。
+- [x] 检查无旧 scope、上游同步依赖、产品功能、个人路径和实际环境凭据；保留必要来源署名。
+- [x] 人类验收前端空启动与全栈状态展示；未完成时明确保留待验收状态。
+- [x] 更新设计、依赖/许可清单和实际结果；完成计划/日志归档、索引和适用审计后提交。
 
 ## 验收矩阵
 
@@ -111,4 +111,4 @@ P1 不发布 npm、不修改线上入口、不删除来源应用。模板尚未�
 
 CoAIForge 已完成规范单一来源、组合清单、三种独立工程、health/Zod 全链路、模块/文档/提交/单项目归档检查和 CI。Node 24.18.0/pnpm 11.13.1 固定；三种输出分别在干净目录冻结安装、格式、Lint、类型、模块、文档、构建和适用测试通过；根治理与组合测试 22/22，后端和契约真实产物/HTTP 测试通过。无前端自动化测试。目标工作区干净，首提交后真实登记基线，正常归档 CI NOT_DUE。
 
-经维护者授权，6ae8374、bb67bd9 已推送到 CoAIForge 的 master。[远端 CI](https://github.com/tanghaojie/CoAIForge/actions/runs/37642662208) 对 bb67bd9 的治理及 Windows/Linux × 三种预设共 7 个任务全部通过。前端空启动、health 加载/成功/失败及刷新由维护者验收，整体 P1 尚不标 completed。CLI/npm 发布和 Geo/公众号编辑器迁移未开始。
+经维护者授权，6ae8374、bb67bd9 已推送到 CoAIForge 的 master。[远端 CI](https://github.com/tanghaojie/CoAIForge/actions/runs/37642662208) 对 bb67bd9 的治理及 Windows/Linux × 三种预设共 7 个任务全部通过。维护者已明确确认前端空启动、health 加载/成功/失败及刷新人工验收通过，整体 P1 标 completed 并完成归档。CLI/npm 发布和 Geo/公众号编辑器迁移未开始。

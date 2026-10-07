@@ -30,6 +30,6 @@ updated: 2026-10-07
 ## 关联
 
 - [正式设计](../../design/ai-collaboration-starter.md)
-- [P1 计划](../../plans/active/2026-10-07-ai-collaboration-starter-p1.md)
+- [P1 计划](../../archive/plans/2026-10-07-ai-collaboration-starter-p1.md)
 
 适用格式、diff 与归档 CI 检查通过，Platform 为 NOT_DUE；归档后台账未变更，最终相对链接检查见协作记录。未执行应用构建、模板生成或浏览器测试。关联提交为本文件所在 `docs(platform): confirm CoAIForge implementation choices`。

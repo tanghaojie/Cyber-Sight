@@ -46,8 +46,8 @@ P0 验证设计、来源清单和计划一致；P1 验证三套最小工程、�
 
 ## 适用边界与关联
 
-本 ADR 接受的是独立模板目标。2026-10-07 已在 CoAIForge 按本决策完成 P1 技术实施并推送 master，提交 6ae8374、bb67bd9 的三种独立工程及 Windows/Linux CI 已通过；前端人工验收仍待维护者，CLI/npm 和产品迁移未启动。保存在 Cyber-Sight 的文件仍按当前规则声明 platform；不废弃当前仓库的下游身份 ADR，也不改变现有源码目录、Foundation 文档或同步协议。
+本 ADR 接受的是独立模板目标。2026-10-07 已在 CoAIForge 按本决策完成 P1 技术实施并推送 master，提交 6ae8374、bb67bd9 的三种独立工程及 Windows/Linux CI 已通过；前端人工验收已由维护者确认通过，CLI/npm 和产品迁移未启动。保存在 Cyber-Sight 的文件仍按当前规则声明 platform；不废弃当前仓库的下游身份 ADR，也不改变现有源码目录、Foundation 文档或同步协议。
 
 - [正式设计](../design/ai-collaboration-starter.md)
 - [提取清单](../design/ai-collaboration-starter-extraction.md)
-- [P1 实施计划](../plans/active/2026-10-07-ai-collaboration-starter-p1.md)
+- [P1 实施计划](../archive/plans/2026-10-07-ai-collaboration-starter-p1.md)

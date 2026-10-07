@@ -49,6 +49,6 @@ change_type: docs
 - [提取清单](../../../../../design/ai-collaboration-starter-extraction.md)
 - [ADR](../../../../../decisions/ADR-20261007-independent-ai-collaboration-starter.md)
 - [P0 计划](../../../../plans/2026-10-07-ai-collaboration-starter-p0.md)
-- [P1 计划](../../../../../plans/active/2026-10-07-ai-collaboration-starter-p1.md)
+- [P1 计划](../../../../../archive/plans/2026-10-07-ai-collaboration-starter-p1.md)
 
 关联提交为包含本文件的 `docs(platform): define independent AI collaboration starter P0`，通过本文件 Git 历史追溯。

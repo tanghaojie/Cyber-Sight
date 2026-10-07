@@ -31,4 +31,4 @@ Platform ledger 推进到已存在的 66b264c0d8152d3fcfc859b97623c3edc8bc09b2�
 ## 关联
 
 - [复核计划](../../../../plans/2026-10-07-starter-p0-archive-review.md)
-- [P1 计划](../../../../../plans/active/2026-10-07-ai-collaboration-starter-p1.md)
+- [P1 计划](../../../../../archive/plans/2026-10-07-ai-collaboration-starter-p1.md)
