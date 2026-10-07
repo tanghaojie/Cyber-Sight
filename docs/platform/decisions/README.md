@@ -2,6 +2,8 @@
 
 当前 Platform 决策：
 
+- [独立 AI 协作启动模板](ADR-20261007-independent-ai-collaboration-starter.md)：未来模板去除所有权 scope，保留严格协作协议，提供前端/后端空工程与全栈 health 示例；不改变本仓库现行身份。
+
 - [桀士排版配置即时保存与主动文章版本](ADR-20261005-jlab-local-storage-history.md)：配置无历史，文章默认 current，主动时间戳版本。
 
 - [桀士排版采用独立纯前端应用](ADR-20261004-jlab-wechat-editor-standalone-app.md)：独立 apps 应用、产品名称、技术栈、功能裁剪与工作台交互边界。

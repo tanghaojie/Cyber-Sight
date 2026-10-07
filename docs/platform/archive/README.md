@@ -1,5 +1,7 @@
 # Platform 历史归档
 
+- [2026-10-07 独立 AI 协作启动模板 P0](plans/2026-10-07-ai-collaboration-starter-p0.md)：将已确认的无业务预设、三种工程和单项目治理方案整理为设计、提取清单、ADR 与未启动 P1 计划；[协作记录](ai-logs/docs/2026/10/2026-10-07-ai-collaboration-starter-p0.md)。仅完成文档，不包含模板代码或 CLI。
+
 - [2026-10-07 桀士排版第二轮人工验收调整](plans/2026-10-07-jlab-ui-acceptance.md)：悬停配色操作与弹窗改名、导入对齐、公众号预览、宽章节/历史抽屉、方括号内编号和提示移除；[协作记录](ai-logs/fix/2026/10/2026-10-07-jlab-ui-acceptance.md)。
 - [2026-10-07 桀士排版近期交付文档归档复核](plans/2026-10-07-jlab-ui-archive-review.md)：核对40df307..9ccc7d9，保留有效设计和ADR、推进真实基线；[协作记录](ai-logs/docs/2026/10/2026-10-07-jlab-ui-archive-review.md)。
 

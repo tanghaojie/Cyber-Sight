@@ -1,5 +1,8 @@
 # Platform 设计索引
 
+- [独立 AI 协作启动模板](ai-collaboration-starter.md)：已确认的无业务预设、三种启动工程、单项目文档与严格协作规则；P1 尚未实施。
+- [独立启动模板提取清单](ai-collaboration-starter-extraction.md)：来源基线、保留/改写/排除项、隐式依赖与待验证证据。
+
 - [桀士排版工作台 UI 与阅读交互](apps/jlab-wechat-editor-ui.md)：52px顶栏、悬停配色操作与弹窗改名、520px章节/历史抽屉、方括号内编号、公众号预览与阅读外壳。
 
 - [桀士排版存储与文章版本](apps/jlab-wechat-editor-storage.md)：配置/固定结尾即时 localStorage、IndexedDB current 与主动时间戳版本、迁移和并发边界。
