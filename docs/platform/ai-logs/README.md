@@ -2,6 +2,8 @@
 
 独立 AI 协作启动模板 P0 协作记录已完成并归档，从[历史归档索引](../archive/README.md)追溯；未启动 P1 代码。
 
+P0 提交后的 Platform 归档复核记录也已归档，覆盖 `9ccc7d9..66b264c`，不包含新的应用运行验收。
+
 [第二轮人工验收调整](../archive/ai-logs/fix/2026/10/2026-10-07-jlab-ui-acceptance.md)与[近期交付归档复核](../archive/ai-logs/docs/2026/10/2026-10-07-jlab-ui-archive-review.md)已完成并归档，记录配色弹窗、宽抽屉、编号和预览布局及真实审查基线。
 
 [统一配色数量与重置](../archive/ai-logs/fix/2026/10/2026-10-06-jlab-palette-limit.md)已完成并归档，记录总数规则、重置与旧数据保护。
