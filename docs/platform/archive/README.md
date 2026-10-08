@@ -1,7 +1,7 @@
 # Platform 历史归档
 
 - [2026-10-07 CoAIForge P1 完成计划](plans/2026-10-07-ai-collaboration-starter-p1.md)：三种工程、Windows/Linux CI 和维护者前端人工验收全部通过；[验收收尾记录](ai-logs/docs/2026/10/2026-10-07-coaiforge-acceptance.md)。
-- [2026-10-07 CoAIForge 接续后的 Platform 复核](plans/2026-10-07-coaiforge-platform-archive-review.md)：核对基线后的三个文档提交、当前 Design/ADR 及真实目标 CI，将 Platform 台账推进到 d68b759，保留 P1 人工验收边界；[协作记录](ai-logs/docs/2026/10/2026-10-07-coaiforge-platform-archive-review.md)。
+- [2026-10-07 CoAIForge 接续后的 Platform 复核](plans/2026-10-07-coaiforge-platform-archive-review.md)：核对交接与验收收尾的当前 Design/ADR、历史链接及真实目标 CI，Platform 台账最终推进到 44f71af，P1 人工验收已通过；[协作记录](ai-logs/docs/2026/10/2026-10-07-coaiforge-platform-archive-review.md)。
 - [2026-10-07 CoAIForge P1 实施接续](plans/2026-10-07-coaiforge-handoff.md)：目标三种工程与治理已实现并推送，Windows/Linux CI 全部通过，前端验收待维护者；[协作记录](ai-logs/docs/2026/10/2026-10-07-coaiforge-handoff.md)。
 - [2026-10-07 CoAIForge 实施前选择确认](plans/2026-10-07-coaiforge-decisions.md)：确认已建仓库、公共基础与片段组合、原归档阈值、CLI 只初始化 Git 和 MIT；[协作记录](ai-logs/docs/2026/10/2026-10-07-coaiforge-decisions.md)。P1 仍未实施。
 
