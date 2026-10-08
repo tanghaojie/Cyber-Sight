@@ -3,7 +3,7 @@ title: 桀士排版独立仓库迁移
 scope: platform
 repository: Cyber-Sight
 status: accepted
-implementation_status: planned
+implementation_status: technically-migrated-pending-human-acceptance
 owner: project maintainers
 updated: 2026-10-08
 ---
@@ -14,15 +14,27 @@ updated: 2026-10-08
 
 维护者确认将桀士排版迁入独立仓库和目录 `JLabWeChatEditor`，英文名称沿用 JLab WeChat Editor，完整保留当前功能与界面，先完成独立运行。目标采用 CoAIForge 0.2.0 前端工程和单项目协作规范，逐项验证业务依赖兼容性。首次打开原稿为空，保留默认配色和排版设置；不迁移源应用浏览器数据。
 
-本轮交付设计与实施计划，不执行工程创建、代码迁移、远端仓库创建、推送或部署。本文保存在来源仓库，因此声明 `scope: platform`；目标工程使用单项目 docs，不携带 Foundation/Platform 所有权和 Forge 同步机制。部署平台与域名尚未确定，本阶段的实现交付为可独立安装、开发和静态部署的应用。
+设计编制后，维护者创建了目标仓库、目录和 CoAIForge 前端模板，并明确授权完成迁移及相关设计、决策移植。迁移技术交付已完成，目标工程使用单项目 docs，不携带 Foundation/Platform 所有权和 Forge 同步机制。本文保存在来源仓库，因此声明 `scope: platform`。部署平台与域名尚未确定，本阶段交付为可独立安装、开发和静态部署的应用；未执行推送或正式部署。
 
 ## 当前事实与来源基线
+
+### 实际迁移结果
+
+来源提取基线为 `2e48a6c8b37a60c9bda704d6c3fefa4ce4fd7ef4`。目标位于 `C:/Users/thj_3/Desktop/JLabWeChatEditor`，origin 为 `https://github.com/tanghaojie/JLabWeChatEditor.git`，分支为 master。维护者初始模板提交为 `b86bf90444a12ae7560eecc2ae03f7b65a6b3ff0`，生成清单确认 CLI/template 0.2.0、frontend 预设与快照 `d07a9fcac33cbc1d40e57ab2c9de46cfaa8c80f9`。
+
+目标技术提交为 `e8332edf5885c91a9b8546c60cc47cd2c4b7298b`，归档台账提交为 `04397afc33377dfb5b3f1752cab4a3b55f8914da`，审查基线登记到技术提交。六模块、入口、配置、锁文件和静态部署说明已迁入。产品、UI、存储、迁移及六模块设计和三份适用 ADR 已适配为目标现行文档；原始设计和调研保存在目标 reference 并标记来源证据。目标 `docs/design/`、`docs/decisions/` 是独立产品后续规范，目标活动计划是技术任务与人工验收的单一记录。
+
+Windows Node 24.19.0、pnpm 11.22.0 下严格 peer 冻结安装、格式、Lint、类型、构建、模块与文档检查通过，21 项治理测试通过。静态 HTML 与相对资源在根路径及 `/jlab/` 子路径访问通过；没有执行浏览器功能自动化。六模块 25 个文件与来源核对，仅有空原稿初始化和保持显示效果的空格字符引用变化。Lint 有 222 条警告，生产 JS 为 524.41 kB，保留 Vite 超过 500 kB 的体积警告；没有通过放宽检查隐藏问题。
+
+目标使用独立开发/预览端口 5175/4175，不读取、复制或清空源浏览器数据。桌面 UI、存储、剪贴板和真实公众号效果仍待维护者人工验收，计划保留 `pending_human_acceptance`。Cyber-Sight 源应用及现行产品设计保留，未删除或切换访问入口。
+
+### 设计时来源记录
 
 2026-10-08 核对来源 HEAD 为 `64a67f2fdcec0df8b2012359237e1aa8bd813216`。源应用在 `apps/wechat-editor/`，包名 `@jlab/wechat-editor`，共有六个业务模块。定向读取源码导入、入口、配置和存储适配器，未发现对 `apps/frontend`、`apps/backend` 或 API 契约包的业务导入。工程仍依赖根 TypeScript 配置、锁文件、Lint、格式与文档治理，不能只复制 src 就宣称独立。
 
 目标模板基线采用 create-coaiforge 0.2.0，而不是随时间变化的 latest。CoAIForge 本地记录的发布快照来源为 `d07a9fcac33cbc1d40e57ab2c9de46cfaa8c80f9`；实施时核对实际包版本及生成清单，不将本轮读取发布记录当成再次执行 npm 消费验证。源应用若在实施前发生变化，重新审查差异并登记实际来源 SHA，不机械覆盖维护者改动。
 
-现行产品、UI、存储和模块设计仍描述 Cyber-Sight 中的源应用。此设计不将它们提前改为“已迁移”，不把尚未完成的公众号人工验收写为通过。
+来源产品、UI、存储和模块设计仍描述 Cyber-Sight 中保留的源应用。目标适配后的设计描述独立产品，不把尚未完成的公众号人工验收写为通过。
 
 ## 范围与非目标
 
@@ -40,7 +52,7 @@ updated: 2026-10-08
 npm create coaiforge@0.2.0 JLabWeChatEditor -- --preset frontend --name jlab-wechat-editor
 ```
 
-命令是未来实施步骤，本轮未运行。目标包名建议为 `@jlab-wechat-editor/frontend`，由生成结果确认并写入目标设计。本地父目录、远端地址、默认分支和仓库是否已创建在实施前核对；不凭目录名推断存在 GitHub 仓库。
+该命令保留为生成方式参考；实际模板由维护者生成，AI 未重新创建或覆盖初始仓库。目标包名已确认是 `@jlab-wechat-editor/frontend`；实际目录、origin、分支和提交见上述迁移结果。
 
 ```text
 JLabWeChatEditor/
@@ -131,7 +143,7 @@ AI 可执行冻结/严格 peer 安装、格式、Lint、TypeScript、生产构�
 
 ## 未决事项与关联
 
-实施前核对目标父目录、仓库实际状态、远端与分支；部署时确认平台、域名和 base。这些不阻碍本轮设计交付，但分别阻止未经确认的目标写入与正式发布。
+目标目录、仓库状态、origin、分支与模板基线已核对。剩余事项为目标人工功能/公众号验收，以及正式发布时的平台、域名和 origin 确认；目前未授权推送、正式发布或删除来源应用。
 
 - [迁移决策](../../decisions/ADR-20261008-jlab-independent-repository.md)
 - [实施计划](../../plans/active/2026-10-08-jlab-independent-migration.md)

@@ -1,6 +1,6 @@
 # Platform 设计索引
 
-- [桀士排版独立仓库迁移](apps/jlab-wechat-editor-migration.md)：JLabWeChatEditor、CoAIForge 0.2.0 工具链、完整保留功能/UI、空原稿与静态交付；已完成设计，尚未迁移。
+- [桀士排版独立仓库迁移](apps/jlab-wechat-editor-migration.md)：JLabWeChatEditor 六模块、设计与决策已迁入，静态技术验证通过，人工验收待维护者；来源应用保留。
 
 - [master 分支集成](master-branch-integration.md)：保留本地桀士排版与远端 Geo 交付，合并 Platform 索引并复核共同合并树。
 

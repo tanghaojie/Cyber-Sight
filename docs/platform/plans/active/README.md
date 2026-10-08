@@ -1,6 +1,6 @@
 # Platform 活动实施计划
 
-- [桀士排版独立迁移](2026-10-08-jlab-independent-migration.md)：设计与选择已确认；工程初始化、六模块迁入、技术验证和人工验收尚未执行。
+- [桀士排版独立迁移来源交接](2026-10-08-jlab-independent-migration.md)：目标技术交付已完成，详细技术任务由目标计划维护；待人工验收后完成来源归档。
 
 [master 冲突处理与共同合并树归档复核](../../archive/plans/2026-10-07-master-conflict-resolution.md)已完成归档，合并提交为 `7d17cf6`；发布证据在最终交付反馈核对。
 
