@@ -1,5 +1,7 @@
 # Platform 历史归档
 
+- [2026-10-08 桀士排版独立迁移设计与计划编制](ai-logs/docs/2026/10/2026-10-08-jlab-independent-migration-design.md)：完成用户选择确认、设计、ADR 和待实施计划；未生成目标工程或迁移代码，实施计划仍在活动区。
+
 - [2026-10-07 CoAIForge P1 完成计划](plans/2026-10-07-ai-collaboration-starter-p1.md)：三种工程、Windows/Linux CI 和维护者前端人工验收全部通过；[验收收尾记录](ai-logs/docs/2026/10/2026-10-07-coaiforge-acceptance.md)。
 - [2026-10-07 CoAIForge 接续后的 Platform 复核](plans/2026-10-07-coaiforge-platform-archive-review.md)：核对交接与验收收尾的当前 Design/ADR、历史链接及真实目标 CI，Platform 台账最终推进到 44f71af，P1 人工验收已通过；[协作记录](ai-logs/docs/2026/10/2026-10-07-coaiforge-platform-archive-review.md)。
 - [2026-10-07 CoAIForge P1 实施接续](plans/2026-10-07-coaiforge-handoff.md)：目标三种工程与治理已实现并推送，Windows/Linux CI 全部通过，前端验收待维护者；[协作记录](ai-logs/docs/2026/10/2026-10-07-coaiforge-handoff.md)。

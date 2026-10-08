@@ -2,6 +2,8 @@
 
 当前 Platform 决策：
 
+- [桀士排版独立仓库与工具链](ADR-20261008-jlab-independent-repository.md)：迁入 JLabWeChatEditor、采用 CoAIForge 0.2.0、完整保留功能/UI，不迁旧数据、首开空原稿，先交付可静态部署应用。
+
 - [独立 AI 协作启动模板](ADR-20261007-independent-ai-collaboration-starter.md)：未来模板去除所有权 scope，保留严格协作协议，提供前端/后端空工程与全栈 health 示例；不改变本仓库现行身份。
 
 - [桀士排版配置即时保存与主动文章版本](ADR-20261005-jlab-local-storage-history.md)：配置无历史，文章默认 current，主动时间戳版本。

@@ -1,5 +1,7 @@
 # Platform 活动实施计划
 
+- [桀士排版独立迁移](2026-10-08-jlab-independent-migration.md)：设计与选择已确认；工程初始化、六模块迁入、技术验证和人工验收尚未执行。
+
 [master 冲突处理与共同合并树归档复核](../../archive/plans/2026-10-07-master-conflict-resolution.md)已完成归档，合并提交为 `7d17cf6`；发布证据在最终交付反馈核对。
 
 [独立 AI 协作启动模板 P1](../../archive/plans/2026-10-07-ai-collaboration-starter-p1.md)已完成归档：CoAIForge 技术实现、Windows/Linux CI 及维护者前端人工验收全部通过。CLI/npm 与产品迁移属于后续阶段。
