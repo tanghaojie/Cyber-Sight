@@ -41,7 +41,7 @@ status: completed
 
 ## 相关设计、ADR、计划和提交
 
-- [开源推广站设计](../../../../design/marketing-site.md)
+- [开源推广站设计](../../../design/marketing-site.md)
 - [实施计划](../../../../archive/plans/2026-08-10-website-seo.md)
-- [ADR-0037](../../../../decisions/ADR-0037-static-marketing-site.md)
+- [ADR-0037](../../../decisions/ADR-0037-static-marketing-site.md)
 - 提交：`feat(website): improve bilingual SEO`

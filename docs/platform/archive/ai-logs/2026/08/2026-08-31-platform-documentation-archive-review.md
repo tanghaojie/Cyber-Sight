@@ -44,7 +44,7 @@ status: completed
 
 ## 相关设计、ADR、计划和提交
 
-- [Geo 当前设计](../../../design/modules/geo.md)
-- [插件架构 ADR](../../../decisions/ADR-20260814-geo-frontend-plugin-architecture.md)
-- [仿真时间 ADR](../../../decisions/ADR-20260830-geo-simulation-time-and-solar-lighting.md)
-- [本次审查计划](../../../archive/plans/2026-08-31-platform-documentation-archive-review.md)
+- [Geo 当前设计](../../../../design/modules/geo.md)
+- [插件架构 ADR](../../../../decisions/ADR-20260814-geo-frontend-plugin-architecture.md)
+- [仿真时间 ADR](../../../../decisions/ADR-20260830-geo-simulation-time-and-solar-lighting.md)
+- [本次审查计划](../../../plans/2026-08-31-platform-documentation-archive-review.md)

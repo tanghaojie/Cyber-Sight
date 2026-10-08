@@ -67,5 +67,5 @@ updated: 2026-08-30
 ## 相关设计、ADR 和 AI 日志
 
 - [Geo 前端空间可视化工作台](../../design/modules/geo.md)
-- [Geo 影像默认源与失败隔离](../../decisions/ADR-20260820-geo-imagery-defaults.md)
+- [Geo 影像默认源与失败隔离](../decisions/ADR-20260820-geo-imagery-defaults.md)
 - [AI 协作记录](../ai-logs/2026/08/2026-08-30-geo-imagery-fallback-and-recovery.md)

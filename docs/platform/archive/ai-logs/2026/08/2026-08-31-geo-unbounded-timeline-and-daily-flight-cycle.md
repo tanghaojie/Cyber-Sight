@@ -43,5 +43,5 @@ Time controller 采用 `ClockRange.UNBOUNDED`，保留唯一 `viewer.clock` 并�
 
 ## 相关设计和计划
 
-- [设计方案](../../../design/modules/geo-unbounded-timeline.md)
-- [实施计划](../../../archive/plans/2026-08-31-geo-unbounded-timeline-and-daily-flight-cycle.md)
+- [设计方案](../../../../design/modules/geo-unbounded-timeline.md)
+- [实施计划](../../../plans/2026-08-31-geo-unbounded-timeline-and-daily-flight-cycle.md)

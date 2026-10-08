@@ -74,4 +74,4 @@ trigger_commit: 2910f7d07098d476aabe508b8f20ab18c2054aed
 - [Geo 前端空间可视化工作台](../../design/modules/geo.md)
 - [Geo 使用第二个 HTML 构建入口](../../decisions/ADR-20260901-geo-second-build-entry.md)
 - [Geo 第二个构建入口实施计划](../../archive/plans/2026-09-01-geo-second-build-entry.md)
-- [本次归档审查协作记录](../../ai-logs/2026/09/2026-09-01-platform-documentation-archive-review-2.md)
+- [本次归档审查协作记录](../ai-logs/2026/09/2026-09-01-platform-documentation-archive-review-2.md)

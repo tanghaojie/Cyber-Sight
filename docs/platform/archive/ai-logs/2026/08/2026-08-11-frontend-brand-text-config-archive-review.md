@@ -37,7 +37,7 @@ status: completed
 
 ## 相关设计、ADR、计划和提交
 
-- [分层文档与历史归档](../../../../design/documentation-governance.md)
+- [分层文档与历史归档](../../../../../foundation/design/documentation-governance.md)
 - [前端品牌文字配置 ADR](../../../../decisions/ADR-20260811-frontend-brand-text-config.md)
-- [审查计划](../../../plans/active/2026-08-11-frontend-brand-text-config-archive-review.md)
+- [审查计划](../../../plans/2026-08-11-frontend-brand-text-config-archive-review.md)
 - 关联提交：`0111e95`、`2d9b304`。

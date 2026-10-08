@@ -1,36 +1,15 @@
 # Platform 历史归档
 
-- [2026-10-08 桀士排版独立迁移来源交接](ai-logs/docs/2026/10/2026-10-08-jlab-migration-handoff.md)：目标六模块与设计、决策已迁移，技术提交与真实归档基线已记录；人工验收仍待维护者，来源交接计划保持活动。
-
-- [2026-10-08 桀士排版独立迁移设计与计划编制](ai-logs/docs/2026/10/2026-10-08-jlab-independent-migration-design.md)：完成用户选择确认、设计、ADR 和待实施计划；未生成目标工程或迁移代码，实施计划仍在活动区。
+- [2026-10-08 独立产品拆分收尾](plans/2026-10-08-product-separation.md)：原应用、专属记录和依赖移除，剩余工程验证通过，修复 80 处旧链接；[协作记录](ai-logs/refactor/2026/10/2026-10-08-product-separation.md)。
 
 - [2026-10-07 CoAIForge P1 完成计划](plans/2026-10-07-ai-collaboration-starter-p1.md)：三种工程、Windows/Linux CI 和维护者前端人工验收全部通过；[验收收尾记录](ai-logs/docs/2026/10/2026-10-07-coaiforge-acceptance.md)。
 - [2026-10-07 CoAIForge 接续后的 Platform 复核](plans/2026-10-07-coaiforge-platform-archive-review.md)：核对交接与验收收尾的当前 Design/ADR、历史链接及真实目标 CI，Platform 台账最终推进到 44f71af，P1 人工验收已通过；[协作记录](ai-logs/docs/2026/10/2026-10-07-coaiforge-platform-archive-review.md)。
 - [2026-10-07 CoAIForge P1 实施接续](plans/2026-10-07-coaiforge-handoff.md)：目标三种工程与治理已实现并推送，Windows/Linux CI 全部通过，前端验收待维护者；[协作记录](ai-logs/docs/2026/10/2026-10-07-coaiforge-handoff.md)。
 - [2026-10-07 CoAIForge 实施前选择确认](plans/2026-10-07-coaiforge-decisions.md)：确认已建仓库、公共基础与片段组合、原归档阈值、CLI 只初始化 Git 和 MIT；[协作记录](ai-logs/docs/2026/10/2026-10-07-coaiforge-decisions.md)。P1 仍未实施。
 
-- [2026-10-07 master 冲突处理与共同合并树归档复核](plans/2026-10-07-master-conflict-resolution.md)：保留桀士排版/P0 与 Geo 双方历史，4 个文档冲突已处理，台账推进到共同提交 `7d17cf6`；[协作记录](ai-logs/chore/2026/10/2026-10-07-master-conflict-resolution.md)。
-
-- [2026-10-07 启动模板 P0 交付后归档复核](plans/2026-10-07-starter-p0-archive-review.md)：复核 `9ccc7d9..66b264c` 的桀士排版 UI 与模板文档，推进 Platform 真实审查基线，保留未启动 P1；[协作记录](ai-logs/docs/2026/10/2026-10-07-starter-p0-archive-review.md)。
+- [2026-10-07 启动模板 P0 交付后归档复核](plans/2026-10-07-starter-p0-archive-review.md)：复核 `9ccc7d9..66b264c` 的模板文档，推进 Platform 真实审查基线，保留未启动 P1；[协作记录](ai-logs/docs/2026/10/2026-10-07-starter-p0-archive-review.md)。
 
 - [2026-10-07 独立 AI 协作启动模板 P0](plans/2026-10-07-ai-collaboration-starter-p0.md)：将已确认的无业务预设、三种工程和单项目治理方案整理为设计、提取清单、ADR 与未启动 P1 计划；[协作记录](ai-logs/docs/2026/10/2026-10-07-ai-collaboration-starter-p0.md)。仅完成文档，不包含模板代码或 CLI。
-
-- [2026-10-07 桀士排版第二轮人工验收调整](plans/2026-10-07-jlab-ui-acceptance.md)：悬停配色操作与弹窗改名、导入对齐、公众号预览、宽章节/历史抽屉、方括号内编号和提示移除；[协作记录](ai-logs/fix/2026/10/2026-10-07-jlab-ui-acceptance.md)。
-- [2026-10-07 桀士排版近期交付文档归档复核](plans/2026-10-07-jlab-ui-archive-review.md)：核对40df307..9ccc7d9，保留有效设计和ADR、推进真实基线；[协作记录](ai-logs/docs/2026/10/2026-10-07-jlab-ui-archive-review.md)。
-
-- [2026-10-06 桀士排版品牌与按钮视觉调整](plans/2026-10-06-jlab-brand-icons.md)：中文标题和副标题、操作图标及浅灰手机边框；[协作记录](ai-logs/style/2026/10/2026-10-06-jlab-brand-icons.md)。
-
-- [2026-10-06 桀士排版统一配色数量与重置](plans/2026-10-06-jlab-palette-limit.md)：总计1至9组，默认配色可修改删除，重置为六组；[协作记录](ai-logs/fix/2026/10/2026-10-06-jlab-palette-limit.md)。
-
-- [2026-10-06 桀士排版验收修改后 Platform 归档复核](plans/2026-10-06-jlab-acceptance-archive-review.md)：核对6ee37c..40df307并推进真实基线；[协作记录](ai-logs/docs/2026/10/2026-10-06-jlab-acceptance-archive-review.md)。
-
-- [2026-10-06 桀士排版人工验收调整](plans/2026-10-06-jlab-acceptance-fixes.md)：章节独立序号、配色管理、宽抽屉、完整阅读外壳和600字/分钟；[协作记录](ai-logs/fix/2026/10/2026-10-06-jlab-acceptance-fixes.md)。
-
-- [2026-10-06 桀士排版完整 UI 与交互改造](plans/2026-10-05-jlab-ui-redesign.md)：52px顶栏、可视化抽屉、来源映射气泡、手机/电脑阅读外壳、稳定反馈与输出升级；实现`87f1f9e`，技术验证通过、人工验收待执行。[协作记录](ai-logs/feat/2026/10/2026-10-05-jlab-ui-redesign.md)。
-
-- [2026-10-05 存储实施后 Platform 归档复核](plans/2026-10-05-jlab-storage-archive-review.md)：复核宽度、滚动条和存储历史实现，台账推进到实际 6ee37c；人工验收待执行。
-
-- [2026-10-05 桀士排版数据存储与文章版本](plans/2026-10-05-jlab-storage-history.md)：配置实时 localStorage、文章 current 与主动时间戳版本；静态验证通过，功能人工验收待执行。
 
 - [Platform 归档审查台账](archive-ledger.json)：当前业务平台最近一次完成审查的 Git 基线；下游独立推进。
 
@@ -41,23 +20,6 @@
 - [Cyber-Sight 推广站设计](design/marketing-site.md)：因下游删除推广站应用和 GitHub Pages 工作流，不再作为当前实现。
 
 ## 已完成计划
-
-- [2026-10-05 桀士排版最小宽度 800px](plans/2026-10-05-jlab-min-width.md)：页面宽度与单层顶栏内部横向滚动；人工验收待执行。
-- [2026-10-05 桀士排版宽度调整前 Platform 归档复核](plans/2026-10-05-jlab-width-archive-review.md)：核对注册及滚动/保存修复，台账推进到实际 b1a098c。
-
-- [2026-10-05 桀士排版组件注册修复](plans/2026-10-05-jlab-component-registration.md)：补齐 Drawer 与 Radio 样式，并更正 Radio 空安装器为显式组件注册；技术检查通过，运行时人工验收待执行。
-- [2026-10-05 桀士排版布局后的归档复核](plans/2026-10-05-jlab-layout-archive-review.md)：复核 25ff537，推进 Platform 实际基线。
-
-- [2026-10-05 桀士排版工作台交互调整](plans/2026-10-05-jlab-layout-refinement.md)：覆盖抽屉、无占位分隔图标、标题旁操作与插图/下载功能移除；技术检查通过，人工验收待执行。
-
-- [2026-10-05 桀士排版实施后的 Platform 归档复核](plans/2026-10-05-jlab-platform-archive-review.md)：复核实际实现 `5fc0bd1`，推进台账，保留人工验收边界。
-
-- [2026-10-05 桀士排版独立应用实施](plans/2026-10-05-jlab-wechat-editor.md)：横屏纯前端单页、排版/草稿/素材与候选公众号复制；技术验证通过，人工验收待执行。
-
-- [2026-10-04 编辑器调研提交后的 Platform 归档复核](plans/2026-10-04-wechat-research-platform-archive-review.md)：按授权同步两处既有文档并复核独立应用设计提交 `063d503`，推进 Platform 台账。
-- [2026-10-04 桀士排版独立应用设计](plans/2026-10-04-jlab-wechat-editor-design.md)：确认 apps 下纯前端单页、技术栈、裁剪功能和抽屉/分栏方案，尚未开发应用。
-- [2026-10-04 公众号兼容规范调研](plans/2026-10-04-wechat-editor-wechat-compatibility.md)：官方结构/CSS/字体/深色规范、候选输出矩阵和人工验收样本。
-- [2026-10-04 Punk 微排技术调研](plans/2026-10-04-wechat-editor-research.md)：报告已提交；原站证据保留，产品现行方案见桀士排版独立应用设计。
 
 - [2026-10-04 Geo 交付与 master 合并及发布](plans/2026-10-04-geo-master-merge.md)：合并 PRISM 与 Geo，保留全部源码和历史，统一 Platform 归档基线。
 
@@ -143,23 +105,6 @@
 - [2026-08-30 Geo 影像与宽屏交付后的 Platform 文档归档审查](plans/2026-08-30-platform-documentation-archive-review-3.md)：复核影像恢复与宽屏交付并推进 Platform 台账。
 
 ## AI 协作记录
-
-- [2026-10-05 桀士排版最小宽度 800px](ai-logs/style/2026/10/2026-10-05-jlab-min-width.md)
-
-- [2026-10-05 桀士排版滚动与自动保存布局](ai-logs/fix/2026/10/2026-10-05-jlab-scroll-autosave.md)：双栏滚动、底部统计与顶栏自动保存；[实施计划](plans/2026-10-05-jlab-scroll-autosave.md)。静态验证通过，人工验收待执行。
-
-- [2026-10-05 桀士排版组件注册修复](ai-logs/fix/2026/10/2026-10-05-jlab-component-registration.md)
-
-- [2026-10-05 桀士排版工作台交互调整](ai-logs/feat/2026/10/2026-10-05-jlab-layout-refinement.md)
-
-- [2026-10-05 桀士排版实施后的 Platform 归档复核](ai-logs/docs/2026/10/2026-10-05-jlab-platform-archive-review.md)
-
-- [2026-10-05 桀士排版独立应用实施](ai-logs/feat/2026/10/2026-10-05-jlab-wechat-editor.md)
-
-- [2026-10-04 编辑器调研提交后的 Platform 归档复核](ai-logs/docs/2026/10/2026-10-04-wechat-research-platform-archive-review.md)
-- [2026-10-04 桀士排版独立应用设计](ai-logs/docs/2026/10/2026-10-04-jlab-wechat-editor-design.md)
-- [2026-10-04 公众号兼容规范调研](ai-logs/docs/2026/10/2026-10-04-wechat-editor-wechat-compatibility.md)
-- [2026-10-04 Punk 微排技术调研报告](ai-logs/docs/2026/10/2026-10-04-wechat-editor-research.md)
 
 - [2026-10-04 Geo 交付合并至 master](ai-logs/chore/2026/10/2026-10-04-geo-master-merge.md)
 

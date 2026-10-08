@@ -36,4 +36,4 @@ status: completed
 ## 相关设计、ADR、计划和提交
 
 - [Geo 当前设计](../../../../design/modules/geo.md)
-- [归档审查计划](../../../../plans/2026-08-31-platform-documentation-archive-review-3.md)
+- [归档审查计划](../../../plans/2026-08-31-platform-documentation-archive-review-3.md)

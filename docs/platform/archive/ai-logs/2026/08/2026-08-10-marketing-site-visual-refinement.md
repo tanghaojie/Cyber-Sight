@@ -41,6 +41,6 @@ status: completed
 
 ## 相关设计、ADR、计划和提交
 
-- [推广站设计](../../../../design/marketing-site.md)
+- [推广站设计](../../../design/marketing-site.md)
 - [实施计划](../../../plans/2026-08-10-marketing-site-visual-refinement.md)
-- [归档审查计划](../../../plans/2026-08-10-documentation-archive-review.md)
+- [归档审查计划](../../../../../foundation/archive/plans/2026-08-10-documentation-archive-review.md)

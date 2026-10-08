@@ -35,5 +35,5 @@ status: completed
 
 ## 相关设计、ADR、计划和提交
 
-- [Geo 前端空间可视化工作台](../../../design/modules/geo.md)
+- [Geo 前端空间可视化工作台](../../../../design/modules/geo.md)
 - [实施计划](../../../plans/2026-08-31-geo-workbench-terrain-acceptance-fixes.md)

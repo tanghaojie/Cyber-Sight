@@ -21,7 +21,7 @@ trigger_commit: e9e68d0d3eef715cf6c2bdf13c4ad4077ab50f52
 
 2026-08-20 的 `pnpm docs:archive:check:ci` 因 Platform 基线之后的已完成功能达到 3 项返回 `DUE`。本次复核只处理 Cyber-Sight 自有的 `platform` 作用域；Foundation 为 inherited，Forge 为 excluded，不修改或同步 `docs/foundation/**`。
 
-复核依据包括 [Platform 文档治理设计](../../../foundation/design/documentation-governance.md)、[Geo 当前设计](../../design/modules/geo.md) 和 [Geo 底图默认策略 ADR](../../decisions/ADR-20260820-geo-imagery-defaults.md)。
+复核依据包括 [Platform 文档治理设计](../../../foundation/design/documentation-governance.md)、[Geo 当前设计](../../design/modules/geo.md) 和 [Geo 底图默认策略 ADR](../decisions/ADR-20260820-geo-imagery-defaults.md)。
 
 ## 范围
 
@@ -66,6 +66,6 @@ trigger_commit: e9e68d0d3eef715cf6c2bdf13c4ad4077ab50f52
 ## 相关设计、ADR 和 AI 日志
 
 - [Geo 当前设计](../../design/modules/geo.md)
-- [Geo 底图默认策略 ADR](../../decisions/ADR-20260820-geo-imagery-defaults.md)
+- [Geo 底图默认策略 ADR](../decisions/ADR-20260820-geo-imagery-defaults.md)
 - [Geo 底图目录交互与默认加载修复计划](2026-08-20-geo-imagery-ui-and-loading.md)
-- [本次复核 AI 记录](../../ai-logs/2026/08/2026-08-20-geo-documentation-archive-review.md)
+- [本次复核 AI 记录](../ai-logs/2026/08/2026-08-20-geo-documentation-archive-review.md)

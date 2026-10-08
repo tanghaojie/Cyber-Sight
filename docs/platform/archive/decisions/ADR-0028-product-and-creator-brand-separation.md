@@ -55,6 +55,6 @@ date: 2026-07-31
 
 ## 相关设计和计划
 
-- [CYBER 品牌与视觉系统](../design/branding.md)
-- [实施计划](../archive/plans/2026-07-31-cyber-branding.md)
+- [CYBER 品牌与视觉系统](../../design/branding.md)
+- [实施计划](https://github.com/tanghaojie/Cyber-Sight/blob/ccb98ea8155c95a6610222847b023171aad76917/docs/archive/plans/2026-07-31-cyber-branding.md)
 - [ADR-0031：Cyber AI Forge 品牌与项目级技术标识](ADR-0031-cyber-ai-forge-brand.md)

@@ -52,7 +52,7 @@ updated: 2026-10-07
 
 - `scripts/forge-sync.mjs`、`scripts/forge-sync.test.mjs`、`.forge-sync.yml`、当前 `.archive-audit.json` 所有权配置和 Git upstream 安全配置。
 - `docs/foundation/design/foundation-platform-ownership.md` 中上游/下游机制，以及产品品牌、部署、业务设计、历史计划、历史 AI 日志和来源归档台账。
-- `apps/frontend/src/platform/`、`apps/backend/src/platform/` 的业务内容；Geo 与桀士排版留在后续独立迁移阶段。
+- `apps/frontend/src/platform/`、`apps/backend/src/platform/` 的业务内容；业务能力留在后续独立迁移阶段。
 - 现有认证/授权/管理模块、数据库与迁移、完整应用壳、PRISM/design-tokens、Cesium 及无实际用途的依赖。
 - `.git`、`.codegraph`、个人 AI 会话/配置、实际环境变量文件、构建产物和本机路径。
 
@@ -73,3 +73,7 @@ updated: 2026-10-07
 - Windows/Linux 上适用技术检查及前端人工验收状态；未经执行不得写成通过。
 
 关联：[P1 实施计划](../archive/plans/2026-10-07-ai-collaboration-starter-p1.md)。
+
+## 2026-10-08 拆分后的记录边界
+
+按维护者明确授权，本文件已移除独立产品内容，仅保留仓库集成或通用模板证据；原始完整记录仍由 Git 历史追溯。

@@ -61,6 +61,6 @@ Geo 需要为个人研究提供可开关的实时航班展示。OpenSky 匿名�
 
 ## 相关设计和计划
 
-- [Geo 前端空间可视化工作台](../design/modules/geo.md)
-- [Geo 单一仿真时间与太阳光照](ADR-20260830-geo-simulation-time-and-solar-lighting.md)
-- [Geo OpenSky 实时航线展示计划](../archive/plans/2026-08-31-geo-opensky-live-flights.md)
+- [Geo 前端空间可视化工作台](../../design/modules/geo.md)
+- [Geo 单一仿真时间与太阳光照](../../decisions/ADR-20260830-geo-simulation-time-and-solar-lighting.md)
+- [Geo OpenSky 实时航线展示计划](../plans/2026-08-31-geo-opensky-live-flights.md)

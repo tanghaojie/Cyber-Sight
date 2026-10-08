@@ -51,5 +51,5 @@ updated: 2026-08-10
 
 ## 相关设计、ADR 和 AI 日志
 
-- [推广站设计](../../design/marketing-site.md)
-- [ADR-0037](../../decisions/ADR-0037-static-marketing-site.md)
+- [推广站设计](../design/marketing-site.md)
+- [ADR-0037](../decisions/ADR-0037-static-marketing-site.md)

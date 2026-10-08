@@ -71,6 +71,6 @@ updated: 2026-08-10
 
 ## 相关设计、ADR 和 AI 日志
 
-- [开源推广站设计](../../design/marketing-site.md)
-- [ADR-0037：独立静态应用发布开源推广站](../../decisions/ADR-0037-static-marketing-site.md)
-- [AI 协作记录](../../ai-logs/2026/08/2026-08-10-website-seo.md)
+- [开源推广站设计](../design/marketing-site.md)
+- [ADR-0037：独立静态应用发布开源推广站](../decisions/ADR-0037-static-marketing-site.md)
+- [AI 协作记录](../ai-logs/2026/08/2026-08-10-website-seo.md)

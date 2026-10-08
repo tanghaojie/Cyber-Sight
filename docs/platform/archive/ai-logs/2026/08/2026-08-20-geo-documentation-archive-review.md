@@ -47,4 +47,4 @@ status: completed
 
 - [本次复核计划](../../../plans/2026-08-20-geo-documentation-archive-review.md)
 - [Geo 当前设计](../../../../design/modules/geo.md)
-- [Geo 底图默认策略 ADR](../../../../decisions/ADR-20260820-geo-imagery-defaults.md)
+- [Geo 底图默认策略 ADR](../../../decisions/ADR-20260820-geo-imagery-defaults.md)

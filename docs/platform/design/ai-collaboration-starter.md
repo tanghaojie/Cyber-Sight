@@ -12,7 +12,7 @@ updated: 2026-10-07
 
 ## 定位与状态
 
-维护者已确认目标：提炼 Cyber-Sight 的人与 AI 协作经验，形成独立项目模板。核心交付是 AGENTS.md、现行设计和文档治理体系；代码只提供最小启动环境。P0 交付设计与清单，P1 制作可运行模板，后续阶段才实现并发布 CLI，最后迁移 Geo 和桀士排版。
+维护者已确认目标：提炼 Cyber-Sight 的人与 AI 协作经验，形成独立项目模板。核心交付是 AGENTS.md、现行设计和文档治理体系；代码只提供最小启动环境。P0 交付设计与清单，P1 制作可运行模板，后续阶段才实现并发布 CLI，后续业务迁移按各独立项目规划。
 
 本文是已接受的目标设计。2026-10-07 已在 CoAIForge 完成 P1 技术实现与三种工程的 Windows 独立验证，目标提交为 `6ae8374`、`bb67bd9`；经维护者授权已推送 master，[Windows/Linux CI](https://github.com/tanghaojie/CoAIForge/actions/runs/37642662208) 的 7 个任务全部通过，维护者已明确确认前端人工验收通过，P1 已完成。文件位于来源仓库，按当前规则声明 `scope: platform`；新模板自身的代码、文档、审计配置均不采用 Forge/Foundation/Platform scope，不继承上游只读身份，也不使用 Forge 合并同步协议。该决定不修改 Cyber-Sight 现行架构或治理。
 
@@ -144,3 +144,7 @@ P1 在 CoAIForge 固定并验证 Node 24.18.0、pnpm 11.13.1，以及 Vue 3/Vite
 - [P1 实施计划](../archive/plans/2026-10-07-ai-collaboration-starter-p1.md)
 
 P0 的交付仍为文档；P1 技术实现及实际证据由 [CoAIForge](https://github.com/tanghaojie/CoAIForge) 独立维护，提交 `6ae8374`、`bb67bd9` 已推送 master，Windows/Linux CI 全部通过。P1 接续记录已完成归档，不在 Cyber-Sight 重复执行模板代码。P0 及本次来源同步从 Platform 归档索引追溯。
+
+## 2026-10-08 拆分后的记录边界
+
+按维护者明确授权，本文件已移除独立产品内容，仅保留仓库集成或通用模板证据；原始完整记录仍由 Git 历史追溯。

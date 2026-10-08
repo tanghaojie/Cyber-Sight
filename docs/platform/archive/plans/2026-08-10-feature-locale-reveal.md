@@ -48,5 +48,5 @@ updated: 2026-08-10
 
 ## 相关设计、ADR 和 AI 日志
 
-- [推广站设计](../../design/marketing-site.md)
+- [推广站设计](../design/marketing-site.md)
 - [AI 协作记录](../ai-logs/2026/08/2026-08-10-feature-locale-reveal.md)

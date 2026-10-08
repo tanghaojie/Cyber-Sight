@@ -37,4 +37,4 @@ Google · 混合底图失败时不自动添加其他源；其已有可恢复瓦�
 
 - [Geo 当前设计](../../../../design/modules/geo.md)
 - [Google 混合默认底图 ADR](../../../../decisions/ADR-20260831-geo-google-hybrid-default.md)
-- [实施计划](../../../../plans/2026-08-31-geo-google-hybrid-default.md)
+- [实施计划](../../../plans/2026-08-31-geo-google-hybrid-default.md)

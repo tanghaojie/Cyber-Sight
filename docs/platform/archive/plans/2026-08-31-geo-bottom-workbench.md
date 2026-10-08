@@ -64,4 +64,4 @@ Time 插件已经通过 `bottomDocks` 注册全局时间轴，Shell 已拥有状
 
 - [Geo 前端空间可视化工作台](../../design/modules/geo.md)
 - [Geo 时间轴与太阳光照 ADR](../../decisions/ADR-20260830-geo-simulation-time-and-solar-lighting.md)
-- [本次协作记录](../../ai-logs/2026/08/2026-08-31-geo-bottom-workbench.md)
+- [本次协作记录](../ai-logs/2026/08/2026-08-31-geo-bottom-workbench.md)

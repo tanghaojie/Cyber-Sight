@@ -73,6 +73,6 @@ baseline_commit: 63cf20a920f2d398dc22ce3340bc1118b1ee1f5e
 ## 相关设计、ADR 和 AI 日志
 
 - [CYBER 品牌与视觉系统](../../design/branding.md)
-- [前端应用与应用壳](../../design/modules/frontend.md)
+- [前端应用与应用壳](../../../foundation/design/modules/frontend.md)
 - [ADR-20260811-frontend-brand-text-config](../../decisions/ADR-20260811-frontend-brand-text-config.md)
 - [AI 协作记录](../ai-logs/2026/08/2026-08-11-frontend-brand-text-config.md)

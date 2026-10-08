@@ -35,5 +35,5 @@ status: completed
 
 ## 相关设计、ADR、计划和提交
 
-- [推广站设计](../../../../design/marketing-site.md)
+- [推广站设计](../../../design/marketing-site.md)
 - [实施计划](../../../plans/2026-08-10-feature-locale-reveal.md)

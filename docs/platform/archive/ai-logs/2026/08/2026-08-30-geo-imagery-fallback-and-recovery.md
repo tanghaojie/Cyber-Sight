@@ -43,6 +43,6 @@ status: completed
 ## 相关设计、ADR、计划和提交
 
 - [Geo 当前设计](../../../../design/modules/geo.md)
-- [影像默认源 ADR](../../../../decisions/ADR-20260820-geo-imagery-defaults.md)
+- [影像默认源 ADR](../../../decisions/ADR-20260820-geo-imagery-defaults.md)
 - [实施计划](../../../../archive/plans/2026-08-30-geo-imagery-fallback-and-recovery.md)
 - 关联提交：本次交付提交。

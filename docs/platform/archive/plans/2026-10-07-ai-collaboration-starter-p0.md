@@ -18,7 +18,7 @@ updated: 2026-10-07
 
 ## 非目标
 
-不创建独立仓库，不实施模板代码或 CLI，不发布 npm 包，不迁移 Geo/桀士排版，不修改 Foundation、根 AGENTS.md、工程脚本或当前归档台账。
+不创建独立仓库，不实施模板代码或 CLI，不发布 npm 包，不迁移业务应用，不修改 Foundation、根 AGENTS.md、工程脚本或当前归档台账。
 
 ## 实施任务
 
@@ -48,3 +48,7 @@ P1 保持 draft/not_started，未执行模板安装、启动、构建、后端/�
 - [长期决策](../../decisions/ADR-20261007-independent-ai-collaboration-starter.md)
 - [P1 实施计划](../../archive/plans/2026-10-07-ai-collaboration-starter-p1.md)
 - [AI 协作记录](../ai-logs/docs/2026/10/2026-10-07-ai-collaboration-starter-p0.md)
+
+## 2026-10-08 拆分后的记录边界
+
+按维护者明确授权，本文件已移除独立产品内容，仅保留仓库集成或通用模板证据；原始完整记录仍由 Git 历史追溯。

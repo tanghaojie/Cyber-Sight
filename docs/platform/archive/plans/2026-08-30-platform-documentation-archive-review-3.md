@@ -67,5 +67,5 @@ trigger_commit: bf4bdccc818ad11d6ddca740f76148d83e15928b
 ## 相关设计、ADR 和 AI 日志
 
 - [Geo 前端空间可视化工作台](../../design/modules/geo.md)
-- [Geo 影像默认源与失败隔离 ADR](../../decisions/ADR-20260820-geo-imagery-defaults.md)
+- [Geo 影像默认源与失败隔离 ADR](../decisions/ADR-20260820-geo-imagery-defaults.md)
 - [本次审查 AI 记录](../ai-logs/2026/08/2026-08-30-platform-documentation-archive-review-3.md)

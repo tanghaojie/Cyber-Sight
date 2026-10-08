@@ -41,6 +41,6 @@ status: completed
 
 - [Geo 前端空间可视化工作台](../../../../design/modules/geo.md)
 - [Geo 前端编译期插件架构](../../../../decisions/ADR-20260814-geo-frontend-plugin-architecture.md)
-- [Geo 影像默认源与失败隔离](../../../../decisions/ADR-20260820-geo-imagery-defaults.md)
+- [Geo 影像默认源与失败隔离](../../../decisions/ADR-20260820-geo-imagery-defaults.md)
 - [Geo 数据面板与地图交互精简计划](../../../plans/2026-08-20-geo-panel-interaction-refinement.md)
 - 关联提交：本轮最终 Git 提交（以 `git log -1` 为准）

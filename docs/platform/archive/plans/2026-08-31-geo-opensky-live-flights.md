@@ -86,5 +86,5 @@ updated: 2026-08-31
 ## 相关设计、ADR 和 AI 日志
 
 - [Geo 前端空间可视化工作台](../../design/modules/geo.md)
-- [Geo OpenSky 实时航班数据边界 ADR](../../decisions/ADR-20260831-geo-opensky-live-flight-tracking.md)
+- [Geo OpenSky 实时航班数据边界 ADR](../decisions/ADR-20260831-geo-opensky-live-flight-tracking.md)
 - [本次 AI 协作记录](../ai-logs/2026/08/2026-08-31-geo-opensky-live-flights.md)

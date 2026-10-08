@@ -43,7 +43,7 @@ updated: 2026-09-01
 
 ## 相关设计、ADR、计划和提交
 
-- [Geo 设计](../../../design/modules/geo.md)
-- [Geo 双入口 ADR](../../../decisions/ADR-20260901-geo-second-build-entry.md)
-- [Geo 双入口实施计划](../../../archive/plans/2026-09-01-geo-second-build-entry.md)
+- [Geo 设计](../../../../design/modules/geo.md)
+- [Geo 双入口 ADR](../../../../decisions/ADR-20260901-geo-second-build-entry.md)
+- [Geo 双入口实施计划](../../../plans/2026-09-01-geo-second-build-entry.md)
 - [归档审查计划](../../../plans/2026-09-01-platform-documentation-archive-review-2.md)

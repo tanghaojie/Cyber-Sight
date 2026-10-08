@@ -45,5 +45,5 @@ Geo 工作台需要在无第三方网络或令牌的环境中仍提供可用首�
 
 ## 相关设计和计划
 
-- [Geo 前端空间可视化工作台](../design/modules/geo.md)
-- [Geo 前端交互完善计划](../archive/plans/2026-08-20-geo-frontend-interaction-completion.md)
+- [Geo 前端空间可视化工作台](../../design/modules/geo.md)
+- [Geo 前端交互完善计划](../plans/2026-08-20-geo-frontend-interaction-completion.md)

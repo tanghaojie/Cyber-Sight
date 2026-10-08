@@ -10,7 +10,7 @@ superseded_by: ADR-20260820-geo-imagery-defaults-and-coordinate-correction.md
 
 # ADR-20260820：Geo 影像默认源与失败隔离
 
-> 本 ADR 已被 [Geo 影像默认源与坐标校正](../../decisions/ADR-20260820-geo-imagery-defaults-and-coordinate-correction.md) 取代。Natural Earth 默认底图的结论不再适用于当前 Geo 产品需求。
+> 本 ADR 已被 [Geo 影像默认源与坐标校正](ADR-20260820-geo-imagery-defaults-and-coordinate-correction.md) 取代。Natural Earth 默认底图的结论不再适用于当前 Geo 产品需求。
 
 ## 背景
 

@@ -71,4 +71,4 @@ updated: 2026-08-29
 ## 相关设计、ADR 和 AI 日志
 
 - [Geo 前端空间可视化工作台](../../design/modules/geo.md)
-- [本次 AI 协作记录](../../ai-logs/2026/08/2026-08-29-geo-contour-interaction.md)
+- [本次 AI 协作记录](../ai-logs/2026/08/2026-08-29-geo-contour-interaction.md)

@@ -20,7 +20,7 @@ baseline_commit: 2d9b3043f98cb33e074b84e7bee11adfeda7c4fc
 
 依据：
 
-- [分层文档与历史归档](../../design/documentation-governance.md)
+- [分层文档与历史归档](../../../foundation/design/documentation-governance.md)
 - [前端品牌文字配置 ADR](../../decisions/ADR-20260811-frontend-brand-text-config.md)
 - [归档审计台账](../../archive/archive-ledger.json)
 
@@ -72,7 +72,7 @@ baseline_commit: 2d9b3043f98cb33e074b84e7bee11adfeda7c4fc
 
 ## 相关设计、ADR 和 AI 日志
 
-- [分层文档与历史归档](../../design/documentation-governance.md)
+- [分层文档与历史归档](../../../foundation/design/documentation-governance.md)
 - [前端品牌文字配置 ADR](../../decisions/ADR-20260811-frontend-brand-text-config.md)
 - [功能实施计划](../../archive/plans/2026-08-11-frontend-brand-text-config.md)
 - [功能 AI 协作记录](../../archive/ai-logs/2026/08/2026-08-11-frontend-brand-text-config.md)

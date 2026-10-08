@@ -45,6 +45,6 @@ status: completed
 ## 相关设计、ADR、计划和提交
 
 - [CYBER 品牌与视觉系统](../../../../design/branding.md)
-- [前端应用与应用壳](../../../../design/modules/frontend.md)
+- [前端应用与应用壳](../../../../../foundation/design/modules/frontend.md)
 - [ADR-20260811-frontend-brand-text-config](../../../../decisions/ADR-20260811-frontend-brand-text-config.md)
 - [实施计划](../../../plans/2026-08-11-frontend-brand-text-config.md)

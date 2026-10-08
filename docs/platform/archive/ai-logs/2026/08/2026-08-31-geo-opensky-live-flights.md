@@ -49,7 +49,7 @@ status: completed
 
 ## 相关设计、ADR、计划和提交
 
-- [Geo 当前设计](../../../design/modules/geo.md)
+- [Geo 当前设计](../../../../design/modules/geo.md)
 - [OpenSky 实时航班 ADR](../../../decisions/ADR-20260831-geo-opensky-live-flight-tracking.md)
 - [实施计划](../../../plans/2026-08-31-geo-opensky-live-flights.md)
 - 关联提交：`feat: add OpenSky live flight layer`。

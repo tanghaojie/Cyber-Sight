@@ -13,7 +13,7 @@ updated: 2026-08-10
 
 ## 背景与设计依据
 
-依据[推广站设计](../../design/marketing-site.md)、[品牌视觉系统](../../design/branding.md)和 [ADR-0037](../../decisions/ADR-0037-static-marketing-site.md)。视觉方案参考 `ui-ux-pro-max` 的暗色开发者工具落地页、宽松密度、功能展示与可访问动效建议，并由 `frontend-design` 收敛为工业编辑式系统蓝图。
+依据[推广站设计](../design/marketing-site.md)、[品牌视觉系统](../../design/branding.md)和 [ADR-0037](../decisions/ADR-0037-static-marketing-site.md)。视觉方案参考 `ui-ux-pro-max` 的暗色开发者工具落地页、宽松密度、功能展示与可访问动效建议，并由 `frontend-design` 收敛为工业编辑式系统蓝图。
 
 ## 范围
 
@@ -63,6 +63,6 @@ updated: 2026-08-10
 
 ## 相关设计、ADR 和 AI 日志
 
-- [推广站设计](../../design/marketing-site.md)
-- [ADR-0037](../../decisions/ADR-0037-static-marketing-site.md)
+- [推广站设计](../design/marketing-site.md)
+- [ADR-0037](../decisions/ADR-0037-static-marketing-site.md)
 - [AI 协作记录](../ai-logs/2026/08/2026-08-10-marketing-site.md)

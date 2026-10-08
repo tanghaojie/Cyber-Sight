@@ -47,5 +47,5 @@ status: completed
 ## 相关设计、ADR、计划和提交
 
 - [Geo 当前设计](../../../../design/modules/geo.md)
-- [影像默认源 ADR](../../../../decisions/ADR-20260820-geo-imagery-defaults.md)
+- [影像默认源 ADR](../../../decisions/ADR-20260820-geo-imagery-defaults.md)
 - [本次审查计划](../../../../archive/plans/2026-08-30-platform-documentation-archive-review-3.md)

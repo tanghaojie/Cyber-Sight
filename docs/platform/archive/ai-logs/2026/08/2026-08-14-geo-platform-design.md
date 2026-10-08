@@ -191,5 +191,5 @@ status: completed
 - [Geo 前端空间可视化工作台](../../../../design/modules/geo.md)
 - [Geo 前端编译期插件架构](../../../../decisions/ADR-20260814-geo-frontend-plugin-architecture.md)
 - [Geo 前端工作台实施计划](../../../plans/2026-08-14-geo-frontend-workspace.md)
-- [Geo 文档归档审查计划](../../../../plans/active/2026-08-17-geo-documentation-archive-review.md)
+- [Geo 文档归档审查计划](../../../plans/2026-08-17-geo-documentation-archive-review.md)
 - 被纠正的初版设计提交：`45d29def200e01d989437dcf009c331b0207030a`；纯前端范围修正提交：`599a7d10210e23882dd629703f7b16190c390ac7`；动态菜单、Viewer 运行时和插件细化提交：`94615b0a6056304cac085d7371e18d5044d285e2`；Viewer 命名和纯工具/UI 分层修订见本记录所在提交。

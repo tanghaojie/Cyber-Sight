@@ -72,10 +72,10 @@ updated: 2026-08-07
 
 ## 相关设计、ADR 和 AI 日志
 
-- [前端应用与应用壳](../../design/modules/frontend.md)
-- [工作台模块](../../design/modules/home.md)
-- [认证模块](../../design/modules/auth.md)
-- [菜单模块](../../design/modules/menus.md)
+- [前端应用与应用壳](../../../foundation/design/modules/frontend.md)
+- [工作台模块](../../../foundation/design/modules/home.md)
+- [认证模块](../../../foundation/design/modules/auth.md)
+- [菜单模块](../../../foundation/design/modules/menus.md)
 - [CYBER 品牌与视觉系统](../../design/branding.md)
 - [AI 协作记录](../ai-logs/2026/08/2026-08-07-about-project.md)
 - 相关提交：`3a63ad81a2fb2b85a918f7a2bb426e9d497114f9`

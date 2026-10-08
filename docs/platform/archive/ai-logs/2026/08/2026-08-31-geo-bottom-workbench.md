@@ -43,6 +43,6 @@ status: completed
 
 ## 相关设计、ADR、计划和提交
 
-- [Geo 前端空间可视化工作台](../../../design/modules/geo.md)
-- [实施计划](../../../plans/active/2026-08-31-geo-bottom-workbench.md)
+- [Geo 前端空间可视化工作台](../../../../design/modules/geo.md)
+- [实施计划](../../../plans/2026-08-31-geo-bottom-workbench.md)
 - 提交：`feat(geo): unify collapsible bottom workbench`
