@@ -1,5 +1,7 @@
 # Platform 历史归档
 
+- [2026-10-08 独立产品拆分后的 Platform 文档复核](plans/2026-10-08-product-separation-archive-review.md)：复核清理与链接修复，台账推进到真实 `4221d9c`；[协作记录](ai-logs/docs/2026/10/2026-10-08-product-separation-archive-review.md)。
+
 - [2026-10-08 独立产品拆分收尾](plans/2026-10-08-product-separation.md)：原应用、专属记录和依赖移除，剩余工程验证通过，修复 80 处旧链接；[协作记录](ai-logs/refactor/2026/10/2026-10-08-product-separation.md)。
 
 - [2026-10-07 CoAIForge P1 完成计划](plans/2026-10-07-ai-collaboration-starter-p1.md)：三种工程、Windows/Linux CI 和维护者前端人工验收全部通过；[验收收尾记录](ai-logs/docs/2026/10/2026-10-07-coaiforge-acceptance.md)。

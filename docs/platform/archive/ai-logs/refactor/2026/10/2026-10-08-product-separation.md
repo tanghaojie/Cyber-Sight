@@ -31,3 +31,5 @@ change_type: refactor
 Windows Node 24.19.0/pnpm 11.22.0 下冻结离线安装、格式、Lint、架构、四个 workspace 类型/生产构建、10 项仓库脚本测试、契约产物校验、17 文件共 143 项后端测试、diff 及最终归档 CI 通过。归档状态 NOT_DUE。保留原有 Sass legacy API、Rollup PURE 注释与 Geo 大 chunk 提示。不运行前端或浏览器自动化，不把静态构建当作 Geo 人工效果验收。关联提交从本文件 Git 历史定位，创建后核验真实模型 trailer；不推送。
 
 关联[设计](../../../../../design/product-separation.md)、[计划](../../../../plans/2026-10-08-product-separation.md)。
+
+技术交付提交为 4221d9cbe4a466cb6bcb9565014ea568cb241b1b，模型标记已核验。提交后审计因历史完成计划的链接修改触发 DUE；已完成[独立复核](../../../docs/2026/10/2026-10-08-product-separation-archive-review.md)，推进 Platform 的真实基线并恢复最终 NOT_DUE。

@@ -33,3 +33,5 @@ updated: 2026-10-08
 Windows Node 24.19.0/pnpm 11.22.0 下冻结离线安装、format/format:check、Lint、架构、四个 workspace 类型/生产构建、10 项仓库脚本测试、契约产物校验和 17 文件共 143 项后端测试通过。686 个剩余应用/共享包/Foundation 文件未改。diff 与最终归档 CI 通过，归档状态 NOT_DUE；原有 Sass legacy API、Rollup PURE 与 Geo chunk 提示保留。
 
 本轮本地提交通过本文件 Git 历史定位，提交标记创建后核验。本次不推送或部署，不重写 Git 历史，不操作任何浏览器数据；前端与 Geo 的人工验收不属于本次删除检查。
+
+技术提交 `4221d9cbe4a466cb6bcb9565014ea568cb241b1b` 后归档审计计入历史完成计划的链接修改并触发 DUE；已完成[后续复核](2026-10-08-product-separation-archive-review.md)，Platform 台账推进到该真实提交，最终 CI 为 NOT_DUE。

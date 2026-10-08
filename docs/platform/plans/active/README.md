@@ -1,5 +1,7 @@
 # Platform 活动实施计划
 
+[独立产品拆分后的 Platform 文档复核](../../archive/plans/2026-10-08-product-separation-archive-review.md)已完成，台账推进到真实技术提交 `4221d9c`，最终归档 CI 为 NOT_DUE。
+
 [master 冲突处理与共同合并树归档复核](../../archive/plans/2026-10-07-master-conflict-resolution.md)已完成归档，合并提交为 `7d17cf6`；发布证据在最终交付反馈核对。
 
 [独立 AI 协作启动模板 P1](../../archive/plans/2026-10-07-ai-collaboration-starter-p1.md)已完成归档：CoAIForge 技术实现、Windows/Linux CI 及维护者前端人工验收全部通过。CLI/npm 与产品迁移属于后续阶段。

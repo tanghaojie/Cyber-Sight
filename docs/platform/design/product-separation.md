@@ -39,4 +39,6 @@ Cyber-Sight 继续拥有 Geo 与平台业务，使用 Foundation 公共接口；
 
 构建保留原有 Sass legacy API、Rollup PURE 注释及 Geo 大 chunk 提示；没有放宽门禁。前端/Geo 人工视觉验收不属于本次代码删除验证。最终归档 CI 为 NOT_DUE，任务记录完成归档，本轮提交通过关联文件 Git 历史定位；未推送或部署。
 
-关联[已完成计划](../archive/plans/2026-10-08-product-separation.md)。
+技术交付提交为 `4221d9cbe4a466cb6bcb9565014ea568cb241b1b`。提交后旧完成计划链接修改触发 Platform DUE（计数 23），已单独完成文档复核，将台账推进到该真实技术提交；不修改阈值或继承作用域。
+
+关联[已完成计划](../archive/plans/2026-10-08-product-separation.md)、[文档复核](../archive/plans/2026-10-08-product-separation-archive-review.md)。
