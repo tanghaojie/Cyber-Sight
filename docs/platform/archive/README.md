@@ -1,5 +1,7 @@
 # Platform 历史归档
 
+- [2026-10-17 建筑建模与飞入拼装要求同步](plans/2026-10-17-building-modeling-requirements.md)：CS-AM-1 制作契约与 AIModels 完整执行版/任务书；[协作记录](ai-logs/docs/2026/10/2026-10-17-building-modeling-requirements.md)。
+
 - [2026-10-17 AIModels 接入后的 Platform 文档复核](plans/2026-10-17-aimodels-archive-review.md)：明确发布坐标与手工 URL 边界，核对两个远端与发布证据；[协作记录](ai-logs/docs/2026/10/2026-10-17-aimodels-archive-review.md)。
 
 - [2026-10-17 AIModels 发布协议与 Geo 模型目录接入](plans/2026-10-17-geo-ai-models.md)：模型目录、质量选择、关联资源与线上验证；[协作记录](ai-logs/feat/2026/10/2026-10-17-geo-ai-models.md)。
