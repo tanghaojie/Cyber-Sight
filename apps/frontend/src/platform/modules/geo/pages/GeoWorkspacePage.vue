@@ -178,6 +178,12 @@ const taskDefinitions = computed<readonly GeoTaskItem[]>(function taskMetadata()
       description: t('geo.tasks.dataDescription'),
     },
     {
+      id: 'external-data',
+      label: t('geo.tasks.externalData'),
+      icon: 'link',
+      description: t('geo.tasks.externalDataDescription'),
+    },
+    {
       id: 'view',
       label: t('geo.tasks.view'),
       icon: 'monitor',

@@ -1,5 +1,6 @@
 import { defineComponent, h } from 'vue'
 import DataPanel from './DataPanel.vue'
+import ExternalDataPanel from './ExternalDataPanel.vue'
 import ModelCoordinateDialog from './ModelCoordinateDialog.vue'
 import type { GeoPluginDefinition, GeoPluginContext } from '../../core/geo-plugin'
 import {
@@ -28,11 +29,11 @@ export interface GeoDataPluginInstance {
   dispose(): void
 }
 
-function panelFor(controller: GeoDataController) {
+function panelFor(controller: GeoDataController, external = false) {
   return defineComponent({
-    name: 'GeoDataPluginPanel',
+    name: external ? 'GeoExternalDataPluginPanel' : 'GeoDataPluginPanel',
     setup() {
-      return () => h(DataPanel, { controller })
+      return () => h(external ? ExternalDataPanel : DataPanel, { controller })
     },
   })
 }
@@ -96,8 +97,20 @@ export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): Geo
               }),
             },
           ],
-          groups: [{ id: 'data', label: '数据', icon: 'database', order: 10 }],
+          groups: [
+            { id: 'data', label: '数据', icon: 'database', order: 10 },
+            { id: 'external-data', label: '外部数据', icon: 'link', order: 15 },
+          ],
           tools: [
+            {
+              id: 'external-data-browser',
+              kind: 'panel',
+              panelId: 'data.external-panel',
+              groupId: 'external-data',
+              label: '外部数据',
+              icon: 'link',
+              order: 15,
+            },
             {
               id: 'data-browser',
               kind: 'panel',
@@ -109,6 +122,12 @@ export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): Geo
             },
           ],
           panels: [
+            {
+              id: 'external-panel',
+              panelId: 'data.external-panel',
+              component: panelFor(controller, true),
+              groupId: 'external-data',
+            },
             {
               id: 'panel',
               panelId: 'data.panel',

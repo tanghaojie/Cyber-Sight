@@ -1,5 +1,7 @@
 # Platform 活动 AI 协作记录
 
+- 已完成：[Geo 外部数据菜单拆分](../archive/ai-logs/feat/2026/10/2026-10-17-geo-external-data-menu.md)，独立菜单与加载面板，静态检查通过，保留人工验收边界。
+
 - [建筑拼装外观修正](../archive/ai-logs/fix/2026/10/2026-10-17-geo-assembly-appearance.md)：记录 Blender 节点与视口颜色不一致的证据、临时渲染修正及人工验收边界。
 
 - [Geo 本地建筑拼装预览](../archive/ai-logs/feat/2026/10/2026-10-17-geo-assembly-preview.md)：DEV 临时入口、独立模型进度、本地服务与工程检查，视觉由维护者人工查看。

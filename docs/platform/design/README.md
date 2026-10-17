@@ -1,5 +1,7 @@
 # Platform 设计索引
 
+- [Geo 外部数据独立菜单](modules/geo-external-data.md)：三种 URL 入口、独立加载表单和会话资源管理，移除地标与周边入口。
+
 - [Geo 本地建筑拼装预览](modules/geo-assembly-preview.md)：DEV 临时入口、独立进度与发布 GLB 的人工预览。
 
 - [master 分支集成](master-branch-integration.md)：保留双方仓库历史与 Geo 交付，合并 Platform 索引并复核共同合并树。
