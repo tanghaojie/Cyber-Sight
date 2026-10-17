@@ -1,5 +1,7 @@
 # Platform 历史归档
 
+- [2026-10-17 Geo 本地建筑拼装预览](plans/2026-10-17-geo-assembly-preview.md)：DEV 专用加载和播放，工程检查及本地入口已就绪，视觉待维护者查看；[协作记录](ai-logs/feat/2026/10/2026-10-17-geo-assembly-preview.md)。
+
 - [2026-10-08 独立产品拆分后的 Platform 文档复核](plans/2026-10-08-product-separation-archive-review.md)：复核清理与链接修复，台账推进到真实 `4221d9c`；[协作记录](ai-logs/docs/2026/10/2026-10-08-product-separation-archive-review.md)。
 
 - [2026-10-08 独立产品拆分收尾](plans/2026-10-08-product-separation.md)：原应用、专属记录和依赖移除，剩余工程验证通过，修复 80 处旧链接；[协作记录](ai-logs/refactor/2026/10/2026-10-08-product-separation.md)。

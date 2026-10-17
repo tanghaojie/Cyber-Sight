@@ -17,6 +17,7 @@
     <div class="geo-map-atmosphere" aria-hidden="true" />
 
     <template v-if="runtime.state.status === 'ready'">
+      <component :is="assemblyPreviewComponent" v-if="assemblyPreviewComponent" />
       <GeoToolRail
         :items="taskRailItems"
         :active-id="activeTaskId"
@@ -120,7 +121,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, type Component } from 'vue'
+import {
+  computed,
+  defineAsyncComponent,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  type Component,
+} from 'vue'
 import { useLocalization } from '@/foundation/modules/localization/localization'
 import GeoLoadState from '../components/shell/GeoLoadState.vue'
 import GeoInspectorFrame from '../components/shell/GeoInspectorFrame.vue'
@@ -147,6 +155,10 @@ interface GeoTaskItem extends GeoTaskRailItem {
 }
 
 const { t } = useLocalization()
+const assemblyPreviewComponent =
+  import.meta.env.DEV && new URLSearchParams(window.location.search).get('assemblyPreview') === '1'
+    ? defineAsyncComponent(() => import('../components/preview/AssemblyPreview.vue'))
+    : undefined
 const workspaceRoot = ref<HTMLElement>()
 const mapContainer = ref<HTMLElement>()
 const activeTaskId = ref<string | undefined>('data')

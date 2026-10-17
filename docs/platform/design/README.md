@@ -1,5 +1,7 @@
 # Platform 设计索引
 
+- [Geo 本地建筑拼装预览](modules/geo-assembly-preview.md)：DEV 临时入口、独立进度与发布 GLB 的人工预览。
+
 - [master 分支集成](master-branch-integration.md)：保留双方仓库历史与 Geo 交付，合并 Platform 索引并复核共同合并树。
 
 - [独立 AI 协作启动模板](ai-collaboration-starter.md)：CoAIForge P1 技术实现与 Windows/Linux CI 已通过，前端人工验收已由维护者确认通过；三种最小工程及单项目协作规范由目标仓库维护。

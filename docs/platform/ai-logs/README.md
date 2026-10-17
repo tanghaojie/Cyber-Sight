@@ -1,5 +1,7 @@
 # Platform 活动 AI 协作记录
 
+- [Geo 本地建筑拼装预览](../archive/ai-logs/feat/2026/10/2026-10-17-geo-assembly-preview.md)：DEV 临时入口、独立模型进度、本地服务与工程检查，视觉由维护者人工查看。
+
 - [独立产品拆分后的 Platform 文档复核](../archive/ai-logs/docs/2026/10/2026-10-08-product-separation-archive-review.md)：核对真实技术提交与链接修复，台账已推进，归档 CI 为 NOT_DUE。
 
 CoAIForge P1 技术实施、master 推送及 Windows/Linux CI 已完成，维护者已确认前端人工验收通过，P1 已完成。来源[交接记录](../archive/ai-logs/docs/2026/10/2026-10-07-coaiforge-handoff.md)及[Platform 复核记录](../archive/ai-logs/docs/2026/10/2026-10-07-coaiforge-platform-archive-review.md)已归档；代码与验收由目标仓库接续。

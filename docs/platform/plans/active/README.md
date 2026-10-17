@@ -1,5 +1,7 @@
 # Platform 活动实施计划
 
+最近完成：[Geo 本地建筑拼装预览](../../archive/plans/2026-10-17-geo-assembly-preview.md)，仅 DEV 显式入口，维护者人工查看效果。
+
 [独立产品拆分后的 Platform 文档复核](../../archive/plans/2026-10-08-product-separation-archive-review.md)已完成，台账推进到真实技术提交 `4221d9c`，最终归档 CI 为 NOT_DUE。
 
 [master 冲突处理与共同合并树归档复核](../../archive/plans/2026-10-07-master-conflict-resolution.md)已完成归档，合并提交为 `7d17cf6`；发布证据在最终交付反馈核对。
