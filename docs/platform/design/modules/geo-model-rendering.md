@@ -4,7 +4,7 @@ scope: platform
 repository: Cyber-Sight
 status: active
 owner: project maintainers
-updated: 2026-10-04
+updated: 2026-10-17
 ---
 
 # Geo 外部模型统一渲染标准
@@ -43,6 +43,8 @@ Scene 另以 `plugins/scene/scene.capabilities.ts` 的 `geoRenderQualityCapabili
 - 资源快照可以保存可读渲染说明，不保存 Cesium 重资源。材质信息只通过公开加载回调检查，不访问私有字段；无可靠证据时保持未知，不宣称已发现缺失材质。
 
 ## 数据流与性能
+
+AIModels 目录加载的 URL、定位和关联资源来自经过运行时校验的显式发布描述；此入口直接选择发布坐标，手工模型 URL 仍保留坐标来源确认。模型和生成街区继续使用本设计的同一 Scene 管理器，不引入独立渲染链。见 [AIModels 接入](geo-ai-models.md)。
 
 URL/定位 → Data 独立下载解析与发光倍率适配 → 有效坐标时询问来源并按需采样地形 → 创建 Model 并等待原始模型 ready → Scene 渲染管理器登记 → 时间和位置求太阳高度 → 更新材质 uniform、环境光及模型直射光 → 按画幅与包围球自动取景。
 

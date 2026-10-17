@@ -4,7 +4,7 @@ scope: platform
 repository: Cyber-Sight
 status: active
 owner: project maintainers
-updated: 2026-10-03
+updated: 2026-10-17
 ---
 
 # Geo 三档显示质量与模型坐标选择
@@ -41,6 +41,8 @@ Scene 拥有质量生命周期，核心分辨率工具不再在 Runtime 与 Scen
 保存并恢复原有Scene、后期、分辨率、DPR与模型状态。所有监听与自建后期资源归所属dispose管理，禁用时不引入空闲重绘。地球光照与模型各自太阳高度语义继续独立。
 
 ## 模型准备与坐标决策
+
+本节的坐标询问针对手工模型 URL。2026-10-17 增加的 [AIModels 目录入口](geo-ai-models.md)使用通过版本/同源/数值校验且明确声明 `coordinateSource: manifest` 的发布坐标，以 resolver 直接选择 input；不改变用户手工 URL 的确认规则。该入口读取统一 model.json，不自动猜测任意模型目录里的 placement.json。适用范围见 [静态发布 ADR](../../decisions/ADR-20261017-aimodels-static-publishing.md)。
 
 Data 下载并解析每次加载的独立GLB/JSON副本，不修改远程源资产或共享Cesium缓存。对当前引擎未实现的KHR_materials_emissive_strength，把每材质倍率转换到仅在内存加载中使用的HDR发光因子，防止重复叠乘；保留Unlit及其他材质。重新封装GLB只改变JSON，保留二进制chunk，外部buffer/图片相对URL仍基于原模型URL。
 
