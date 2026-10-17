@@ -51,6 +51,7 @@ async function loadDefaultTileset(controller: GeoDataController): Promise<void> 
 export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): GeoPluginDefinition {
   const pluginOptions: GeoDataControllerOptions = {
     ...options,
+    aiModelCatalogUrl: options.aiModelCatalogUrl ?? import.meta.env.VITE_GEO_AI_MODELS_CATALOG_URL,
     coordinateCorrection: options.coordinateCorrection ?? 'auto',
     tiandituToken:
       options.tiandituToken ?? (import.meta.env.VITE_GEO_TIANDITU_TOKEN as string | undefined),

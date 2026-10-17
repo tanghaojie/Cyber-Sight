@@ -10,7 +10,7 @@ export const localizationResource = defineLocalizationResource('geo', {
     'workspace.webglHint': '请确认浏览器已启用 WebGL 和硬件加速。',
     'tasks.data': '数据',
     'tasks.externalData': '外部数据',
-    'tasks.externalDataDescription': '通过 URL 加载 GeoJSON、glTF / GLB 模型和 3D Tiles。',
+    'tasks.externalDataDescription': '通过 URL 或 AIModels 目录加载模型、矢量和三维瓦片。',
     'tasks.view': '视图',
     'tasks.scene': '场景',
     'tasks.flight': '航班',
@@ -99,7 +99,8 @@ export const localizationResource = defineLocalizationResource('geo', {
     'workspace.webglHint': 'Make sure WebGL and hardware acceleration are enabled.',
     'tasks.data': 'Data',
     'tasks.externalData': 'External data',
-    'tasks.externalDataDescription': 'Load GeoJSON, glTF / GLB models, and 3D Tiles from URLs.',
+    'tasks.externalDataDescription':
+      'Load models, vectors, and 3D Tiles from URLs or the AIModels catalog.',
     'tasks.view': 'View',
     'tasks.scene': 'Scene',
     'tasks.flight': 'Flights',

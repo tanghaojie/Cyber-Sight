@@ -17,7 +17,7 @@ updated: 2026-10-17
 
 ## 场景接口
 
-2026-10-17 起，外部数据独立菜单只保留三种 URL，当前 UI 不再提供地标与周边、场景 URL、台北示例及场景管理操作，见[外部数据独立菜单](geo-external-data.md)。以下保留工具层接口与生命周期说明，不代表当前菜单可进入的功能。
+2026-10-17 起，外部数据独立菜单保留三种 URL，并增加 AIModels 模型目录；当前 UI 不提供地标与周边、场景 URL、台北示例及场景管理操作，见[外部数据独立菜单](geo-external-data.md)。以下保留原有地标工具层接口与生命周期说明；AIModels 的配套资源通过[模型发布描述](geo-ai-models.md)自动关联，不重新开放地标场景入口。
 
 新增显式 scene.json URL 加载，不猜测任意模型的 sidecar。版本 1 描述名称、WGS84 锚点、主体模型 URL、周边 3D Tiles URL、署名和椭球体地形要求。相对 URL 基于场景索引解析。坐标范围、数值、版本和 URL 在工具层校验，不执行远程代码。
 
@@ -31,7 +31,7 @@ updated: 2026-10-17
 - tools/data/data-browser.ts：Model/3D Tiles 创建、取消、Primitive 所有权及环境渲染登记；
 - tools/data/landmark-scene-loader.ts：场景加载编排、独立取消、关联生命周期、重试与署名；
 - plugins/data/data.controller.ts：注入坐标选择、连接工具状态与 UI 操作；
-- plugins/data/DataPanel.vue：底图与注记、地形；ExternalDataPanel.vue 只提供三种 URL 和会话资源管理，不再提供地标场景 UI；
+- plugins/data/DataPanel.vue：底图与注记、地形；ExternalDataPanel.vue 提供三种 URL、AI 模型目录和会话资源管理，不提供地标场景 UI；
 - tools/scene/model-rendering.ts：新增显式瓦片昼夜登记，复用太阳、IBL 与唯一 Clock，并应用瓦片质量预算。
 
 所有运行时代码仍位于现有 Platform Geo，不新增跨模块公共端口、第三方前端依赖或后台管理能力。

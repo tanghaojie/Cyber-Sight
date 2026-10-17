@@ -39,9 +39,15 @@ import {
   type GeoLandmarkSceneLoader,
   type GeoLandmarkSceneSnapshot,
 } from '../../tools/data/landmark-scene-loader'
+import {
+  DEFAULT_AI_MODEL_CATALOG_URL,
+  loadAiModelCatalog,
+  type AiModelCatalogItem,
+} from '../../tools/data/ai-model-catalog'
+import { createAiModelLoader, type AiModelGroupSnapshot } from '../../tools/data/ai-model-loader'
 
 export type GeoDataLoadingOperation =
-  'geojson' | 'model' | 'tileset' | 'landmark-scene' | 'fly-to' | 'transform'
+  'geojson' | 'model' | 'tileset' | 'landmark-scene' | 'fly-to' | 'transform' | 'ai-model'
 
 export interface GeoDataState {
   imagery: readonly GeoImageryLayerSnapshot[]
@@ -53,6 +59,12 @@ export interface GeoDataState {
   loadingOperation?: GeoDataLoadingOperation
   loadingImagerySource?: GeoImagerySourceId
   error?: string
+  aiModelCatalog: readonly AiModelCatalogItem[]
+  aiModelCatalogStatus: 'idle' | 'loading' | 'ready' | 'failed'
+  aiModelCatalogError?: string
+  aiModelGroups: readonly AiModelGroupSnapshot[]
+  aiModelLoadingId?: string
+  aiModelProgress?: string
   modelCoordinateRequest?: {
     readonly coordinates: GeoModelCoordinates
     readonly input?: GeoModelTransform
@@ -72,6 +84,9 @@ export interface GeoDataController {
   flyToImagery(id: string): void
   loadGeoJson(options: LoadGeoJsonOptions): Promise<void>
   loadModel(options: LoadModelOptions): Promise<void>
+  refreshAiModelCatalog(): Promise<void>
+  loadAiModel(id: string, variantId?: string): Promise<void>
+  cancelAiModelLoad(): void
   loadLandmarkScene(url: string): Promise<void>
   retryLandmarkScene(id: string): Promise<void>
   cancelLandmarkLoad(): void
@@ -90,6 +105,7 @@ export interface GeoDataController {
 }
 
 export interface GeoDataControllerOptions extends GeoImagerySourceOptions {
+  readonly aiModelCatalogUrl?: string
   readonly catalog?: ReturnType<typeof createGeoImageryCatalog>
   readonly signal?: AbortSignal
   readonly onActiveTilesetChange?: (tileset: Cesium3DTileset | undefined) => void
@@ -124,9 +140,14 @@ export function createGeoDataController(
     landmarkScenes: [],
     terrain: browser.getTerrain(),
     busy: false,
+    aiModelCatalog: [],
+    aiModelCatalogStatus: 'idle',
+    aiModelGroups: [],
   })
   let imagery: GeoImageryLayerManager
   let landmarks: GeoLandmarkSceneLoader | undefined
+  let aiModels: ReturnType<typeof createAiModelLoader> | undefined
+  let catalogRequest: AbortController | undefined
   let disposed = false
   let pendingOperations = 0
   let terrainRequestVersion = 0
@@ -148,6 +169,9 @@ export function createGeoDataController(
   }
 
   function refresh(): void {
+    state.aiModelGroups = aiModels?.list() ?? []
+    state.aiModelLoadingId = aiModels?.loadingId
+    state.aiModelProgress = aiModels?.progress
     state.landmarkScenes = landmarks?.sync() ?? []
     state.landmarkLoading = landmarks?.loading
     const imageryLayers = imagery.list()
@@ -325,6 +349,62 @@ export function createGeoDataController(
     chooseCoordinates: requestModelCoordinates,
   })
 
+  aiModels = createAiModelLoader(browser, { signal: options.signal, onChange: refresh })
+
+  async function refreshAiModelCatalog(): Promise<void> {
+    guard()
+    catalogRequest?.abort()
+    const request = new AbortController()
+    catalogRequest = request
+    function abort(): void {
+      request.abort()
+    }
+    options.signal?.addEventListener('abort', abort, { once: true })
+    state.aiModelCatalogStatus = 'loading'
+    state.aiModelCatalogError = undefined
+    try {
+      if (options.signal?.aborted) {
+        request.abort()
+      }
+      const items = await loadAiModelCatalog(
+        options.aiModelCatalogUrl ?? DEFAULT_AI_MODEL_CATALOG_URL,
+        request.signal,
+      )
+      if (disposed || request.signal.aborted) {
+        return
+      }
+      state.aiModelCatalog = items
+      state.aiModelCatalogStatus = 'ready'
+    } catch (error) {
+      if (!disposed && !request.signal.aborted) {
+        state.aiModelCatalogStatus = 'failed'
+        state.aiModelCatalogError = error instanceof Error ? error.message : 'AI 模型目录读取失败'
+      }
+    } finally {
+      options.signal?.removeEventListener('abort', abort)
+      if (catalogRequest === request) {
+        catalogRequest = undefined
+      }
+    }
+  }
+
+  async function loadAiModel(id: string, variantId?: string): Promise<void> {
+    if (state.busy) {
+      return
+    }
+    await run(async function loadPublishedModel() {
+      const item = state.aiModelCatalog.find((entry) => entry.id === id)
+      if (!item) {
+        throw new Error('AI 模型不在当前目录中，请刷新目录。')
+      }
+      await aiModels!.load(item, variantId)
+    }, 'ai-model')
+  }
+
+  function cancelAiModelLoad(): void {
+    aiModels?.cancel()
+  }
+
   async function loadLandmarkScene(url: string): Promise<void> {
     await run(async function loadScene() {
       await landmarks!.load(url)
@@ -357,7 +437,7 @@ export function createGeoDataController(
 
   function removeResource(id: string): void {
     guard()
-    if (!landmarks?.removeResource(id)) {
+    if (!aiModels?.remove(id) && !landmarks?.removeResource(id)) {
       browser.remove(id)
     }
     refresh()
@@ -365,6 +445,10 @@ export function createGeoDataController(
 
   function setResourceVisible(id: string, show: boolean): void {
     guard()
+    if (aiModels?.setVisible(id, show)) {
+      refresh()
+      return
+    }
     landmarks?.setResourceVisible(id, show)
     browser.setVisible(id, show)
     refresh()
@@ -404,6 +488,7 @@ export function createGeoDataController(
 
   async function updateModelTransform(id: string, transform: GeoModelTransform): Promise<void> {
     await run(async function update() {
+      aiModels?.assertTransformEditable(id)
       browser.updateModelTransform(id, transform)
     }, 'transform')
   }
@@ -442,6 +527,8 @@ export function createGeoDataController(
     }
     disposed = true
     chooseModelCoordinates('cancel')
+    catalogRequest?.abort()
+    aiModels?.dispose()
     landmarks?.dispose()
     options.onImageryLayersChange?.([])
     imagery.dispose()
@@ -470,6 +557,9 @@ export function createGeoDataController(
     flyToImagery,
     loadGeoJson,
     loadModel,
+    refreshAiModelCatalog,
+    loadAiModel,
+    cancelAiModelLoad,
     loadLandmarkScene,
     retryLandmarkScene,
     cancelLandmarkLoad,

@@ -1,7 +1,7 @@
 <template>
   <div class="external-data-panel" :aria-busy="controller.state.busy">
     <div class="data-panel__intro">
-      <span>通过 URL 添加数据</span>
+      <span>{{ activeType === 'ai-model' ? '浏览 AIModels 模型' : '通过 URL 添加数据' }}</span>
       <small>选择数据类型，加载到当前场景</small>
     </div>
     <div class="data-panel__types" role="group" aria-label="外部数据类型">
@@ -18,6 +18,7 @@
         <small>{{ item.format }}</small>
       </button>
     </div>
+    <AiModelCatalog v-if="activeType === 'ai-model'" :controller="controller" />
     <section
       v-show="activeType === 'geojson'"
       class="data-panel__load-card"
@@ -117,6 +118,14 @@
     <p v-if="controller.state.busy" class="data-panel__loading" role="status" aria-live="polite">
       <i aria-hidden="true" />{{ loadingLabel }}
     </p>
+    <button
+      v-if="controller.state.aiModelLoadingId"
+      class="data-panel__cancel"
+      type="button"
+      @click="controller.cancelAiModelLoad()"
+    >
+      取消模型加载
+    </button>
     <p v-if="controller.state.error" class="data-panel__error" role="alert">
       {{ controller.state.error }}
     </p>
@@ -136,6 +145,7 @@
           <label
             ><input
               type="checkbox"
+              :disabled="controller.state.busy"
               :checked="resource.show"
               @change="
                 controller.setResourceVisible(
@@ -158,6 +168,7 @@
             ></label
           >
           <button
+            :disabled="controller.state.busy"
             v-if="resource.visualStyle"
             class="data-panel__resource-style"
             type="button"
@@ -168,6 +179,7 @@
             {{ resource.visualStyle === 'cyber-scan' ? '科技扫描' : '原始材质' }}
           </button>
           <button
+            :disabled="controller.state.busy"
             v-if="resource.modelTransform"
             class="data-panel__resource-adjust"
             type="button"
@@ -178,6 +190,7 @@
             调整
           </button>
           <button
+            :disabled="controller.state.busy"
             type="button"
             :aria-label="`定位 ${resource.label}`"
             title="定位"
@@ -186,6 +199,7 @@
             ⌖
           </button>
           <button
+            :disabled="controller.state.busy"
             type="button"
             :aria-label="`移除 ${resource.label}`"
             title="移除"
@@ -262,15 +276,17 @@ import AppIcon from '@/foundation/components/AppIcon.vue'
 import type { GeoDataResourceSnapshot, GeoModelTransform } from '../../tools/data/data-browser'
 import { DEFAULT_GEO_MODEL_URL } from '../../tools/data/data-presets'
 import type { GeoDataController } from './data.controller'
+import AiModelCatalog from './AiModelCatalog.vue'
 
 const props = defineProps<{ controller: GeoDataController }>()
-type ExternalDataType = 'geojson' | 'model' | 'tileset'
+type ExternalDataType = 'geojson' | 'model' | 'tileset' | 'ai-model'
 const activeType = ref<ExternalDataType>('geojson')
 const dataTypes: readonly { id: ExternalDataType; label: string; format: string; icon: string }[] =
   [
     { id: 'geojson', label: 'GeoJSON', format: '矢量数据', icon: 'map-pin' },
     { id: 'model', label: '模型', format: 'glTF / GLB', icon: 'grid' },
     { id: 'tileset', label: '3D Tiles', format: '三维瓦片', icon: 'layers' },
+    { id: 'ai-model', label: 'AI 模型', format: 'AIModels', icon: 'database' },
   ]
 const geoJsonUrl = ref('')
 const modelUrl = ref(DEFAULT_GEO_MODEL_URL)
@@ -280,6 +296,8 @@ const modelDrafts = reactive<Record<string, GeoModelTransform>>({})
 const expandedModelId = ref<string>()
 const loadingLabel = computed(function currentLoadingLabel() {
   switch (props.controller.state.loadingOperation) {
+    case 'ai-model':
+      return props.controller.state.aiModelProgress ?? '正在加载 AI 模型…'
     case 'geojson':
       return '正在加载 GeoJSON…'
     case 'model':
@@ -384,7 +402,7 @@ async function loadTileset(): Promise<void> {
 }
 .data-panel__types {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 7px;
 }
 .data-panel__types button {
@@ -487,6 +505,14 @@ async function loadTileset(): Promise<void> {
   color: var(--geo-text-faint);
   text-align: center;
   font-size: 11px;
+}
+.data-panel__cancel {
+  min-height: 32px;
+  border: 1px solid var(--geo-line);
+  border-radius: 8px;
+  color: var(--geo-text-soft);
+  background: var(--geo-surface-hover);
+  cursor: pointer;
 }
 .data-panel__input {
   display: grid;

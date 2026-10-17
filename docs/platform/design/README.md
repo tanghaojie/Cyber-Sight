@@ -1,6 +1,8 @@
 # Platform 设计索引
 
-- [Geo 外部数据独立菜单](modules/geo-external-data.md)：三种 URL 入口、独立加载表单和会话资源管理，移除地标与周边入口。
+- [Geo AIModels 模型目录](modules/geo-ai-models.md)：版本化发布协议、模型卡片、质量选择、关联资源和取消清理。
+
+- [Geo 外部数据独立菜单](modules/geo-external-data.md)：三种 URL 与 AI 模型入口、独立加载内容和会话资源管理，不提供地标与周边入口。
 
 - [Geo 本地建筑拼装预览](modules/geo-assembly-preview.md)：DEV 临时入口、独立进度与发布 GLB 的人工预览。
 

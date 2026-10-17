@@ -1,5 +1,7 @@
 # Platform 活动 AI 协作记录
 
+- 已完成：[AIModels 发布协议与 Geo 模型目录接入](../archive/ai-logs/feat/2026/10/2026-10-17-geo-ai-models.md)。
+
 - 已完成：[Geo 菜单交付后的 Platform 文档复核](../archive/ai-logs/docs/2026/10/2026-10-17-geo-menu-archive-review.md)。
 
 - 已完成：[Geo 外部数据菜单拆分](../archive/ai-logs/feat/2026/10/2026-10-17-geo-external-data-menu.md)，独立菜单与加载面板，静态检查通过，保留人工验收边界。

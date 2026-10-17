@@ -1,5 +1,7 @@
 # Platform 架构决策索引
 
+- [AIModels 版本化静态发布](ADR-20261017-aimodels-static-publishing.md)：静态目录与模型描述、显式定位和关联资源协议。
+
 当前 Platform 决策：
 
 - [独立 AI 协作启动模板](ADR-20261007-independent-ai-collaboration-starter.md)：未来模板去除所有权 scope，保留严格协作协议，提供前端/后端空工程与全栈 health 示例；不改变本仓库现行身份。

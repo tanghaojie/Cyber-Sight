@@ -1,5 +1,7 @@
 # Platform 历史归档
 
+- [2026-10-17 AIModels 发布协议与 Geo 模型目录接入](plans/2026-10-17-geo-ai-models.md)：模型目录、质量选择、关联资源与线上验证；[协作记录](ai-logs/feat/2026/10/2026-10-17-geo-ai-models.md)。
+
 - [2026-10-17 Geo 菜单交付后的 Platform 文档复核](plans/2026-10-17-geo-menu-archive-review.md)：核对 e71a7b3..c76aa95，推进真实基线；[协作记录](ai-logs/docs/2026/10/2026-10-17-geo-menu-archive-review.md)。
 
 - [2026-10-17 Geo 外部数据菜单拆分](plans/2026-10-17-geo-external-data-menu.md)：独立三种 URL 入口，移除地标与周边 UI；[协作记录](ai-logs/feat/2026/10/2026-10-17-geo-external-data-menu.md)。
