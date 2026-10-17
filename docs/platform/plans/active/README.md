@@ -1,5 +1,7 @@
 # Platform 活动实施计划
 
+- 已完成：[Geo 菜单交付后的 Platform 文档复核](../../archive/plans/2026-10-17-geo-menu-archive-review.md)，基线推进到真实 c76aa95。
+
 - 已完成：[Geo 外部数据菜单拆分](../../archive/plans/2026-10-17-geo-external-data-menu.md)，仅提供三种 URL；交互与视觉待维护者人工验收。
 
 最近完成：[建筑拼装外观修正](../../archive/plans/2026-10-17-geo-assembly-appearance.md)，默认柔光对照与恢复后的视口颜色，视觉待维护者确认。

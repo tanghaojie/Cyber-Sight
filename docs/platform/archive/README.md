@@ -1,5 +1,7 @@
 # Platform 历史归档
 
+- [2026-10-17 Geo 菜单交付后的 Platform 文档复核](plans/2026-10-17-geo-menu-archive-review.md)：核对 e71a7b3..c76aa95，推进真实基线；[协作记录](ai-logs/docs/2026/10/2026-10-17-geo-menu-archive-review.md)。
+
 - [2026-10-17 Geo 外部数据菜单拆分](plans/2026-10-17-geo-external-data-menu.md)：独立三种 URL 入口，移除地标与周边 UI；[协作记录](ai-logs/feat/2026/10/2026-10-17-geo-external-data-menu.md)。
 
 - [2026-10-17 建筑拼装外观修正](plans/2026-10-17-geo-assembly-appearance.md)：核实视口颜色未进入节点，增加临时配色恢复、柔光/日光对照与高清档；[协作记录](ai-logs/fix/2026/10/2026-10-17-geo-assembly-appearance.md)。
