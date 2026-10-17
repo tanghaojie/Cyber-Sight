@@ -3,6 +3,7 @@ import ScenePanel from './ScenePanel.vue'
 import {
   geoModelRenderingCapability,
   geoSolarLightingCapability,
+  geoRenderQualityCapability,
   type GeoSolarLightingCapability,
 } from './scene.capabilities'
 import { createGeoSceneController, type GeoSceneController } from './scene.controller'
@@ -45,6 +46,11 @@ export function createGeoScenePlugin(): GeoPluginDefinition {
       }
       context.capabilities.provide(geoSolarLightingCapability, solarLighting, context.scope)
       context.capabilities.provide(geoModelRenderingCapability, modelRendering, context.scope)
+      context.capabilities.provide(
+        geoRenderQualityCapability,
+        { state: controller.state, setMode: controller.setRenderMode },
+        context.scope,
+      )
       const instance: GeoScenePluginInstance = {
         id: 'scene',
         controller,

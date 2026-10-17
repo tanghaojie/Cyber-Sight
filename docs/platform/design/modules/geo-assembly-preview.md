@@ -10,6 +10,16 @@ updated: 2026-10-17
 
 ## 职责与接口
 
+### 材质与对照照明（2026-10-17 修订）
+
+根据当前 Blender 只读检查，四个 Assembly 材质的 `diffuse_color` 为已显示的混凝土、结构、幕墙、屋顶配色，但 Principled Base Color 都为 `[0.8,0.8,0.8,1]`；发布 GLB 同样全部灰色。因此灰色不是前端丢材质，而是导出前实际节点没有设置颜色。截图对应的实体工作室显示不等同于实际材质渲染。
+
+临时预览只对下载后的内存副本按四个明确材质名恢复上述视口颜色，保持动画、几何、alpha 和其他材质属性；不修改 Blender、仓库源 GLB 或线上文件。`tools/model/assembly-preview-materials.ts` 负责 GLB JSON 段重建并保留其他数据段，未知材质不改。此兼容路径只用于该示例，不加入通用加载器。
+
+默认“柔光对照”使用模型专属 UNLIT CustomShader 按相机空间法线做柔和主光/补光，保留恢复后的漫反射颜色，避免场景昼夜改变对照配色；不声称复刻 Blender 工作室环境或 AgX。可切换“场景日光”，注销柔光 Shader 并重新使用统一太阳与环境渲染；切换不重启动画。清理注销管理器句柄并销毁自有 Shader。
+
+Scene 提供 `geoRenderQualityCapability`，公开只读 renderMode 与 setMode，内部仍由原有唯一分辨率控制器设置。临时面板挂载时请求高清模式、卸载时在模式未被改为其他档时恢复原档，避免预览直接写 resolutionScale 或创建竞争控制器。移除模型也恢复原画质，重新加载时再请求高清。
+
 `components/preview/AssemblyPreview.vue` 只负责操作和状态显示；`tools/model/assembly-preview.ts` 的 `createAssemblyPreview(viewer, rendering)` 拥有下载、Primitive、动画、镜头、取消和清理，返回 `load / play / pause / seek / clear / dispose`。这些均为 Geo 内部接口，不增加跨模块公共依赖。页面只组装组件，组件使用 Viewer 访问端口和 Scene 公开 capability。
 
 加载固定地址 `https://jt-ai-models.vercel.app/tmp/building_assembly.glb`，复用 `prepareGeoModelAsset` 与统一模型渲染管理器。演示位置为成都附近明确标注的示例坐标，不声称模型包含真实地理定位；在当前地形上采样高度。模型就绪后同时激活全部构件动画，通过公开 `animationTime` 和 `animateWhilePaused` 使用同一实际经过秒数，短片段停留末帧。预览独立于场景 Clock，不改变昼夜、时间倍率或航班时间。

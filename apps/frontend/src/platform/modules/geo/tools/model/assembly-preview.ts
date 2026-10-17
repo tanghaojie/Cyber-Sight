@@ -2,16 +2,20 @@ import {
   BoundingSphere,
   Cartesian3,
   Cartographic,
+  CustomShader,
   EllipsoidTerrainProvider,
   HeadingPitchRange,
   JulianDate,
+  LightingModel,
   Model,
+  ShadowMode,
   Transforms,
   sampleTerrain,
   sampleTerrainMostDetailed,
   type Viewer,
 } from 'cesium'
 import { prepareGeoModelAsset } from '../data/model-asset'
+import { restoreAssemblyViewportColors } from './assembly-preview-materials'
 import type {
   GeoModelRenderingManager,
   GeoModelRenderingRegistration,
@@ -20,6 +24,7 @@ import type {
 export const ASSEMBLY_PREVIEW_URL = 'https://jt-ai-models.vercel.app/tmp/building_assembly.glb'
 
 export interface AssemblyPreviewState {
+  lighting: 'studio' | 'scene'
   loading: boolean
   loaded: boolean
   playing: boolean
@@ -67,6 +72,7 @@ export function createAssemblyPreview(
   onChange: (state: AssemblyPreviewState) => void,
 ) {
   const state: AssemblyPreviewState = {
+    lighting: 'studio',
     loading: false,
     loaded: false,
     playing: false,
@@ -76,6 +82,7 @@ export function createAssemblyPreview(
   }
   let model: Model | undefined
   let registration: GeoModelRenderingRegistration | undefined
+  let studioShader: CustomShader | undefined
   let pending: AbortController | undefined
   let disposed = false
   let previous = performance.now()
@@ -96,6 +103,39 @@ export function createAssemblyPreview(
 
   function pause(): void {
     state.playing = false
+    redraw()
+  }
+
+  function setLighting(lighting: AssemblyPreviewState['lighting']): void {
+    state.lighting = lighting
+    registration?.dispose()
+    registration = undefined
+    if (model && !model.isDestroyed()) {
+      // Cesium supports clearing the shader; the public declaration omits undefined.
+      ;(model as unknown as { customShader: CustomShader | undefined }).customShader = undefined
+    }
+    studioShader?.destroy()
+    studioShader = undefined
+    if (model && !model.isDestroyed()) {
+      if (lighting === 'scene') {
+        model.shadows = ShadowMode.ENABLED
+        registration = rendering.register(model)
+      } else {
+        model.shadows = ShadowMode.DISABLED
+        studioShader = new CustomShader({
+          lightingModel: LightingModel.UNLIT,
+          fragmentShaderText: `
+            void fragmentMain(FragmentInput fsInput, inout czm_modelMaterial material) {
+              vec3 normal = normalize(fsInput.attributes.normalEC);
+              float key = max(dot(normal, normalize(vec3(-0.4, 0.7, 0.8))), 0.0);
+              float fill = max(dot(normal, normalize(vec3(0.8, 0.1, 0.5))), 0.0);
+              material.diffuse *= 0.35 + 0.55 * key + 0.15 * fill;
+            }
+          `,
+        })
+        model.customShader = studioShader
+      }
+    }
     redraw()
   }
 
@@ -127,6 +167,11 @@ export function createAssemblyPreview(
     cancelFlight = undefined
     registration?.dispose()
     registration = undefined
+    if (model && !model.isDestroyed()) {
+      ;(model as unknown as { customShader: CustomShader | undefined }).customShader = undefined
+    }
+    studioShader?.destroy()
+    studioShader = undefined
     if (model && !model.isDestroyed()) {
       if (viewer.isDestroyed() || !viewer.scene.primitives.remove(model)) {
         model.destroy()
@@ -177,13 +222,21 @@ export function createAssemblyPreview(
     publish()
     let prepared: Awaited<ReturnType<typeof prepareGeoModelAsset>> | undefined
     let resource: Model | undefined
+    let correctedUrl: string | undefined
     function check(): void {
       if (operation.signal.aborted || disposed || viewer.isDestroyed()) {
         throw new DOMException('预览已取消', 'AbortError')
       }
     }
     try {
-      prepared = await prepareGeoModelAsset(ASSEMBLY_PREVIEW_URL, operation.signal)
+      const response = await fetch(ASSEMBLY_PREVIEW_URL, { signal: operation.signal })
+      if (!response.ok) {
+        throw new Error(`预览模型下载失败（HTTP ${response.status}）`)
+      }
+      const corrected = restoreAssemblyViewportColors(await response.arrayBuffer())
+      check()
+      correctedUrl = URL.createObjectURL(new Blob([corrected], { type: 'model/gltf-binary' }))
+      prepared = await prepareGeoModelAsset(correctedUrl, operation.signal)
       check()
       // Demonstration coordinates only; sample the current terrain before placement.
       const provider = viewer.terrainProvider
@@ -226,7 +279,7 @@ export function createAssemblyPreview(
       viewer.scene.primitives.add(resource)
       await waitUntilReady(resource, viewer, operation.signal)
       check()
-      registration = rendering.register(resource)
+      setLighting(state.lighting)
       resource.activeAnimations.animateWhilePaused = true
       const animations = resource.activeAnimations.addAll({
         // Fixed early epoch allows seeking the scene Clock backwards without stopping the preview.
@@ -273,6 +326,9 @@ export function createAssemblyPreview(
       }
     } finally {
       prepared?.dispose()
+      if (correctedUrl) {
+        URL.revokeObjectURL(correctedUrl)
+      }
       if (pending === operation) {
         pending = undefined
       }
@@ -287,5 +343,5 @@ export function createAssemblyPreview(
   }
 
   publish()
-  return { load, play, pause, seek, clear, dispose }
+  return { load, play, pause, seek, setLighting, clear, dispose }
 }

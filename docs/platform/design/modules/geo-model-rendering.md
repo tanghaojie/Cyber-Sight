@@ -32,6 +32,8 @@ updated: 2026-10-04
 
 ## 职责与公共接口
 
+Scene 另以 `plugins/scene/scene.capabilities.ts` 的 `geoRenderQualityCapability` 提供只读 `state.renderMode` 与 `setMode(mode)`。消费者只能通过该 capability 请求既有画质档位，不能自行创建第二个分辨率控制器。本地拼装预览的请求及恢复约定见 [Geo 本地建筑拼装预览](geo-assembly-preview.md)。
+
 能力仍属于 `apps/frontend/src/platform/modules/geo/`，不新增跨 Platform 模块的公共 API。
 
 - Time 拥有 Clock 控制，不导入模型渲染实现。

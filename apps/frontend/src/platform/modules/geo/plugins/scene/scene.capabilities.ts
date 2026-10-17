@@ -1,5 +1,14 @@
 import { createGeoCapabilityToken } from '../../core/capability-registry'
 import type { GeoModelRenderingManager } from '../../tools/scene/model-rendering'
+import type { GeoRenderMode } from '../../core/render-performance'
+
+export interface GeoRenderQualityCapability {
+  readonly state: { readonly renderMode: GeoRenderMode }
+  setMode(mode: GeoRenderMode): void
+}
+
+export const geoRenderQualityCapability =
+  createGeoCapabilityToken<GeoRenderQualityCapability>('scene.renderQuality')
 
 export interface GeoSolarLightingState {
   readonly lighting: boolean

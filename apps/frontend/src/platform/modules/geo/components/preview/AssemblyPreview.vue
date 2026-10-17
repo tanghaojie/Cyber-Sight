@@ -2,6 +2,23 @@
   <section class="assembly-preview" aria-label="建筑拼装预览">
     <header><span>本地预览</span><strong>建筑 · 从无到有</strong></header>
     <p>38 个构件逐步飞入拼装 · 成都示例位置</p>
+    <div class="assembly-preview__actions" aria-label="模型照明">
+      <button
+        type="button"
+        :aria-pressed="state.lighting === 'studio'"
+        @click="preview.setLighting('studio')"
+      >
+        柔光对照
+      </button>
+      <button
+        type="button"
+        :aria-pressed="state.lighting === 'scene'"
+        @click="preview.setLighting('scene')"
+      >
+        场景日光
+      </button>
+    </div>
+    <small>已恢复 Blender 视口配色 · 高清预览</small>
     <p v-if="state.loading" role="status">正在加载模型并定位镜头…</p>
     <template v-else-if="state.loaded">
       <div class="assembly-preview__progress">
@@ -28,10 +45,10 @@
       </div>
     </template>
     <div class="assembly-preview__actions">
-      <button v-if="!state.loaded && !state.loading" type="button" @click="preview.load()">
+      <button v-if="!state.loaded && !state.loading" type="button" @click="loadPreview">
         加载并播放
       </button>
-      <button v-if="state.loaded || state.loading" type="button" @click="preview.clear()">
+      <button v-if="state.loaded || state.loading" type="button" @click="clearPreview">
         移除预览
       </button>
     </div>
@@ -43,7 +60,10 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, shallowRef } from 'vue'
 import { useGeoRuntime } from '../../core/geo-context'
-import { geoModelRenderingCapability } from '../../plugins/scene/scene.capabilities'
+import {
+  geoModelRenderingCapability,
+  geoRenderQualityCapability,
+} from '../../plugins/scene/scene.capabilities'
 import {
   createAssemblyPreview,
   type AssemblyPreviewState,
@@ -51,6 +71,7 @@ import {
 
 const runtime = useGeoRuntime()
 const state = shallowRef<AssemblyPreviewState>({
+  lighting: 'studio',
   loading: false,
   loaded: false,
   playing: false,
@@ -65,6 +86,24 @@ const preview = createAssemblyPreview(
     state.value = value
   },
 )
+const quality = runtime.plugins.capabilities.require(geoRenderQualityCapability)
+const originalQuality = quality.state.renderMode
+
+function loadPreview(): void {
+  quality.setMode('performance')
+  void preview.load()
+}
+
+function restoreQuality(): void {
+  if (quality.state.renderMode === 'performance' && runtime.state.status === 'ready') {
+    quality.setMode(originalQuality)
+  }
+}
+
+function clearPreview(): void {
+  preview.clear()
+  restoreQuality()
+}
 
 function seek(event: Event): void {
   preview.pause()
@@ -76,10 +115,11 @@ function showCompleted(): void {
   preview.seek(state.value.duration)
 }
 
-onMounted(() => {
-  void preview.load()
+onMounted(loadPreview)
+onBeforeUnmount(() => {
+  preview.dispose()
+  restoreQuality()
 })
-onBeforeUnmount(() => preview.dispose())
 </script>
 
 <style scoped>
@@ -150,5 +190,10 @@ button:focus-visible {
 }
 .assembly-preview__error {
   color: #ffb7ab;
+}
+button[aria-pressed='true'] {
+  border-color: var(--geo-accent);
+  color: var(--geo-accent);
+  background: rgba(73, 201, 255, 0.12);
 }
 </style>

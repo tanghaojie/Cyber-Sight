@@ -1,5 +1,7 @@
 # Platform 活动实施计划
 
+最近完成：[建筑拼装外观修正](../../archive/plans/2026-10-17-geo-assembly-appearance.md)，默认柔光对照与恢复后的视口颜色，视觉待维护者确认。
+
 最近复核：[Geo 临时预览交付后的文档复核](../../archive/plans/2026-10-17-geo-preview-archive-review.md)，Platform 基线为真实提交 `e71a7b3`。
 
 最近完成：[Geo 本地建筑拼装预览](../../archive/plans/2026-10-17-geo-assembly-preview.md)，仅 DEV 显式入口，维护者人工查看效果。
