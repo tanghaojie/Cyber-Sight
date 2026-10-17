@@ -14,3 +14,7 @@ status: completed
 实际验证：发布资源 HTTP 200、MIME `model/gltf-binary`、CORS `*`，227184 字节与源文件一致；类型、前端生产构建、变更文件 lint、架构检查通过。生产 JS 无临时参数、模型 URL 或专用组件文案。最终格式及归档 CI 为提交前门禁。
 
 本地服务在 5173 运行，`/geo.html?assemblyPreview=1` 返回 HTTP 200；已请求 Codex 打开供人工查看。未运行前端自动化，未声称已完成人工视觉验收。不推送远端。代码与本记录归于同一本地 `feat(geo): add local building assembly preview` 提交。
+
+开发编译补充：生产构建排除 DEV 组件，因此不能证明临时组件能编译。本地服务暴露了按钮内联多语句格式化后的编译错误，已改为命名处理函数；重新请求 DEV 组件模块返回 HTTP 200。该检查属于开发编译与模块响应检查，不是浏览器视觉验收。
+
+提交 `e71a7b3` 后 Platform completed features 计数达到 3；按门禁创建并完成同作用域文档复核，对照 `4221d9c..e71a7b3` 的真实文件、拆分设计、预览设计与代码，无需替换 ADR。台账仅推进 Platform 到 `e71a7b3`，按钮修复作为后续收尾变更保留，不修改 Foundation 或审计阈值。复核计划见归档索引。

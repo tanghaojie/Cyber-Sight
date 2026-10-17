@@ -24,15 +24,7 @@
           {{ state.playing ? '暂停' : '播放' }}
         </button>
         <button type="button" @click="preview.play(true)">重新拼装</button>
-        <button
-          type="button"
-          @click="
-            preview.pause()
-            preview.seek(state.duration)
-          "
-        >
-          查看完成
-        </button>
+        <button type="button" @click="showCompleted">查看完成</button>
       </div>
     </template>
     <div class="assembly-preview__actions">
@@ -77,6 +69,11 @@ const preview = createAssemblyPreview(
 function seek(event: Event): void {
   preview.pause()
   preview.seek(Number((event.target as HTMLInputElement).value))
+}
+
+function showCompleted(): void {
+  preview.pause()
+  preview.seek(state.value.duration)
 }
 
 onMounted(() => {
