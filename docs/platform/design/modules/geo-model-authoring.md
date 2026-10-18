@@ -4,7 +4,7 @@ scope: platform
 repository: Cyber-Sight
 status: active
 owner: project maintainers
-updated: 2026-10-17
+updated: 2026-10-18
 ---
 
 # Geo 模型制作与地理参考标准
@@ -271,7 +271,7 @@ Meshopt/Draco 减少几何传输，KTX2/BasisU 改善纹理传输及 GPU 存储�
 
 本标准不新增后端/公共 API、依赖或运行时 Schema。资料 → 局部建模 → PBR / UV / 纹理 → WGS84 锚点及轴向校准 → 导出验证 → 外部托管 → Data 加载与坐标选择 → Scene 统一昼夜。
 
-涉及动画时在制作端增加“语义分件 → 保存装配矩阵 → 排程/路径 → TRS 烘焙 → 静态与动画独立导出”。AIModels 目录消费静态主模型，动画及其附录供后续明确的播放任务使用，不把 DEV 固定样例入口视为通用生产能力。
+涉及动画时在制作端增加“语义分件 → 保存装配矩阵 → 排程/路径 → TRS 烘焙 → 静态与动画独立导出”。AIModels 目录消费静态主模型；2026-10-18 已为实际加载的动画 GLB 接入[资源行播放控制](geo-model-animation.md)，不自动发现静态主文件旁的动画，也不解析制作附录。DEV 固定样例的配色与柔光仍是独立兼容路径。
 
 读取和定位入口仍为 Geo 的 model-asset.ts、data-browser.ts，渲染由 Scene 和唯一 Clock 管理。说明字段不执行脚本、不自动转换参考系。主体源资产整改独立于已交付的[自动周边街区](geo-landmark-context.md)；生成环境不表示主体 GLB 已重制。
 
