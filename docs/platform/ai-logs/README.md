@@ -1,5 +1,7 @@
 # Platform 活动 AI 协作记录
 
+- [Geo 已加载模型动画控制](../archive/ai-logs/feat/2026/10/2026-10-18-geo-model-animation.md)：动画发现、资源按钮和独立播放面板，工程检查通过。
+
 - 已完成：[建筑建模与飞入拼装要求同步](../archive/ai-logs/docs/2026/10/2026-10-17-building-modeling-requirements.md)：来源会话、CS-AM-1、AIModels 执行版与验证边界。
 
 - 已完成：[AIModels 接入后的 Platform 文档复核](../archive/ai-logs/docs/2026/10/2026-10-17-aimodels-archive-review.md)。

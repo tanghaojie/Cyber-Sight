@@ -167,47 +167,76 @@
               ><small v-else-if="resource.maximumVisibleCameraHeight">30 km 外自动隐藏</small></span
             ></label
           >
-          <button
-            :disabled="controller.state.busy"
-            v-if="resource.visualStyle"
-            class="data-panel__resource-style"
-            type="button"
-            :title="resource.visualStyle === 'cyber-scan' ? '切换为原始材质' : '切换为科技扫描'"
-            @click="toggleTilesetVisualStyle(resource)"
-          >
-            <i :class="{ 'is-active': resource.visualStyle === 'cyber-scan' }" aria-hidden="true" />
-            {{ resource.visualStyle === 'cyber-scan' ? '科技扫描' : '原始材质' }}
-          </button>
-          <button
-            :disabled="controller.state.busy"
-            v-if="resource.modelTransform"
-            class="data-panel__resource-adjust"
-            type="button"
-            :aria-expanded="expandedModelId === resource.id"
-            :title="expandedModelId === resource.id ? '收起模型调整' : '调整模型'"
-            @click="toggleModelEditor(resource)"
-          >
-            调整
-          </button>
-          <button
-            :disabled="controller.state.busy"
-            type="button"
-            :aria-label="`定位 ${resource.label}`"
-            title="定位"
-            @click="controller.flyToResource(resource.id)"
-          >
-            ⌖
-          </button>
-          <button
-            :disabled="controller.state.busy"
-            type="button"
-            :aria-label="`移除 ${resource.label}`"
-            title="移除"
-            @click="removeResource(resource.id)"
-          >
-            ×
-          </button>
+          <div class="data-panel__resource-actions">
+            <button
+              :disabled="controller.state.busy"
+              v-if="resource.visualStyle"
+              class="data-panel__resource-style"
+              type="button"
+              :title="resource.visualStyle === 'cyber-scan' ? '切换为原始材质' : '切换为科技扫描'"
+              @click="toggleTilesetVisualStyle(resource)"
+            >
+              <i
+                :class="{ 'is-active': resource.visualStyle === 'cyber-scan' }"
+                aria-hidden="true"
+              />
+              {{ resource.visualStyle === 'cyber-scan' ? '科技扫描' : '原始材质' }}
+            </button>
+            <button
+              :disabled="controller.state.busy"
+              v-if="resource.modelTransform"
+              class="data-panel__resource-adjust"
+              type="button"
+              :aria-expanded="expandedModelId === resource.id"
+              :title="expandedModelId === resource.id ? '收起模型调整' : '调整模型'"
+              @click="toggleModelEditor(resource)"
+            >
+              调整
+            </button>
+            <button
+              v-if="resource.animation?.clips.length"
+              class="data-panel__resource-animation"
+              :class="{ 'is-playing': resource.animation.playing }"
+              :disabled="controller.state.busy"
+              type="button"
+              :aria-label="`动画控制 ${resource.label}`"
+              :aria-expanded="expandedAnimationId === resource.id"
+              :aria-controls="`model-animation-${resource.id}`"
+              title="动画控制"
+              @click="toggleAnimationPanel(resource.id)"
+            >
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 2.5 13 8l-8 5.5z" /></svg>
+              <span>动画</span>
+            </button>
+            <button
+              :disabled="controller.state.busy"
+              type="button"
+              :aria-label="`定位 ${resource.label}`"
+              title="定位"
+              @click="controller.flyToResource(resource.id)"
+            >
+              ⌖
+            </button>
+            <button
+              :disabled="controller.state.busy"
+              type="button"
+              :aria-label="`移除 ${resource.label}`"
+              title="移除"
+              @click="removeResource(resource.id)"
+            >
+              ×
+            </button>
+          </div>
         </div>
+        <ModelAnimationControls
+          v-if="resource.animation && expandedAnimationId === resource.id"
+          :id="`model-animation-${resource.id}`"
+          :label="resource.label"
+          :animation="resource.animation"
+          :visible="resource.show && !resource.autoHidden"
+          @control="controller.controlModelAnimation(resource.id, $event)"
+          @close="closeAnimationPanel"
+        />
         <div
           v-if="
             resource.modelTransform && expandedModelId === resource.id && modelDrafts[resource.id]
@@ -277,6 +306,7 @@ import type { GeoDataResourceSnapshot, GeoModelTransform } from '../../tools/dat
 import { DEFAULT_GEO_MODEL_URL } from '../../tools/data/data-presets'
 import type { GeoDataController } from './data.controller'
 import AiModelCatalog from './AiModelCatalog.vue'
+import ModelAnimationControls from './ModelAnimationControls.vue'
 
 const props = defineProps<{ controller: GeoDataController }>()
 type ExternalDataType = 'geojson' | 'model' | 'tileset' | 'ai-model'
@@ -294,6 +324,7 @@ const tilesetUrl = ref('')
 const modelPlacement = reactive<GeoModelTransform>(props.controller.suggestModelTransform())
 const modelDrafts = reactive<Record<string, GeoModelTransform>>({})
 const expandedModelId = ref<string>()
+const expandedAnimationId = ref<string>()
 const loadingLabel = computed(function currentLoadingLabel() {
   switch (props.controller.state.loadingOperation) {
     case 'ai-model':
@@ -363,6 +394,17 @@ function removeResource(id: string): void {
   if (expandedModelId.value === id) {
     expandedModelId.value = undefined
   }
+  if (expandedAnimationId.value === id) {
+    expandedAnimationId.value = undefined
+  }
+}
+
+function toggleAnimationPanel(id: string): void {
+  expandedAnimationId.value = expandedAnimationId.value === id ? undefined : id
+}
+
+function closeAnimationPanel(): void {
+  expandedAnimationId.value = undefined
 }
 
 function toggleTilesetVisualStyle(resource: GeoDataResourceSnapshot): void {
@@ -642,7 +684,7 @@ async function loadTileset(): Promise<void> {
 }
 .data-panel__resource-summary {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) repeat(4, auto);
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 5px;
 }
@@ -712,7 +754,28 @@ async function loadTileset(): Promise<void> {
 }
 
 .data-panel__resource-summary {
-  grid-template-columns: minmax(0, 1fr) repeat(4, auto);
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.data-panel__resource-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.data-panel__resource-actions .data-panel__resource-animation {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--geo-accent);
+  font-size: 8px;
+}
+.data-panel__resource-animation svg {
+  width: 11px;
+  height: 11px;
+  fill: currentColor;
+}
+.data-panel__resource-actions .data-panel__resource-animation[aria-expanded='true'],
+.data-panel__resource-actions .data-panel__resource-animation.is-playing {
+  background: color-mix(in srgb, var(--geo-accent), transparent 82%);
 }
 .data-panel__resource-name {
   overflow: hidden;

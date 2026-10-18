@@ -1,5 +1,7 @@
 # Platform 活动实施计划
 
+- [已完成：Geo 已加载模型动画控制](../../archive/plans/2026-10-18-geo-model-animation.md)，工程检查通过，实际播放与视觉待维护者人工验收。
+
 已完成：[建筑建模与飞入拼装要求同步](../../archive/plans/2026-10-17-building-modeling-requirements.md)，CS-AM-1、AIModels 完整执行版与任务书已交付，文档及既有发布检查通过。
 
 - 已完成：[AIModels 接入后的 Platform 文档复核](../../archive/plans/2026-10-17-aimodels-archive-review.md)，基线推进到真实 9fc04f1。

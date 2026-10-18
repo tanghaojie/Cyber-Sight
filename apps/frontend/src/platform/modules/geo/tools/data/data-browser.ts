@@ -26,6 +26,14 @@ import {
 } from './model-asset'
 import { modelCameraOffset } from '../view/model-camera'
 import {
+  createModelAnimationPlayer,
+  readModelAnimationClips,
+  type GeoModelAnimationClip,
+  type GeoModelAnimationCommand,
+  type GeoModelAnimationPlayer,
+  type GeoModelAnimationSnapshot,
+} from '../model/model-animation'
+import {
   createCyberCityTilesetVisual,
   type GeoTilesetVisual,
   type GeoTilesetVisualStyle,
@@ -62,6 +70,7 @@ export interface GeoDataResourceSnapshot {
   readonly error?: string
   readonly modelRenderingNotice?: string
   readonly modelTransform?: GeoModelTransform
+  readonly animation?: GeoModelAnimationSnapshot
   readonly visualStyle?: GeoTilesetVisualStyle
   readonly autoHidden?: boolean
   readonly maximumVisibleCameraHeight?: number
@@ -125,6 +134,7 @@ interface ManagedResource {
   modelRenderingRegistration?: GeoModelRenderingRegistration
   environmentRegistration?: { dispose(): void }
   modelMaterialNotice?: string
+  animation?: GeoModelAnimationPlayer
   tilesetError?: string
   requestedShow: boolean
   autoHidden: boolean
@@ -143,6 +153,7 @@ export interface GeoDataBrowser {
   setVisible(id: string, show: boolean): void
   setTilesetVisualStyle(id: string, style: GeoTilesetVisualStyle): void
   updateModelTransform(id: string, transform: GeoModelTransform): void
+  controlModelAnimation(id: string, command: GeoModelAnimationCommand): void
   flyTo(id: string, duration?: number): Promise<boolean>
   setTerrain(id: GeoTerrainResourceId, url?: string): Promise<GeoTerrainSnapshot>
   getTerrain(): GeoTerrainSnapshot
@@ -153,6 +164,7 @@ export interface GeoDataBrowserOptions {
   readonly signal?: AbortSignal
   readonly onActiveTilesetChange?: (tileset: Cesium3DTilesetType | undefined) => void
   readonly onResourcesChange?: () => void
+  readonly onModelAnimationChange?: () => void
   readonly onResourcesError?: (message: string) => void
   readonly modelRendering?: GeoModelRenderingManager
 }
@@ -393,6 +405,7 @@ export function createGeoDataBrowser(
     managed.autoHidden =
       maximumHeight !== undefined && viewer.camera.positionCartographic.height > maximumHeight
     managed.resource.show = managed.requestedShow && !managed.autoHidden
+    managed.animation?.setVisible(managed.resource.show)
     return previousAutoHidden !== managed.autoHidden || previousShow !== managed.resource.show
   }
 
@@ -570,6 +583,7 @@ export function createGeoDataBrowser(
       modelTransform: managed.snapshot.modelTransform
         ? { ...managed.snapshot.modelTransform }
         : undefined,
+      animation: managed.animation?.snapshot(),
       show: managed.requestedShow,
       status: managed.tilesetError ? 'failed' : 'ready',
       error: managed.tilesetError,
@@ -642,6 +656,8 @@ export function createGeoDataBrowser(
     let resource: Model | undefined
     let modelRenderingRegistration: GeoModelRenderingRegistration | undefined
     let modelRenderingNotice: string | undefined
+    let animationClips: readonly GeoModelAnimationClip[] = []
+    let animation: GeoModelAnimationPlayer | undefined
     let added = false
     let prepared: PreparedGeoModelAsset | undefined
     let transform = options.transform ? { ...options.transform } : undefined
@@ -706,6 +722,7 @@ export function createGeoDataBrowser(
           },
           gltfCallback(gltf: unknown) {
             modelRenderingNotice = modelMaterialNotice(gltf, Boolean(browserOptions.modelRendering))
+            animationClips = readModelAnimationClips(gltf)
           },
         }),
         load.signal,
@@ -726,6 +743,16 @@ export function createGeoDataBrowser(
       requestRender()
       await waitForModelReady(resource, load.signal)
       checkLoad(load.signal)
+      if (animationClips.length) {
+        animation = createModelAnimationPlayer(
+          resource,
+          viewer,
+          animationClips,
+          function changed() {
+            browserOptions.onModelAnimationChange?.()
+          },
+        )
+      }
       if (browserOptions.modelRendering) {
         try {
           modelRenderingRegistration = browserOptions.modelRendering.register(resource)
@@ -748,11 +775,13 @@ export function createGeoDataBrowser(
         },
         resource,
         modelMaterialNotice: initialModelMaterialNotice,
+        animation,
         modelRenderingRegistration,
         requestedShow: options.show ?? true,
         autoHidden: false,
         remove: () => {
           try {
+            managed.animation?.dispose()
             managed.modelRenderingRegistration?.dispose()
             managed.modelRenderingRegistration = undefined
             const removed = viewer.isDestroyed()
@@ -771,6 +800,7 @@ export function createGeoDataBrowser(
       return snapshotFor(managed)
     } catch (error) {
       try {
+        animation?.dispose()
         if (resource) {
           modelRenderingRegistration?.dispose()
           if (added && !viewer.isDestroyed()) {
@@ -906,6 +936,15 @@ export function createGeoDataBrowser(
     }
     requestRender()
     return removed
+  }
+
+  function controlModelAnimation(id: string, command: GeoModelAnimationCommand): void {
+    assertActive()
+    const managed = resources.get(id)
+    if (!managed?.animation) {
+      throw new Error('该资源没有可控制的模型动画。')
+    }
+    managed.animation.control(command)
   }
 
   function clear(): void {
@@ -1069,6 +1108,7 @@ export function createGeoDataBrowser(
     setVisible,
     setTilesetVisualStyle,
     updateModelTransform,
+    controlModelAnimation,
     flyTo,
     setTerrain,
     getTerrain,

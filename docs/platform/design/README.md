@@ -1,5 +1,7 @@
 # Platform 设计索引
 
+- [Geo 已加载模型动画控制](modules/geo-model-animation.md)：内嵌动画识别、资源行按钮、局部播放面板与生命周期。
+
 - [建筑分件、爆炸与飞入拼装制作要求](modules/geo-model-assembly-authoring.md)：CS-AM-1、固定地理锚点、语义部件、确定性 TRS、成品/动画交付与 AIModels 制作边界。
 
 - [Geo AIModels 模型目录](modules/geo-ai-models.md)：版本化发布协议、模型卡片、质量选择、关联资源和取消清理。

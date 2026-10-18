@@ -1,5 +1,7 @@
 # Platform 架构决策索引
 
+- [已加载模型的动画发现与独立播放](ADR-20261018-model-animation-controls.md)：读取当前 glTF、局部秒数求值，不改变场景时钟或静态发布协议。
+
 - [建筑静态成品与分件动画制作契约](ADR-20261017-building-assembly-authoring.md)：静态成品、飞入拼装和爆炸分解分开导出，AIModels 保存完整制作执行要求。
 
 - [AIModels 版本化静态发布](ADR-20261017-aimodels-static-publishing.md)：静态目录与模型描述、显式定位和关联资源协议。

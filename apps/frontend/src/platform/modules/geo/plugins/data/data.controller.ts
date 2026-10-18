@@ -45,6 +45,7 @@ import {
   type AiModelCatalogItem,
 } from '../../tools/data/ai-model-catalog'
 import { createAiModelLoader, type AiModelGroupSnapshot } from '../../tools/data/ai-model-loader'
+import type { GeoModelAnimationCommand } from '../../tools/model/model-animation'
 
 export type GeoDataLoadingOperation =
   'geojson' | 'model' | 'tileset' | 'landmark-scene' | 'fly-to' | 'transform' | 'ai-model'
@@ -99,6 +100,7 @@ export interface GeoDataController {
   flyToResource(id: string): Promise<void>
   suggestModelTransform(): GeoModelTransform
   updateModelTransform(id: string, transform: GeoModelTransform): Promise<void>
+  controlModelAnimation(id: string, command: GeoModelAnimationCommand): void
   setTerrain(id: GeoTerrainResourceId, url?: string): Promise<void>
   refresh(): void
   dispose(): void
@@ -125,6 +127,11 @@ export function createGeoDataController(
     onResourcesChange() {
       if (!disposed) {
         refresh()
+      }
+    },
+    onModelAnimationChange() {
+      if (!disposed) {
+        refreshResources()
       }
     },
     onResourcesError(message) {
@@ -179,13 +186,17 @@ export function createGeoDataController(
       return { ...item }
     })
     publishImageryLayers(imageryLayers)
+    refreshResources()
+    state.terrain = { ...browser.getTerrain() }
+  }
+
+  function refreshResources(): void {
     state.resources = browser.list().map(function copyResource(item) {
       return {
         ...item,
         modelTransform: item.modelTransform ? { ...item.modelTransform } : undefined,
       }
     })
-    state.terrain = { ...browser.getTerrain() }
   }
 
   imagery = createGeoImageryLayerManager(viewer, catalog, {
@@ -493,6 +504,15 @@ export function createGeoDataController(
     }, 'transform')
   }
 
+  function controlModelAnimation(id: string, command: GeoModelAnimationCommand): void {
+    guard()
+    try {
+      browser.controlModelAnimation(id, command)
+    } catch (error) {
+      state.error = error instanceof Error ? error.message : '模型动画操作失败'
+    }
+  }
+
   async function setTerrain(id: GeoTerrainResourceId, url?: string): Promise<void> {
     guard()
     const requestVersion = ++terrainRequestVersion
@@ -572,6 +592,7 @@ export function createGeoDataController(
     flyToResource,
     suggestModelTransform,
     updateModelTransform,
+    controlModelAnimation,
     setTerrain,
     refresh,
     dispose,
