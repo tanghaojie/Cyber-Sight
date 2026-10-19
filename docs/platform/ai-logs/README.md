@@ -1,5 +1,7 @@
 # Platform 活动 AI 协作记录
 
+- [拍摄分辨率修复后的 Platform 文档复核](../archive/ai-logs/docs/2026/10/2026-10-19-capture-resolution-archive-review.md)：复核真实差异并推进至 `58eb1bb`，保留人工导出验收边界。
+
 - [Geo 导出画布分辨率修复](../archive/ai-logs/fix/2026/10/2026-10-19-geo-capture-resolution.md)：实际 canvas 尺寸锁定、恢复与失败诊断；静态检查通过，现场导出待复验。
 
 - [拍摄与模型模式共同树复核](../archive/ai-logs/docs/2026/10/2026-10-19-capture-merge-archive-review.md)：核对双方实现保留与模式/拍摄边界，推进真实共同树基线。

@@ -1,5 +1,7 @@
 # Platform 历史归档
 
+- [2026-10-19 拍摄分辨率修复后的文档复核](plans/2026-10-19-capture-resolution-archive-review.md)：审查真实 `6831891..58eb1bb`，现行设计已反映按钮与画布行为，Platform 基线推进至 `58eb1bb`；[协作记录](ai-logs/docs/2026/10/2026-10-19-capture-resolution-archive-review.md)。
+
 - [2026-10-19 Geo 导出画布分辨率修复](plans/2026-10-19-geo-capture-resolution.md)：直接锁定实际 canvas，核对绘图缓冲并恢复样式；[协作记录](ai-logs/fix/2026/10/2026-10-19-geo-capture-resolution.md)。静态门禁通过，1080p 竖屏现场导出待维护者复验。
 
 - [2026-10-19 拍摄与模型模式共同树复核](plans/2026-10-19-capture-merge-archive-review.md)：审查真实 `70bfe5c..6831891`，保留双方实现及决策，推进合并基线；[协作记录](ai-logs/docs/2026/10/2026-10-19-capture-merge-archive-review.md)。

@@ -44,4 +44,4 @@ change_type: fix
 
 ## 关联计划和提交
 
-[实施计划](../../../../plans/2026-10-19-geo-capture-resolution.md)。实现与归档提交为本记录所在的 `fix(geo): lock capture render canvas dimensions`，具体 SHA 由 Git 历史追溯；提交后核对真实模型 trailer 与工作区。
+[实施计划](../../../../plans/2026-10-19-geo-capture-resolution.md)。实现与归档提交为 `58eb1bbf5ebac7be9949948720dedc27aace3211`，已核对 AI trailer 与工作区。提交后归档 CI 因完成计划达到 3 项返回 DUE，由 [文档复核](../../../../plans/2026-10-19-capture-resolution-archive-review.md) 接续。

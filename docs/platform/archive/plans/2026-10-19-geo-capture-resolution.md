@@ -45,4 +45,4 @@ updated: 2026-10-19
 
 通过 `pnpm format`、`pnpm format:check`、修改文件 ESLint、`pnpm --filter @cyber-ai-forge/frontend build`（含 Vue/TypeScript）、`pnpm architecture:check`、`pnpm docs:archive:check:ci`（NOT_DUE）及 `git diff --check`。构建保留 Sass 旧 API 和大分包提示，未出现构建错误。无实现范围偏差；1080×1920 的用户现场导出与 GPU/编码结果仍待维护者复验。
 
-关联 [AI 协作记录](../ai-logs/fix/2026/10/2026-10-19-geo-capture-resolution.md)。实现与归档随本记录同一提交 `fix(geo): lock capture render canvas dimensions`，具体 SHA 由本文件 Git 历史追溯。
+关联 [AI 协作记录](../ai-logs/fix/2026/10/2026-10-19-geo-capture-resolution.md)。实现与归档提交为 `58eb1bbf5ebac7be9949948720dedc27aace3211`。提交后归档 CI 因累计完成计划达到 3 项返回 DUE，已由 [后续文档复核](2026-10-19-capture-resolution-archive-review.md) 接续。
