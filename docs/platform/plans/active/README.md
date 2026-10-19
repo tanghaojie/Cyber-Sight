@@ -1,5 +1,7 @@
 # Platform 活动实施计划
 
+- [已完成：Geo 导出画布分辨率修复](../../archive/plans/2026-10-19-geo-capture-resolution.md)：固定实际渲染画布尺寸，静态检查通过，1080p 竖屏导出待维护者复验。
+
 - [已完成：拍摄与模型模式共同树复核](../../archive/plans/2026-10-19-capture-merge-archive-review.md)：核对共同树与发布/拍摄边界，基线推进至真实 `6831891`。
 
 - [已完成：拍摄与 origin/master 集成](../../archive/plans/2026-10-19-capture-origin-integration.md)：保留远端模式/精细度与拍摄模块，共同树检查通过。

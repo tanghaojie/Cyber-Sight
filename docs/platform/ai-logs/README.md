@@ -1,5 +1,7 @@
 # Platform 活动 AI 协作记录
 
+- [Geo 导出画布分辨率修复](../archive/ai-logs/fix/2026/10/2026-10-19-geo-capture-resolution.md)：实际 canvas 尺寸锁定、恢复与失败诊断；静态检查通过，现场导出待复验。
+
 - [拍摄与模型模式共同树复核](../archive/ai-logs/docs/2026/10/2026-10-19-capture-merge-archive-review.md)：核对双方实现保留与模式/拍摄边界，推进真实共同树基线。
 
 - [拍摄与 origin/master 集成](../archive/ai-logs/chore/2026/10/2026-10-19-capture-origin-integration.md)：保留双方条目与实现，共同树检查通过。

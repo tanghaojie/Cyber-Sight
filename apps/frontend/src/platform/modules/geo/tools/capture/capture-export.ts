@@ -240,6 +240,7 @@ export async function exportCapture(options: CaptureExportOptions): Promise<void
     await sink.abort()
     throw new Error('浏览器无法创建输出画布。')
   }
+  const renderCanvas = viewer.scene.canvas
   const original = {
     loop: viewer.useDefaultRenderLoop,
     requestRenderMode: viewer.scene.requestRenderMode,
@@ -247,7 +248,7 @@ export async function exportCapture(options: CaptureExportOptions): Promise<void
     resolutionScale: viewer.resolutionScale,
     browserResolution: viewer.useBrowserRecommendedResolution,
     targetFrameRate: viewer.targetFrameRate,
-    containerStyle: (viewer.container as HTMLElement).style.cssText,
+    canvasStyle: renderCanvas.style.cssText,
   }
   let session: ReturnType<typeof createCaptureSession> | undefined
   let resolutionLease: { dispose(): void } | undefined
@@ -272,14 +273,12 @@ export async function exportCapture(options: CaptureExportOptions): Promise<void
     viewer.scene.requestRenderMode = false
     viewer.scene.rethrowRenderErrors = true
     resolutionLease = quality.acquireFixedResolution()
-    Object.assign((viewer.container as HTMLElement).style, {
+    // Cesium sizes its drawing buffer from the canvas, not the Vue-owned map host.
+    Object.assign(renderCanvas.style, {
       width: `${width}px`,
       height: `${height}px`,
-      left: '0px',
-      top: '0px',
-      right: 'auto',
-      bottom: 'auto',
-      transform: 'none',
+      maxWidth: 'none',
+      maxHeight: 'none',
     })
     viewer.forceResize()
     if (media) {
@@ -352,16 +351,25 @@ export async function exportCapture(options: CaptureExportOptions): Promise<void
         if (viewer.isDestroyed()) {
           throw new Error('三维场景已关闭。')
         }
+        viewer.resize()
         viewer.scene.requestRender()
         viewer.render()
         steps += 1
         stable = viewer.scene.globe.tilesLoaded && subjects.ready() ? stable + 1 : 0
         if (steps >= warmupSteps && stable >= 3) {
-          if (viewer.scene.canvas.width !== width || viewer.scene.canvas.height !== height) {
-            throw new Error('浏览器未能保持指定输出分辨率，请降低分辨率后重试。')
+          const { drawingBufferWidth, drawingBufferHeight } = viewer.scene
+          if (
+            renderCanvas.width !== width ||
+            renderCanvas.height !== height ||
+            drawingBufferWidth !== width ||
+            drawingBufferHeight !== height
+          ) {
+            throw new Error(
+              `输出分辨率不匹配：目标 ${width}×${height}，画布 ${renderCanvas.width}×${renderCanvas.height}，绘图缓冲 ${drawingBufferWidth}×${drawingBufferHeight}。请降低分辨率后重试。`,
+            )
           }
           // Copy synchronously before yielding; WebGL does not preserve its default drawing buffer.
-          context.drawImage(viewer.scene.canvas, 0, 0, width, height)
+          context.drawImage(renderCanvas, 0, 0)
           const credits = viewer.container
             .querySelector('.cesium-credit-textContainer')
             ?.textContent?.replace(/\s+/g, ' ')
@@ -440,7 +448,7 @@ export async function exportCapture(options: CaptureExportOptions): Promise<void
       session?.dispose()
     } finally {
       if (!viewer.isDestroyed()) {
-        ;(viewer.container as HTMLElement).style.cssText = original.containerStyle
+        renderCanvas.style.cssText = original.canvasStyle
         resolutionLease?.dispose()
         viewer.useBrowserRecommendedResolution = original.browserResolution
         viewer.resolutionScale = original.resolutionScale
