@@ -8,6 +8,7 @@ import {
   createActiveTilesetCapability,
   createImageryLayerCollectionCapability,
   imageryLayerCollectionCapability,
+  geoCaptureSubjectsCapability,
 } from './data.capabilities'
 import { geoModelRenderingCapability } from '../scene/scene.capabilities'
 import {
@@ -73,6 +74,11 @@ export function createGeoDataPlugin(options: GeoDataControllerOptions = {}): Geo
         onImageryLayersChange: imageryLayers.setLayers,
       })
       context.scope.use(controller)
+      context.capabilities.provide(
+        geoCaptureSubjectsCapability,
+        controller.captureSubjects,
+        context.scope,
+      )
       if (!context.signal.aborted && !context.viewer.isDestroyed()) {
         await controller.addImagery('google-hybrid')
       }

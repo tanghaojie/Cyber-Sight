@@ -46,6 +46,7 @@ import {
 } from '../../tools/data/ai-model-catalog'
 import { createAiModelLoader, type AiModelGroupSnapshot } from '../../tools/data/ai-model-loader'
 import type { GeoModelAnimationCommand } from '../../tools/model/model-animation'
+import type { GeoCaptureSubjects } from '../../tools/data/capture-subject'
 
 export type GeoDataLoadingOperation =
   'geojson' | 'model' | 'tileset' | 'landmark-scene' | 'fly-to' | 'transform' | 'ai-model'
@@ -73,6 +74,7 @@ export interface GeoDataState {
 }
 
 export interface GeoDataController {
+  readonly captureSubjects: GeoCaptureSubjects
   readonly state: DeepReadonly<GeoDataState>
   readonly imageryCatalog: ReturnType<typeof createGeoImageryCatalog>
   imageryAvailability(sourceId: GeoImagerySourceId): GeoImageryAvailability
@@ -557,6 +559,7 @@ export function createGeoDataController(
 
   refresh()
   return {
+    captureSubjects: browser.captureSubjects,
     state: readonly(state),
     imageryCatalog: imagery.catalog,
     imageryAvailability(sourceId) {

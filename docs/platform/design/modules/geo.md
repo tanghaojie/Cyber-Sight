@@ -4,10 +4,12 @@ scope: platform
 repository: Cyber-Sight
 status: active
 owner: project maintainers
-updated: 2026-10-17
+updated: 2026-10-19
 ---
 
 # Geo 前端空间可视化工作台
+
+2026-10-19 增加独立 [拍摄插件](geo-capture.md)与[操作指南](../../guides/geo-capture.md)。`workspace.presentation` 是通用 core 展示端口，页面只消费净画面与画幅状态；Data 通过 `data.captureSubjects` 发布可见独立模型、动画采样租约与瓦片就绪状态。插件通过 Scene 的可恢复分辨率端口逐帧输出，不修改 Foundation 或增加第二个 Clock。
 
 ## 背景与目标
 

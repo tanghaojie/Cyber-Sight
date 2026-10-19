@@ -1,4 +1,4 @@
-import { JulianDate, type Model, type ModelAnimation, type Viewer } from 'cesium'
+import { JulianDate, type Matrix4, type Model, type ModelAnimation, type Viewer } from 'cesium'
 
 export interface GeoModelAnimationClip {
   readonly index: number
@@ -29,6 +29,36 @@ function object(value: unknown): Record<string, unknown> | undefined {
   return value !== null && typeof value === 'object'
     ? (value as Record<string, unknown>)
     : undefined
+}
+
+/** Name only the in-memory nodes so the public Model.getNode API can reset every TRS. */
+export function prepareAnimationCaptureNodes(gltf: unknown): { names: string[]; trsOnly: boolean } {
+  const asset = object(gltf)
+  const names = new Set<string>()
+  const nodes = Array.isArray(asset?.nodes) ? asset.nodes : []
+  const reserved = new Set(nodes.map((value) => object(value)?.name))
+  for (const [index, value] of nodes.entries()) {
+    const node = object(value)
+    if (!node) {
+      continue
+    }
+    let name = typeof node.name === 'string' ? node.name : ''
+    if (!name || names.has(name)) {
+      name = `__sight_capture_node_${index}`
+      while (reserved.has(name) || names.has(name)) {
+        name += '_'
+      }
+    }
+    node.name = name
+    names.add(name)
+  }
+  const trsOnly = (Array.isArray(asset?.animations) ? asset.animations : []).every((value) => {
+    const channels = object(value)?.channels
+    return (Array.isArray(channels) ? channels : []).every((channel) =>
+      ['translation', 'rotation', 'scale'].includes(String(object(object(channel)?.target)?.path)),
+    )
+  })
+  return { names: [...names], trsOnly }
 }
 
 export function readModelAnimationClips(gltf: unknown): readonly GeoModelAnimationClip[] {
@@ -63,6 +93,7 @@ export function createModelAnimationPlayer(
   viewer: Viewer,
   clips: readonly GeoModelAnimationClip[],
   onChange: () => void,
+  captureNodes: { names: readonly string[]; trsOnly: boolean } = { names: [], trsOnly: false },
 ) {
   let clipIndex = clips[0]?.index ?? 0
   let current = 0
@@ -77,6 +108,7 @@ export function createModelAnimationPlayer(
   let previous = 0
   let lastPublished = 0
   let active: ModelAnimation | undefined
+  let externallyDriven = false
   const originalAnimateWhilePaused = model.activeAnimations.animateWhilePaused
 
   function selected(): GeoModelAnimationClip | undefined {
@@ -200,6 +232,9 @@ export function createModelAnimationPlayer(
     if (disposed) {
       return
     }
+    if (externallyDriven) {
+      throw new Error('模型正在拍摄中，请先停止拍摄再操作独立播放器。')
+    }
     error = undefined
     try {
       switch (command.type) {
@@ -260,6 +295,93 @@ export function createModelAnimationPlayer(
     }
   }
 
+  function acquireExternal() {
+    if (disposed || externallyDriven) {
+      throw new Error('该模型已被移除或正在拍摄中。')
+    }
+    const before = snapshot()
+    stopFrame()
+    externallyDriven = true
+    function resetNodes(): void {
+      if (active) {
+        model.activeAnimations.remove(active)
+      }
+      active = undefined
+      for (const name of captureNodes.names) {
+        const node = model.getNode(name)
+        if (node) {
+          ;(node as unknown as { matrix: Matrix4 | undefined }).matrix = undefined
+        }
+      }
+    }
+    let released = false
+    let sampled = false
+    return {
+      reset(): void {
+        if (!sampled || released || disposed || model.isDestroyed()) {
+          return
+        }
+        resetNodes()
+        clipIndex = before.clipIndex
+        current = before.current
+        if (before.started) {
+          activate()
+        }
+        sampled = false
+        redraw()
+      },
+      sample(clip: string, seconds: number): void {
+        if (released || disposed || model.isDestroyed()) {
+          throw new Error('拍摄模型已被移除。')
+        }
+        if (!captureNodes.trsOnly) {
+          throw new Error('拍摄动画目前仅支持节点 TRS 通道。')
+        }
+        const selection = clips.find((entry) => `${entry.index}:${entry.label}` === clip)
+        if (!selection || !Number.isFinite(seconds)) {
+          throw new Error(`模型动画不存在：${clip}`)
+        }
+        if (clipIndex !== selection.index || !active) {
+          resetNodes()
+          clipIndex = selection.index
+          activate()
+        }
+        sampled = true
+        current = Math.max(0, Math.min(selection.duration, seconds))
+        redraw()
+      },
+      dispose(): void {
+        if (released) {
+          return
+        }
+        released = true
+        externallyDriven = false
+        if (disposed || model.isDestroyed()) {
+          return
+        }
+        if (sampled) {
+          resetNodes()
+        }
+        clipIndex = before.clipIndex
+        current = before.current
+        speed = before.speed
+        loop = before.loop
+        started = before.started
+        if (before.started && sampled) {
+          activate()
+        }
+        model.activeAnimations.animateWhilePaused = before.started
+          ? true
+          : originalAnimateWhilePaused
+        if (before.playing && visible && !document.hidden) {
+          play()
+        }
+        redraw()
+        publish()
+      },
+    }
+  }
+
   function onVisibilityChange(): void {
     if (document.hidden && playing) {
       stopFrame()
@@ -290,7 +412,7 @@ export function createModelAnimationPlayer(
     active = undefined
   }
 
-  return { snapshot, control, setVisible, dispose }
+  return { snapshot, control, setVisible, acquireExternal, dispose }
 }
 
 export type GeoModelAnimationPlayer = ReturnType<typeof createModelAnimationPlayer>

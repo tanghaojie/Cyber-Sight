@@ -11,6 +11,7 @@ import {
 } from '../../tools/scene/scene-settings'
 
 export interface GeoSceneController {
+  acquireFixedResolution(): { dispose(): void }
   readonly state: DeepReadonly<GeoSceneSettings & { renderMode: GeoRenderMode }>
   setRenderMode(mode: GeoRenderMode): void
   set(patch: GeoSceneSettingsPatch): void
@@ -66,6 +67,7 @@ export function createGeoSceneController(
   }
 
   return {
+    acquireFixedResolution: quality.acquireFixedResolution,
     state: readonly(state),
     setRenderMode(mode) {
       guard()

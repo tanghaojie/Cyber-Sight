@@ -1,5 +1,7 @@
 # Platform 设计索引
 
+- [Geo 拍摄模块与逐帧输出](modules/geo-capture.md)：镜头工程、自动运镜、统一拍摄进度、净画面与 MP4 / PNG 序列。
+
 - [Geo 已加载模型动画控制](modules/geo-model-animation.md)：内嵌动画识别、资源行按钮、局部播放面板与生命周期。
 
 - [建筑分件、爆炸与飞入拼装制作要求](modules/geo-model-assembly-authoring.md)：CS-AM-1、固定地理锚点、语义部件、确定性 TRS、成品/动画交付与 AIModels 制作边界。

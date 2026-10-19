@@ -3,6 +3,7 @@ import type { GeoModelRenderingManager } from '../../tools/scene/model-rendering
 import type { GeoRenderMode } from '../../core/render-performance'
 
 export interface GeoRenderQualityCapability {
+  acquireFixedResolution(): { dispose(): void }
   readonly state: { readonly renderMode: GeoRenderMode }
   setMode(mode: GeoRenderMode): void
 }

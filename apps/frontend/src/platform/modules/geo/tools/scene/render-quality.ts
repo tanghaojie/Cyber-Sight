@@ -187,6 +187,7 @@ export function createGeoRenderQuality(viewer: Viewer, models: GeoModelRendering
   setMode('balanced')
 
   return {
+    acquireFixedResolution: resolution.acquireFixedResolution,
     setMode,
     dispose() {
       if (disposed) {

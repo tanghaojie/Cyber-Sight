@@ -12,6 +12,8 @@ export const localizationResource = defineLocalizationResource('geo', {
     'tasks.externalData': '外部数据',
     'tasks.externalDataDescription': '通过 URL 或 AIModels 目录加载模型、矢量和三维瓦片。',
     'tasks.view': '视图',
+    'tasks.capture': '拍摄',
+    'tasks.captureDescription': '编排机位、预览自动运镜并逐帧输出视频与图片序列。',
     'tasks.scene': '场景',
     'tasks.flight': '航班',
     'tasks.drawing': '标绘',
@@ -102,6 +104,9 @@ export const localizationResource = defineLocalizationResource('geo', {
     'tasks.externalDataDescription':
       'Load models, vectors, and 3D Tiles from URLs or the AIModels catalog.',
     'tasks.view': 'View',
+    'tasks.capture': 'Capture',
+    'tasks.captureDescription':
+      'Compose camera shots, preview movement, and export video or image sequences frame by frame.',
     'tasks.scene': 'Scene',
     'tasks.flight': 'Flights',
     'tasks.drawing': 'Draw',

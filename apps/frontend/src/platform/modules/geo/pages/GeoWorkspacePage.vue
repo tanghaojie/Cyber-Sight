@@ -6,19 +6,31 @@
       'geo-workspace--status-collapsed': statusBarCollapsed,
       'geo-workspace--has-bottom-docks': bottomDocks.length > 0,
       'geo-workspace--bottom-docks-collapsed': bottomDocksCollapsed,
+      'geo-workspace--framed': Boolean(runtime.presentation.state.aspectRatio),
+      'geo-workspace--clean': runtime.presentation.state.clean,
     }"
     :aria-label="t('geo.views.workspace')"
   >
     <div
       ref="mapContainer"
       class="geo-map-host"
+      :style="mapFrameStyle"
       :class="{ 'geo-map-host--crosshair': runtime.interactions.state.cursor === 'crosshair' }"
     />
-    <div class="geo-map-atmosphere" aria-hidden="true" />
+    <div
+      v-show="!runtime.presentation.state.aspectRatio"
+      class="geo-map-atmosphere"
+      aria-hidden="true"
+    />
 
     <template v-if="runtime.state.status === 'ready'">
-      <component :is="assemblyPreviewComponent" v-if="assemblyPreviewComponent" />
+      <component
+        :is="assemblyPreviewComponent"
+        v-if="assemblyPreviewComponent"
+        v-show="!runtime.presentation.state.clean"
+      />
       <GeoToolRail
+        v-show="!runtime.presentation.state.clean"
         :items="taskRailItems"
         :active-id="activeTaskId"
         :label="t('geo.views.workspace')"
@@ -27,6 +39,7 @@
 
       <GeoPanelFrame
         v-if="panelOpen"
+        v-show="!runtime.presentation.state.clean"
         :title="activeTask.label"
         :eyebrow="`TASK · ${activeTask.id.toUpperCase()}`"
         :close-label="t('geo.tasks.closePanel')"
@@ -42,6 +55,7 @@
       </GeoPanelFrame>
 
       <GeoMapControls
+        v-show="!runtime.presentation.state.clean && !runtime.presentation.state.aspectRatio"
         :label="t('geo.views.workspace')"
         :scene-mode="runtime.state.sceneMode"
         :fullscreen="runtime.state.fullscreen"
@@ -60,17 +74,26 @@
 
       <GeoInspectorFrame
         v-if="activeInspectorComponent"
+        v-show="!runtime.presentation.state.clean"
         :title="t('geo.inspector.title')"
         eyebrow="SELECTION"
       >
         <component :is="activeInspectorComponent" />
       </GeoInspectorFrame>
 
-      <GeoPluginErrors :title="t('geo.plugins.errors')" :errors="runtime.plugins.state.errors" />
+      <GeoPluginErrors
+        v-show="!runtime.presentation.state.clean"
+        :title="t('geo.plugins.errors')"
+        :errors="runtime.plugins.state.errors"
+      />
 
       <component :is="overlay.component" v-for="overlay in overlays" :key="overlay.id" />
 
-      <div v-if="bottomDocks.length" class="geo-bottom-docks">
+      <div
+        v-if="bottomDocks.length"
+        v-show="!runtime.presentation.state.clean && !runtime.presentation.state.aspectRatio"
+        class="geo-bottom-docks"
+      >
         <component
           :is="dock.component"
           v-for="dock in bottomDocks"
@@ -84,6 +107,7 @@
       </div>
 
       <GeoStatusBar
+        v-show="!runtime.presentation.state.clean"
         :longitude="runtime.state.longitude"
         :latitude="runtime.state.latitude"
         :surface-height="runtime.state.surfaceHeight"
@@ -168,6 +192,23 @@ const bottomDockCollapsed = ref<Record<string, boolean>>({})
 const locationError = ref<string>()
 const runtime = createGeoRuntime({ plugins: geoPlugins })
 provideGeoRuntime(runtime)
+const viewport = ref({ width: window.innerWidth, height: window.innerHeight })
+let resizeObserver: ResizeObserver | undefined
+const mapFrameStyle = computed(function compositionFrame() {
+  const ratio = runtime.presentation.state.aspectRatio
+  if (!ratio) {
+    return undefined
+  }
+  const width = Math.min(viewport.value.width, viewport.value.height * ratio)
+  return {
+    width: `${width}px`,
+    height: `${width / ratio}px`,
+    inset: 'auto',
+    left: '50%',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',
+  }
+})
 
 const taskDefinitions = computed<readonly GeoTaskItem[]>(function taskMetadata() {
   return [
@@ -200,6 +241,12 @@ const taskDefinitions = computed<readonly GeoTaskItem[]>(function taskMetadata()
       label: t('geo.tasks.flight'),
       icon: 'activity',
       description: t('geo.tasks.flightDescription'),
+    },
+    {
+      id: 'capture',
+      label: t('geo.tasks.capture'),
+      icon: 'monitor',
+      description: t('geo.tasks.captureDescription'),
     },
     {
       id: 'drawing',
@@ -398,11 +445,21 @@ function handleEscape(event: KeyboardEvent): void {
 }
 
 onMounted(function mountGeoPage() {
+  resizeObserver = new ResizeObserver(function measureWorkspace(entries) {
+    const rect = entries[0]?.contentRect
+    if (rect) {
+      viewport.value = { width: rect.width, height: rect.height }
+    }
+  })
+  if (workspaceRoot.value) {
+    resizeObserver.observe(workspaceRoot.value)
+  }
   window.addEventListener('keydown', handleEscape)
   void mountWorkspace()
 })
 
 onBeforeUnmount(function disposeGeoPage() {
+  resizeObserver?.disconnect()
   window.removeEventListener('keydown', handleEscape)
   runtime.dispose()
 })
@@ -438,6 +495,14 @@ onBeforeUnmount(function disposeGeoPage() {
 .geo-workspace--status-collapsed {
   --geo-bottom-dock-bottom: 14px;
   --geo-credits-bottom: calc(var(--geo-bottom-dock-bottom) + var(--geo-bottom-dock-height) + 16px);
+}
+
+.geo-workspace--framed {
+  background: #02070c;
+}
+
+.geo-workspace--clean {
+  --geo-credits-bottom: 8px;
 }
 
 .geo-workspace--bottom-docks-collapsed {

@@ -1,5 +1,7 @@
 # Platform 活动实施计划
 
+- [已完成：Geo 拍摄模块](../../archive/plans/2026-10-19-geo-capture.md)：镜头工程、预览与逐帧输出；实际 GPU/编码待人工验收。
+
 - [已完成：Geo 动画控制交付后的文档复核](../../archive/plans/2026-10-18-geo-animation-archive-review.md)，Platform 基线推进到真实 `8654726`。
 
 - [已完成：Geo 已加载模型动画控制](../../archive/plans/2026-10-18-geo-model-animation.md)，工程检查通过，实际播放与视觉待维护者人工验收。

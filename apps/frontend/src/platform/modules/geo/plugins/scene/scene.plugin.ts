@@ -48,7 +48,11 @@ export function createGeoScenePlugin(): GeoPluginDefinition {
       context.capabilities.provide(geoModelRenderingCapability, modelRendering, context.scope)
       context.capabilities.provide(
         geoRenderQualityCapability,
-        { state: controller.state, setMode: controller.setRenderMode },
+        {
+          state: controller.state,
+          setMode: controller.setRenderMode,
+          acquireFixedResolution: controller.acquireFixedResolution,
+        },
         context.scope,
       )
       const instance: GeoScenePluginInstance = {

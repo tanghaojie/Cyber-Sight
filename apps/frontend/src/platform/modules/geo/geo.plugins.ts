@@ -9,12 +9,14 @@ import { geoScenePlugin } from './plugins/scene/scene.plugin'
 import { terrainPlugin } from './plugins/terrain/terrain.plugin'
 import { geoTimePlugin } from './plugins/time/time.plugin'
 import { geoViewPlugin } from './plugins/view/view.plugin'
+import { geoCapturePlugin } from './plugins/capture/capture.plugin'
 
 export const geoPlugins: readonly GeoPluginDefinition[] = [
   geoDataPlugin,
   geoViewPlugin,
   geoScenePlugin,
   geoTimePlugin,
+  geoCapturePlugin,
   geoFlightPlugin,
   drawingPlugin,
   measurementPlugin,

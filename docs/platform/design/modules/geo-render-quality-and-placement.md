@@ -4,10 +4,12 @@ scope: platform
 repository: Cyber-Sight
 status: active
 owner: project maintainers
-updated: 2026-10-17
+updated: 2026-10-19
 ---
 
 # Geo 三档显示质量与模型坐标选择
+
+2026-10-19：[拍摄导出](geo-capture.md)通过 `scene.renderQuality.acquireFixedResolution` 临时关闭自适应分辨率，锁定原生输出像素；释放恢复原比例和 DPR 策略，不重新应用画质预设或覆盖手动场景设置。
 
 ## 目标与范围
 

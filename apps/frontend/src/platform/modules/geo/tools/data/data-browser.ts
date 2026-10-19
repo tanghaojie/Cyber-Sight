@@ -27,12 +27,14 @@ import {
 import { modelCameraOffset } from '../view/model-camera'
 import {
   createModelAnimationPlayer,
+  prepareAnimationCaptureNodes,
   readModelAnimationClips,
   type GeoModelAnimationClip,
   type GeoModelAnimationCommand,
   type GeoModelAnimationPlayer,
   type GeoModelAnimationSnapshot,
 } from '../model/model-animation'
+import type { GeoCaptureSubjects } from './capture-subject'
 import {
   createCyberCityTilesetVisual,
   type GeoTilesetVisual,
@@ -144,6 +146,7 @@ interface ManagedResource {
 }
 
 export interface GeoDataBrowser {
+  readonly captureSubjects: GeoCaptureSubjects
   list(): readonly GeoDataResourceSnapshot[]
   loadGeoJson(options: LoadGeoJsonOptions): Promise<GeoDataResourceSnapshot>
   loadModel(options: LoadModelOptions): Promise<GeoDataResourceSnapshot>
@@ -657,6 +660,10 @@ export function createGeoDataBrowser(
     let modelRenderingRegistration: GeoModelRenderingRegistration | undefined
     let modelRenderingNotice: string | undefined
     let animationClips: readonly GeoModelAnimationClip[] = []
+    let captureNodes: ReturnType<typeof prepareAnimationCaptureNodes> = {
+      names: [],
+      trsOnly: false,
+    }
     let animation: GeoModelAnimationPlayer | undefined
     let added = false
     let prepared: PreparedGeoModelAsset | undefined
@@ -712,6 +719,7 @@ export function createGeoDataBrowser(
       }
       resource = await awaitLoad(
         Model.fromGltfAsync({
+          incrementallyLoadTextures: false,
           url: prepared.url,
           modelMatrix: transform ? modelMatrixFromTransform(transform) : options.modelMatrix,
           show: options.show ?? true,
@@ -723,6 +731,7 @@ export function createGeoDataBrowser(
           gltfCallback(gltf: unknown) {
             modelRenderingNotice = modelMaterialNotice(gltf, Boolean(browserOptions.modelRendering))
             animationClips = readModelAnimationClips(gltf)
+            captureNodes = prepareAnimationCaptureNodes(gltf)
           },
         }),
         load.signal,
@@ -751,6 +760,7 @@ export function createGeoDataBrowser(
           function changed() {
             browserOptions.onModelAnimationChange?.()
           },
+          captureNodes,
         )
       }
       if (browserOptions.modelRendering) {
@@ -1098,7 +1108,96 @@ export function createGeoDataBrowser(
     requestRender()
   }
 
+  const captureSubjects: GeoCaptureSubjects = {
+    list() {
+      if (disposed || viewer.isDestroyed()) {
+        return []
+      }
+      return [...resources.values()].flatMap(function subject(managed) {
+        if (managed.snapshot.kind !== 'model') {
+          return []
+        }
+        const model = managed.resource as Model
+        if (model.isDestroyed() || !model.ready || !model.show) {
+          return []
+        }
+        const center = Cartographic.fromCartesian(model.boundingSphere.center)
+        return [
+          {
+            id: managed.snapshot.id,
+            label: managed.snapshot.label,
+            url: managed.snapshot.url,
+            anchor: [
+              CesiumMath.toDegrees(center.longitude),
+              CesiumMath.toDegrees(center.latitude),
+              center.height,
+            ] as [number, number, number],
+            radius: model.boundingSphere.radius,
+            clips: managed.animation?.snapshot().clips ?? [],
+          },
+        ]
+      })
+    },
+    ready() {
+      return (
+        !disposed &&
+        [...resources.values()].every(function loaded(managed) {
+          if (!managed.resource.show) {
+            return true
+          }
+          if (managed.snapshot.kind === '3d-tiles') {
+            return !managed.tilesetError && (managed.resource as Cesium3DTilesetType).tilesLoaded
+          }
+          return managed.snapshot.kind !== 'model' || (managed.resource as Model).ready
+        })
+      )
+    },
+    acquire(id) {
+      assertActive()
+      const selected = resources.get(id)
+      if (!selected || selected.snapshot.kind !== 'model' || !selected.resource.show) {
+        throw new Error('拍摄主体已隐藏或移除，请重新选择已加载模型。')
+      }
+      const leases: ReturnType<GeoModelAnimationPlayer['acquireExternal']>[] = []
+      let selectedLease: ReturnType<GeoModelAnimationPlayer['acquireExternal']> | undefined
+      try {
+        resources.forEach(function freeze(managed) {
+          if (!managed.animation) {
+            return
+          }
+          const lease = managed.animation.acquireExternal()
+          leases.push(lease)
+          if (managed === selected) {
+            selectedLease = lease
+          }
+        })
+      } catch (error) {
+        leases.reverse().forEach((lease) => lease.dispose())
+        throw error
+      }
+      return {
+        sample(clip, seconds) {
+          if (resources.get(id) !== selected || !selected.resource.show) {
+            throw new Error('拍摄主体已隐藏或移除。')
+          }
+          if (clip === undefined) {
+            selectedLease?.reset()
+            return
+          }
+          if (!selectedLease) {
+            throw new Error('拍摄主体没有可播放的动画。')
+          }
+          selectedLease.sample(clip, seconds)
+        },
+        dispose() {
+          leases.reverse().forEach((lease) => lease.dispose())
+        },
+      }
+    },
+  }
+
   return {
+    captureSubjects,
     list,
     loadGeoJson,
     loadModel,

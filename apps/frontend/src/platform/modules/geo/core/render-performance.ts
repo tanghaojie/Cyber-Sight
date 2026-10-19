@@ -15,6 +15,7 @@ export type GeoRenderMode = 'performance' | 'balanced' | 'compatible'
 
 export interface GeoRenderPerformanceController extends Disposable {
   setMode(mode: GeoRenderMode): void
+  acquireFixedResolution(): Disposable
 }
 
 function clampScale(value: number): number {
@@ -61,6 +62,7 @@ export function createGeoRenderPerformanceController(
   let sampleFrames = 0
   let lastAdjustmentAt = 0
   let disposed = false
+  let fixedResolution = false
 
   applyResolutionScale(viewer, Math.min(viewer.resolutionScale, scaleLimit))
 
@@ -71,7 +73,7 @@ export function createGeoRenderPerformanceController(
   }
 
   function handlePostRender(): void {
-    if (disposed || document.hidden || mode === 'performance') {
+    if (disposed || fixedResolution || document.hidden || mode === 'performance') {
       resetSample()
       return
     }
@@ -113,7 +115,7 @@ export function createGeoRenderPerformanceController(
   }
 
   function handleResize(): void {
-    if (disposed) {
+    if (disposed || fixedResolution) {
       return
     }
     scaleLimit = resolutionScaleLimit(viewer, mode)
@@ -130,6 +132,35 @@ export function createGeoRenderPerformanceController(
   window.addEventListener('resize', handleResize)
 
   return {
+    acquireFixedResolution() {
+      if (disposed || fixedResolution) {
+        throw new Error('输出分辨率已被锁定或场景已关闭。')
+      }
+      const previous = {
+        scale: viewer.resolutionScale,
+        browser: viewer.useBrowserRecommendedResolution,
+      }
+      fixedResolution = true
+      viewer.useBrowserRecommendedResolution = true
+      viewer.resolutionScale = 1
+      resetSample()
+      let released = false
+      return {
+        dispose() {
+          if (released) {
+            return
+          }
+          released = true
+          fixedResolution = false
+          if (!disposed && !viewer.isDestroyed()) {
+            viewer.useBrowserRecommendedResolution = previous.browser
+            viewer.resolutionScale = previous.scale
+            viewer.forceResize()
+          }
+          resetSample()
+        },
+      }
+    },
     setMode(nextMode) {
       if (disposed) {
         return

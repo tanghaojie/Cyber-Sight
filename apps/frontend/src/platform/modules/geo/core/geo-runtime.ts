@@ -17,6 +17,11 @@ import { createGeoViewerAccess, type GeoViewerAccess } from './viewer-access'
 import { createGeoPluginRegistry, type GeoPluginRegistry } from './plugin-registry'
 import type { GeoPluginDefinition } from './geo-plugin'
 import {
+  createGeoWorkspacePresentation,
+  geoWorkspacePresentationCapability,
+  type GeoWorkspacePresentation,
+} from './workspace-presentation'
+import {
   DEFAULT_GEO_CAMERA_VIEW,
   flyToGeoLocation,
   setGeoCameraView,
@@ -39,6 +44,7 @@ export interface GeoRuntimeState {
 }
 
 export interface GeoRuntime {
+  readonly presentation: GeoWorkspacePresentation
   readonly viewerAccess: GeoViewerAccess
   readonly interactions: GeoInteractionManager
   readonly plugins: GeoPluginRegistry
@@ -228,6 +234,8 @@ export function createGeoRuntime(options: GeoRuntimeOptions = {}): GeoRuntime {
     definitions: options.plugins ?? [],
     interactions,
   })
+  const presentation = createGeoWorkspacePresentation()
+  plugins.capabilities.register(geoWorkspacePresentationCapability, presentation)
   const state = reactive<GeoRuntimeState>({
     status: 'idle',
     heading: 0,
@@ -409,6 +417,7 @@ export function createGeoRuntime(options: GeoRuntimeOptions = {}): GeoRuntime {
   }
 
   return {
+    presentation,
     viewerAccess: viewerAccessControl,
     interactions,
     plugins,

@@ -4,10 +4,12 @@ scope: platform
 repository: Cyber-Sight
 status: active
 owner: project maintainers
-updated: 2026-10-18
+updated: 2026-10-19
 ---
 
 # Geo 已加载模型动画控制
+
+2026-10-19：[拍摄模块](geo-capture.md)新增外部采样租约，临时暂停局部 RAF 并按拍摄秒数控制 TRS 动画；结束恢复原片段、进度、速度、循环和播放状态。普通操作在租约期间拒绝抢占。内存 glTF 对缺名或重名节点赋予运行时唯一名称，通过公开 `Model.getNode` / `ModelNode.matrix` 重置 TRS，不改写源 GLB；权重通道不进入拍摄采样。动画片段用索引加名称引用，避免重名歧义。
 
 ## 目标与边界
 
