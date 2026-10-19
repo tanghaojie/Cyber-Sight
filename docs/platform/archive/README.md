@@ -1,5 +1,7 @@
 # Platform 历史归档
 
+- [2026-10-19 拍摄与模型模式共同树复核](plans/2026-10-19-capture-merge-archive-review.md)：审查真实 `70bfe5c..6831891`，保留双方实现及决策，推进合并基线；[协作记录](ai-logs/docs/2026/10/2026-10-19-capture-merge-archive-review.md)。
+
 - [2026-10-19 拍摄与 origin/master 集成](plans/2026-10-19-capture-origin-integration.md)：合并远端模式/精细度与拍摄提交，保留双方历史、索引和实现；[协作记录](ai-logs/chore/2026/10/2026-10-19-capture-origin-integration.md)。共同树工程检查通过。
 
 - [2026-10-19 拍摄交付后的 Platform 文档复核](plans/2026-10-19-geo-capture-archive-review.md)：核对 `8654726..70bfe5c` 的控制/渲染与静态发布边界，推进真实基线；[协作记录](ai-logs/docs/2026/10/2026-10-19-geo-capture-archive-review.md)。

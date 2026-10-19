@@ -26,4 +26,6 @@ updated: 2026-10-19
 
 提交采用 `chore(geo): merge model selection updates with capture studio`，保留 `cc6a9fd` 与 `8fefe2f` 两个父提交和 GPT-6 trailer。生成合并提交后普通推送 `HEAD:master`，远端提交号与实际推送结果在最终交付反馈中核对，不强制推送。
 
+实际合并提交为 `683189123af2f397ee06c318f8be536f76d8ac04`；提交后完成事项计数触发的归档门禁由[共同树文档复核](2026-10-19-capture-merge-archive-review.md)处理。
+
 实际 GPU/编码行为仍按仓库规定由维护者人工验收；本次不创建或运行前端/浏览器自动化。

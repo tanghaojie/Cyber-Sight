@@ -1,5 +1,7 @@
 # Platform 活动 AI 协作记录
 
+- [拍摄与模型模式共同树复核](../archive/ai-logs/docs/2026/10/2026-10-19-capture-merge-archive-review.md)：核对双方实现保留与模式/拍摄边界，推进真实共同树基线。
+
 - [拍摄与 origin/master 集成](../archive/ai-logs/chore/2026/10/2026-10-19-capture-origin-integration.md)：保留双方条目与实现，共同树检查通过。
 
 - [拍摄交付后的文档复核](../archive/ai-logs/docs/2026/10/2026-10-19-geo-capture-archive-review.md)：确认控制/渲染/静态发布边界，基线推进至真实 `70bfe5c`。

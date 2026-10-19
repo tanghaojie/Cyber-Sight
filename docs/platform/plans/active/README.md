@@ -1,5 +1,7 @@
 # Platform 活动实施计划
 
+- [已完成：拍摄与模型模式共同树复核](../../archive/plans/2026-10-19-capture-merge-archive-review.md)：核对共同树与发布/拍摄边界，基线推进至真实 `6831891`。
+
 - [已完成：拍摄与 origin/master 集成](../../archive/plans/2026-10-19-capture-origin-integration.md)：保留远端模式/精细度与拍摄模块，共同树检查通过。
 
 - [已完成：拍摄交付后的文档复核](../../archive/plans/2026-10-19-geo-capture-archive-review.md)：确认 Geo 内部控制与发布边界，基线推进到真实 `70bfe5c`。
