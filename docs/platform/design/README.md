@@ -6,7 +6,7 @@
 
 - [建筑分件、爆炸与飞入拼装制作要求](modules/geo-model-assembly-authoring.md)：CS-AM-1、固定地理锚点、语义部件、确定性 TRS、成品/动画交付与 AIModels 制作边界。
 
-- [Geo AIModels 模型目录](modules/geo-ai-models.md)：版本化发布协议、模型卡片、质量选择、关联资源和取消清理。
+- [Geo AIModels 模型目录](modules/geo-ai-models.md)：兼容默认配置、静态/飞入/爆炸模式、精细度选择、关联资源和取消清理。
 
 - [Geo 外部数据独立菜单](modules/geo-external-data.md)：三种 URL 与 AI 模型入口、独立加载内容和会话资源管理，不提供地标与周边入口。
 

@@ -1,8 +1,12 @@
 # Platform 活动 AI 协作记录
 
+- [拍摄与 origin/master 集成](../archive/ai-logs/chore/2026/10/2026-10-19-capture-origin-integration.md)：保留双方条目与实现，共同树检查通过。
+
 - [拍摄交付后的文档复核](../archive/ai-logs/docs/2026/10/2026-10-19-geo-capture-archive-review.md)：确认控制/渲染/静态发布边界，基线推进至真实 `70bfe5c`。
 
 - [Geo 拍摄模块](../archive/ai-logs/feat/2026/10/2026-10-19-geo-capture.md)：镜头工程、统一预览与逐帧输出，工程检查通过。
+
+- [已完成：AIModels 模式与精细度声明适配](../archive/ai-logs/feat/2026/10/2026-10-19-ai-model-modes.md)：默认规则、两仓库实现与验证。
 
 - [Geo 动画控制交付后的文档复核](../archive/ai-logs/docs/2026/10/2026-10-18-geo-animation-archive-review.md)：核对制作、发布与局部播放边界，推进真实基线。
 

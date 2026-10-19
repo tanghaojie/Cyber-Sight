@@ -2,13 +2,33 @@ import type { GeoModelTransform } from './data-browser'
 
 export const DEFAULT_AI_MODEL_CATALOG_URL = 'https://jt-ai-models.vercel.app/catalog.json'
 
+export type AiModelModeId = 'static' | 'assembly' | 'explode'
+
+export interface AiModelVariantOption {
+  readonly id: string
+  readonly label: string
+}
+
+export interface AiModelModeOption {
+  readonly id: AiModelModeId
+  readonly label: string
+  readonly variants: readonly AiModelVariantOption[]
+  readonly defaultVariant: string
+}
+
+export interface AiModelSelection {
+  readonly modeId: AiModelModeId
+  readonly variantId: string
+}
+
 export interface AiModelCatalogItem {
   readonly id: string
   readonly label: string
   readonly description: string
   readonly thumbnail?: string
   readonly manifest: string
-  readonly variants: readonly { readonly id: string; readonly label: string }[]
+  readonly defaultMode: AiModelModeId
+  readonly modes: readonly AiModelModeOption[]
 }
 
 export interface AiModelFile {
@@ -17,16 +37,18 @@ export interface AiModelFile {
   readonly sha256: string
 }
 
-export interface AiModelVariant extends AiModelFile {
-  readonly id: string
-  readonly label: string
+export interface AiModelVariant extends AiModelFile, AiModelVariantOption {}
+
+export interface AiModelMode extends AiModelModeOption {
+  readonly model: AiModelFile
+  readonly variants: readonly AiModelVariant[]
 }
 
 export interface AiModelManifest {
   readonly id: string
   readonly label: string
-  readonly model: AiModelFile
-  readonly variants: readonly AiModelVariant[]
+  readonly defaultMode: AiModelModeId
+  readonly modes: readonly AiModelMode[]
   readonly placement: GeoModelTransform & {
     readonly terrain: 'ellipsoid' | 'any'
     readonly notice: string
@@ -76,6 +98,81 @@ function unique<T extends { readonly id: string }>(items: T[]): T[] {
     throw new Error('AIModels 发布列表存在重复标识。')
   }
   return items
+}
+
+function variantOptions(value: unknown): AiModelVariantOption[] {
+  return unique(
+    array(value === undefined ? [] : value, 8).map(function variant(value) {
+      const entry = object(value)
+      const key = id(entry.id)
+      if (key === 'original') {
+        throw new Error('AIModels 质量标识 original 为保留值。')
+      }
+      return { id: key, label: text(entry.label, '精细度名称', 200) }
+    }),
+  )
+}
+
+function modeOptions(entry: Record<string, unknown>, key: AiModelModeId): AiModelModeOption {
+  const variants = variantOptions(entry.variants)
+  const defaultVariant = entry.defaultVariant === undefined ? 'original' : id(entry.defaultVariant)
+  if (defaultVariant !== 'original' && !variants.some((variant) => variant.id === defaultVariant)) {
+    throw new Error('AIModels 默认精细度未声明。')
+  }
+  const label = { static: '静态模型', assembly: '飞入拼装', explode: '爆炸分解' }[key]
+  return {
+    id: key,
+    label:
+      key === 'static' || entry.label === undefined ? label : text(entry.label, '模式名称', 200),
+    variants,
+    defaultVariant,
+  }
+}
+
+function additionalModes<T extends AiModelModeOption>(
+  value: unknown,
+  read: (entry: Record<string, unknown>, key: AiModelModeId) => T,
+): T[] {
+  return unique(
+    array(value === undefined ? [] : value, 2).map(function mode(value) {
+      const entry = object(value)
+      const key = id(entry.id)
+      if (key !== 'assembly' && key !== 'explode') {
+        throw new Error('AIModels 额外模式只支持飞入拼装和爆炸分解，静态使用主模型。')
+      }
+      return read(entry, key)
+    }),
+  )
+}
+
+function defaultMode(
+  entry: Record<string, unknown>,
+  modes: readonly AiModelModeOption[],
+): AiModelModeId {
+  const key = entry.defaultMode === undefined ? 'static' : id(entry.defaultMode)
+  const mode = modes.find((mode) => mode.id === key)
+  if (!mode) {
+    throw new Error('AIModels 默认模式未声明。')
+  }
+  return mode.id
+}
+
+export function resolveAiModelSelection(
+  item: AiModelCatalogItem,
+  selection: Partial<AiModelSelection> = {},
+): AiModelSelection {
+  const mode =
+    item.modes.find((mode) => mode.id === selection.modeId) ??
+    item.modes.find((mode) => mode.id === item.defaultMode)!
+  const variant = selection.variantId
+  return {
+    modeId: mode.id,
+    variantId:
+      selection.modeId === mode.id &&
+      (variant === 'original' || mode.variants.some((item) => item.id === variant))
+        ? variant!
+        : mode.defaultVariant,
+  }
 }
 
 function number(value: unknown, label: string, min: number, max: number): number {
@@ -140,6 +237,7 @@ export async function loadAiModelCatalog(
   return unique(
     array(root.models, 500).map(function entry(value): AiModelCatalogItem {
       const item = object(value)
+      const modes = [modeOptions(item, 'static'), ...additionalModes(item.modes, modeOptions)]
       return {
         id: id(item.id),
         label: text(item.label, '名称', 200),
@@ -147,16 +245,8 @@ export async function loadAiModelCatalog(
         thumbnail:
           item.thumbnail === undefined ? undefined : assetUrl(item.thumbnail, base, origin),
         manifest: assetUrl(item.manifest, base, origin),
-        variants: unique(
-          array(item.variants, 8).map(function variant(value) {
-            const entry = object(value)
-            const key = id(entry.id)
-            if (key === 'original') {
-              throw new Error('AIModels 质量标识 original 为保留值。')
-            }
-            return { id: key, label: text(entry.label, '质量名称', 200) }
-          }),
-        ),
+        defaultMode: defaultMode(item, modes),
+        modes,
       }
     }),
   )
@@ -191,16 +281,16 @@ export async function loadAiModelManifest(
   ) {
     throw new Error('AIModels 缺少受支持的定位与地形约定。')
   }
-  const variants = unique(
-    array(root.variants, 8).map(function variant(value): AiModelVariant {
-      const entry = object(value)
-      const key = id(entry.id)
-      if (key === 'original') {
-        throw new Error('AIModels 质量标识 original 为保留值。')
-      }
-      return { id: key, label: text(entry.label, '质量名称', 200), ...file(value) }
-    }),
-  )
+  function mode(entry: Record<string, unknown>, key: AiModelModeId): AiModelMode {
+    const options = modeOptions(entry, key)
+    const files = array(entry.variants === undefined ? [] : entry.variants, 8)
+    return {
+      ...options,
+      model: file(entry.model),
+      variants: options.variants.map((variant, index) => ({ ...variant, ...file(files[index]) })),
+    }
+  }
+  const modes = [mode(root, 'static'), ...additionalModes(root.modes, mode)]
   const resources = unique(
     array(root.resources, 16).map(function resource(value) {
       const entry = object(value)
@@ -224,8 +314,8 @@ export async function loadAiModelManifest(
   return {
     id: item.id,
     label: text(root.label, '名称', 200),
-    model: file(root.model),
-    variants,
+    defaultMode: defaultMode(root, modes),
+    modes,
     placement: {
       longitude: number(placement.longitude, '经度', -180, 180),
       latitude: number(placement.latitude, '纬度', -90, 90),

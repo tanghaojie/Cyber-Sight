@@ -1,8 +1,12 @@
 # Platform 活动实施计划
 
+- [已完成：拍摄与 origin/master 集成](../../archive/plans/2026-10-19-capture-origin-integration.md)：保留远端模式/精细度与拍摄模块，共同树检查通过。
+
 - [已完成：拍摄交付后的文档复核](../../archive/plans/2026-10-19-geo-capture-archive-review.md)：确认 Geo 内部控制与发布边界，基线推进到真实 `70bfe5c`。
 
 - [已完成：Geo 拍摄模块](../../archive/plans/2026-10-19-geo-capture.md)：镜头工程、预览与逐帧输出；实际 GPU/编码待人工验收。
+
+- [已完成：AIModels 模式与精细度声明适配](../../archive/plans/2026-10-19-ai-model-modes.md)：两仓库兼容声明、生成校验与 Sight 加载选择，实际交互待人工验收。
 
 - [已完成：Geo 动画控制交付后的文档复核](../../archive/plans/2026-10-18-geo-animation-archive-review.md)，Platform 基线推进到真实 `8654726`。
 

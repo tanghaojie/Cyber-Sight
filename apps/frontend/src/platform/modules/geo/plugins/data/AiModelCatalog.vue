@@ -35,7 +35,7 @@
           type="button"
           :disabled="controller.state.busy"
           :aria-label="`加载 ${item.label}`"
-          @click="load(item.id)"
+          @click="load(item)"
         >
           <img
             v-if="item.thumbnail && !failedThumbnails[item.id]"
@@ -52,15 +52,32 @@
           <strong>{{ item.label }}</strong>
           <p>{{ item.description }}</p>
           <div class="ai-model-card__actions">
-            <label v-if="item.variants.length">
-              <span>质量</span>
+            <label v-if="item.modes.length > 1">
+              <span>模式</span>
               <select
-                :value="variants[item.id] ?? 'original'"
+                :value="selection(item).modeId"
                 :disabled="controller.state.busy"
-                @change="variants[item.id] = ($event.target as HTMLSelectElement).value"
+                @change="selectMode(item, $event)"
+              >
+                <option v-for="mode in item.modes" :key="mode.id" :value="mode.id">
+                  {{ mode.label }}
+                </option>
+              </select>
+            </label>
+            <small v-else>{{ selectedMode(item).label }}</small>
+            <label v-if="selectedMode(item).variants.length">
+              <span>精细度</span>
+              <select
+                :value="selection(item).variantId"
+                :disabled="controller.state.busy"
+                @change="selectVariant(item, $event)"
               >
                 <option value="original">原始版</option>
-                <option v-for="variant in item.variants" :key="variant.id" :value="variant.id">
+                <option
+                  v-for="variant in selectedMode(item).variants"
+                  :key="variant.id"
+                  :value="variant.id"
+                >
                   {{ variant.label }}
                 </option>
               </select>
@@ -70,9 +87,9 @@
               class="ai-model-card__load"
               type="button"
               :disabled="controller.state.busy"
-              @click="load(item.id)"
+              @click="load(item)"
             >
-              {{ actionLabel(item.id) }}
+              {{ actionLabel(item) }}
             </button>
           </div>
         </div>
@@ -111,6 +128,7 @@
             移除整组
           </button>
         </div>
+        <small>{{ group.modeLabel }} · {{ group.variantLabel }}</small>
         <small>{{
           group.status === 'partial'
             ? '部分配套未加载，可重新加载'
@@ -140,10 +158,16 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import AppIcon from '@/foundation/components/AppIcon.vue'
 import type { GeoDataController } from './data.controller'
+import {
+  resolveAiModelSelection,
+  type AiModelCatalogItem,
+  type AiModelModeId,
+  type AiModelSelection,
+} from '../../tools/data/ai-model-catalog'
 
 const props = defineProps<{ controller: GeoDataController }>()
 const query = ref('')
-const variants = reactive<Record<string, string>>({})
+const selections = reactive<Record<string, AiModelSelection | undefined>>({})
 const failedThumbnails = reactive<Record<string, boolean>>({})
 const items = computed(function filteredModels() {
   const text = query.value.trim().toLowerCase()
@@ -156,21 +180,45 @@ function loadedGroup(id: string) {
   return props.controller.state.aiModelGroups.find((group) => group.id === id)
 }
 
-function actionLabel(id: string): string {
-  if (props.controller.state.aiModelLoadingId === id) {
+function selection(item: AiModelCatalogItem): AiModelSelection {
+  return resolveAiModelSelection(item, selections[item.id] ?? loadedGroup(item.id))
+}
+
+function selectedMode(item: AiModelCatalogItem) {
+  return item.modes.find((mode) => mode.id === selection(item).modeId)!
+}
+
+function selectMode(item: AiModelCatalogItem, event: Event): void {
+  selections[item.id] = resolveAiModelSelection(item, {
+    modeId: (event.target as HTMLSelectElement).value as AiModelModeId,
+  })
+}
+
+function selectVariant(item: AiModelCatalogItem, event: Event): void {
+  selections[item.id] = resolveAiModelSelection(item, {
+    ...selection(item),
+    variantId: (event.target as HTMLSelectElement).value,
+  })
+}
+
+function actionLabel(item: AiModelCatalogItem): string {
+  if (props.controller.state.aiModelLoadingId === item.id) {
     return '正在加载…'
   }
-  const group = loadedGroup(id)
+  const group = loadedGroup(item.id)
   if (!group) {
     return '加载模型'
   }
-  return group.status === 'partial' || group.variantId !== (variants[id] ?? 'original')
+  const selected = selection(item)
+  return group.status === 'partial' ||
+    group.modeId !== selected.modeId ||
+    group.variantId !== selected.variantId
     ? '重新加载'
     : '定位模型'
 }
 
-function load(id: string): void {
-  void props.controller.loadAiModel(id, variants[id] ?? 'original')
+function load(item: AiModelCatalogItem): void {
+  void props.controller.loadAiModel(item.id, selection(item))
 }
 
 onMounted(function readCatalog() {
@@ -311,6 +359,9 @@ select {
   min-width: 0;
   color: var(--geo-text-faint);
   font-size: 10px;
+}
+.ai-model-card__actions {
+  flex-wrap: wrap;
 }
 .ai-model-card__actions select {
   width: auto;

@@ -2,14 +2,19 @@ import { Cartesian3 } from 'cesium'
 import type { GeoDataBrowser } from './data-browser'
 import {
   loadAiModelManifest,
+  resolveAiModelSelection,
   type AiModelCatalogItem,
   type AiModelManifest,
+  type AiModelSelection,
 } from './ai-model-catalog'
 
 export interface AiModelGroupSnapshot {
   readonly id: string
   readonly label: string
+  readonly modeId: AiModelSelection['modeId']
+  readonly modeLabel: string
   readonly variantId: string
+  readonly variantLabel: string
   readonly modelId: string
   readonly resourceIds: readonly string[]
   readonly status: 'ready' | 'partial'
@@ -118,12 +123,17 @@ export function createAiModelLoader(
     }
   }
 
-  async function load(item: AiModelCatalogItem, variantId = 'original'): Promise<void> {
+  async function load(item: AiModelCatalogItem, selection?: AiModelSelection): Promise<void> {
     if (active) {
       throw new Error('请等待当前 AI 模型加载完成。')
     }
+    const { modeId, variantId } = selection ?? resolveAiModelSelection(item)
     const existing = groups.get(item.id)
-    if (existing?.snapshot.status === 'ready' && existing.snapshot.variantId === variantId) {
+    if (
+      existing?.snapshot.status === 'ready' &&
+      existing.snapshot.modeId === modeId &&
+      existing.snapshot.variantId === variantId
+    ) {
       await browser.flyTo(existing.snapshot.modelId)
       return
     }
@@ -142,12 +152,14 @@ export function createAiModelLoader(
       const manifest = await loadAiModelManifest(item, operation.signal)
       check(operation.signal)
       assertTerrain(manifest)
-      const file =
-        variantId === 'original'
-          ? manifest.model
-          : manifest.variants.find((variant) => variant.id === variantId)
+      const mode = manifest.modes.find((mode) => mode.id === modeId)
+      if (!mode) {
+        throw new Error('该模型没有请求的模式，请刷新目录。')
+      }
+      const variant = mode.variants.find((variant) => variant.id === variantId)
+      const file = variantId === 'original' ? mode.model : variant
       if (!file) {
-        throw new Error('该模型没有请求的质量版本，请刷新目录。')
+        throw new Error('该模型没有请求的模式或精细度，请刷新目录。')
       }
       remove(item.id)
       replacing = true
@@ -218,7 +230,10 @@ export function createAiModelLoader(
         snapshot: {
           id: item.id,
           label: manifest.label,
+          modeId,
+          modeLabel: mode.label,
           variantId,
+          variantLabel: variant?.label ?? '原始版',
           modelId: model.id,
           resourceIds: [...resourceIds],
           status: notices.length ? 'partial' : 'ready',
