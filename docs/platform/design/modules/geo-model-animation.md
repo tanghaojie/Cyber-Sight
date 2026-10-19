@@ -4,7 +4,7 @@ scope: platform
 repository: Cyber-Sight
 status: active
 owner: project maintainers
-updated: 2026-10-18
+updated: 2026-10-19
 ---
 
 # Geo 已加载模型动画控制
@@ -13,7 +13,7 @@ updated: 2026-10-18
 
 在“外部数据 → 已加载数据”的资源操作区，仅对内嵌 glTF 动画的独立模型显示“动画”按钮。点击展开该资源的播放面板，支持片段选择、播放/暂停、重播、秒数进度、速度及循环。一次展开一个资源的面板；关闭面板或切换菜单保留资源的播放状态。
 
-能力属于 Platform Geo 内部，不增加依赖、后端或跨模块公共接口。URL 和 AI 模型加载共用既有 Model 路径。静态 GLB、GeoJSON 与 3D Tiles 不显示按钮，不解析瓦片内模型动画。AIModels 发布 v1 不变，不猜测静态文件旁的 assembly/explode 地址，不读取制作附录。望京 SOHO 静态目录项仍不含动画；使用其独立动画 GLB 才有播放入口。
+能力属于 Platform Geo 内部，不增加依赖、后端或跨模块公共接口。URL 和 AI 模型加载共用既有 Model 路径。静态 GLB、GeoJSON 与 3D Tiles 不显示按钮，不解析瓦片内模型动画。AIModels 可按[模式声明](geo-ai-models.md)选择独立动画 GLB，不猜测静态文件旁的 assembly/explode 地址，不读取制作附录。望京 SOHO 的静态模式不含动画，选择其飞入或爆炸模式后才有播放入口。
 
 ## 职责和数据流
 
@@ -38,7 +38,7 @@ updated: 2026-10-18
 
 执行格式、TypeScript、生产构建、修改文件 ESLint、模块边界和文档归档 CI。不创建或运行前端或浏览器自动化。维护者人工核对静态按钮隐藏、有动画按钮出现、片段选择、暂停/回退/末帧/重播/速度/循环、隐藏与删除、菜单切换、后台恢复，以及场景时间暂停/回退/3600 倍速不影响模型局部进度。最低布局 1280×720。
 
-本次工程检查均通过，实际交互/视觉仍待人工验收。可在“外部数据 → 模型”填写 `https://jt-ai-models.vercel.app/models/wangjing-soho/wangjing-soho-assembly.glb`，按已有坐标确认流程加载；预期显示 `BUILD_ASSEMBLY`、30 s。爆炸文件为同目录 `wangjing-soho-explode.glb`，预期 `BUILD_EXPLODE`、12 s。避免同时保留同位置的静态主体遮挡动画；这些文件不会由静态目录自动发现。
+本次工程检查均通过，实际交互/视觉仍待人工验收。可在“外部数据 → 模型”填写 `https://jt-ai-models.vercel.app/models/wangjing-soho/wangjing-soho-assembly.glb`，按已有坐标确认流程加载；预期显示 `BUILD_ASSEMBLY`、30 s。爆炸文件为同目录 `wangjing-soho-explode.glb`，预期 `BUILD_EXPLODE`、12 s。也可在声明了 modes 的 AI 目录中选择对应模式；同一目录项按模式整组替换，避免保留同位置的静态主体遮挡动画。
 
 ## 关联
 

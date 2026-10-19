@@ -1,5 +1,7 @@
 # Platform 活动 AI 协作记录
 
+- [已完成：AIModels 模式与精细度声明适配](../archive/ai-logs/feat/2026/10/2026-10-19-ai-model-modes.md)：默认规则、两仓库实现与验证。
+
 - [Geo 动画控制交付后的文档复核](../archive/ai-logs/docs/2026/10/2026-10-18-geo-animation-archive-review.md)：核对制作、发布与局部播放边界，推进真实基线。
 
 - [Geo 已加载模型动画控制](../archive/ai-logs/feat/2026/10/2026-10-18-geo-model-animation.md)：动画发现、资源按钮和独立播放面板，工程检查通过。

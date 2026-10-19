@@ -43,6 +43,7 @@ import {
   DEFAULT_AI_MODEL_CATALOG_URL,
   loadAiModelCatalog,
   type AiModelCatalogItem,
+  type AiModelSelection,
 } from '../../tools/data/ai-model-catalog'
 import { createAiModelLoader, type AiModelGroupSnapshot } from '../../tools/data/ai-model-loader'
 import type { GeoModelAnimationCommand } from '../../tools/model/model-animation'
@@ -86,7 +87,7 @@ export interface GeoDataController {
   loadGeoJson(options: LoadGeoJsonOptions): Promise<void>
   loadModel(options: LoadModelOptions): Promise<void>
   refreshAiModelCatalog(): Promise<void>
-  loadAiModel(id: string, variantId?: string): Promise<void>
+  loadAiModel(id: string, selection?: AiModelSelection): Promise<void>
   cancelAiModelLoad(): void
   loadLandmarkScene(url: string): Promise<void>
   retryLandmarkScene(id: string): Promise<void>
@@ -399,7 +400,7 @@ export function createGeoDataController(
     }
   }
 
-  async function loadAiModel(id: string, variantId?: string): Promise<void> {
+  async function loadAiModel(id: string, selection?: AiModelSelection): Promise<void> {
     if (state.busy) {
       return
     }
@@ -408,7 +409,7 @@ export function createGeoDataController(
       if (!item) {
         throw new Error('AI 模型不在当前目录中，请刷新目录。')
       }
-      await aiModels!.load(item, variantId)
+      await aiModels!.load(item, selection)
     }, 'ai-model')
   }
 

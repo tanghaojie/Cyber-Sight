@@ -1,5 +1,7 @@
 # Platform 历史归档
 
+- [2026-10-19 AIModels 模式与精细度声明适配](plans/2026-10-19-ai-model-modes.md)：兼容默认值、独立模式/精细度与联合加载身份；[协作记录](ai-logs/feat/2026/10/2026-10-19-ai-model-modes.md)。工程检查通过，交互与视觉待人工验收。
+
 - [2026-10-18 Geo 动画控制交付后的 Platform 文档复核](plans/2026-10-18-geo-animation-archive-review.md)：真实范围 `9fc04f1..8654726`，制作/静态发布/局部播放分工与归档；[协作记录](ai-logs/docs/2026/10/2026-10-18-geo-animation-archive-review.md)。
 
 - [2026-10-18 Geo 已加载模型动画控制](plans/2026-10-18-geo-model-animation.md)：条件动画入口、片段与独立播放面板、生命周期清理；[协作记录](ai-logs/feat/2026/10/2026-10-18-geo-model-animation.md)。工程检查通过，交互与视觉待维护者人工验收。

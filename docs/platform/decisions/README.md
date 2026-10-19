@@ -1,5 +1,7 @@
 # Platform 架构决策索引
 
+- [AIModels 模式与精细度的兼容声明](ADR-20261019-ai-model-modes.md)：可选模式与默认值、旧配置兼容和独立精细度。
+
 - [已加载模型的动画发现与独立播放](ADR-20261018-model-animation-controls.md)：读取当前 glTF、局部秒数求值，不改变场景时钟或静态发布协议。
 
 - [建筑静态成品与分件动画制作契约](ADR-20261017-building-assembly-authoring.md)：静态成品、飞入拼装和爆炸分解分开导出，AIModels 保存完整制作执行要求。
