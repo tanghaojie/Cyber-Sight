@@ -145,7 +145,9 @@
               >
                 ↓</button
               ><button type="button" @click="controller.duplicateShot(shot.id)">复制</button
-              ><button type="button" @click="controller.removeShot(shot.id)">删除</button>
+              ><button type="button" class="shot-delete" @click="controller.removeShot(shot.id)">
+                删除
+              </button>
             </div>
           </li>
         </ol>
@@ -474,14 +476,35 @@ fieldset:disabled button {
 }
 .shot-actions {
   display: flex;
-  gap: 3px;
-  padding: 0 6px 5px;
+  gap: 6px;
+  padding: 0 6px 6px;
 }
 .shot-actions button {
-  min-height: 27px;
+  min-height: 30px;
   font-size: 10px;
   border-color: transparent;
   background: transparent;
+  transition:
+    color 0.15s,
+    border-color 0.15s,
+    background-color 0.15s;
+}
+.shot-actions button:not(:disabled):is(:hover, :focus-visible) {
+  color: var(--geo-accent);
+  border-color: rgba(73, 201, 255, 0.45);
+  background: rgba(73, 201, 255, 0.14);
+}
+.shot-actions .shot-delete:not(:disabled):is(:hover, :focus-visible) {
+  color: #ffb3bd;
+  border-color: rgba(255, 179, 189, 0.5);
+  background: rgba(255, 179, 189, 0.14);
+}
+.shot-actions button:focus-visible {
+  outline: 2px solid var(--geo-accent);
+  outline-offset: 2px;
+}
+.shot-actions .shot-delete:focus-visible {
+  outline-color: #ffb3bd;
 }
 .hint {
   margin: 0;
