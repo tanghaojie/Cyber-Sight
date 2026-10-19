@@ -1,5 +1,7 @@
 # Platform 历史归档
 
+- [2026-10-19 Geo 分镜相机距离与端点定位](plans/2026-10-19-geo-capture-shot-views.md)：起终点相机距离、各卡片及编辑器的定位按钮与切镜边界；[协作记录](ai-logs/feat/2026/10/2026-10-19-geo-capture-shot-views.md)。工程检查通过，交互与视觉待人工验收。
+
 - [2026-10-19 拍摄分辨率修复后的文档复核](plans/2026-10-19-capture-resolution-archive-review.md)：审查真实 `6831891..58eb1bb`，现行设计已反映按钮与画布行为，Platform 基线推进至 `58eb1bb`；[协作记录](ai-logs/docs/2026/10/2026-10-19-capture-resolution-archive-review.md)。
 
 - [2026-10-19 Geo 导出画布分辨率修复](plans/2026-10-19-geo-capture-resolution.md)：直接锁定实际 canvas，核对绘图缓冲并恢复样式；[协作记录](ai-logs/fix/2026/10/2026-10-19-geo-capture-resolution.md)。静态门禁通过，1080p 竖屏现场导出待维护者复验。

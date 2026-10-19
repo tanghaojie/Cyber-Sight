@@ -41,6 +41,25 @@
       /></label>
     </div>
     <div class="pair">
+      <label v-for="which in poseKeys" :key="which"
+        >{{ which === 'start' ? '起点' : '终点' }}相机距离 / 米<input
+          type="number"
+          min="0.1"
+          max="50000000"
+          step="any"
+          :disabled="which === 'end' && shot.kind === 'hold'"
+          :value="
+            Number(capturePoseDistance(shot.kind === 'hold' ? shot.start : shot[which]).toFixed(2))
+          "
+          @change="$emit('distance', which, numeric($event))"
+      /></label>
+    </div>
+    <p class="hint">数值越小，相机越近；沿当前视线调整，保持注视点与视场角。固定机位只调整起点。</p>
+    <div class="pair">
+      <button type="button" @click="$emit('locate', 'start')">移动到起点视角</button>
+      <button type="button" @click="$emit('locate', 'end')">移动到终点视角</button>
+    </div>
+    <div class="pair">
       <button type="button" @click="$emit('capture', 'start')">用当前视角设为起点</button>
       <button type="button" :disabled="shot.kind === 'hold'" @click="$emit('capture', 'end')">
         用当前视角设为终点
@@ -117,7 +136,7 @@
 
 <script setup lang="ts">
 import type { DeepReadonly } from 'vue'
-import type { CaptureShot } from '../../tools/capture/capture-project'
+import { capturePoseDistance, type CaptureShot } from '../../tools/capture/capture-project'
 const props = defineProps<{
   shot: DeepReadonly<CaptureShot>
   clips: readonly { index: number; label: string; duration: number }[]
@@ -125,6 +144,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   update: [patch: Partial<CaptureShot>]
   capture: [which: 'start' | 'end']
+  locate: [which: 'start' | 'end']
+  distance: [which: 'start' | 'end', value: number]
 }>()
 const axes = ['东', '北', '上']
 const poseKeys = ['start', 'end'] as const
@@ -202,7 +223,8 @@ button {
 button:hover {
   border-color: var(--geo-accent);
 }
-button:disabled {
+button:disabled,
+input:disabled {
   opacity: 0.4;
   cursor: default;
 }

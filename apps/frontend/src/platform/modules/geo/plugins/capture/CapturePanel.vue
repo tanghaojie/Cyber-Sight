@@ -129,6 +129,24 @@
               ><strong>{{ shot.name }}</strong
               ><small>{{ shot.duration }}s</small>
             </button>
+            <div class="shot-views pair">
+              <button
+                type="button"
+                :disabled="!state.subjectId"
+                :aria-label="`移动到${shot.name}的起点视角`"
+                @click="controller.moveToShotPose(shot.id, 'start')"
+              >
+                移动到起点视角
+              </button>
+              <button
+                type="button"
+                :disabled="!state.subjectId"
+                :aria-label="`移动到${shot.name}的终点视角`"
+                @click="controller.moveToShotPose(shot.id, 'end')"
+              >
+                移动到终点视角
+              </button>
+            </div>
             <div class="shot-actions">
               <button
                 type="button"
@@ -169,6 +187,8 @@
           :clips="selectedSubject?.clips ?? []"
           @update="controller.updateShot(selectedShot.id, $event)"
           @capture="controller.capturePose"
+          @locate="controller.moveToShotPose(selectedShot.id, $event)"
+          @distance="(which, value) => controller.setShotDistance(selectedShot!.id, which, value)"
         />
       </section>
       <section>
@@ -478,6 +498,13 @@ fieldset:disabled button {
   display: flex;
   gap: 6px;
   padding: 0 6px 6px;
+}
+.shot-views {
+  padding: 0 6px 6px;
+}
+.shot-views button {
+  min-height: 30px;
+  font-size: 10px;
 }
 .shot-actions button {
   min-height: 30px;

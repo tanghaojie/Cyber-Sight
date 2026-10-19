@@ -106,6 +106,24 @@ function pose(value: unknown): CapturePose {
   return { position, target, fov: number(item.fov, 10, 100) }
 }
 
+export function capturePoseDistance(pose: {
+  position: readonly number[]
+  target: readonly number[]
+}): number {
+  return Math.hypot(...pose.position.map((axis, index) => axis - pose.target[index]))
+}
+
+export function withCapturePoseDistance(pose: CapturePose, distance: number): CapturePose {
+  const ratio = number(distance, 0.1, 50_000_000) / capturePoseDistance(pose)
+  return {
+    position: pose.position.map(
+      (axis, index) => pose.target[index] + (axis - pose.target[index]) * ratio,
+    ) as CaptureVector,
+    target: [...pose.target],
+    fov: pose.fov,
+  }
+}
+
 export function parseCaptureProject(value: unknown): CaptureProject {
   const item = object(value)
   if (
@@ -342,11 +360,16 @@ export function evaluateCaptureShot(shot: CaptureShot, seconds: number): Capture
   return { position, target, fov: mix(shot.start.fov, shot.end.fov, t) }
 }
 
-export function locateCaptureTime(project: CaptureProject, seconds: number) {
+export function locateCaptureTime(project: CaptureProject, seconds: number, shotId?: string) {
   let elapsed = 0
   let sceneSeconds = 0
   for (const [index, shot] of project.shots.entries()) {
-    if (seconds < elapsed + shot.duration || index === project.shots.length - 1) {
+    // An explicit shot keeps its exact endpoint on this shot at a cut boundary.
+    if (
+      shotId
+        ? shot.id === shotId
+        : seconds < elapsed + shot.duration || index === project.shots.length - 1
+    ) {
       const local = Math.max(0, Math.min(shot.duration, seconds - elapsed))
       return { shot, index, local, sceneSeconds: sceneSeconds + local * shot.sceneRate }
     }

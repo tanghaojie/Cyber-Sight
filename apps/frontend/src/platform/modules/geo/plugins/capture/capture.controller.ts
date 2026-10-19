@@ -11,6 +11,7 @@ import {
   createCaptureTemplate,
   makeCaptureShot,
   parseCaptureProject,
+  withCapturePoseDistance,
   type CaptureProject,
   type CaptureShot,
   type CaptureTemplate,
@@ -245,6 +246,32 @@ export function createCaptureController(
       }
     })
   }
+  function setShotDistance(id: string, which: 'start' | 'end', distance: number): void {
+    const updated = editProject(function changeDistance(project) {
+      const shot = project.shots.find((entry) => entry.id === id)
+      if (!shot) {
+        throw new Error('请选择要调整的镜头。')
+      }
+      const endpoint = shot.kind === 'hold' ? 'start' : which
+      shot[endpoint] = withCapturePoseDistance(shot[endpoint], distance)
+    })
+    if (updated) {
+      moveToShotPose(id, which)
+    }
+  }
+  function moveToShotPose(id: string, which: 'start' | 'end'): void {
+    if (state.busy || disposed) {
+      return
+    }
+    const shot = state.project.shots.find((entry) => entry.id === id)
+    if (!shot) {
+      state.error = '请选择要定位的镜头。'
+      return
+    }
+    state.selectedShotId = id
+    viewer.camera.cancelFlight()
+    seek(shotStartTime(state.project, id) + (which === 'end' ? shot.duration : 0), id)
+  }
   function selectShot(id: string): void {
     if (state.busy) {
       return
@@ -338,7 +365,7 @@ export function createCaptureController(
     session = createCaptureSession(viewer, project, state.subjectId, subjects)
     state.active = true
   }
-  function seek(seconds: number): void {
+  function seek(seconds: number, shotId?: string): void {
     if (state.busy || disposed || !Number.isFinite(seconds)) {
       return
     }
@@ -347,7 +374,7 @@ export function createCaptureController(
     try {
       ensureSession()
       state.current = Math.max(0, Math.min(captureDuration(state.project), seconds))
-      session!.apply(state.current)
+      session!.apply(state.current, shotId)
       session!.setInputEnabled(true)
     } catch (error) {
       stopPreview()
@@ -663,6 +690,8 @@ export function createCaptureController(
     bindSubject,
     applyTemplate,
     updateShot,
+    setShotDistance,
+    moveToShotPose,
     selectShot,
     addShot,
     capturePose,

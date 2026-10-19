@@ -1,5 +1,7 @@
 # Platform 活动实施计划
 
+- [已完成：Geo 分镜相机距离与端点定位](../../archive/plans/2026-10-19-geo-capture-shot-views.md)：起终点距离编辑、各分镜定位按钮与精确端点求值；交互与视觉待维护者人工验收。
+
 - [已完成：拍摄分辨率修复后的 Platform 文档复核](../../archive/plans/2026-10-19-capture-resolution-archive-review.md)：复核真实差异，基线推进至修复提交 `58eb1bb`。
 
 - [已完成：Geo 导出画布分辨率修复](../../archive/plans/2026-10-19-geo-capture-resolution.md)：固定实际渲染画布尺寸，静态检查通过，1080p 竖屏导出待维护者复验。

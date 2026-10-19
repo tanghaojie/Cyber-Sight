@@ -140,14 +140,14 @@ export function createCaptureSession(
         viewer.scene.screenSpaceCameraController.enableInputs = enabled && original.inputs
       }
     },
-    apply(seconds: number): void {
+    apply(seconds: number, shotId?: string): void {
       if (disposed || viewer.isDestroyed()) {
         throw new Error('拍摄会话已结束。')
       }
       if (!subjects.list().some((subject) => subject.id === subjectId)) {
         throw new Error('拍摄主体已隐藏或移除。')
       }
-      const current = locateCaptureTime(project, seconds)
+      const current = locateCaptureTime(project, seconds, shotId)
       clock.shouldAnimate = false
       clock.currentTime = JulianDate.addSeconds(start, current.sceneSeconds, new JulianDate())
       applyCapturePose(viewer, project, evaluateCaptureShot(current.shot, current.local))

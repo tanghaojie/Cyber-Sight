@@ -1,6 +1,6 @@
 # Platform 设计索引
 
-- [Geo 拍摄模块与逐帧输出](modules/geo-capture.md)：镜头工程、自动运镜、统一拍摄进度、净画面与 MP4 / PNG 序列。
+- [Geo 拍摄模块与逐帧输出](modules/geo-capture.md)：镜头工程、相机距离与端点定位、自动运镜、统一拍摄进度、净画面与 MP4 / PNG 序列。
 
 - [Geo 已加载模型动画控制](modules/geo-model-animation.md)：内嵌动画识别、资源行按钮、局部播放面板与生命周期。
 
