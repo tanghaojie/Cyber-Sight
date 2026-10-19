@@ -1,5 +1,7 @@
 # Platform 活动 AI 协作记录
 
+- [分镜距离与端点定位后的 Platform 文档复核](../archive/ai-logs/docs/2026/10/2026-10-19-capture-shot-views-archive-review.md)：复核技术提交 `9ea4acf`，Platform 台账已推进。
+
 - [Geo 分镜相机距离与端点定位](../archive/ai-logs/feat/2026/10/2026-10-19-geo-capture-shot-views.md)：距离编辑、起终点定位与边界求值，工程检查通过，交互待人工验收。
 
 - [拍摄分辨率修复后的 Platform 文档复核](../archive/ai-logs/docs/2026/10/2026-10-19-capture-resolution-archive-review.md)：复核真实差异并推进至 `58eb1bb`，保留人工导出验收边界。

@@ -17,7 +17,7 @@ updated: 2026-10-19
 
 - `plugins/capture/`：插件注册、响应式控制器、拍摄面板与净画面控制浮层。
 - `tools/capture/capture-project.ts`：版本化工程、运行时校验、模板、局部米制机位、镜头求值和输出尺寸；不依赖 Vue。
-- `tools/capture/capture-session.ts`：独占相机/时间、模型动画、场景状态快照与恢复；向预览和导出提供同一 `apply(seconds)`。
+- `tools/capture/capture-session.ts`：独占相机/时间、模型动画、场景状态快照与恢复；向预览和导出提供同一 `apply(seconds, shotId?)`，可选镜头 ID 仅用于端点定位，普通播放与导出按时间切镜。
 - `tools/capture/capture-export.ts`：预热、逐帧渲染、加载稳定检查、画面采集、编码、下载、取消与恢复。
 - `plugins/data/data.capabilities.ts` 登记 `data.captureSubjects`：只读主体中心/半径/来源/动画清单、动画外部采样租约、可见瓦片加载状态；不暴露资源 Map 或模型私有属性。独立模型等待纹理一起就绪，防止拍到分批贴图过程。
 - `tools/model/model-animation.ts` 新增外部采样租约：暂停自身 RAF、按绝对秒数求值，释放时恢复原片段/进度/速度/循环/播放状态。普通动画操作在租约期间拒绝抢占。

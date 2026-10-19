@@ -37,10 +37,10 @@ updated: 2026-10-19
 
 ## 实际偏差和遗留问题
 
-实现与计划一致。相关 ESLint、前端 `build`（含 `vue-tsc`）、`pnpm architecture:check`、`pnpm format:check`、`git diff --check` 均通过；`pnpm format` 已执行，`pnpm docs:archive:check:ci` 为 NOT_DUE。构建报告 Sass legacy API、VueUse 注释及大包提示，无构建错误。
+实现与计划一致。相关 ESLint、前端 `build`（含 `vue-tsc`）、`pnpm architecture:check`、`pnpm format:check`、`git diff --check` 均通过；`pnpm format` 已执行，提交前归档 CI 为 NOT_DUE。功能提交后完成计划计数触发 DUE，已在[后续复核](2026-10-19-capture-shot-views-archive-review.md)处理。构建报告 Sass legacy API、VueUse 注释及大包提示，无构建错误。
 
 浏览器视觉及交互由维护者人工验收；不将静态检查视为实际相机、场景动画或视频输出验收。本轮未创建或运行前端自动化测试。
 
 ## 相关记录与提交
 
-[AI 协作记录](../ai-logs/feat/2026/10/2026-10-19-geo-capture-shot-views.md)。实现、最终设计及本记录同次提交，主题为 `feat(geo): add shot distance and endpoint controls`，父提交为 `e682a6c`。
+[AI 协作记录](../ai-logs/feat/2026/10/2026-10-19-geo-capture-shot-views.md)。功能提交为 `9ea4acf`（`feat(geo): add shot distance and endpoint controls`），父提交为 `e682a6c`。

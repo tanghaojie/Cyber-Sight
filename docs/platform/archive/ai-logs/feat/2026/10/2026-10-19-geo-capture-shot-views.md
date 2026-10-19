@@ -26,7 +26,7 @@ change_type: feat
 
 已完成距离读写、每个分镜卡片及编辑器的起终点按钮、指定镜头的会话求值。距离修改成功会自动暂停并预览相应端点；沿用版本 1 坐标保存，无新增存储字段或依赖。
 
-相关 ESLint、前端 `build`（含 `vue-tsc`）、`pnpm architecture:check`、`pnpm format:check` 和 `git diff --check` 均通过；已执行 `pnpm format`，归档 CI 为 NOT_DUE。构建仅有 Sass legacy API、VueUse 注释和包体积提示，无构建错误。未创建或运行前端自动化测试，浏览器交互和视觉待维护者人工验收。
+相关 ESLint、前端 `build`（含 `vue-tsc`）、`pnpm architecture:check`、`pnpm format:check` 和 `git diff --check` 均通过；已执行 `pnpm format`，提交前归档 CI 为 NOT_DUE。功能提交后完成计划阈值触发 DUE，已由[文档复核](../../../docs/2026/10/2026-10-19-capture-shot-views-archive-review.md)接续处理。构建仅有 Sass legacy API、VueUse 注释和包体积提示，无构建错误。未创建或运行前端自动化测试，浏览器交互和视觉待维护者人工验收。
 
 ## 未决问题与下一步
 
@@ -36,4 +36,4 @@ change_type: feat
 
 - [拍摄设计](../../../../../design/modules/geo-capture.md)
 - [实施计划](../../../../plans/2026-10-19-geo-capture-shot-views.md)
-- 本记录、计划、设计与实现同次提交，主题为 `feat(geo): add shot distance and endpoint controls`，父提交为 `e682a6c`。
+- 功能提交为 `9ea4acf`（`feat(geo): add shot distance and endpoint controls`），父提交为 `e682a6c`。
