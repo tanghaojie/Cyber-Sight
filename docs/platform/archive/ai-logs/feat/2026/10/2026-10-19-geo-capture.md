@@ -31,4 +31,4 @@ date: 2026-10-19
 - 未创建或运行前端/浏览器自动化；保留实际 GPU/视频人工验收。当前场景渲染不承诺跨设备像素一致；形态权重、自动避障和音轨不在实现范围。内存下载上限 256 MB；可用时流式写盘，PNG ZIP 上限 3 GB。
 - 现行设计、ADR、操作指南与关联设计已同步。构建保留既有 Sass/PURE/chunk 警告，不在本任务调整构建策略。
 
-关联提交：本文件所属 `feat(geo): add capture studio and frame-by-frame export`；未推送、发布或修改远端应用。
+关联提交：`70bfe5c4373530316623269fb090b2bdd326853c`（`feat(geo): add capture studio and frame-by-frame export`），AI trailer 已验证。提交后架构即时触发项由独立 Platform 文档复核处理；未推送、发布或修改远端应用。

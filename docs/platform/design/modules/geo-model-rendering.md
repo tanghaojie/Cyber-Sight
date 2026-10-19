@@ -4,10 +4,12 @@ scope: platform
 repository: Cyber-Sight
 status: active
 owner: project maintainers
-updated: 2026-10-18
+updated: 2026-10-19
 ---
 
 # Geo 外部模型统一渲染标准
+
+2026-10-19：[拍摄插件](geo-capture.md)在会话内以绝对拍摄进度设置唯一 `viewer.clock.currentTime`，并通过模型外部 TRS 采样租约暂停局部 RAF；Scene 仍在 preUpdate 按同一日期求值昼夜。停止或取消归还时间与动画。导出借用固定分辨率端口，不重新应用场景画质预设；采集前等待可见资源稳定。
 
 ## 背景与目标
 

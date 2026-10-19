@@ -1,5 +1,7 @@
 # Platform 活动 AI 协作记录
 
+- [拍摄交付后的文档复核](../archive/ai-logs/docs/2026/10/2026-10-19-geo-capture-archive-review.md)：确认控制/渲染/静态发布边界，基线推进至真实 `70bfe5c`。
+
 - [Geo 拍摄模块](../archive/ai-logs/feat/2026/10/2026-10-19-geo-capture.md)：镜头工程、统一预览与逐帧输出，工程检查通过。
 
 - [Geo 动画控制交付后的文档复核](../archive/ai-logs/docs/2026/10/2026-10-18-geo-animation-archive-review.md)：核对制作、发布与局部播放边界，推进真实基线。

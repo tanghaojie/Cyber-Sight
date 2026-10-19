@@ -1,5 +1,7 @@
 # Platform 历史归档
 
+- [2026-10-19 拍摄交付后的 Platform 文档复核](plans/2026-10-19-geo-capture-archive-review.md)：核对 `8654726..70bfe5c` 的控制/渲染与静态发布边界，推进真实基线；[协作记录](ai-logs/docs/2026/10/2026-10-19-geo-capture-archive-review.md)。
+
 - [2026-10-19 Geo 拍摄模块](plans/2026-10-19-geo-capture.md)：镜头工程、四类模板、机位/画幅、统一时间、净画面与逐帧 MP4 / PNG；[协作记录](ai-logs/feat/2026/10/2026-10-19-geo-capture.md)。工程检查通过，实际 GPU/编码与视觉待人工验收。
 
 - [2026-10-18 Geo 动画控制交付后的 Platform 文档复核](plans/2026-10-18-geo-animation-archive-review.md)：真实范围 `9fc04f1..8654726`，制作/静态发布/局部播放分工与归档；[协作记录](ai-logs/docs/2026/10/2026-10-18-geo-animation-archive-review.md)。

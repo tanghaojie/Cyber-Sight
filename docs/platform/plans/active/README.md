@@ -1,5 +1,7 @@
 # Platform 活动实施计划
 
+- [已完成：拍摄交付后的文档复核](../../archive/plans/2026-10-19-geo-capture-archive-review.md)：确认 Geo 内部控制与发布边界，基线推进到真实 `70bfe5c`。
+
 - [已完成：Geo 拍摄模块](../../archive/plans/2026-10-19-geo-capture.md)：镜头工程、预览与逐帧输出；实际 GPU/编码待人工验收。
 
 - [已完成：Geo 动画控制交付后的文档复核](../../archive/plans/2026-10-18-geo-animation-archive-review.md)，Platform 基线推进到真实 `8654726`。

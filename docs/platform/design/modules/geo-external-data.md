@@ -4,10 +4,12 @@ scope: platform
 repository: Cyber-Sight
 status: active
 owner: project maintainers
-updated: 2026-10-18
+updated: 2026-10-19
 ---
 
 # Geo 外部数据独立菜单
+
+2026-10-19：Data 通过 `plugins/data/data.capabilities.ts` 的 `data.captureSubjects` 向[拍摄插件](geo-capture.md)公开可见独立模型的中心、半径、来源、片段、采样租约与可见瓦片就绪状态。端口不暴露资源 Map，拍摄工程导入不自动加载 URL；既有加载、坐标确认与静态目录发布语义保持有效。
 
 ## 职责与边界
 

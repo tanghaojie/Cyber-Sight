@@ -26,3 +26,5 @@ date: 2026-10-19
 按 AGENTS.md 未创建或运行前端/浏览器自动化；实际 GPU、编码、资源加载和视觉由维护者按[指南](../../guides/geo-capture.md)人工验收。导出保留当前场景效果，只锁定绘图像素；普通下载限 256 MB，支持文件 API 时流式写盘，PNG ZIP 单文件限 3 GB。无自动避障、形态权重动画采样、音轨或跨设备像素一致保证。
 
 关联：[设计](../../design/modules/geo-capture.md)、[决策](../../decisions/ADR-20261019-geo-capture.md)。
+
+功能提交 `70bfe5c` 后，门禁检测到架构即时触发项，另行完成[Platform 文档复核](2026-10-19-geo-capture-archive-review.md)并推进真实基线；上述 NOT_DUE 为功能提交前的实际检查结果。
